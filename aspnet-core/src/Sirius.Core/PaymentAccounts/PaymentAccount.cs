@@ -1,0 +1,75 @@
+﻿using Abp;
+using Abp.Domain.Entities;
+using Abp.Domain.Entities.Auditing;
+using Sirius.Shared.Enums;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Sirius.AppPaymentAccounts
+{
+    [Table("AppPaymentAccounts")]
+    public class PaymentAccount : FullAuditedEntity<Guid>, IMustHaveTenant
+    {
+        protected PaymentAccount()
+        {
+
+        }
+
+        public int TenantId { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string AccountName { get; private set; }
+
+        public PaymentAccountType PaymentAccountType { get; private set; }
+        public string Description { get; private set; }
+
+        public Guid? PersonId { get; private set; }
+
+        public string Iban { get; private set; }
+        public bool TenantIsOwner { get; private set; }
+
+        public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description, Guid? personId, bool tenantIsOwner)
+        {
+            return BindEntity(new PaymentAccount(),  id, tenantId, PaymentAccountType.Cash, accountName, description, personId,
+                tenantIsOwner);
+        }
+
+        public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description, string iban, Guid? personId, bool tenantIsOwner)
+        {
+            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName, description, personId,
+                tenantIsOwner, iban);
+        }
+
+        public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description, string iban, Guid? personId, bool tenantIsOwner)
+        {
+            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName, description, personId,
+                tenantIsOwner, iban);
+        }
+
+        public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
+            string description, Guid? personId, bool tenantIsOwner, string iban = null)
+        {
+            return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
+                existingPaymentAccount.PaymentAccountType, accountName, description, personId, tenantIsOwner, iban);
+        }
+        
+        private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId, PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId, bool tenantIsOwner, string iban = null)
+        {
+            paymentAccount ??= new PaymentAccount();
+
+
+            paymentAccount.Id = id;
+            paymentAccount.TenantId = tenantId;
+            paymentAccount.AccountName = accountName;
+            paymentAccount.PersonId = personId;
+            paymentAccount.Description = description;
+            paymentAccount.PaymentAccountType = paymentAccountType;
+            paymentAccount.Iban = iban;
+            paymentAccount.TenantIsOwner = tenantIsOwner;
+
+            return paymentAccount;
+        }     
+    }
+}

@@ -1,0 +1,66 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #editHousingForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'EditHousing' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="block">
+            {{ "Block" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="block"
+              id="block"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="housing.block"
+              #blockModel="ngModel"
+              #blockEl
+            />
+            <abp-validation-summary
+              [control]="blockModel"
+              [controlEl]="blockEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "Apartment" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="apartment"
+              id="apartment"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="housing.apartment"
+              #apartmentModel="ngModel"
+              #apartmentEl
+            />
+            <abp-validation-summary
+              [control]="apartmentModel"
+              [controlEl]="apartmentEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!editHousingForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>

@@ -1,0 +1,112 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #createEmployeeForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'CreateNewEmployee' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="firstName">
+            {{ "FirstName" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="firstName"
+              id="firstName"
+              required
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="employee.firstName"
+              #firstNameModel="ngModel"
+              #firstNameEl
+            />
+            <abp-validation-summary
+              [control]="firstNameModel"
+              [controlEl]="firstNameEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="lastName">
+            {{ "LastName" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="lastName"
+              id="lastName"
+              required
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="employee.lastName"
+              #lastNameModel="ngModel"
+              #lastNameEl
+            />
+            <abp-validation-summary
+              [control]="lastNameModel"
+              [controlEl]="lastNameEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="phone1">
+            {{ "Phone1" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="phone1"
+              id="phone1"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="employee.phone1"
+              #phone1Model="ngModel"
+              #phone1El
+            />
+            <abp-validation-summary
+              [control]="phone1Model"
+              [controlEl]="phone1El"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="phone2">
+            {{ "Phone2" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="phone2"
+              id="phone2"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="employee.phone2"
+              #phone2Model="ngModel"
+              #phone2El
+            />
+            <abp-validation-summary
+              [control]="phone2Model"
+              [controlEl]="phone2El"
+            ></abp-validation-summary>
+          </div>
+        </div>               
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!createEmployeeForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>

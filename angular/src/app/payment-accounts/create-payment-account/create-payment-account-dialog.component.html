@@ -1,0 +1,111 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #createPaymentAccountForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'CreateNew' + paymentAccountTypeEnum[this.paymentAccountType] | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="accountName">
+            {{ "AccountName" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="accountName"
+              id="accountName"
+              required
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="paymentAccount.accountName"
+              #accountNameModel="ngModel"
+              #accountNameEl
+            />
+            <abp-validation-summary
+              [control]="accountNameModel"
+              [controlEl]="accountNameEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="description">
+            {{ "Description" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="description"
+              id="description"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="paymentAccount.description"
+              #descriptionModel="ngModel"
+              #descriptionEl
+            />
+            <abp-validation-summary
+              [control]="descriptionModel"
+              [controlEl]="descriptionEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div *ngIf="paymentAccountType != paymentAccountTypeEnum.Cash" class="form-group row">
+          <label class="col-md-3 col-form-label" for="iban">
+            {{ "Iban" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="iban"
+              id="iban"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="paymentAccount.iban"
+              #ibanModel="ngModel"
+              #ibanEl
+            />
+            <abp-validation-summary
+              [control]="ibanModel"
+              [controlEl]="ibanEl"
+            ></abp-validation-summary>
+          </div>
+        </div>      
+        <div class="form-group row mb-0">
+          <label class="col-md-3 col-form-label">
+            {{ "TenantIsOwner" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="tenantIsOwner"
+                id="tenantIsOwner"
+                [(ngModel)]="paymentAccount.tenantIsOwner"
+              />
+              <label class="custom-control-label mt-2" for="tenantIsOwner"></label>
+            </div>
+          </div>
+        </div> 
+        <div class="form-group row mb-0">
+          <label class="col-md-12 col-form-label">
+            {{ "TenantIsOwnerDescription" | localize }}
+          </label>
+        </div>                          
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!createPaymentAccountForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>

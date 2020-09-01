@@ -1,0 +1,133 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #createHousingDueAccountBookForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'CreateNewHousingDueAccountBook' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="processDateTime">
+            {{ "ProcessDateTime" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="processDateTime"
+              id="processDateTime"
+              required
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="accountBook.processDateTime"
+              #processDateTimeModel="ngModel"
+              #processDateTimeEl
+            />
+            <abp-validation-summary
+              [control]="processDateTimeModel"
+              [controlEl]="processDateTimeEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="housingId">
+            {{ "Housing" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="housingId"
+              id="housingId"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="accountBook.housingId"
+              #housingIdModel="ngModel"
+              #housingIdEl
+            />
+            <abp-validation-summary
+              [control]="housingIdModel"
+              [controlEl]="housingIdEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="paymentAccountId">
+            {{ "PaymentAccount" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="paymentAccountId"
+              id="paymentAccountId"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="accountBook.toPaymentAccountId"
+              #paymentAccountIdModel="ngModel"
+              #paymentAccountIdEl
+            />
+            <abp-validation-summary
+              [control]="paymentAccountIdModel"
+              [controlEl]="paymentAccountIdEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="amount">
+            {{ "Amount" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="amount"
+              id="amount"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="accountBook.amount"
+              #amountModel="ngModel"
+              #amountEl
+            />
+            <abp-validation-summary
+              [control]="amountModel"
+              [controlEl]="amountEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="description">
+            {{ "Description" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="description"
+              id="description"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="accountBook.description"
+              #descriptionModel="ngModel"
+              #descriptionEl
+            />
+            <abp-validation-summary
+              [control]="descriptionModel"
+              [controlEl]="descriptionEl"
+            ></abp-validation-summary>
+          </div>
+        </div>                        
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!createHousingDueAccountBookForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>
