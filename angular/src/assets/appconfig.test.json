@@ -1,6 +1,6 @@
 {
-  "remoteServiceBaseUrl": "http://localhost:21021",
-  "appBaseUrl": "http://localhost:4200",
+  "remoteServiceBaseUrl": "https://sirius-web-api.azurewebsites.net",
+  "appBaseUrl": "https://sirius-ui.azurewebsites.net",
   "localeMappings": [
     {
       "from": "pt-BR",
