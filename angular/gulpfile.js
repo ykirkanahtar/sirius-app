@@ -7,7 +7,7 @@ var less = require('gulp-less');
 var uglify = require('gulp-uglify');
 var cleanCss = require('gulp-clean-css');
 
-var bundleConfig = require(path.resolve(__dirname, 'bundles.json'));
+// var bundleConfig = require(path.resolve(__dirname, 'bundles.json'));
 var production = false;
 
 var styleEntries = {};
@@ -27,21 +27,21 @@ function processInputDefinition(input) {
     return result;
 }
 
-function fillScriptBundles() {
-    // User defined bundles
-    for (var k = 0; k < bundleConfig.scripts.length; k++) {
-        var scriptBundle = bundleConfig.scripts[k];
-        scriptEntries[scriptBundle.output] = globby.sync(processInputDefinition(scriptBundle.input), { noext: true });
-    }
-}
+// function fillScriptBundles() {
+//     // User defined bundles
+//     for (var k = 0; k < bundleConfig.scripts.length; k++) {
+//         var scriptBundle = bundleConfig.scripts[k];
+//         scriptEntries[scriptBundle.output] = globby.sync(processInputDefinition(scriptBundle.input), { noext: true });
+//     }
+// }
 
-function fillStyleBundles() {
-    // User defined styles
-    for (var k = 0; k < bundleConfig.styles.length; k++) {
-        var styleBundle = bundleConfig.styles[k];
-        styleEntries[styleBundle.output] = globby.sync(processInputDefinition(styleBundle.input), { noext: true });
-    }
-}
+// function fillStyleBundles() {
+//     // User defined styles
+//     for (var k = 0; k < bundleConfig.styles.length; k++) {
+//         var styleBundle = bundleConfig.styles[k];
+//         styleEntries[styleBundle.output] = globby.sync(processInputDefinition(styleBundle.input), { noext: true });
+//     }
+// }
 
 function getFileNameFromPath(path) {
     return path.substring(path.lastIndexOf('/') + 1);
@@ -109,8 +109,8 @@ function build() {
 
     production = true;
 
-    fillScriptBundles();
-    fillStyleBundles();
+    // fillScriptBundles();
+    // fillStyleBundles();
 
     var scriptTasks = createScriptBundles();
     var styleTasks = createStyleBundles();
@@ -120,8 +120,8 @@ function build() {
 
 function buildDev() {
 
-    fillScriptBundles();
-    fillStyleBundles();
+    // fillScriptBundles();
+    // fillStyleBundles();
 
     var scriptTasks = createScriptBundles();
     var styleTasks = createStyleBundles();
