@@ -131,3 +131,8 @@ function buildDev() {
 
 exports.build = build;
 exports.buildDev = buildDev;
+
+gulp.task('default', function(done) {
+    console.log("Started");
+    done();
+  });
