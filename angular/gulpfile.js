@@ -130,4 +130,4 @@ function buildDev() {
 }
 
 exports.build = build;
-exports.default = buildDev;
+exports.buildDev = buildDev;
