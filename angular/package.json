@@ -4,9 +4,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "prod-build-test": "ng build --test --build-optimizer",    
-    "prod-build-prod": "ng build --prod --build-optimizer",
-    "prod-build-staging": "ng build --prod --configuration=staging --build-optimizer",
+    "build-test": "ng build --test --build-optimizer",    
+    "build-prod": "ng build --prod --build-optimizer",
+    "build-staging": "ng build --prod --configuration=staging --build-optimizer",
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "protractor",
     "hmr": "ng serve --host 0.0.0.0 --port 4200 --hmr",
