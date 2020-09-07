@@ -88,7 +88,7 @@ import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-pa
     SidebarLogoComponent,
     SidebarUserPanelComponent,
     SidebarMenuComponent,
-    //custom-components
+    // custom-components
     HousingsComponent,
     CreateHousingDialogComponent,
     EditHousingDialogComponent,
