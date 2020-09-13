@@ -11,6 +11,7 @@ namespace Sirius.Housings.Dto
         public Guid Id { get; set; }
         public string Block { get; set; }
         public string Apartment { get; set; }
+        public Guid HousingCategoryId { get; set; }
 
         public void AddValidationErrors(CustomValidationContext context)
         {

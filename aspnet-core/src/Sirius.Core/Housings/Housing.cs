@@ -5,6 +5,7 @@ using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.Extensions;
 using Abp.UI;
+using Sirius.HousingCategories;
 
 namespace Sirius.Housings
 {
@@ -23,6 +24,11 @@ namespace Sirius.Housings
 
         [StringLength(50)]
         public string Apartment { get; private set; }
+        public Guid HousingCategoryId { get; private set; }
+        
+        
+        [ForeignKey(nameof(HousingCategoryId))]
+        public virtual  HousingCategory HousingCategory { get; set; }
 
         public string GetName()
         {
@@ -38,17 +44,17 @@ namespace Sirius.Housings
             return string.Empty;
         }
         
-        public static Housing Create(Guid id, int tenantId, string block, string apartment)
+        public static Housing Create(Guid id, int tenantId, string block, string apartment, HousingCategory housingCategory)
         {
-            return BindEntity(new Housing(), id, tenantId, block, apartment);
+            return BindEntity(new Housing(), id, tenantId, block, apartment, housingCategory);
         }
 
-        public static Housing Update(Housing existingHousing, string block, string apartment)
+        public static Housing Update(Housing existingHousing, string block, string apartment, HousingCategory housingCategory)
         {
-            return BindEntity(existingHousing, existingHousing.Id, existingHousing.TenantId, block, apartment);
+            return BindEntity(existingHousing, existingHousing.Id, existingHousing.TenantId, block, apartment, housingCategory);
         }
 
-        private static Housing BindEntity(Housing housing, Guid id, int tenantId, string block, string apartment)
+        private static Housing BindEntity(Housing housing, Guid id, int tenantId, string block, string apartment, HousingCategory housingCategory)
         {
             if (block.IsNullOrWhiteSpace() && apartment.IsNullOrWhiteSpace())
             {
@@ -61,6 +67,7 @@ namespace Sirius.Housings
             housing.TenantId = tenantId;
             housing.Block = block;
             housing.Apartment = apartment;
+            housing.HousingCategoryId = housingCategory.Id;
 
             return housing;
         }
