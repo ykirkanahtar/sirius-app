@@ -8,6 +8,7 @@ using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentCategories
 {
@@ -15,6 +16,7 @@ namespace Sirius.PaymentCategories
     {
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private IPaymentCategoryManager _paymentCategoryManagerImplementation;
 
         public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
         {
@@ -36,7 +38,18 @@ namespace Sirius.PaymentCategories
         {
             await _paymentCategoryRepository.DeleteAsync(paymentCategory);
         }
-        
+
+        public async Task<PaymentCategory> GetRegularHousingDueAsync()
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+                    p.HousingDueType == HousingDueType.RegularHousingDue);
+
+                return query.Single();
+            }
+        }
+
         public async Task<PaymentCategory> GetAsync(Guid id)
         {
             var paymentCategory = await _paymentCategoryRepository.GetAsync(id);
@@ -53,8 +66,10 @@ namespace Sirius.PaymentCategories
             {
                 var query = _paymentCategoryRepository
                     .GetAll()
-                    .Where(p => p.TenantId == null || p.TenantId == tenantId)
-                    .PageBy(pagingRequest);
+                    .Where(p => p.TenantId == null || p.TenantId == tenantId);
+
+                if (pagingRequest != null)
+                    query = query.PageBy(pagingRequest);
 
                 return await query.ToListAsync();
             }

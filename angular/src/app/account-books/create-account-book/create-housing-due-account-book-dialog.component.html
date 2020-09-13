@@ -12,26 +12,17 @@
     <tabset>
       <tab [heading]="'Details' | localize" class="pt-3 px-2">
         <div class="form-group row required">
-          <label class="col-md-3 col-form-label" for="processDateTime">
+          <label class="col-md-3 col-form-label" for="AccountBook_ProcessDate">
             {{ "ProcessDateTime" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
+            <input type="text"
+              id="processDate"
+              name="processDate"
+              [placeholder]="'SelectDate' | localize"
               class="form-control"
-              name="processDateTime"
-              id="processDateTime"
-              required
-              minlength="0"
-              maxlength="50"
               [(ngModel)]="accountBook.processDateTime"
-              #processDateTimeModel="ngModel"
-              #processDateTimeEl
-            />
-            <abp-validation-summary
-              [control]="processDateTimeModel"
-              [controlEl]="processDateTimeEl"
-            ></abp-validation-summary>
+              bsDatepicker>
           </div>
         </div>
         <div class="form-group row required">
@@ -39,21 +30,15 @@
             {{ "Housing" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
-              class="form-control"
-              name="housingId"
-              id="housingId"
-              minlength="0"
-              maxlength="500"
-              [(ngModel)]="accountBook.housingId"
-              #housingIdModel="ngModel"
-              #housingIdEl
-            />
-            <abp-validation-summary
-              [control]="housingIdModel"
-              [controlEl]="housingIdEl"
-            ></abp-validation-summary>
+            <p-dropdown 
+              id="housings" 
+              name="housings" 
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="housings" 
+              [(ngModel)]="accountBook.housingId" 
+              [filter]="true"
+              [style]="{'width':'100%'}">
+              </p-dropdown>
           </div>
         </div>
         <div class="form-group row required">
@@ -61,21 +46,15 @@
             {{ "PaymentAccount" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
-              class="form-control"
-              name="paymentAccountId"
-              id="paymentAccountId"
-              minlength="0"
-              maxlength="500"
-              [(ngModel)]="accountBook.toPaymentAccountId"
-              #paymentAccountIdModel="ngModel"
-              #paymentAccountIdEl
-            />
-            <abp-validation-summary
-              [control]="paymentAccountIdModel"
-              [controlEl]="paymentAccountIdEl"
-            ></abp-validation-summary>
+            <p-dropdown 
+            id="paymentAccounts" 
+            name="paymentAccounts" 
+            [placeholder]="'PleaseSelect' | localize"
+            [options]="paymentAccounts" 
+            [(ngModel)]="accountBook.toPaymentAccountId" 
+            [filter]="true"
+            [style]="{'width':'100%'}">
+            </p-dropdown>
           </div>
         </div>
         <div class="form-group row required">

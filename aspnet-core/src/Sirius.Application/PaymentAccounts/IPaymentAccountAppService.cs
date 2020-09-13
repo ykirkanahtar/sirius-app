@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Sirius.AccountBooks.Dto;
 using Sirius.PaymentAccounts.Dto;
+using Sirius.Shared.Dtos;
 
 namespace Sirius.PaymentAccounts
 {
@@ -11,5 +13,6 @@ namespace Sirius.PaymentAccounts
         Task<PaymentAccountDto> CreateCashAccountAsync(CreateCashAccountDto input);
         Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input);
         Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input);
+        Task<List<LookUpDto>> GetPaymentAccountLookUpAsync();
     }
 }

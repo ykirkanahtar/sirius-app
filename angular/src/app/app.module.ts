@@ -57,7 +57,11 @@ import { EditPaymentAccountDialogComponent } from './payment-accounts/edit-payme
 import { CreatePaymentCategoryDialogComponent } from './payment-categories/create-payment-category/create-payment-category-dialog.component';
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-payment-category/edit-payment-category-dialog.component';
+import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
+import {DropdownModule} from 'primeng/dropdown';
 
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { trLocale } from 'ngx-bootstrap/locale';
 
 @NgModule({
   declarations: [
@@ -122,6 +126,8 @@ import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-pa
     ServiceProxyModule,
     SharedModule,
     NgxPaginationModule,
+    BsDatepickerModule.forRoot(),
+    DropdownModule
   ],
   providers: [],
   entryComponents: [
@@ -137,4 +143,10 @@ import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-pa
     ResetPasswordDialogComponent,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor( private bsLocaleService: BsLocaleService) {
+    trLocale.invalidDate = 'Geçersiz tarih';
+    defineLocale('tr', trLocale);
+    this.bsLocaleService.use('tr');
+  }
+}

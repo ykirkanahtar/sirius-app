@@ -14,11 +14,11 @@
             <ul class="dropdown-menu" *dropdownMenu>
                 <li>
                     <a href="javascript:;"
-                        (click)="createAccountBook()">{{'HousingDue' | localize}}</a>
+                        (click)="createHousingDueAccountBook()">{{'HousingDue' | localize}}</a>
                 </li>
                 <li>
                     <a href="javascript:;" 
-                        (click)="createAccountBook()">{{'BillPayment' | localize}}</a>
+                        (click)="createAccountBook()">{{'OtherPayments' | localize}}</a>
                 </li>                                                                                                                                                                         											
             </ul>
           </div>
@@ -76,12 +76,12 @@
                         }
                 "
               >
-                <td>{{ accountBook.processDateTime }}</td>
-                <td>{{ accountBook.paymentCategoryId }}</td>
-                <td>{{ accountBook.housingId }}</td>
+                <td>{{ accountBook.processDateTime.format('DD-MM-YYYY') }}</td>
+                <td>{{ accountBook.paymentCategory.paymentCategoryName }}</td>
+                <td>{{ accountBook.housing != null ? getHousingName(accountBook.housing) : '' }}</td>
                 <td>{{ accountBook.amount }}</td>
-                <td>{{ accountBook.fromPaymentAccountId }}</td>
-                <td>{{ accountBook.toPaymentAccountId }}</td>
+                <td>{{ accountBook.fromPaymentAccount != null ? accountBook.fromPayment.accountName : '' }}</td>
+                <td>{{ accountBook.toPaymentAccount != null ? accountBook.toPaymentAccount.accountName : '' }}</td>
                 <td>
                   <button
                     type="button"

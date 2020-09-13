@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
@@ -7,6 +9,7 @@ using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
 using Sirius.AppPaymentAccounts;
 using Sirius.PaymentAccounts.Dto;
+using Sirius.Shared.Dtos;
 
 namespace Sirius.PaymentAccounts
 {
@@ -35,6 +38,15 @@ namespace Sirius.PaymentAccounts
                     );
             await _paymentAccountManager.CreateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
+        }
+
+        public async Task<List<LookUpDto>> GetPaymentAccountLookUpAsync()
+        {
+            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();         
+                                                                               
+            return                                                             
+                (from l in paymentAccounts                                            
+                    select new LookUpDto(l.Id.ToString(), l.AccountName)).ToList();  
         }
 
         public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input)

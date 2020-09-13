@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
+using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Sirius.AccountBooks.Dto;
+using Sirius.AppPaymentAccounts;
+using Sirius.Housings;
 using Sirius.PaymentCategories;
-using Sirius.Shared.Constants;
 
 namespace Sirius.AccountBooks
 {
@@ -17,14 +22,16 @@ namespace Sirius.AccountBooks
     {
         private readonly IAccountBookManager _accountBookManager;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
-        private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public AccountBookAppService(IAccountBookManager accountBookManager, IRepository<AccountBook, Guid> accountBookRepository, IGuidGenerator guidGenerator, IRepository<PaymentCategory, Guid> paymentCategoryRepository)
+        public AccountBookAppService(IAccountBookManager accountBookManager, IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager, IUnitOfWorkManager unitOfWorkManager)
             :base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
             _accountBookRepository = accountBookRepository;
-            _paymentCategoryRepository = paymentCategoryRepository;
+            _paymentCategoryManager = paymentCategoryManager;
+            _unitOfWorkManager = unitOfWorkManager;
         }
         
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -34,9 +41,8 @@ namespace Sirius.AccountBooks
         
         public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
         {
-            var housingDuePaymentCategory = await _paymentCategoryRepository
-                .GetAll().Where(p => p.PaymentCategoryName == AppConstants.HousingDueString).SingleAsync();
-            
+            var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+        
             var accountBook = AccountBook.CreateHousingDue(
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
@@ -46,7 +52,7 @@ namespace Sirius.AccountBooks
                 , input.ToPaymentAccountId
                 , input.Amount
                 , input.Description);
-            
+    
             await _accountBookManager.CreateAsync(accountBook);
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -58,6 +64,21 @@ namespace Sirius.AccountBooks
                 input.DocumentNumber);
             await _accountBookManager.UpdateAsync(accountBook);
             return ObjectMapper.Map<AccountBookDto>(accountBook);            
+        }
+        
+        public override async Task<PagedResultDto<AccountBookDto>> GetAllAsync(PagedAccountBookResultRequestDto input)
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var query = _accountBookRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId)
+                    .Include(p => p.PaymentCategory).Include(p => p.Housing).Include(p => p.FromPaymentAccount)
+                    .Include(p => p.ToPaymentAccount);
+                
+                var accountBooks = await query.ToListAsync();
+                
+                return new PagedResultDto<AccountBookDto>(accountBooks.Count,
+                    ObjectMapper.Map<List<AccountBookDto>>(accountBooks));
+            }
         }
 
         // public async Task<AccountBookDto> CreateBankingAndInsuranceTransactionTaxAsync(CreateBankTransferOrEftOrBankTaxFeeAccountBookDto input)

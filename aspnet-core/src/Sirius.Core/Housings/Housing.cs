@@ -24,6 +24,20 @@ namespace Sirius.Housings
         [StringLength(50)]
         public string Apartment { get; private set; }
 
+        public string GetName()
+        {
+            if (!string.IsNullOrWhiteSpace(Block) && !string.IsNullOrWhiteSpace(Apartment))
+                return $"{Block} - {Apartment}";
+
+            if (string.IsNullOrWhiteSpace(Block))
+                return Apartment;
+
+            if (string.IsNullOrWhiteSpace(Apartment))
+                return Block;
+
+            return string.Empty;
+        }
+        
         public static Housing Create(Guid id, int tenantId, string block, string apartment)
         {
             return BindEntity(new Housing(), id, tenantId, block, apartment);

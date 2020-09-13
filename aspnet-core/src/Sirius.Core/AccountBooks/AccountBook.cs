@@ -2,6 +2,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using Sirius.AppPaymentAccounts;
+using Sirius.Housings;
+using Sirius.PaymentCategories;
 using Sirius.Shared.Enums;
 
 namespace Sirius.AccountBooks
@@ -27,6 +30,18 @@ namespace Sirius.AccountBooks
         public DateTime? DocumentDateTime { get; private set; }
         public string DocumentNumber { get; private set; }
 
+        [ForeignKey(nameof(PaymentCategoryId))]
+        public virtual PaymentCategory PaymentCategory { get; set; }
+        
+        [ForeignKey(nameof(HousingId))]
+        public virtual Housing Housing { get; set; }
+        
+        [ForeignKey(nameof(FromPaymentAccountId))]
+        public virtual PaymentAccount FromPaymentAccount { get; set; }
+        
+        [ForeignKey(nameof(ToPaymentAccountId))]
+        public virtual PaymentAccount ToPaymentAccount { get; set; }
+        
         private static AccountBook BindEntity(AccountBook accountBook, Guid id, int tenantId, DateTime processDateTime, Guid paymentCategoryId, Guid? housingId, Guid? fromPaymentAccountId, Guid? toPaymentAccountId, decimal amount, string description, DateTime? documentDateTime, string documentNumber)
         {
             accountBook ??= new AccountBook();

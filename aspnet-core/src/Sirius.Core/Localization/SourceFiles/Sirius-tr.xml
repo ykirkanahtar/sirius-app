@@ -160,5 +160,9 @@
     <text name="RegularHousingDue">Olağan aidat ödemesi</text>
     <text name="AdditionalHousingDueForResident">İkamet edenler için ek aidat ödemesi</text>
     <text name="AdditionalHousingDueForOwner">Konut sahipleri için ek aidat ödemesi</text>
+    <text name="SelectDate">Tarih Seçiniz</text>
+    <text name="PleaseSelect">Lütfen Seçiniz</text>
+    <text name="PaymentAccount">Ödeme hesabı</text>
+
   </texts>
 </localizationDictionary>

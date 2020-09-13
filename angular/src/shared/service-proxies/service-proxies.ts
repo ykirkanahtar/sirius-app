@@ -320,62 +320,6 @@ export class AccountBookServiceProxy {
     }
 
     /**
-     * @param id (optional) 
-     * @return Success
-     */
-    get(id: string | undefined): Observable<AccountBookDto> {
-        let url_ = this.baseUrl + "/api/services/app/AccountBook/Get?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "Id=" + encodeURIComponent("" + id) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGet(<any>response_);
-                } catch (e) {
-                    return <Observable<AccountBookDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<AccountBookDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGet(response: HttpResponseBase): Observable<AccountBookDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AccountBookDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<AccountBookDto>(<any>null);
-    }
-
-    /**
      * @param keyword (optional) 
      * @param isActive (optional) 
      * @param skipCount (optional) 
@@ -440,6 +384,62 @@ export class AccountBookServiceProxy {
             }));
         }
         return _observableOf<AccountBookDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<AccountBookDto> {
+        let url_ = this.baseUrl + "/api/services/app/AccountBook/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<AccountBookDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AccountBookDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<AccountBookDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AccountBookDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AccountBookDto>(<any>null);
     }
 
     /**
@@ -1031,6 +1031,61 @@ export class HousingServiceProxy {
             }));
         }
         return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getHousingLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/GetHousingLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -1633,6 +1688,61 @@ export class PaymentAccountServiceProxy {
             }));
         }
         return _observableOf<PaymentAccountDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getPaymentAccountLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentAccount/GetPaymentAccountLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentAccountLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentAccountLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentAccountLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -4362,6 +4472,275 @@ export interface ICreateAccountBookDto {
     documentNumber: string | undefined;
 }
 
+export enum HousingDueType {
+    RegularHousingDue = 1,
+    AdditionalHousingDueForResident = 2,
+    AdditionalHousingDueForOwner = 3,
+}
+
+export class PaymentCategoryDto implements IPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    housingDueType: HousingDueType;
+    isValidForAllPeriods: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IPaymentCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.housingDueType = _data["housingDueType"];
+            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PaymentCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["housingDueType"] = this.housingDueType;
+        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): PaymentCategoryDto {
+        const json = this.toJSON();
+        let result = new PaymentCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    housingDueType: HousingDueType;
+    isValidForAllPeriods: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class HousingDto implements IHousingDto {
+    block: string | undefined;
+    apartment: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IHousingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.block = _data["block"];
+            this.apartment = _data["apartment"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): HousingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["block"] = this.block;
+        data["apartment"] = this.apartment;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): HousingDto {
+        const json = this.toJSON();
+        let result = new HousingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingDto {
+    block: string | undefined;
+    apartment: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export enum PaymentAccountType {
+    Cash = 1,
+    BankAccount = 2,
+    AdvanceAccount = 3
+}
+
+export class PaymentAccountDto implements IPaymentAccountDto {
+    accountName: string | undefined;
+    paymentAccountType: PaymentAccountType;
+    description: string | undefined;
+    personId: string | undefined;
+    iban: string | undefined;
+    tenantIsOwner: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IPaymentAccountDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accountName = _data["accountName"];
+            this.paymentAccountType = _data["paymentAccountType"];
+            this.description = _data["description"];
+            this.personId = _data["personId"];
+            this.iban = _data["iban"];
+            this.tenantIsOwner = _data["tenantIsOwner"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PaymentAccountDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentAccountDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accountName"] = this.accountName;
+        data["paymentAccountType"] = this.paymentAccountType;
+        data["description"] = this.description;
+        data["personId"] = this.personId;
+        data["iban"] = this.iban;
+        data["tenantIsOwner"] = this.tenantIsOwner;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): PaymentAccountDto {
+        const json = this.toJSON();
+        let result = new PaymentAccountDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentAccountDto {
+    accountName: string | undefined;
+    paymentAccountType: PaymentAccountType;
+    description: string | undefined;
+    personId: string | undefined;
+    iban: string | undefined;
+    tenantIsOwner: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
 export class AccountBookDto implements IAccountBookDto {
     processDateTime: moment.Moment;
     paymentCategoryId: string;
@@ -4372,6 +4751,10 @@ export class AccountBookDto implements IAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    paymentCategory: PaymentCategoryDto;
+    housing: HousingDto;
+    fromPaymentAccount: PaymentAccountDto;
+    toPaymentAccount: PaymentAccountDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -4401,6 +4784,10 @@ export class AccountBookDto implements IAccountBookDto {
             this.description = _data["description"];
             this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
             this.documentNumber = _data["documentNumber"];
+            this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
+            this.housing = _data["housing"] ? HousingDto.fromJS(_data["housing"]) : <any>undefined;
+            this.fromPaymentAccount = _data["fromPaymentAccount"] ? PaymentAccountDto.fromJS(_data["fromPaymentAccount"]) : <any>undefined;
+            this.toPaymentAccount = _data["toPaymentAccount"] ? PaymentAccountDto.fromJS(_data["toPaymentAccount"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -4430,6 +4817,10 @@ export class AccountBookDto implements IAccountBookDto {
         data["description"] = this.description;
         data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
         data["documentNumber"] = this.documentNumber;
+        data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
+        data["housing"] = this.housing ? this.housing.toJSON() : <any>undefined;
+        data["fromPaymentAccount"] = this.fromPaymentAccount ? this.fromPaymentAccount.toJSON() : <any>undefined;
+        data["toPaymentAccount"] = this.toPaymentAccount ? this.toPaymentAccount.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -4459,6 +4850,10 @@ export interface IAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    paymentCategory: PaymentCategoryDto;
+    housing: HousingDto;
+    fromPaymentAccount: PaymentAccountDto;
+    toPaymentAccount: PaymentAccountDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -4953,85 +5348,6 @@ export interface ICreateHousingDto {
     apartment: string | undefined;
 }
 
-export class HousingDto implements IHousingDto {
-    block: string | undefined;
-    apartment: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IHousingDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.block = _data["block"];
-            this.apartment = _data["apartment"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): HousingDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new HousingDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["block"] = this.block;
-        data["apartment"] = this.apartment;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): HousingDto {
-        const json = this.toJSON();
-        let result = new HousingDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IHousingDto {
-    block: string | undefined;
-    apartment: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-}
-
 export class UpdateHousingDto implements IUpdateHousingDto {
     id: string;
     block: string | undefined;
@@ -5081,6 +5397,53 @@ export interface IUpdateHousingDto {
     id: string;
     block: string | undefined;
     apartment: string | undefined;
+}
+
+export class LookUpDto implements ILookUpDto {
+    readonly value: string | undefined;
+    readonly label: string | undefined;
+
+    constructor(data?: ILookUpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).value = _data["value"];
+            (<any>this).label = _data["label"];
+        }
+    }
+
+    static fromJS(data: any): LookUpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LookUpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        data["label"] = this.label;
+        return data; 
+    }
+
+    clone(): LookUpDto {
+        const json = this.toJSON();
+        let result = new LookUpDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILookUpDto {
+    value: string | undefined;
+    label: string | undefined;
 }
 
 export class HousingDtoPagedResultDto implements IHousingDtoPagedResultDto {
@@ -5561,107 +5924,6 @@ export interface ICreateBankOrAdvanceAccountDto {
     tenantIsOwner: boolean;
 }
 
-export enum PaymentAccountType {
-    Cash = 1,
-    BankAccount = 2,
-    AdvanceAccount = 3
-}
-
-export class PaymentAccountDto implements IPaymentAccountDto {
-    accountName: string | undefined;
-    paymentAccountType: PaymentAccountType;
-    description: string | undefined;
-    personId: string | undefined;
-    iban: string | undefined;
-    tenantIsOwner: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IPaymentAccountDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.accountName = _data["accountName"];
-            this.paymentAccountType = _data["paymentAccountType"];
-            this.description = _data["description"];
-            this.personId = _data["personId"];
-            this.iban = _data["iban"];
-            this.tenantIsOwner = _data["tenantIsOwner"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): PaymentAccountDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaymentAccountDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["accountName"] = this.accountName;
-        data["paymentAccountType"] = this.paymentAccountType;
-        data["description"] = this.description;
-        data["personId"] = this.personId;
-        data["iban"] = this.iban;
-        data["tenantIsOwner"] = this.tenantIsOwner;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): PaymentAccountDto {
-        const json = this.toJSON();
-        let result = new PaymentAccountDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPaymentAccountDto {
-    accountName: string | undefined;
-    paymentAccountType: PaymentAccountType;
-    description: string | undefined;
-    personId: string | undefined;
-    iban: string | undefined;
-    tenantIsOwner: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-}
-
 export class CreateCashAccountDto implements ICreateCashAccountDto {
     accountName: string | undefined;
     description: string | undefined;
@@ -5863,12 +6125,6 @@ export interface IPaymentAccountDtoPagedResultDto {
     items: PaymentAccountDto[] | undefined;
 }
 
-export enum HousingDueType {
-    RegularHousingDue = 1,
-    AdditionalHousingDueForResident = 2,
-    AdditionalHousingDueForOwner = 3,
-}
-
 export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
@@ -5918,89 +6174,6 @@ export interface ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
     isValidForAllPeriods: boolean;
-}
-
-export class PaymentCategoryDto implements IPaymentCategoryDto {
-    paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
-    isValidForAllPeriods: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IPaymentCategoryDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.paymentCategoryName = _data["paymentCategoryName"];
-            this.housingDueType = _data["housingDueType"];
-            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): PaymentCategoryDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaymentCategoryDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["paymentCategoryName"] = this.paymentCategoryName;
-        data["housingDueType"] = this.housingDueType;
-        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): PaymentCategoryDto {
-        const json = this.toJSON();
-        let result = new PaymentCategoryDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPaymentCategoryDto {
-    paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
-    isValidForAllPeriods: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
 }
 
 export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {

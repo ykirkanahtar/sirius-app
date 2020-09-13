@@ -1,8 +1,9 @@
 ﻿using System;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
-using Sirius.PaymentCategories;
-using Sirius.Shared.Enums;
+using Sirius.Housings.Dto;
+using Sirius.PaymentAccounts.Dto;
+using Sirius.PaymentCategories.Dto;
 
 namespace Sirius.AccountBooks.Dto
 {
@@ -18,5 +19,10 @@ namespace Sirius.AccountBooks.Dto
         public string Description { get; set; }
         public DateTime? DocumentDateTime { get; set; }
         public string DocumentNumber { get; set; }
+        
+        public virtual PaymentCategoryDto PaymentCategory { get; set; }
+        public virtual HousingDto Housing { get; set; }
+        public virtual PaymentAccountDto FromPaymentAccount { get; set; }
+        public virtual PaymentAccountDto ToPaymentAccount { get; set; }
     }
 }

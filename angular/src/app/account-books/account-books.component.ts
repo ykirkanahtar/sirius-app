@@ -6,7 +6,8 @@ import {
   PagedListingComponentBase,
   PagedRequestDto
 } from '@shared/paged-listing-component-base';
-import { AccountBookDto, AccountBookServiceProxy, AccountBookDtoPagedResultDto  } from '@shared/service-proxies/service-proxies';
+import { AccountBookDto, AccountBookServiceProxy, AccountBookDtoPagedResultDto, HousingDto  } from '@shared/service-proxies/service-proxies';
+import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
@@ -48,6 +49,22 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
       });
   }
 
+  getHousingName(housing: HousingDto): string {
+    if (housing.block && housing.apartment) {
+      return housing.block + ' - ' + housing.apartment;
+    }
+
+    if (!housing.block) {
+      return housing.apartment;
+    }
+
+    if (!housing.apartment) {
+      return housing.block;
+    }
+
+    return null;
+  }
+
   delete(accountBook: AccountBookDto): void {
     abp.message.confirm(
       this.l('AccountBookDeleteWarningMessage', accountBook.id),
@@ -69,12 +86,25 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
   }
 
   createAccountBook(): void {
-    this.showCreateOrEditAccountBookDialog();
+    this.showCreateOrEditAccountBookDialog(false);
   }
 
-  showCreateOrEditAccountBookDialog(id?: number): void {
+  createHousingDueAccountBook(): void {
+    this.showCreateOrEditAccountBookDialog(true);
+  }
+
+  showCreateOrEditAccountBookDialog(isHousingDue: boolean, id?: number): void {
     let createOrEditAccountBookDialog: BsModalRef;
     if (!id) {
+      if(isHousingDue) {
+          createOrEditAccountBookDialog = this._modalService.show(
+            CreateHousingDueAccountBookDialogComponent,
+            {
+              class: 'modal-lg',
+            }
+          );
+      }
+
       // createOrEditAccountBookDialog = this._modalService.show(
       //   CreateAccountBookDialogComponent,
       //   {

@@ -9,5 +9,6 @@ namespace Sirius.Housings.Dto
     {
         public string Block { get; set; }
         public string Apartment { get; set; }
+        
     }
 }
