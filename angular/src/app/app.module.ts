@@ -58,7 +58,10 @@ import { CreatePaymentCategoryDialogComponent } from './payment-categories/creat
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-payment-category/edit-payment-category-dialog.component';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import {DropdownModule} from 'primeng/dropdown';
+import { DropdownModule } from 'primeng/dropdown';
+import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
+import { EditHousingCategoryDialogComponent } from './housing-categories/edit-housing-category/edit-housing-category-dialog.component';
+import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
 
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { trLocale } from 'ngx-bootstrap/locale';
@@ -110,7 +113,10 @@ import { trLocale } from 'ngx-bootstrap/locale';
     CreateHousingDueAccountBookDialogComponent,
     CreatePaymentCategoryDialogComponent,
     EditPaymentCategoryDialogComponent,
-    PaymentCategoriesComponent
+    PaymentCategoriesComponent,
+    CreateHousingCategoryDialogComponent,
+    EditHousingCategoryDialogComponent,
+    HousingCategoriesComponent
   ],
   imports: [
     CommonModule,

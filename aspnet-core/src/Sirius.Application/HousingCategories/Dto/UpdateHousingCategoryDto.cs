@@ -6,6 +6,6 @@ namespace Sirius.HousingCategories.Dto
     public class UpdateHousingCategoryDto : IEntityDto<Guid>
     {
         public Guid Id { get; set; }
-        public string CategoryName { get; set; }
+        public string HousingCategoryName { get; set; }
     }
 }

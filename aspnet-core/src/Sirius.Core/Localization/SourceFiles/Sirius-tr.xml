@@ -163,6 +163,7 @@
     <text name="SelectDate">Tarih Seçiniz</text>
     <text name="PleaseSelect">Lütfen Seçiniz</text>
     <text name="PaymentAccount">Ödeme hesabı</text>
-
+    <text name="HousingCategories">Konut Grupları</text>
+    <text name="HousingCategoryName">Konut Grup Adı</text>
   </texts>
 </localizationDictionary>

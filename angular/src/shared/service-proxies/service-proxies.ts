@@ -1213,6 +1213,360 @@ export class HousingServiceProxy {
 }
 
 @Injectable()
+export class HousingCategoryServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateHousingCategoryDto | undefined): Observable<HousingCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<HousingCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: UpdateHousingCategoryDto | undefined): Observable<HousingCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<HousingCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getHousingCategoryLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/GetHousingCategoryLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingCategoryLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingCategoryLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<HousingCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<HousingCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param keyword (optional) 
+     * @param isActive (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(keyword: string | null | undefined, isActive: boolean | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingCategoryDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingCategory/GetAll?";
+        if (keyword !== undefined && keyword !== null)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (isActive !== undefined && isActive !== null)
+            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingCategoryDtoPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingCategoryDtoPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<HousingCategoryDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingCategoryDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingCategoryDtoPagedResultDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class HousingPaymentPlanServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -4561,9 +4915,86 @@ export interface IPaymentCategoryDto {
     id: string;
 }
 
+export class HousingCategoryDto implements IHousingCategoryDto {
+    housingCategoryName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IHousingCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingCategoryName = _data["housingCategoryName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): HousingCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingCategoryName"] = this.housingCategoryName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): HousingCategoryDto {
+        const json = this.toJSON();
+        let result = new HousingCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingCategoryDto {
+    housingCategoryName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
 export class HousingDto implements IHousingDto {
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
+    housingCategory: HousingCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -4586,6 +5017,8 @@ export class HousingDto implements IHousingDto {
         if (_data) {
             this.block = _data["block"];
             this.apartment = _data["apartment"];
+            this.housingCategoryId = _data["housingCategoryId"];
+            this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -4608,6 +5041,8 @@ export class HousingDto implements IHousingDto {
         data = typeof data === 'object' ? data : {};
         data["block"] = this.block;
         data["apartment"] = this.apartment;
+        data["housingCategoryId"] = this.housingCategoryId;
+        data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -4630,6 +5065,8 @@ export class HousingDto implements IHousingDto {
 export interface IHousingDto {
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
+    housingCategory: HousingCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -5304,6 +5741,7 @@ export interface IEmployeeDtoPagedResultDto {
 export class CreateHousingDto implements ICreateHousingDto {
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
 
     constructor(data?: ICreateHousingDto) {
         if (data) {
@@ -5318,6 +5756,7 @@ export class CreateHousingDto implements ICreateHousingDto {
         if (_data) {
             this.block = _data["block"];
             this.apartment = _data["apartment"];
+            this.housingCategoryId = _data["housingCategoryId"];
         }
     }
 
@@ -5332,6 +5771,7 @@ export class CreateHousingDto implements ICreateHousingDto {
         data = typeof data === 'object' ? data : {};
         data["block"] = this.block;
         data["apartment"] = this.apartment;
+        data["housingCategoryId"] = this.housingCategoryId;
         return data; 
     }
 
@@ -5346,12 +5786,14 @@ export class CreateHousingDto implements ICreateHousingDto {
 export interface ICreateHousingDto {
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
 }
 
 export class UpdateHousingDto implements IUpdateHousingDto {
     id: string;
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
 
     constructor(data?: IUpdateHousingDto) {
         if (data) {
@@ -5367,6 +5809,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
             this.id = _data["id"];
             this.block = _data["block"];
             this.apartment = _data["apartment"];
+            this.housingCategoryId = _data["housingCategoryId"];
         }
     }
 
@@ -5382,6 +5825,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
         data["id"] = this.id;
         data["block"] = this.block;
         data["apartment"] = this.apartment;
+        data["housingCategoryId"] = this.housingCategoryId;
         return data; 
     }
 
@@ -5397,6 +5841,7 @@ export interface IUpdateHousingDto {
     id: string;
     block: string | undefined;
     apartment: string | undefined;
+    housingCategoryId: string;
 }
 
 export class LookUpDto implements ILookUpDto {
@@ -5499,6 +5944,151 @@ export class HousingDtoPagedResultDto implements IHousingDtoPagedResultDto {
 export interface IHousingDtoPagedResultDto {
     totalCount: number;
     items: HousingDto[] | undefined;
+}
+
+export class CreateHousingCategoryDto implements ICreateHousingCategoryDto {
+    housingCategoryName: string | undefined;
+
+    constructor(data?: ICreateHousingCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingCategoryName = _data["housingCategoryName"];
+        }
+    }
+
+    static fromJS(data: any): CreateHousingCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateHousingCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingCategoryName"] = this.housingCategoryName;
+        return data; 
+    }
+
+    clone(): CreateHousingCategoryDto {
+        const json = this.toJSON();
+        let result = new CreateHousingCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateHousingCategoryDto {
+    housingCategoryName: string | undefined;
+}
+
+export class UpdateHousingCategoryDto implements IUpdateHousingCategoryDto {
+    id: string;
+    housingCategoryName: string | undefined;
+
+    constructor(data?: IUpdateHousingCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.housingCategoryName = _data["housingCategoryName"];
+        }
+    }
+
+    static fromJS(data: any): UpdateHousingCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateHousingCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["housingCategoryName"] = this.housingCategoryName;
+        return data; 
+    }
+
+    clone(): UpdateHousingCategoryDto {
+        const json = this.toJSON();
+        let result = new UpdateHousingCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateHousingCategoryDto {
+    id: string;
+    housingCategoryName: string | undefined;
+}
+
+export class HousingCategoryDtoPagedResultDto implements IHousingCategoryDtoPagedResultDto {
+    totalCount: number;
+    items: HousingCategoryDto[] | undefined;
+
+    constructor(data?: IHousingCategoryDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(HousingCategoryDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): HousingCategoryDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingCategoryDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): HousingCategoryDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new HousingCategoryDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingCategoryDtoPagedResultDto {
+    totalCount: number;
+    items: HousingCategoryDto[] | undefined;
 }
 
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {

@@ -6,6 +6,6 @@ namespace Sirius.HousingCategories.Dto
 
     public class CreateHousingCategoryDto
     {
-        public string CategoryName { get; set; }
+        public string HousingCategoryName { get; set; }
     }
 }

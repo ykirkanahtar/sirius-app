@@ -26,7 +26,7 @@ namespace Sirius.HousingCategories
 
         public override async Task<HousingCategoryDto> CreateAsync(CreateHousingCategoryDto input)
         {
-            var housingCategory = HousingCategory.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(), input.CategoryName);
+            var housingCategory = HousingCategory.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(), input.HousingCategoryName);
             await _housingCategoryManager.CreateAsync(housingCategory);
             return ObjectMapper.Map<HousingCategoryDto>(housingCategory);
         }
@@ -34,7 +34,7 @@ namespace Sirius.HousingCategories
         public override async Task<HousingCategoryDto> UpdateAsync(UpdateHousingCategoryDto input)
         {
             var existingHousingCategory = await _housingCategoryManager.GetAsync(input.Id);
-            var housingCategory = HousingCategory.Update(existingHousingCategory, input.CategoryName);
+            var housingCategory = HousingCategory.Update(existingHousingCategory, input.HousingCategoryName);
             await _housingCategoryManager.UpdateAsync(housingCategory);
             return ObjectMapper.Map<HousingCategoryDto>(housingCategory);
         }
@@ -51,7 +51,7 @@ namespace Sirius.HousingCategories
             
             return
                 (from l in housingCategories
-                select new LookUpDto(l.Id.ToString(), l.CategoryName)).ToList();                                                     
+                select new LookUpDto(l.Id.ToString(), l.HousingCategoryName)).ToList();                                                     
         }
     }
 }

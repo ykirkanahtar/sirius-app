@@ -28,7 +28,7 @@ namespace Sirius.Housings
         
         
         [ForeignKey(nameof(HousingCategoryId))]
-        public virtual  HousingCategory HousingCategory { get; set; }
+        public virtual HousingCategory HousingCategory { get; set; }
 
         public string GetName()
         {

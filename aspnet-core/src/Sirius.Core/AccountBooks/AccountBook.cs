@@ -9,7 +9,7 @@ using Sirius.Shared.Enums;
 
 namespace Sirius.AccountBooks
 {
-    [Table("AppAccountBookss")]
+    [Table("AppAccountBooks")]
     public class AccountBook : FullAuditedEntity<Guid>, IMustHaveTenant
     {
         protected AccountBook()

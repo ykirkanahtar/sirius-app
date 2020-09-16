@@ -7,7 +7,7 @@ namespace Sirius.HousingCategories.Dto
     [AutoMapFrom(typeof(HousingCategory))]
     public class HousingCategoryDto : FullAuditedEntityDto<Guid>
     {
-        public string CategoryName { get; set; }
+        public string HousingCategoryName { get; set; }
         
     }
 }
