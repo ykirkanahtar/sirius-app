@@ -68,14 +68,8 @@
               [(ngModel)]="housing.housingCategoryId" 
               [filter]="true"
               [style]="{'width':'100%'}"
-              required
-              #housingCategoryEl="ngModel"
-              #housingCategoryModel>
+              required>
               </p-dropdown>
-              <abp-validation-summary
-              [control]="housingCategoryModel"
-              [controlEl]="housingCategoryEl"
-            ></abp-validation-summary>
           </div>
         </div>        
       </tab>
