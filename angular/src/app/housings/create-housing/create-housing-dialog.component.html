@@ -55,6 +55,29 @@
             ></abp-validation-summary>
           </div>
         </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "HousingCategory" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-dropdown 
+              id="housingCategories" 
+              name="housingCategories" 
+              [options]="housingCategories" 
+              [placeholder]="'PleaseSelect' | localize"
+              [(ngModel)]="housing.housingCategoryId" 
+              [filter]="true"
+              [style]="{'width':'100%'}"
+              required
+              #housingCategoryEl="ngModel"
+              #housingCategoryModel>
+              </p-dropdown>
+              <abp-validation-summary
+              [control]="housingCategoryModel"
+              [controlEl]="housingCategoryEl"
+            ></abp-validation-summary>
+          </div>
+        </div>        
       </tab>
     </tabset>
   </div>

@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { HousingDto, HousingServiceProxy } from '@shared/service-proxies/service-proxies';
+import { HousingCategoryServiceProxy, HousingDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'edit-housing-dialog.component.html'
@@ -19,15 +19,23 @@ export class EditHousingDialogComponent extends AppComponentBase
   saving = false;
   id: string;
   housing = new HousingDto();
+  housingCategories: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
     injector: Injector,
     private _housingService: HousingServiceProxy,
+    private _housingCategoryService: HousingCategoryServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
+
+    this._housingCategoryService
+    .getHousingCategoryLookUp()
+    .subscribe((result: LookUpDto[]) => {
+      this.housingCategories = result;
+    });
   }
 
   ngOnInit(): void {

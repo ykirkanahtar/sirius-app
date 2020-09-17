@@ -46,6 +46,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
       )
       .subscribe((result: HousingDtoPagedResultDto) => {
         this.housings = result.items;
+        console.log(result.items);
         this.showPaging(result, pageNumber);
       });
   }

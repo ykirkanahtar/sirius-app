@@ -7,6 +7,7 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
+using Microsoft.EntityFrameworkCore;
 using Sirius.HousingCategories;
 using Sirius.Housings.Dto;
 using Sirius.Shared.Dtos;
@@ -49,6 +50,17 @@ namespace Sirius.Housings
         {
             var housing = await _housingManager.GetAsync(input.Id);
             await _housingManager.DeleteAsync(housing);
+        }
+        
+        public override async Task<PagedResultDto<HousingDto>> GetAllAsync(PagedHousingResultRequestDto input)
+        {
+            var query = _housingRepository.GetAll()
+                    .Include(p => p.HousingCategory);
+                
+                var housings = await query.ToListAsync();
+                
+                return new PagedResultDto<HousingDto>(housings.Count,
+                    ObjectMapper.Map<List<HousingDto>>(housings));
         }
 
         public async Task<List<LookUpDto>> GetHousingLookUpAsync()

@@ -48,10 +48,10 @@ namespace Sirius.HousingCategories
         public async Task<List<LookUpDto>> GetHousingCategoryLookUpAsync()
         {           
             var housingCategories = await _housingCategoryRepository.GetAllListAsync();
-            
-            return
-                (from l in housingCategories
-                select new LookUpDto(l.Id.ToString(), l.HousingCategoryName)).ToList();                                                     
+            var selectList =  (from l in housingCategories
+                select new LookUpDto(l.Id.ToString(), l.HousingCategoryName)).ToList();
+            return selectList;
+
         }
     }
 }
