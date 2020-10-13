@@ -59,7 +59,7 @@ namespace Sirius.PaymentCategories
             }
             return paymentCategory;
         }
-
+        
         public async Task<List<PaymentCategory>> GetAllAsync(int tenantId, PagedResultRequestDto pagingRequest)
         {
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))

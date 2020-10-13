@@ -62,7 +62,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
 import { EditHousingCategoryDialogComponent } from './housing-categories/edit-housing-category/edit-housing-category-dialog.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
-
+import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/create-housing-payment-plan/create-housing-payment-plan.component';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { trLocale } from 'ngx-bootstrap/locale';
 
@@ -116,7 +116,8 @@ import { trLocale } from 'ngx-bootstrap/locale';
     PaymentCategoriesComponent,
     CreateHousingCategoryDialogComponent,
     EditHousingCategoryDialogComponent,
-    HousingCategoriesComponent
+    HousingCategoriesComponent,
+    CreateHousingPaymentPlanComponent
   ],
   imports: [
     CommonModule,

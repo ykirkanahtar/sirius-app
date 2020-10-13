@@ -26,8 +26,7 @@ namespace Sirius.HousingPaymentPlans
         public decimal Amount { get; private set; }
         public string Description { get; private set; }
         public Guid? AccountBookId { get; private set; }
-
-
+        
         public static HousingPaymentPlan CreateDebt(Guid id, int tenantId, Housing housing, PaymentCategory paymentCategory, DateTime date, decimal amount, string description) //tanımlanacak aidatlar
         {
             return BindEntity(new HousingPaymentPlan(), id, tenantId, PaymentPlanType.Debt, housing.Id, paymentCategory.Id, date, amount, description, null);

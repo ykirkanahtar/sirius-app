@@ -33,7 +33,9 @@ export class CreateHousingDueAccountBookDialogComponent extends AppComponentBase
     public bsModalRef: BsModalRef
   ) {
     super(injector);
+  }
 
+  ngOnInit(): void {
     this._housingServiceProxy
           .getHousingLookUp()
           .subscribe((result: LookUpDto[]) => {
@@ -45,10 +47,6 @@ export class CreateHousingDueAccountBookDialogComponent extends AppComponentBase
           .subscribe((result: LookUpDto[]) => {
               this.paymentAccounts = result;
           });
-  }
-
-  ngOnInit(): void {
-
   }
 
   save(): void {

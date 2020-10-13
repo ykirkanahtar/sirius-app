@@ -8,6 +8,7 @@ namespace Sirius.HousingPaymentPlans
 {
     public interface IHousingPaymentPlanAppService : IAsyncCrudAppService<HousingPaymentPlanDto, Guid, PagedHousingPaymentPlanResultRequestDto, CreateCreditHousingPaymentPlanDto, UpdateHousingPaymentPlanDto>
     {
+        Task CreateDebtPaymentForHousingCategory(CreateDebtHousingPaymentPlanForHousingCategoryDto input);
         Task<HousingPaymentPlanDto> CreateDebtPaymentAsync(CreateDebtHousingPaymentPlanDto input);
         Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input);
     }

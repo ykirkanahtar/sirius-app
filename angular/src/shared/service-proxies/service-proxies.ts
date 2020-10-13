@@ -1034,6 +1034,73 @@ export class HousingServiceProxy {
     }
 
     /**
+     * @param keyword (optional) 
+     * @param isActive (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(keyword: string | null | undefined, isActive: boolean | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/GetAll?";
+        if (keyword !== undefined && keyword !== null)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (isActive !== undefined && isActive !== null)
+            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingDtoPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingDtoPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<HousingDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingDtoPagedResultDto>(<any>null);
+    }
+
+    /**
      * @return Success
      */
     getHousingLookUp(): Observable<LookUpDto[]> {
@@ -1142,73 +1209,6 @@ export class HousingServiceProxy {
             }));
         }
         return _observableOf<HousingDto>(<any>null);
-    }
-
-    /**
-     * @param keyword (optional) 
-     * @param isActive (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    getAll(keyword: string | null | undefined, isActive: boolean | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/Housing/GetAll?";
-        if (keyword !== undefined && keyword !== null)
-            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
-        if (isActive !== undefined && isActive !== null)
-            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAll(<any>response_);
-                } catch (e) {
-                    return <Observable<HousingDtoPagedResultDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<HousingDtoPagedResultDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAll(response: HttpResponseBase): Observable<HousingDtoPagedResultDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = HousingDtoPagedResultDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<HousingDtoPagedResultDto>(<any>null);
     }
 }
 
@@ -1575,6 +1575,58 @@ export class HousingPaymentPlanServiceProxy {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createDebtPaymentForHousingCategory(body: CreateDebtHousingPaymentPlanForHousingCategoryDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateDebtPaymentForHousingCategory";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateDebtPaymentForHousingCategory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateDebtPaymentForHousingCategory(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateDebtPaymentForHousingCategory(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
     }
 
     /**
@@ -5844,53 +5896,6 @@ export interface IUpdateHousingDto {
     housingCategoryId: string;
 }
 
-export class LookUpDto implements ILookUpDto {
-    readonly value: string | undefined;
-    readonly label: string | undefined;
-
-    constructor(data?: ILookUpDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            (<any>this).value = _data["value"];
-            (<any>this).label = _data["label"];
-        }
-    }
-
-    static fromJS(data: any): LookUpDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LookUpDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["value"] = this.value;
-        data["label"] = this.label;
-        return data; 
-    }
-
-    clone(): LookUpDto {
-        const json = this.toJSON();
-        let result = new LookUpDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ILookUpDto {
-    value: string | undefined;
-    label: string | undefined;
-}
-
 export class HousingDtoPagedResultDto implements IHousingDtoPagedResultDto {
     totalCount: number;
     items: HousingDto[] | undefined;
@@ -5944,6 +5949,53 @@ export class HousingDtoPagedResultDto implements IHousingDtoPagedResultDto {
 export interface IHousingDtoPagedResultDto {
     totalCount: number;
     items: HousingDto[] | undefined;
+}
+
+export class LookUpDto implements ILookUpDto {
+    readonly value: string | undefined;
+    readonly label: string | undefined;
+
+    constructor(data?: ILookUpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).value = _data["value"];
+            (<any>this).label = _data["label"];
+        }
+    }
+
+    static fromJS(data: any): LookUpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LookUpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        data["label"] = this.label;
+        return data; 
+    }
+
+    clone(): LookUpDto {
+        const json = this.toJSON();
+        let result = new LookUpDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILookUpDto {
+    value: string | undefined;
+    label: string | undefined;
 }
 
 export class CreateHousingCategoryDto implements ICreateHousingCategoryDto {
@@ -6089,6 +6141,69 @@ export class HousingCategoryDtoPagedResultDto implements IHousingCategoryDtoPage
 export interface IHousingCategoryDtoPagedResultDto {
     totalCount: number;
     items: HousingCategoryDto[] | undefined;
+}
+
+export class CreateDebtHousingPaymentPlanForHousingCategoryDto implements ICreateDebtHousingPaymentPlanForHousingCategoryDto {
+    housingCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
+
+    constructor(data?: ICreateDebtHousingPaymentPlanForHousingCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingCategoryId = _data["housingCategoryId"];
+            this.amountPerMonth = _data["amountPerMonth"];
+            this.countOfMonth = _data["countOfMonth"];
+            this.paymentDayOfMonth = _data["paymentDayOfMonth"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateDebtHousingPaymentPlanForHousingCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateDebtHousingPaymentPlanForHousingCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingCategoryId"] = this.housingCategoryId;
+        data["amountPerMonth"] = this.amountPerMonth;
+        data["countOfMonth"] = this.countOfMonth;
+        data["paymentDayOfMonth"] = this.paymentDayOfMonth;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        return data; 
+    }
+
+    clone(): CreateDebtHousingPaymentPlanForHousingCategoryDto {
+        const json = this.toJSON();
+        let result = new CreateDebtHousingPaymentPlanForHousingCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateDebtHousingPaymentPlanForHousingCategoryDto {
+    housingCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
 }
 
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {

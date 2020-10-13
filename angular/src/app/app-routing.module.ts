@@ -15,7 +15,7 @@ import { AccountBooksComponent } from './account-books/account-books.component';
 import { PaymentAccountsComponent } from './payment-accounts/payment-accounts.component';
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
-
+import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/create-housing-payment-plan/create-housing-payment-plan.component';
 @NgModule({
     imports: [
         RouterModule.forChild([
@@ -31,7 +31,8 @@ import { HousingCategoriesComponent } from './housing-categories/housing-categor
                     { path: 'people', component: PeopleComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },                    
                     { path: 'account-books', component: AccountBooksComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },                    
                     { path: 'payment-categories', component: PaymentCategoriesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },                    
-                    { path: 'housing-categories', component: HousingCategoriesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },                    
+                    { path: 'housing-categories', component: HousingCategoriesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] }, 
+                    { path: 'create-housing-payment-plans', component: CreateHousingPaymentPlanComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },                    
                     { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
                     { path: 'roles', component: RolesComponent, data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },
                     { path: 'tenants', component: TenantsComponent, data: { permission: 'Pages.Tenants' }, canActivate: [AppRouteGuard] },

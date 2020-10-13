@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore.Repositories;
 using Abp.UI;
 
 namespace Sirius.HousingPaymentPlans
@@ -8,7 +11,6 @@ namespace Sirius.HousingPaymentPlans
     public class HousingPaymentPlanManager : IHousingPaymentPlanManager
     {
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
-
         public HousingPaymentPlanManager(IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
         {
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
@@ -17,6 +19,11 @@ namespace Sirius.HousingPaymentPlans
         public async Task CreateAsync(HousingPaymentPlan housingPaymentPlan)
         {
             await _housingPaymentPlanRepository.InsertAsync(housingPaymentPlan);
+        }
+
+        public async Task BulkCreateAsync(IEnumerable<HousingPaymentPlan> housingPaymentPlans)
+        {
+            await _housingPaymentPlanRepository.GetDbContext().AddRangeAsync(housingPaymentPlans);
         }
         
         public async Task UpdateAsync(HousingPaymentPlan housingPaymentPlan)

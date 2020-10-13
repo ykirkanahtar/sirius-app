@@ -167,5 +167,11 @@
     <text name="HousingCategoryName">Konut Grup Adı</text>
     <text name="CreateNewHousingDueAccountBook">Aidat ödemesi ekle</text>
     <text name="HousingCategory">Konut grubu</text>
+    <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
+    <text name="CreateHousingPaymentPlan">Aidat Ödeme Planı Girişi</text>
+    <text name="StartDate">Başlangıç Tarihi</text>
+    <text name="AmountPerMonth">Tutar / Ay</text>
+    <text name="CountOfMonth">Ay Sayısı</text>
+    <text name="PaymentDayOfMonth">Ödeme Günü</text>
   </texts>
 </localizationDictionary>
