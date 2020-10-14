@@ -174,5 +174,6 @@
     <text name="CountOfMonth">Ay Sayısı</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
     <text name="Balance">Bakiye</text>
+    <text name="CreateNewHousingCategory">Konut Grubu Oluştur</text>
   </texts>
 </localizationDictionary>
