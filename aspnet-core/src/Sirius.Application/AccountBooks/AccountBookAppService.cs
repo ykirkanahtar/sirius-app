@@ -23,15 +23,17 @@ namespace Sirius.AccountBooks
         private readonly IAccountBookManager _accountBookManager;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IHousingManager _housingManager;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public AccountBookAppService(IAccountBookManager accountBookManager, IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager, IUnitOfWorkManager unitOfWorkManager)
+        public AccountBookAppService(IAccountBookManager accountBookManager, IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager, IUnitOfWorkManager unitOfWorkManager, IHousingManager housingManager)
             :base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
             _accountBookRepository = accountBookRepository;
             _paymentCategoryManager = paymentCategoryManager;
             _unitOfWorkManager = unitOfWorkManager;
+            _housingManager = housingManager;
         }
         
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -42,7 +44,8 @@ namespace Sirius.AccountBooks
         public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
         {
             var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
-        
+            var housing = await _housingManager.GetAsync(input.HousingId);
+            
             var accountBook = AccountBook.CreateHousingDue(
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
@@ -54,6 +57,8 @@ namespace Sirius.AccountBooks
                 , input.Description);
     
             await _accountBookManager.CreateAsync(accountBook);
+            await _housingManager.DecreaseBalance(housing, input.Amount);
+            
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
         

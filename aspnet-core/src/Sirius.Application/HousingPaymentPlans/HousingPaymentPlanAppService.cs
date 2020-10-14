@@ -19,6 +19,7 @@ namespace Sirius.HousingPaymentPlans
             CreateCreditHousingPaymentPlanDto, UpdateHousingPaymentPlanDto>, IHousingPaymentPlanAppService
     {
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
+        private readonly IHousingManager _housingManager;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
@@ -31,7 +32,7 @@ namespace Sirius.HousingPaymentPlans
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository,
-            IPaymentCategoryManager paymentCategoryManager)
+            IPaymentCategoryManager paymentCategoryManager, IHousingManager housingManager)
             : base(housingPaymentPlanRepository)
         {
             _housingPaymentPlanManager = housingPaymentPlanManager;
@@ -41,6 +42,7 @@ namespace Sirius.HousingPaymentPlans
             _accountBookRepository = accountBookRepository;
             _housingCategoryRepository = housingCategoryRepository;
             _paymentCategoryManager = paymentCategoryManager;
+            _housingManager = housingManager;
         }
 
         public async Task CreateDebtPaymentForHousingCategory(
@@ -89,7 +91,16 @@ namespace Sirius.HousingPaymentPlans
                 }
             }
 
-            await _housingPaymentPlanManager.BulkCreateAsync(housingPaymentPlans);
+            try
+            {
+                await _housingPaymentPlanManager.BulkCreateAsync(housingPaymentPlans);
+                _housingManager.BulkIncreaseBalance(housings, input.AmountPerMonth * input.CountOfMonth);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)

@@ -45,6 +45,7 @@
                 <th>{{ "Block" | localize }}</th>
                 <th>{{ "Apartment" | localize }}</th>
                 <th>{{ "HousingCategory" | localize }}</th>
+                <th>{{ "Balance" | localize }}</th>
                 <th style="width: 200px;">{{ "Actions" | localize }}</th>
               </tr>
             </thead>
@@ -64,6 +65,7 @@
                 <td>{{ housing.block }}</td>
                 <td>{{ housing.apartment }}</td>
                 <td>{{ housing.housingCategory.housingCategoryName }}</td>
+                <td>{{ housing.balance | number:'1.2-2' }}</td>
                 <td>
                   <button
                     type="button"
