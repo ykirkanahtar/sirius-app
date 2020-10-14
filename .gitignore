@@ -7,3 +7,4 @@ bin/
 aspnet-core/src/Sirius.Web.Host/App_Data/Logs/
 aspnet-core/src/Sirius.Web.Mvc/App_Data/Logs/
 aspnet-core/src/Sirius.Migrator/Logs/Logs.txt
+angular/yarn.lock
