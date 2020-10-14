@@ -5046,6 +5046,7 @@ export class HousingDto implements IHousingDto {
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryId: string;
+    balance: number;
     housingCategory: HousingCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -5070,6 +5071,7 @@ export class HousingDto implements IHousingDto {
             this.block = _data["block"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
+            this.balance = _data["balance"];
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -5094,6 +5096,7 @@ export class HousingDto implements IHousingDto {
         data["block"] = this.block;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
+        data["balance"] = this.balance;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -5118,6 +5121,7 @@ export interface IHousingDto {
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryId: string;
+    balance: number;
     housingCategory: HousingCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
