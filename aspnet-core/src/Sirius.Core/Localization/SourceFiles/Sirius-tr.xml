@@ -175,5 +175,6 @@
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
     <text name="Balance">Bakiye</text>
     <text name="CreateNewHousingCategory">Konut Grubu Oluştur</text>
+    <text name="OtherPayments">Diğer ödemeler</text>
   </texts>
 </localizationDictionary>
