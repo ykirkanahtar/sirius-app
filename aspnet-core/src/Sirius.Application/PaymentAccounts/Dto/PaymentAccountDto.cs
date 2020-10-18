@@ -13,6 +13,7 @@ namespace Sirius.PaymentAccounts.Dto
     {
         public string AccountName { get; set; }
         public PaymentAccountType PaymentAccountType { get; set; }
+        public decimal Balance { get; set; }
         public string Description { get; set; }
         public Guid? PersonId { get; set; }
         public string Iban { get; set; }

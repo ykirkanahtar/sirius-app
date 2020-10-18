@@ -9,6 +9,8 @@ namespace Sirius.AccountBooks
     public interface IAccountBookAppService : IAsyncCrudAppService<AccountBookDto, Guid, PagedAccountBookResultRequestDto, CreateAccountBookDto, UpdateAccountBookDto>
     {
         Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input);
+
+        Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input);
         // Task<AccountBookDto> CreateBillPaymentAsync(CreateBillPaymentAccountBookDto input);
         // Task<AccountBookDto> CreateTransferFromThePreviousPeriodAsync(CreateTransferFromPreviousPeriodAccountBookDto input);
         // Task<AccountBookDto> CreateSalaryPaymentAsync(CreateAccountBookDto input);

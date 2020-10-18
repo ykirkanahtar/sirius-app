@@ -267,6 +267,62 @@ export class AccountBookServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createOtherPayment(body: CreateOtherPaymentAccountBookDto | undefined): Observable<AccountBookDto> {
+        let url_ = this.baseUrl + "/api/services/app/AccountBook/CreateOtherPayment";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOtherPayment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOtherPayment(<any>response_);
+                } catch (e) {
+                    return <Observable<AccountBookDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AccountBookDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateOtherPayment(response: HttpResponseBase): Observable<AccountBookDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AccountBookDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AccountBookDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     update(body: UpdateAccountBookDto | undefined): Observable<AccountBookDto> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/Update";
         url_ = url_.replace(/[?&]$/, "");
@@ -2738,6 +2794,61 @@ export class PaymentCategoryServiceProxy {
     }
 
     /**
+     * @return Success
+     */
+    getPaymentCategoryLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentCategoryLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentCategoryLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -5142,6 +5253,7 @@ export enum PaymentAccountType {
 export class PaymentAccountDto implements IPaymentAccountDto {
     accountName: string | undefined;
     paymentAccountType: PaymentAccountType;
+    balance: number;
     description: string | undefined;
     personId: string | undefined;
     iban: string | undefined;
@@ -5168,6 +5280,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         if (_data) {
             this.accountName = _data["accountName"];
             this.paymentAccountType = _data["paymentAccountType"];
+            this.balance = _data["balance"];
             this.description = _data["description"];
             this.personId = _data["personId"];
             this.iban = _data["iban"];
@@ -5194,6 +5307,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         data = typeof data === 'object' ? data : {};
         data["accountName"] = this.accountName;
         data["paymentAccountType"] = this.paymentAccountType;
+        data["balance"] = this.balance;
         data["description"] = this.description;
         data["personId"] = this.personId;
         data["iban"] = this.iban;
@@ -5220,6 +5334,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
 export interface IPaymentAccountDto {
     accountName: string | undefined;
     paymentAccountType: PaymentAccountType;
+    balance: number;
     description: string | undefined;
     personId: string | undefined;
     iban: string | undefined;
@@ -5414,6 +5529,77 @@ export interface ICreateHousingDueAccountBookDto {
     toPaymentAccountId: string;
     amount: number;
     description: string | undefined;
+}
+
+export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAccountBookDto {
+    processDateTime: moment.Moment;
+    paymentCategoryId: string;
+    fromPaymentAccountId: string | undefined;
+    toPaymentAccountId: string | undefined;
+    amount: number;
+    description: string | undefined;
+    documentDateTime: moment.Moment | undefined;
+    documentNumber: string | undefined;
+
+    constructor(data?: ICreateOtherPaymentAccountBookDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.paymentCategoryId = _data["paymentCategoryId"];
+            this.fromPaymentAccountId = _data["fromPaymentAccountId"];
+            this.toPaymentAccountId = _data["toPaymentAccountId"];
+            this.amount = _data["amount"];
+            this.description = _data["description"];
+            this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
+            this.documentNumber = _data["documentNumber"];
+        }
+    }
+
+    static fromJS(data: any): CreateOtherPaymentAccountBookDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOtherPaymentAccountBookDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["paymentCategoryId"] = this.paymentCategoryId;
+        data["fromPaymentAccountId"] = this.fromPaymentAccountId;
+        data["toPaymentAccountId"] = this.toPaymentAccountId;
+        data["amount"] = this.amount;
+        data["description"] = this.description;
+        data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
+        data["documentNumber"] = this.documentNumber;
+        return data; 
+    }
+
+    clone(): CreateOtherPaymentAccountBookDto {
+        const json = this.toJSON();
+        let result = new CreateOtherPaymentAccountBookDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateOtherPaymentAccountBookDto {
+    processDateTime: moment.Moment;
+    paymentCategoryId: string;
+    fromPaymentAccountId: string | undefined;
+    toPaymentAccountId: string | undefined;
+    amount: number;
+    description: string | undefined;
+    documentDateTime: moment.Moment | undefined;
+    documentNumber: string | undefined;
 }
 
 export class UpdateAccountBookDto implements IUpdateAccountBookDto {

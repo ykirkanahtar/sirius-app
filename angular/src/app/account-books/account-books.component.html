@@ -8,18 +8,18 @@
         <div class="col-6 text-right">
           <div class="btn-group dropdown" dropdown>
             <button dropdownToggle class="dropdown-toggle btn bg-blue">
-                <i class="fa fa-plus-square"></i>
-                {{"Create" | localize}}
+              <i class="fa fa-plus-square"></i>
+              {{"Create" | localize}}
             </button>
-            <ul class="dropdown-menu" *dropdownMenu>
-                <li>
-                    <a href="javascript:;"
-                        (click)="createHousingDueAccountBook()">{{'HousingDue' | localize}}</a>
-                </li>
-                <li>
-                    <a href="javascript:;" 
-                        (click)="createAccountBook()">{{'OtherPayments' | localize}}</a>
-                </li>                                                                                                                                                                         											
+            <ul class="dropdown-menu" *dropdownMenu style="background-color:#007bff !important;">
+              <li>
+                <a class="dropdown-item" href="javascript:;" style="color: black;"
+                  (click)="createHousingDueAccountBook()">{{'HousingDue' | localize}}</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="javascript:;" style="color: black;"
+                  (click)="createOtherPaymentAccountBook()">{{'OtherPayments' | localize}}</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -32,22 +32,12 @@
         <div class="card-header">
           <div class="input-group">
             <div class="input-group-prepend">
-              <button
-                type="button"
-                class="btn bg-blue"
-                (click)="getDataPage(1)"
-              >
+              <button type="button" class="btn bg-blue" (click)="getDataPage(1)">
                 <i class="fas fa-search"></i>
               </button>
             </div>
-            <input
-              type="text"
-              class="form-control"
-              name="keyword"
-              [placeholder]="'SearchWithThreeDot' | localize"
-              [(ngModel)]="keyword"
-              (keyup.enter)="getDataPage(1)"
-            />
+            <input type="text" class="form-control" name="keyword" [placeholder]="'SearchWithThreeDot' | localize"
+              [(ngModel)]="keyword" (keyup.enter)="getDataPage(1)" />
           </div>
         </div>
         <div class="card-body table-responsive p-0">
@@ -60,12 +50,13 @@
                 <th>{{ "Amount" | localize }}</th>
                 <th>{{ "FromPaymentAccount" | localize }}</th>
                 <th>{{ "ToPaymentAccount" | localize }}</th>
+                <th>{{ "FromPaymentAccountBalance" | localize }}</th>
+                <th>{{ "ToPaymentAccountBalance" | localize }}</th>
                 <th style="width: 200px;">{{ "Actions" | localize }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                *ngFor="
+              <tr *ngFor="
                   let accountBook of accountBooks
                     | paginate
                       : {
@@ -74,20 +65,21 @@
                           currentPage: pageNumber,
                           totalItems: totalItems
                         }
-                "
-              >
+                ">
                 <td>{{ accountBook.processDateTime.format('DD-MM-YYYY') }}</td>
                 <td>{{ accountBook.paymentCategory.paymentCategoryName }}</td>
                 <td>{{ accountBook.housing != null ? getHousingName(accountBook.housing) : '' }}</td>
-                <td>{{ accountBook.amount }}</td>
-                <td>{{ accountBook.fromPaymentAccount != null ? accountBook.fromPayment.accountName : '' }}</td>
+                <td>{{ accountBook.amount | number:'1.2-2'}}</td>
+                <td>{{ accountBook.fromPaymentAccount != null ? accountBook.fromPaymentAccount.accountName : '' }}</td>
                 <td>{{ accountBook.toPaymentAccount != null ? accountBook.toPaymentAccount.accountName : '' }}</td>
                 <td>
-                  <button
-                    type="button"
-                    class="btn btn-sm bg-danger mx-2"
-                    (click)="delete(accountBook)"
-                  >
+                  {{ (accountBook.fromPaymentAccount != null ? accountBook.fromPaymentAccount.balance   : '')  | number:'1.2-2'  }}
+                </td>
+                <td>
+                  {{ (accountBook.toPaymentAccount != null ? accountBook.toPaymentAccount.balance : '')  | number:'1.2-2'  }}
+                </td>
+                <td>
+                  <button type="button" class="btn btn-sm bg-danger mx-2" (click)="delete(accountBook)">
                     <i class="fas fa-trash"></i>
                     {{ "Delete" | localize }}
                   </button>
@@ -110,10 +102,7 @@
             </div>
             <div class="col-sm-4 col-12">
               <div class="float-sm-right m-auto">
-                <abp-pagination-controls
-                  id="server"
-                  (pageChange)="getDataPage($event)"
-                >
+                <abp-pagination-controls id="server" (pageChange)="getDataPage($event)">
                 </abp-pagination-controls>
               </div>
             </div>

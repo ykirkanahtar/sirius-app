@@ -26,7 +26,7 @@ namespace Sirius.Housings
         {
             await _housingRepository.UpdateAsync(housing);
         }
-        
+
         public async Task DeleteAsync(Housing housing)
         {
             await _housingRepository.DeleteAsync(housing);
@@ -43,20 +43,21 @@ namespace Sirius.Housings
             var updatedHousings = housings.Select(housing => Housing.IncreaseBalance(housing, amount)).ToList();
             _housingRepository.GetDbContext().UpdateRange(updatedHousings);
         }
-        
+
         public async Task DecreaseBalance(Housing housing, decimal amount)
         {
             housing = Housing.DecreaseBalance(housing, amount);
-            await _housingRepository.UpdateAsync(housing);        }
-
+            await _housingRepository.UpdateAsync(housing);
+        }
 
         public async Task<Housing> GetAsync(Guid id)
         {
             var housing = await _housingRepository.GetAsync(id);
-            if(housing == null)
+            if (housing == null)
             {
                 throw new UserFriendlyException("Konut bulunamadı");
             }
+
             return housing;
         }
     }

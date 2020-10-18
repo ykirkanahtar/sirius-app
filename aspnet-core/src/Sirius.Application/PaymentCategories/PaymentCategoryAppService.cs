@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
@@ -8,6 +9,7 @@ using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Sirius.PaymentCategories.Dto;
+using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentCategories
@@ -17,12 +19,14 @@ namespace Sirius.PaymentCategories
             CreatePaymentCategoryDto, UpdatePaymentCategoryDto>, IPaymentCategoryAppService
     {
         private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
 
         public PaymentCategoryAppService(IPaymentCategoryManager paymentCategoryManager,
             IRepository<PaymentCategory, Guid> paymentCategoryRepository)
             : base(paymentCategoryRepository)
         {
             _paymentCategoryManager = paymentCategoryManager;
+            _paymentCategoryRepository = paymentCategoryRepository;
         }
 
         public override async Task<PaymentCategoryDto> CreateAsync(CreatePaymentCategoryDto input)
@@ -59,6 +63,15 @@ namespace Sirius.PaymentCategories
 
             return new PagedResultDto<PaymentCategoryDto>(query.Count,
                 ObjectMapper.Map<List<PaymentCategoryDto>>(query));
+        }
+        
+        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
+        {
+            var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync();         
+                                                                               
+            return                                                             
+                (from l in paymentAccounts                                            
+                    select new LookUpDto(l.Id.ToString(), l.PaymentCategoryName)).ToList();  
         }
     }
 }

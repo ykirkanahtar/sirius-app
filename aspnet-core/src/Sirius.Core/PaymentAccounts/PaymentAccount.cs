@@ -3,8 +3,10 @@ using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Sirius.Shared.Enums;
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Abp.UI;
 
 namespace Sirius.AppPaymentAccounts
 {
@@ -23,6 +25,8 @@ namespace Sirius.AppPaymentAccounts
         public string AccountName { get; private set; }
 
         public PaymentAccountType PaymentAccountType { get; private set; }
+        [DefaultValue(0)]
+        public decimal Balance { get; private set; }
         public string Description { get; private set; }
 
         public Guid? PersonId { get; private set; }
@@ -71,5 +75,26 @@ namespace Sirius.AppPaymentAccounts
 
             return paymentAccount;
         }     
+        
+        public static PaymentAccount IncreaseBalance(PaymentAccount paymentAccount, decimal amount)
+        {
+            if (amount < 0)
+            {
+                throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
+            }
+            paymentAccount.Balance += amount;
+            return paymentAccount;
+        }
+        
+        public static PaymentAccount DecreaseBalance(PaymentAccount paymentAccount, decimal amount)
+        {
+            if (amount < 0)
+            {
+                throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
+            }
+            
+            paymentAccount.Balance -= amount;
+            return paymentAccount;
+        }
     }
 }

@@ -34,5 +34,17 @@ namespace Sirius.PaymentAccounts
             }
             return paymentAccount;
         }
+        
+        public async Task IncreaseBalance(PaymentAccount paymentAccount, decimal amount)
+        {
+            paymentAccount = PaymentAccount.IncreaseBalance(paymentAccount, amount);
+            await _paymentAccountRepository.UpdateAsync(paymentAccount);
+        }
+
+        public async Task DecreaseBalance(PaymentAccount paymentAccount, decimal amount)
+        {
+            paymentAccount = PaymentAccount.DecreaseBalance(paymentAccount, amount);
+            await _paymentAccountRepository.UpdateAsync(paymentAccount);
+        }
     }
 }

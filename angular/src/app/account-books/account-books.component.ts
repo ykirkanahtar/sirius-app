@@ -6,8 +6,9 @@ import {
   PagedListingComponentBase,
   PagedRequestDto
 } from '@shared/paged-listing-component-base';
-import { AccountBookDto, AccountBookServiceProxy, AccountBookDtoPagedResultDto, HousingDto  } from '@shared/service-proxies/service-proxies';
+import { AccountBookDto, AccountBookServiceProxy, AccountBookDtoPagedResultDto, HousingDto } from '@shared/service-proxies/service-proxies';
 import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
+import { CreateOtherPaymentAccountBookDialogComponent } from './create-account-book/create-other-payment-account-book-dialog.component';
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
@@ -20,7 +21,7 @@ class PagedAccountBooksRequestDto extends PagedRequestDto {
 export class AccountBooksComponent extends PagedListingComponentBase<AccountBookDto> {
   accountBooks: AccountBookDto[] = [];
   keyword = '';
-  
+
   constructor(
     injector: Injector,
     private _accountBooksService: AccountBookServiceProxy,
@@ -79,7 +80,7 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
@@ -93,24 +94,21 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
     this.showCreateOrEditAccountBookDialog(true);
   }
 
+  createOtherPaymentAccountBook(): void {
+    this.showCreateOrEditAccountBookDialog(false);
+  }
+
   showCreateOrEditAccountBookDialog(isHousingDue: boolean, id?: number): void {
     let createOrEditAccountBookDialog: BsModalRef;
     if (!id) {
-      if(isHousingDue) {
-          createOrEditAccountBookDialog = this._modalService.show(
-            CreateHousingDueAccountBookDialogComponent,
-            {
-              class: 'modal-lg',
-            }
-          );
-      }
-
-      // createOrEditAccountBookDialog = this._modalService.show(
-      //   CreateAccountBookDialogComponent,
-      //   {
-      //     class: 'modal-lg',
-      //   }
-      // );
+      createOrEditAccountBookDialog = this._modalService.show(
+        isHousingDue ?
+          CreateHousingDueAccountBookDialogComponent
+          : CreateOtherPaymentAccountBookDialogComponent,
+        {
+          class: 'modal-lg',
+        }
+      );
     }
     //else {
     //   createOrEditAccountBookDialog = this._modalService.show(
