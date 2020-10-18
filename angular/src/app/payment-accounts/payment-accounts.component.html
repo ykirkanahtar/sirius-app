@@ -60,6 +60,7 @@
               <tr>
                 <th>{{ "AccountName" | localize }}</th>
                 <th>{{ "PaymentAccountType" | localize }}</th>
+                <th>{{ "Balance" | localize }}</th>
                 <th>{{ "TenantIsOwner" | localize }}</th>
                 <th style="width: 200px;">{{ "Actions" | localize }}</th>
               </tr>
@@ -79,6 +80,7 @@
               >
                 <td>{{ paymentAccount.accountName }}</td>
                 <td>{{ paymentAccountTypeEnum[paymentAccount.paymentAccountType] | localize}}</td>
+                <td>{{ paymentAccount.balance | number:'1.2-2' }}</td>
                 <td>{{ paymentAccount.tenantIsOwner ? 'Evet' : 'Hayır' }}</td>
                 <td>
                   <!-- <button
