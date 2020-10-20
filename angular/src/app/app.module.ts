@@ -42,6 +42,7 @@ import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 //custom-components
 import { CreateHousingDialogComponent } from './housings/create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './housings/edit-housing/edit-housing-dialog.component';
+import { AddPersonDialogComponent } from './housings/add-or-edit-person/add-person-dialog.component';
 import { EmployeesComponent } from './employees/employees.component';
 import { CreateEmployeeDialogComponent } from './employees/create-employee/create-employee-dialog.component';
 import { EditEmployeeDialogComponent } from './employees/edit-employee/edit-employee-dialog.component';
@@ -100,6 +101,7 @@ import { trLocale } from 'ngx-bootstrap/locale';
     HousingsComponent,
     CreateHousingDialogComponent,
     EditHousingDialogComponent,
+    AddPersonDialogComponent,
     EmployeesComponent,
     CreateEmployeeDialogComponent,
     EditEmployeeDialogComponent,
@@ -153,7 +155,7 @@ import { trLocale } from 'ngx-bootstrap/locale';
   ],
 })
 export class AppModule {
-  constructor( private bsLocaleService: BsLocaleService) {
+  constructor(private bsLocaleService: BsLocaleService) {
     trLocale.invalidDate = 'Geçersiz tarih';
     defineLocale('tr', trLocale);
     this.bsLocaleService.use('tr');

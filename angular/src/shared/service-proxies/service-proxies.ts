@@ -1212,6 +1212,122 @@ export class HousingServiceProxy {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    addPerson(body: CreateHousingPersonDto | undefined): Observable<HousingPersonDto> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/AddPerson";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddPerson(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddPerson(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingPersonDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingPersonDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processAddPerson(response: HttpResponseBase): Observable<HousingPersonDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingPersonDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingPersonDto>(<any>null);
+    }
+
+    /**
+     * @param housingId (optional) 
+     * @return Success
+     */
+    getPeopleLookUp(housingId: string | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/GetPeopleLookUp?";
+        if (housingId === null)
+            throw new Error("The parameter 'housingId' cannot be null.");
+        else if (housingId !== undefined)
+            url_ += "housingId=" + encodeURIComponent("" + housingId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPeopleLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPeopleLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPeopleLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -4760,9 +4876,9 @@ export interface IIsTenantAvailableInput {
 }
 
 export enum TenantAvailabilityState {
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    Available = 1,
+    InActive = 2,
+    NotFound = 3,
 }
 
 export class IsTenantAvailableOutput implements IIsTenantAvailableOutput {
@@ -5153,12 +5269,197 @@ export interface IHousingCategoryDto {
     id: string;
 }
 
+export enum HousingPersonType {
+    Owner = 1,
+    Resident = 2,
+    Hirer = 3,
+}
+
+export class PersonDto implements IPersonDto {
+    firstName: string | undefined;
+    lastName: string | undefined;
+    phone1: string | undefined;
+    phone2: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IPersonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.phone1 = _data["phone1"];
+            this.phone2 = _data["phone2"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PersonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PersonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["phone1"] = this.phone1;
+        data["phone2"] = this.phone2;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): PersonDto {
+        const json = this.toJSON();
+        let result = new PersonDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPersonDto {
+    firstName: string | undefined;
+    lastName: string | undefined;
+    phone1: string | undefined;
+    phone2: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class HousingPersonDto implements IHousingPersonDto {
+    housingId: string;
+    personId: string;
+    housingPersonType: HousingPersonType;
+    contact: boolean;
+    person: PersonDto;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    constructor(data?: IHousingPersonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.personId = _data["personId"];
+            this.housingPersonType = _data["housingPersonType"];
+            this.contact = _data["contact"];
+            this.person = _data["person"] ? PersonDto.fromJS(_data["person"]) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): HousingPersonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPersonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["personId"] = this.personId;
+        data["housingPersonType"] = this.housingPersonType;
+        data["contact"] = this.contact;
+        data["person"] = this.person ? this.person.toJSON() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): HousingPersonDto {
+        const json = this.toJSON();
+        let result = new HousingPersonDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPersonDto {
+    housingId: string;
+    personId: string;
+    housingPersonType: HousingPersonType;
+    contact: boolean;
+    person: PersonDto;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+}
+
 export class HousingDto implements IHousingDto {
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
     housingCategory: HousingCategoryDto;
+    housingPerson: HousingPersonDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -5184,6 +5485,7 @@ export class HousingDto implements IHousingDto {
             this.housingCategoryId = _data["housingCategoryId"];
             this.balance = _data["balance"];
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
+            this.housingPerson = _data["housingPerson"] ? HousingPersonDto.fromJS(_data["housingPerson"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -5209,6 +5511,7 @@ export class HousingDto implements IHousingDto {
         data["housingCategoryId"] = this.housingCategoryId;
         data["balance"] = this.balance;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
+        data["housingPerson"] = this.housingPerson ? this.housingPerson.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -5234,6 +5537,7 @@ export interface IHousingDto {
     housingCategoryId: string;
     balance: number;
     housingCategory: HousingCategoryDto;
+    housingPerson: HousingPersonDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -5247,7 +5551,7 @@ export interface IHousingDto {
 export enum PaymentAccountType {
     Cash = 1,
     BankAccount = 2,
-    AdvanceAccount = 3
+    AdvanceAccount = 3,
 }
 
 export class PaymentAccountDto implements IPaymentAccountDto {
@@ -6188,6 +6492,61 @@ export interface ILookUpDto {
     label: string | undefined;
 }
 
+export class CreateHousingPersonDto implements ICreateHousingPersonDto {
+    housingId: string;
+    personId: string;
+    housingPersonType: HousingPersonType;
+    contact: boolean;
+
+    constructor(data?: ICreateHousingPersonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.personId = _data["personId"];
+            this.housingPersonType = _data["housingPersonType"];
+            this.contact = _data["contact"];
+        }
+    }
+
+    static fromJS(data: any): CreateHousingPersonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateHousingPersonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["personId"] = this.personId;
+        data["housingPersonType"] = this.housingPersonType;
+        data["contact"] = this.contact;
+        return data; 
+    }
+
+    clone(): CreateHousingPersonDto {
+        const json = this.toJSON();
+        let result = new CreateHousingPersonDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateHousingPersonDto {
+    housingId: string;
+    personId: string;
+    housingPersonType: HousingPersonType;
+    contact: boolean;
+}
+
 export class CreateHousingCategoryDto implements ICreateHousingCategoryDto {
     housingCategoryName: string | undefined;
 
@@ -6461,7 +6820,7 @@ export interface ICreateCreditHousingPaymentPlanDto {
 
 export enum PaymentPlanType {
     Credit = 1,
-    Debt = 2
+    Debt = 2,
 }
 
 export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
@@ -7230,93 +7589,6 @@ export interface ICreatePersonDto {
     lastName: string | undefined;
     phone1: string | undefined;
     phone2: string | undefined;
-}
-
-export class PersonDto implements IPersonDto {
-    firstName: string | undefined;
-    lastName: string | undefined;
-    phone1: string | undefined;
-    phone2: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IPersonDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.phone1 = _data["phone1"];
-            this.phone2 = _data["phone2"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): PersonDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PersonDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["phone1"] = this.phone1;
-        data["phone2"] = this.phone2;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): PersonDto {
-        const json = this.toJSON();
-        let result = new PersonDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPersonDto {
-    firstName: string | undefined;
-    lastName: string | undefined;
-    phone1: string | undefined;
-    phone2: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
 }
 
 export class UpdatePersonDto implements IUpdatePersonDto {

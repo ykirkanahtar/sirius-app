@@ -9,6 +9,7 @@ import {
 import { CreateHousingDialogComponent } from './create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './edit-housing/edit-housing-dialog.component';
 import { HousingDto, HousingServiceProxy, HousingDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -64,7 +65,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
@@ -76,6 +77,23 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
 
   editHousing(housing: HousingDto): void {
     this.showCreateOrEditHousingDialog(housing.id);
+  }
+
+  accountActivities(housing: HousingDto): void {
+    //Todo
+  }
+
+  addPerson(housing: HousingDto): void {
+    let addPersonDialog: BsModalRef;
+    addPersonDialog = this._modalService.show(
+      AddPersonDialogComponent,
+      {
+        class: 'modal-lg,',
+        initialState: {
+          id: housing.id
+        }
+      }
+    );
   }
 
   showCreateOrEditHousingDialog(id?: string): void {

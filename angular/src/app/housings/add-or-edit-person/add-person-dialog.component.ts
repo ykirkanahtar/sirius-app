@@ -3,50 +3,64 @@ import {
   Injector,
   OnInit,
   EventEmitter,
-  Output
+  Output,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { HousingDto, HousingServiceProxy, CreateHousingDto, LookUpDto, HousingCategoryServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CreateHousingPersonDto, HousingDto, HousingPersonDto, HousingPersonType, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
-  templateUrl: 'create-housing-dialog.component.html'
+  templateUrl: 'add-person-dialog.component.html'
 })
-export class CreateHousingDialogComponent extends AppComponentBase
+export class AddPersonDialogComponent extends AppComponentBase
   implements OnInit {
   saving = false;
+  id: string;
   housing = new HousingDto();
-  housingCategories: LookUpDto[];
+  people: LookUpDto[];
+  housingPerson = new HousingPersonDto();
+  housingPersonId: string;
+  housingPersonType = HousingPersonType;
+  housingPersonTypeValues = Object.values(
+    HousingPersonType
+  ).filter((e) => typeof e === 'number');
 
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
     injector: Injector,
     private _housingService: HousingServiceProxy,
-    private _housingCategoryService: HousingCategoryServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
   }
 
   ngOnInit(): void {
-    this._housingCategoryService
-      .getHousingCategoryLookUp()
+    this._housingService
+      .get(this.id)
+      .subscribe((result: HousingDto) => {
+        this.housing = result;
+      });
+
+    this._housingService
+      .getPeopleLookUp(this.id)
       .subscribe((result: LookUpDto[]) => {
-        this.housingCategories = result;
+        this.people = result;
       });
   }
 
   save(): void {
     this.saving = true;
 
-    const housing = new CreateHousingDto();
-    housing.init(this.housing);
+    const housingPerson = new CreateHousingPersonDto();
+    housingPerson.init(this.housing);
+
+    housingPerson.housingId = this.housing.id;
 
     this._housingService
-      .create(housing)
+      .addPerson(this.housingPerson)
       .pipe(
         finalize(() => {
           this.saving = false;
