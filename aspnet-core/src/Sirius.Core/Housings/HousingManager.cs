@@ -5,16 +5,22 @@ using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
 using Abp.UI;
+using Sirius.People;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {
     public class HousingManager : IHousingManager
     {
         private readonly IRepository<Housing, Guid> _housingRepository;
+        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IHousingPersonPolicy _housingPersonPolicy;
 
-        public HousingManager(IRepository<Housing, Guid> housingRepository)
+        public HousingManager(IRepository<Housing, Guid> housingRepository, IRepository<HousingPerson> housingPersonRepository, IHousingPersonPolicy housingPersonPolicy)
         {
             _housingRepository = housingRepository;
+            _housingPersonRepository = housingPersonRepository;
+            _housingPersonPolicy = housingPersonPolicy;
         }
 
         public async Task CreateAsync(Housing housing)
@@ -59,6 +65,13 @@ namespace Sirius.Housings
             }
 
             return housing;
+        }
+        
+        public async Task<HousingPerson> AddPersonAsync(Housing housing, Person person, HousingPersonType housingPersonType, bool contact)
+        {
+            return await _housingPersonRepository.InsertAsync(
+                await HousingPerson.CreateAsync(housing, person, housingPersonType, contact,_housingPersonPolicy)
+            );
         }
     }
 }

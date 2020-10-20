@@ -181,5 +181,14 @@
     <text name="PaymentCategory">Ödeme türü</text>
     <text name="DocumentDateTime">Belge Tarihi</text>
     <text name="DocumentNumber">Belge Numarası</text>
+    <text name="AccountActivities">Hesap Hareketleri</text>
+    <text name="AddOrEditPerson">Kişi Ekle/Düzenle</text>
+    <text name="Person">Kişi</text>
+    <text name="AddPerson">Kişi Ekle</text>
+    <text name="ContactText">İletişim</text>
+    <text name="PersonOptions">Kişi Seçenekleri</text>
+    <text name="Owner">Mülk sahibi</text>
+    <text name="Resident">Malik (Tapu sahibi eşi, çocuğu vs..)</text>
+    <text name="Hirer">Kiracı</text>
   </texts>
 </localizationDictionary>

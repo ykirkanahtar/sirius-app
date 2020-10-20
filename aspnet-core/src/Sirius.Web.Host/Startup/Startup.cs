@@ -18,6 +18,7 @@ using Abp.Dependency;
 using Abp.Json;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Sirius.Web.Host.Filters;
 
 namespace Sirius.Web.Host.Startup
 {
@@ -104,6 +105,8 @@ namespace Sirius.Web.Host.Startup
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
                 });
+                options.SchemaFilter<EnumSchemaFilter>();
+
             });
 
             // Configure Abp and Dependency Injection

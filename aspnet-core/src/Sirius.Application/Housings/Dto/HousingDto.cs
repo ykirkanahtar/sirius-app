@@ -14,5 +14,6 @@ namespace Sirius.Housings.Dto
         public decimal Balance { get; set; }
         
         public virtual HousingCategoryDto HousingCategory { get; set; }
+        public virtual HousingPersonDto HousingPerson { get; set; }
     }
 }

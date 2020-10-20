@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,6 +31,9 @@ namespace Sirius.Housings
 
         [ForeignKey(nameof(HousingCategoryId))]
         public virtual HousingCategory HousingCategory { get; set; }
+        
+        [ForeignKey("HousingId")]
+        public virtual ICollection<HousingPerson> HousingPeople { get; protected set; }
 
         public string GetName()
         {
@@ -72,6 +77,7 @@ namespace Sirius.Housings
             housing.Block = block;
             housing.Apartment = apartment;
             housing.HousingCategoryId = housingCategory.Id;
+            housing.HousingPeople = new Collection<HousingPerson>();
 
             return housing;
         }

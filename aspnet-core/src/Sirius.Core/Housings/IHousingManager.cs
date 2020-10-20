@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Domain.Services;
+using Sirius.People;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {
@@ -14,6 +16,7 @@ namespace Sirius.Housings
         void BulkIncreaseBalance(IEnumerable<Housing> housings, decimal amount);
         Task IncreaseBalance(Housing housing, decimal amount);
         Task DecreaseBalance(Housing housing, decimal amount);
+        Task<HousingPerson> AddPersonAsync(Housing housing, Person person, HousingPersonType housingPersonType, bool contact);
 
     }
 }
