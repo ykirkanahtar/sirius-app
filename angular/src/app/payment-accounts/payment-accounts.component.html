@@ -79,7 +79,7 @@
                 "
               >
                 <td>{{ paymentAccount.accountName }}</td>
-                <td>{{ paymentAccountTypeEnum[paymentAccount.paymentAccountType] | localize}}</td>
+                <td>{{ paymentAccountTypeEnum[paymentAccount.paymentAccountType]}}</td>
                 <td>{{ paymentAccount.balance | number:'1.2-2' }}</td>
                 <td>{{ paymentAccount.tenantIsOwner ? 'Evet' : 'Hayır' }}</td>
                 <td>

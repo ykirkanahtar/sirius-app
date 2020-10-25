@@ -39,6 +39,7 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/admin-lte-css-only/css/adminlte.min.css",
               "src/shared/core.less",
+              "src/shared/custom.less",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/themes/saga-blue/theme.css",
               "node_modules/primeng/resources/primeng.min.css"
@@ -166,6 +167,7 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/admin-lte-css-only/css/adminlte.min.css",
               "src/shared/core.less",
+              "src/shared/custom.less"
             ],
             "scripts": [
               "node_modules/moment/min/moment.min.js",

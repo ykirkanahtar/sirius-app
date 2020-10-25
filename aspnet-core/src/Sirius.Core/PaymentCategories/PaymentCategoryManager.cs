@@ -16,7 +16,6 @@ namespace Sirius.PaymentCategories
     {
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
-        private IPaymentCategoryManager _paymentCategoryManagerImplementation;
 
         public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
         {

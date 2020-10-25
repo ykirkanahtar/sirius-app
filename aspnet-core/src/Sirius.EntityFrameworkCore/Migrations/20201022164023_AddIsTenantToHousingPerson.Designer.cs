@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201022164023_AddIsTenantToHousingPerson")]
+    partial class AddIsTenantToHousingPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1786,8 +1788,6 @@ namespace Sirius.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PaymentCategoryId");
-
                     b.ToTable("AppHousingPaymentPlans");
                 });
 
@@ -2255,15 +2255,6 @@ namespace Sirius.Migrations
                     b.HasOne("Sirius.Authorization.Users.User", "LastModifierUser")
                         .WithMany()
                         .HasForeignKey("LastModifierUserId");
-                });
-
-            modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlan", b =>
-                {
-                    b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
-                        .WithMany()
-                        .HasForeignKey("PaymentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sirius.Housings.Housing", b =>

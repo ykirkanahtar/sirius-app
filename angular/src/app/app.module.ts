@@ -43,6 +43,7 @@ import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 import { CreateHousingDialogComponent } from './housings/create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './housings/edit-housing/edit-housing-dialog.component';
 import { AddPersonDialogComponent } from './housings/add-or-edit-person/add-person-dialog.component';
+import { AccountActivitiesDialogComponent } from './housings/account-activities/account-activities.component';
 import { EmployeesComponent } from './employees/employees.component';
 import { CreateEmployeeDialogComponent } from './employees/create-employee/create-employee-dialog.component';
 import { EditEmployeeDialogComponent } from './employees/edit-employee/edit-employee-dialog.component';
@@ -102,6 +103,7 @@ import { trLocale } from 'ngx-bootstrap/locale';
     CreateHousingDialogComponent,
     EditHousingDialogComponent,
     AddPersonDialogComponent,
+    AccountActivitiesDialogComponent,
     EmployeesComponent,
     CreateEmployeeDialogComponent,
     EditEmployeeDialogComponent,

@@ -25,10 +25,10 @@ namespace Sirius.Housings
         public virtual Person Person { get; protected set; }
         public virtual Guid PersonId { get; protected set; }
 
-        public HousingPersonType HousingPersonType { get; protected set; }
+        public bool IsTenant { get; protected set; }
         public bool Contact { get; protected set; }
         
-        public static async Task<HousingPerson> CreateAsync(Housing housing, Person person, HousingPersonType housingPersonType, bool contact, IHousingPersonPolicy housingPersonPolicy)
+        public static async Task<HousingPerson> CreateAsync(Housing housing, Person person, bool isTenant, bool contact, IHousingPersonPolicy housingPersonPolicy)
         {
             await housingPersonPolicy.CheckAddPersonAttemptAsync(housing, person);
 
@@ -39,7 +39,7 @@ namespace Sirius.Housings
                 Housing = housing,
                 PersonId = person.Id,
                 Person = person,
-                HousingPersonType = housingPersonType,
+                IsTenant = isTenant,
                 Contact = contact
             };
         }

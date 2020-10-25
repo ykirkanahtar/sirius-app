@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Sirius.AccountBooks.Dto;
 using Sirius.AppPaymentAccounts;
+using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
@@ -28,12 +29,13 @@ namespace Sirius.AccountBooks
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IHousingManager _housingManager;
+        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager,
             IUnitOfWorkManager unitOfWorkManager, IHousingManager housingManager,
-            IPaymentAccountManager paymentAccountManager)
+            IPaymentAccountManager paymentAccountManager, IHousingPaymentPlanManager housingPaymentPlanManager)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -42,6 +44,7 @@ namespace Sirius.AccountBooks
             _unitOfWorkManager = unitOfWorkManager;
             _housingManager = housingManager;
             _paymentAccountManager = paymentAccountManager;
+            _housingPaymentPlanManager = housingPaymentPlanManager;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -68,6 +71,16 @@ namespace Sirius.AccountBooks
             await _accountBookManager.CreateAsync(accountBook);
             await _housingManager.DecreaseBalance(housing, input.Amount);
             await _paymentAccountManager.IncreaseBalance(toPaymentAccount, input.Amount);
+            await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
+                SequentialGuidGenerator.Instance.Create()
+                , AbpSession.GetTenantId()
+                , housing
+                , housingDuePaymentCategory
+                , input.ProcessDateTime
+                , input.Amount
+                , input.Description
+                , accountBook
+            ));
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -90,7 +103,7 @@ namespace Sirius.AccountBooks
                 , input.DocumentNumber);
 
             await _accountBookManager.CreateAsync(accountBook);
-            
+
             if (input.FromPaymentAccountId.HasValue)
             {
                 var fromPaymentAccount = await _paymentAccountManager.GetAsync(input.FromPaymentAccountId.Value);

@@ -33,21 +33,15 @@
             </p-dropdown>
           </div>
         </div>
-        <div class="form-group row required">
-          <label class="col-md-3 col-form-label" for="housingPersonTypes">
-            {{ "PersonOptions" | localize }}
+        <div class="form-group row mb-0">
+          <label class="col-md-3 col-form-label">
+            {{ "IsTenant" | localize }}
           </label>
           <div class="col-md-9">
-            <div class="form-group">
-              <div class="form-check" *ngFor="
-                      let choice of housingPersonTypeValues
-                  ">
-                <input class="form-check-input" type="radio" name="search-method"
-                  [(ngModel)]="housingPerson.housingPersonType" [value]="choice" required />
-                <label class="form-check-label" for="echo-tag-radio">{{
-                          housingPersonType[choice] | localize
-                      }}</label>
-              </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="isTenant" id="isTenant"
+                [(ngModel)]="housingPerson.isTenant" />
+              <label class="custom-control-label mt-2" for="isTenant"></label>
             </div>
           </div>
         </div>

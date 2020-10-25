@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
+using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.Timing;
+using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks;
 using Sirius.HousingCategories;
 using Sirius.HousingPaymentPlans.Dto;
@@ -26,13 +31,15 @@ namespace Sirius.HousingPaymentPlans
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public HousingPaymentPlanAppService(IHousingPaymentPlanManager housingPaymentPlanManager,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository,
-            IPaymentCategoryManager paymentCategoryManager, IHousingManager housingManager)
+            IPaymentCategoryManager paymentCategoryManager, IHousingManager housingManager,
+            IUnitOfWorkManager unitOfWorkManager)
             : base(housingPaymentPlanRepository)
         {
             _housingPaymentPlanManager = housingPaymentPlanManager;
@@ -43,6 +50,7 @@ namespace Sirius.HousingPaymentPlans
             _housingCategoryRepository = housingCategoryRepository;
             _paymentCategoryManager = paymentCategoryManager;
             _housingManager = housingManager;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public async Task CreateDebtPaymentForHousingCategory(
@@ -156,6 +164,23 @@ namespace Sirius.HousingPaymentPlans
                 input.Amount, input.Description);
             await _housingPaymentPlanManager.UpdateAsync(housingPaymentPlan);
             return ObjectMapper.Map<HousingPaymentPlanDto>(housingPaymentPlan);
+        }
+
+        public async Task<PagedResultDto<HousingPaymentPlanDto>> GetAllByHousingIdAsync(
+            PagedHousingPaymentPlanResultRequestDto input)
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var query = _housingPaymentPlanRepository.GetAll()
+                    .Where(p => p.TenantId == AbpSession.TenantId && p.HousingId == input.HousingId)
+                    .Include(p => p.PaymentCategory)
+                    .OrderBy(p => p.Date);
+
+                var list = await query.PageBy(input).ToListAsync();
+
+                return new PagedResultDto<HousingPaymentPlanDto>(query.Count(),
+                    ObjectMapper.Map<List<HousingPaymentPlanDto>>(list));
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Sirius.Housings.Dto
     {
         public Guid HousingId { get; set; }
         public Guid PersonId { get; set; }
-        public HousingPersonType HousingPersonType { get; set; }
+        public bool IsTenant { get; set; }
         public bool Contact { get; set; }
 
         public virtual PersonDto Person { get; set; }

@@ -67,7 +67,7 @@ namespace Sirius.Housings
             var query = _housingRepository.GetAll()
                 .Include(p => p.HousingCategory);
 
-            var housings = await query.ToListAsync();
+            var housings = await query.PageBy(input).ToListAsync();
 
             return new PagedResultDto<HousingDto>(housings.Count,
                 ObjectMapper.Map<List<HousingDto>>(housings));
@@ -87,7 +87,7 @@ namespace Sirius.Housings
             var housing = await _housingManager.GetAsync(input.HousingId);
             var person = await _personManager.GetAsync(input.PersonId);
 
-            var housingPerson = await _housingManager.AddPersonAsync(housing, person, input.HousingPersonType, input.Contact);
+            var housingPerson = await _housingManager.AddPersonAsync(housing, person, input.IsTenant, input.Contact);
             return ObjectMapper.Map<HousingPersonDto>(housingPerson);
         }
 

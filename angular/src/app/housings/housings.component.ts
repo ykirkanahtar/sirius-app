@@ -10,6 +10,7 @@ import { CreateHousingDialogComponent } from './create-housing/create-housing-di
 import { EditHousingDialogComponent } from './edit-housing/edit-housing-dialog.component';
 import { HousingDto, HousingServiceProxy, HousingDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
 import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
+import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -25,7 +26,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
 
   constructor(
     injector: Injector,
-    private _housingsService: HousingServiceProxy,
+    private _housingService: HousingServiceProxy,
     private _modalService: BsModalService
   ) {
     super(injector);
@@ -38,7 +39,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
   ): void {
     request.keyword = this.keyword;
 
-    this._housingsService
+    this._housingService
       .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
@@ -57,7 +58,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
       undefined,
       (result: boolean) => {
         if (result) {
-          this._housingsService
+          this._housingService
             .delete(housing.id)
             .pipe(
               finalize(() => {
@@ -80,8 +81,16 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
   }
 
   accountActivities(housing: HousingDto): void {
-    //Todo
-  }
+    let accountActivitiesDialog: BsModalRef;
+    accountActivitiesDialog = this._modalService.show(
+      AccountActivitiesDialogComponent,
+      {
+        class: 'modal-lg, modal-xl',
+        initialState: {
+          id: housing.id
+        }
+      }
+    );  }
 
   addPerson(housing: HousingDto): void {
     let addPersonDialog: BsModalRef;

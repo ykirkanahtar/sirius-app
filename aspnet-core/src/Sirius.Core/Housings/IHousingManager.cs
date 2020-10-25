@@ -16,7 +16,7 @@ namespace Sirius.Housings
         void BulkIncreaseBalance(IEnumerable<Housing> housings, decimal amount);
         Task IncreaseBalance(Housing housing, decimal amount);
         Task DecreaseBalance(Housing housing, decimal amount);
-        Task<HousingPerson> AddPersonAsync(Housing housing, Person person, HousingPersonType housingPersonType, bool contact);
+        Task<HousingPerson> AddPersonAsync(Housing housing, Person person, bool isTenant, bool contact);
 
     }
 }

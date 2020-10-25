@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { CreateHousingPersonDto, HousingDto, HousingPersonDto, HousingPersonType, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
+import { CreateHousingPersonDto, HousingDto, HousingPersonDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'add-person-dialog.component.html'
@@ -22,10 +22,6 @@ export class AddPersonDialogComponent extends AppComponentBase
   people: LookUpDto[];
   housingPerson = new HousingPersonDto();
   housingPersonId: string;
-  housingPersonType = HousingPersonType;
-  housingPersonTypeValues = Object.values(
-    HousingPersonType
-  ).filter((e) => typeof e === 'number');
 
   @Output() onSave = new EventEmitter<any>();
 

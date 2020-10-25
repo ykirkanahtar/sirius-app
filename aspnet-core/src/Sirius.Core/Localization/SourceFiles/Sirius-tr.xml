@@ -187,8 +187,9 @@
     <text name="AddPerson">Kişi Ekle</text>
     <text name="ContactText">İletişim</text>
     <text name="PersonOptions">Kişi Seçenekleri</text>
-    <text name="Owner">Mülk sahibi</text>
-    <text name="Resident">Malik (Tapu sahibi eşi, çocuğu vs..)</text>
+    <text name="IsTenant">Kiracı</text>
     <text name="Hirer">Kiracı</text>
+    <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
+    <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
   </texts>
 </localizationDictionary>

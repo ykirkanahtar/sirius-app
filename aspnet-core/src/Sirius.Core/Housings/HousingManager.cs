@@ -67,10 +67,10 @@ namespace Sirius.Housings
             return housing;
         }
         
-        public async Task<HousingPerson> AddPersonAsync(Housing housing, Person person, HousingPersonType housingPersonType, bool contact)
+        public async Task<HousingPerson> AddPersonAsync(Housing housing, Person person, bool isTenant, bool contact)
         {
             return await _housingPersonRepository.InsertAsync(
-                await HousingPerson.CreateAsync(housing, person, housingPersonType, contact,_housingPersonPolicy)
+                await HousingPerson.CreateAsync(housing, person, isTenant, contact,_housingPersonPolicy)
             );
         }
     }
