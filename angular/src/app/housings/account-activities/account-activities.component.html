@@ -1,0 +1,87 @@
+<form class="form-horizontal" autocomplete="off" #accountActivitiesForm="ngForm">
+  <abp-modal-header [title]="'AccountActivities' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row readonly">
+          <label class="col-md-3 col-form-label" for="block">
+            {{ "Block" | localize }}
+          </label>
+          <div class="col-md-9">
+            <label class="col-md-3 col-form-label">
+              {{ housing.block }}
+            </label>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "Apartment" | localize }}
+          </label>
+          <div class="col-md-9">
+            <label class="col-md-3 col-form-label">
+              {{ housing.apartment }}
+            </label>
+          </div>
+        </div>
+
+        <section class="content px-2">
+          <div class="container-fluid">
+            <div class="card">
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap" [busy]="isTableLoading">
+                  <thead class="bg-light">
+                    <tr>
+                      <th>{{ "Date" | localize }}</th>
+                      <th>{{ "PaymentPlanType" | localize }}</th>
+                      <th>{{ "PaymentCategory" | localize }}</th>
+                      <th>{{ "Amount" | localize }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="
+                        let item of housingPaymentPlans
+                          | paginate
+                            : {
+                                id: 'server',
+                                itemsPerPage: pageSize,
+                                currentPage: pageNumber,
+                                totalItems: totalItems
+                              }
+                      ">
+                      <td>{{ item.date.format('DD-MM-YYYY') }}</td>
+                      <td>{{ (item.paymentPlanType == paymentPlanTypeEnum.Debt ? 'DebtTextForHousingPaymentPlan' 
+                        : 'CreditTextForHousingPaymentPlan') | localize}}</td>
+                      <td>{{ item.paymentCategory.paymentCategoryName }}</td>
+                      <td>{{ item.amount | number:'1.2-2' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer bg-light border-top">
+                <div class="row">
+                  <div class="col-sm-4 col-12 text-sm-left text-center">
+                    <button class="btn btn-secondary" (click)="refresh()">
+                      <i class="fas fa-redo-alt"></i>
+                    </button>
+                  </div>
+                  <div class="col-sm-4 col-12 text-center">
+                    <p class="mb-0 my-2">
+                      {{ "TotalRecordsCount" | localize: totalItems }}
+                    </p>
+                  </div>
+                  <div class="col-sm-4 col-12">
+                    <div class="float-sm-right m-auto">
+                      <abp-pagination-controls id="server" (pageChange)="getDataPage($event)">
+                      </abp-pagination-controls>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </tab>
+    </tabset>
+  </div>
+</form>
