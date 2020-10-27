@@ -191,5 +191,6 @@
     <text name="Hirer">Kiracı</text>
     <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
     <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
+    <text name="Payment">Ödeme</text>
   </texts>
 </localizationDictionary>
