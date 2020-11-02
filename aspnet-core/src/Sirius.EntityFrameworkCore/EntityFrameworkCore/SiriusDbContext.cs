@@ -26,6 +26,7 @@ namespace Sirius.EntityFrameworkCore
         public virtual DbSet<PaymentCategory> PaymentCategories { get; set; }
         public virtual DbSet<HousingCategory> HousingCategories { get; set; }
         public virtual DbSet<HousingPerson> HousingPeople { get; set; }
+        public virtual DbSet<Block> Blocks { get; set; }
 
         public SiriusDbContext(DbContextOptions<SiriusDbContext> options)
             : base(options)

@@ -123,6 +123,7 @@
     <text name="EditHousing">Konut düzenle</text>
     <text name="Details">Detaylar</text>
     <text name="Block">Blok</text>
+    <text name="BlockName">Blok Adı</text>
     <text name="Apartment">Daire</text>
     <text name="CreateNewPerson">Kişi ekle</text>
     <text name="EditPerson">Kişi düzenle</text>

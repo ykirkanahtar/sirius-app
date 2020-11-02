@@ -28,10 +28,10 @@ namespace Sirius.Housings
         private readonly IPersonManager _personManager;
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPerson> _housingPersonRepository;
-
+        private readonly IRepository<Block, Guid> _blockRepository;
         public HousingAppService(IHousingManager housingManager, IRepository<Housing, Guid> housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
-            IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository)
+            IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository, IRepository<Block, Guid> blockRepository)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -40,14 +40,21 @@ namespace Sirius.Housings
             _personManager = personManager;
             _personRepository = personRepository;
             _housingPersonRepository = housingPersonRepository;
+            _blockRepository = blockRepository;
         }
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
         {
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
+            Block block = null;
 
+            if (input.BlockId.HasValue)
+            {
+                block = await _blockRepository.GetAsync(input.BlockId.Value);
+            }
+            
             var housing = Housing.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(),
-                input.Block, input.Apartment, housingCategory);
+                block, input.Apartment, housingCategory);
             await _housingManager.CreateAsync(housing);
             return ObjectMapper.Map<HousingDto>(housing);
         }
@@ -56,8 +63,14 @@ namespace Sirius.Housings
         {
             var existingHousing = await _housingManager.GetAsync(input.Id);
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
+            Block block = null;
 
-            var housing = Housing.Update(existingHousing, input.Block, input.Apartment, housingCategory);
+            if (input.BlockId.HasValue)
+            {
+                block = await _blockRepository.GetAsync(input.BlockId.Value);
+            }
+            
+            var housing = Housing.Update(existingHousing, block, input.Apartment, housingCategory);
             await _housingManager.UpdateAsync(housing);
             return ObjectMapper.Map<HousingDto>(housing);
         }

@@ -8,7 +8,7 @@ namespace Sirius.Housings.Dto
 
     public class CreateHousingDto
     {
-        public string Block { get; set; }
+        public Guid? BlockId { get; set; }
         public string Apartment { get; set; }
         public Guid HousingCategoryId { get; set; }
     }
