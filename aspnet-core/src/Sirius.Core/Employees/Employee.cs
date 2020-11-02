@@ -15,32 +15,29 @@ namespace Sirius.Employees
     {
         protected Employee()
         {
-
         }
 
         public int TenantId { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string FirstName { get; protected set; }
+        [Required] [StringLength(50)] public string FirstName { get; protected set; }
 
-        [Required]
-        [StringLength(50)]
-        public string LastName { get; protected set; }
+        [Required] [StringLength(50)] public string LastName { get; protected set; }
 
-        [StringLength(50)]
-        public string Phone1 { get; protected set; }
+        [StringLength(50)] public string Phone1 { get; protected set; }
 
-        [StringLength(50)]
-        public string Phone2 { get; protected set; }
+        [StringLength(50)] public string Phone2 { get; protected set; }
+
+        [NotMapped] public string Name => FirstName + " " + LastName;
+
 
         public static Employee Create(Guid id, int tenantId, [NotNull] string firstName,
             [NotNull] string lastName, string phoneNumber1, string phoneNumber2)
         {
             return BindEntity(new Employee(), id, tenantId, firstName, lastName, phoneNumber1, phoneNumber2);
         }
-        
-        public static Employee Update(Employee existingEmployee, [NotNull] string firstName, [NotNull] string lastName, string phoneNumber1, string phoneNumber2)
+
+        public static Employee Update(Employee existingEmployee, [NotNull] string firstName, [NotNull] string lastName,
+            string phoneNumber1, string phoneNumber2)
         {
             return BindEntity(existingEmployee, existingEmployee.Id, existingEmployee.TenantId, firstName, lastName,
                 phoneNumber1, phoneNumber2);
@@ -53,7 +50,7 @@ namespace Sirius.Employees
             Check.NotNull(lastName, nameof(lastName));
 
             employee ??= new Employee();
-            
+
             employee.Id = id;
             employee.TenantId = tenantId;
 
@@ -63,12 +60,12 @@ namespace Sirius.Employees
 
             return employee;
         }
-        
+
         private void SetName([NotNull] string firstName, [NotNull] string lastName)
         {
             Check.NotNull(firstName, nameof(firstName));
             Check.NotNull(lastName, nameof(lastName));
-            
+
             FirstName = firstName;
             LastName = lastName;
         }

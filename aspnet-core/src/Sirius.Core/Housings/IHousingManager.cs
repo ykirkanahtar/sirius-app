@@ -17,6 +17,6 @@ namespace Sirius.Housings
         Task IncreaseBalance(Housing housing, decimal amount);
         Task DecreaseBalance(Housing housing, decimal amount);
         Task<HousingPerson> AddPersonAsync(Housing housing, Person person, bool isTenant, bool contact);
-
+        Task<List<Housing>> GetHousingsFromPersonIds(List<Guid> personIds);
     }
 }

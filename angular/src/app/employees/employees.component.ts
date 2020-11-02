@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -9,6 +9,8 @@ import {
 import { CreateEmployeeDialogComponent } from './create-employee/create-employee-dialog.component';
 import { EditEmployeeDialogComponent } from './edit-employee/edit-employee-dialog.component';
 import { EmployeeDto, EmployeeServiceProxy, EmployeeDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { Table } from 'primeng/table';
+import { LazyLoadEvent } from 'primeng/api';
 
 class PagedEmployeesRequestDto extends PagedRequestDto {
   keyword: string;
@@ -18,9 +20,20 @@ class PagedEmployeesRequestDto extends PagedRequestDto {
   templateUrl: './Employees.component.html',
   animations: [appModuleAnimation()]
 })
-export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto> {
+export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
+  advancedFiltersVisible = false;
+
   employees: EmployeeDto[] = [];
-  keyword = '';
+
+  employeesFilter: string[] = [];
+  selectedEmployeeFilter: string;
+
+  phoneNumberFilter: string;
 
   constructor(
     injector: Injector,
@@ -30,27 +43,62 @@ export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto> {
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this.getDataPage(1);
+  }
+
+  searchEmployee(event) {
+    this._employeesService
+      .getEmployeeFromAutoCompleteFilter(event.query)
+      .subscribe((result) => {
+        this.employeesFilter = result;
+      });
+  }
+
+  createEmployee(): void {
+    this.showCreateOrEditEmployeeDialog();
+  }
+
+  editEmployee(employee: EmployeeDto): void {
+    this.showCreateOrEditEmployeeDialog(employee.id);
+  }
+
+  clearFilters(): void {
+    this.employeesFilter = [];
+    this.selectedEmployeeFilter = '';
+    this.phoneNumberFilter = '';
+    this.getDataPage(1);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedEmployeesRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._employeesService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(
+        this.selectedEmployeeFilter,
+        this.phoneNumberFilter,
+        this.sortingColumn,
+        request.skipCount,
+        request.maxResultCount)
       .pipe(
-        finalize(() => {
-          finishedCallback();
-        })
-      )
+          finalize(() => {
+            finishedCallback();
+          })
+        )
       .subscribe((result: EmployeeDtoPagedResultDto) => {
         this.employees = result.items;
         this.showPaging(result, pageNumber);
       });
   }
 
-  delete(employee: EmployeeDto): void {
+  protected delete(employee: EmployeeDto): void {
     abp.message.confirm(
       this.l('EmployeeDeleteWarningMessage', employee.firstName + ' ' + employee.lastName),
       undefined,
@@ -64,21 +112,13 @@ export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto> {
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
   }
 
-  createEmployee(): void {
-    this.showCreateOrEditEmployeeDialog();
-  }
-
-  editEmployee(employee: EmployeeDto): void {
-    this.showCreateOrEditEmployeeDialog(employee.id);
-  }
-
-  showCreateOrEditEmployeeDialog(id?: string): void {
+  private showCreateOrEditEmployeeDialog(id?: string): void {
     let createOrEditEmployeeDialog: BsModalRef;
     if (!id) {
       createOrEditEmployeeDialog = this._modalService.show(

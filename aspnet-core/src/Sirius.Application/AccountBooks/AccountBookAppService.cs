@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
@@ -10,9 +11,7 @@ using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Sirius.AccountBooks.Dto;
-using Sirius.AppPaymentAccounts;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts;
@@ -130,13 +129,28 @@ namespace Sirius.AccountBooks
 
         public override async Task<PagedResultDto<AccountBookDto>> GetAllAsync(PagedAccountBookResultRequestDto input)
         {
+            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
+
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var query = _accountBookRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId)
                     .Include(p => p.PaymentCategory).Include(p => p.Housing).Include(p => p.FromPaymentAccount)
-                    .Include(p => p.ToPaymentAccount);
+                    .Include(p => p.ToPaymentAccount)
+                    .WhereIf(input.StartDate.HasValue, p => p.ProcessDateTime > input.StartDate.Value)
+                    .WhereIf(input.EndDate.HasValue, p => p.ProcessDateTime < input.EndDate.Value)
+                    .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.HousingId ?? Guid.Empty))
+                    .WhereIf(input.PaymentCategoryIds.Count > 0,
+                        p => input.PaymentCategoryIds.Contains(p.PaymentCategoryId))
+                    .WhereIf(housingIdsFromPersonFilter.Count > 0,
+                        p => housingIdsFromPersonFilter.Select(s => s.Id).Contains(p.HousingId ?? Guid.Empty))
+                    .WhereIf(input.FromPaymentAccountIds.Count > 0,
+                        p => input.FromPaymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty))
+                    .WhereIf(input.ToPaymentAccountIds.Count > 0,
+                        p => input.ToPaymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty));
 
-                var accountBooks = await query.ToListAsync();
+                var accountBooks = await query.OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.CreationTime)} DESC")
+                    .PageBy(input)
+                    .ToListAsync();
 
                 return new PagedResultDto<AccountBookDto>(accountBooks.Count,
                     ObjectMapper.Map<List<AccountBookDto>>(accountBooks));

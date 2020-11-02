@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
 using Abp.UI;
+using Microsoft.EntityFrameworkCore;
 using Sirius.People;
 using Sirius.Shared.Enums;
 
@@ -72,6 +73,13 @@ namespace Sirius.Housings
             return await _housingPersonRepository.InsertAsync(
                 await HousingPerson.CreateAsync(housing, person, isTenant, contact,_housingPersonPolicy)
             );
+        }
+
+        public async Task<List<Housing>> GetHousingsFromPersonIds(List<Guid> personIds)
+        {
+            var query = _housingPersonRepository.GetAll().Where(p => personIds.Contains(p.PersonId))
+                .Select(p => p.Housing);
+            return await query.ToListAsync();
         }
     }
 }

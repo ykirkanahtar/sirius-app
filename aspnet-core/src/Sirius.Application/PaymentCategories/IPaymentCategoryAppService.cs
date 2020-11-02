@@ -10,5 +10,6 @@ namespace Sirius.PaymentCategories
     public interface IPaymentCategoryAppService : IAsyncCrudAppService<PaymentCategoryDto, Guid, PagedPaymentCategoryResultRequestDto, CreatePaymentCategoryDto, UpdatePaymentCategoryDto>
     {
         Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync();
+        Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request);
     }
 }

@@ -1,5 +1,12 @@
-<form class="form-horizontal" autocomplete="off" #accountActivitiesForm="ngForm">
-  <abp-modal-header [title]="'AccountActivities' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #accountActivitiesForm="ngForm"
+>
+  <abp-modal-header
+    [title]="'AccountActivities' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
   <div class="modal-body">
     <tabset>
       <tab [heading]="'Details' | localize" class="pt-3 px-2">
@@ -28,34 +35,74 @@
           <div class="container-fluid">
             <div class="card">
               <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap" [busy]="isTableLoading">
-                  <thead class="bg-light">
+                <p-table
+                  #dataTable
+                  class="table table-hover text-nowrap"
+                  [value]="housingPaymentPlans"
+                  [resizableColumns]="true"
+                  [autoLayout]="true"
+                  [busy]="isTableLoading"
+                  (onLazyLoad)="getData($event)"
+                  [lazy]="true"
+                  [loading]="isTableLoading"
+                >
+                  <ng-template pTemplate="header">
                     <tr>
-                      <th>{{ "Date" | localize }}</th>
-                      <th>{{ "PaymentPlanType" | localize }}</th>
-                      <th>{{ "PaymentCategory" | localize }}</th>
-                      <th>{{ "Amount" | localize }}</th>
+                      <th pSortableColumn="Date">
+                        {{ "Date" | localize }}
+                        <p-sortIcon field="Date"></p-sortIcon>
+                      </th>
+                      <th pSortableColumn="PaymentPlanType">
+                        {{ "PaymentPlanType" | localize }}
+                        <p-sortIcon field="PaymentPlanType"></p-sortIcon>
+                      </th>
+                      <th pSortableColumn="PaymentCategory">
+                        {{ "PaymentCategory" | localize }}
+                        <p-sortIcon field="PaymentCategory"></p-sortIcon>
+                      </th>
+                      <th pSortableColumn="Amount">
+                        {{ "Amount" | localize }}
+                        <p-sortIcon field="Amount"></p-sortIcon>
+                      </th>
                     </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="
-                        let item of housingPaymentPlans
-                          | paginate
-                            : {
-                                id: 'server',
-                                itemsPerPage: pageSize,
-                                currentPage: pageNumber,
-                                totalItems: totalItems
-                              }
-                      ">
-                      <td>{{ item.date.format('DD-MM-YYYY') }}</td>
-                      <td>{{ (item.paymentPlanType == paymentPlanTypeEnum.Debt ? 'DebtTextForHousingPaymentPlan' 
-                        : 'CreditTextForHousingPaymentPlan') | localize}}</td>
-                      <td>{{ item.paymentCategory.paymentCategoryName }}</td>
-                      <td>{{ item.amount | number:'1.2-2' }}</td>
+                  </ng-template>
+                  <ng-template
+                    pTemplate="body"
+                    ngFor
+                    let-housingPaymentPlan
+                    [ngForOf]="
+                      housingPaymentPlans
+                        | paginate
+                          : {
+                              id: 'server',
+                              itemsPerPage: pageSize,
+                              currentPage: pageNumber,
+                              totalItems: totalItems
+                            }
+                    "
+                  >
+                    <tr>
+                      <td>
+                        {{ housingPaymentPlan.date.format("DD-MM-YYYY") }}
+                      </td>
+                      <td>
+                        {{
+                          (housingPaymentPlan.paymentPlanType ==
+                          paymentPlanTypeEnum.Debt
+                            ? "DebtTextForHousingPaymentPlan"
+                            : "CreditTextForHousingPaymentPlan"
+                          ) | localize
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          housingPaymentPlan.paymentCategory.paymentCategoryName
+                        }}
+                      </td>
+                      <td>{{ housingPaymentPlan.amount | number: "1.2-2" }}</td>
                     </tr>
-                  </tbody>
-                </table>
+                  </ng-template>
+                </p-table>
               </div>
               <div class="card-footer bg-light border-top">
                 <div class="row">
@@ -71,7 +118,10 @@
                   </div>
                   <div class="col-sm-4 col-12">
                     <div class="float-sm-right m-auto">
-                      <abp-pagination-controls id="server" (pageChange)="getDataPage($event)">
+                      <abp-pagination-controls
+                        id="server"
+                        (pageChange)="getDataPage($event)"
+                      >
                       </abp-pagination-controls>
                     </div>
                   </div>
@@ -80,7 +130,6 @@
             </div>
           </div>
         </section>
-
       </tab>
     </tabset>
   </div>

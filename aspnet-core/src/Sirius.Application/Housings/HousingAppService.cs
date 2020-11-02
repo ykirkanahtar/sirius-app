@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
@@ -17,7 +18,9 @@ using Sirius.Shared.Dtos;
 
 namespace Sirius.Housings
 {
-    public class HousingAppService : AsyncCrudAppService<Housing, HousingDto, Guid, PagedHousingResultRequestDto, CreateHousingDto, UpdateHousingDto>, IHousingAppService
+    public class HousingAppService :
+        AsyncCrudAppService<Housing, HousingDto, Guid, PagedHousingResultRequestDto, CreateHousingDto, UpdateHousingDto
+        >, IHousingAppService
     {
         private readonly IHousingManager _housingManager;
         private readonly IRepository<Housing, Guid> _housingRepository;
@@ -26,7 +29,9 @@ namespace Sirius.Housings
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPerson> _housingPersonRepository;
 
-        public HousingAppService(IHousingManager housingManager, IRepository<Housing, Guid> housingRepository, IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager, IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository)
+        public HousingAppService(IHousingManager housingManager, IRepository<Housing, Guid> housingRepository,
+            IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
+            IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -41,7 +46,8 @@ namespace Sirius.Housings
         {
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
 
-            var housing = Housing.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(), input.Block, input.Apartment, housingCategory);
+            var housing = Housing.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(),
+                input.Block, input.Apartment, housingCategory);
             await _housingManager.CreateAsync(housing);
             return ObjectMapper.Map<HousingDto>(housing);
         }
@@ -64,12 +70,26 @@ namespace Sirius.Housings
 
         public override async Task<PagedResultDto<HousingDto>> GetAllAsync(PagedHousingResultRequestDto input)
         {
-            var query = _housingRepository.GetAll()
-                .Include(p => p.HousingCategory);
+            var query = (from housing in _housingRepository.GetAll().Include(p => p.HousingCategory)
+                    join housingPerson in _housingPersonRepository.GetAll() on housing.Id equals housingPerson
+                            .HousingId
+                        into g1
+                    from housingPerson in g1.DefaultIfEmpty()
+                    join person in _personRepository.GetAll() on housingPerson.PersonId equals person.Id into g2
+                    from person in g2.DefaultIfEmpty()
+                    select new {housing, housingPerson, person})
+                .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
+                .WhereIf(input.HousingCategoryIds.Count > 0,
+                    p => input.HousingCategoryIds.Contains(p.housing.HousingCategoryId))
+                .WhereIf(input.PersonIds.Count > 0,
+                    p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty));
 
-            var housings = await query.PageBy(input).ToListAsync();
+            var housings = await query.Select(p => p.housing)
+                .OrderBy(input.Sorting ?? $"{nameof(HousingDto.Block)} ASC, {nameof(HousingDto.Apartment)}")
+                .PageBy(input)
+                .ToListAsync();
 
-            return new PagedResultDto<HousingDto>(housings.Count,
+            return new PagedResultDto<HousingDto>(query.Count(),
                 ObjectMapper.Map<List<HousingDto>>(housings));
         }
 
@@ -79,7 +99,7 @@ namespace Sirius.Housings
 
             return
                 (from l in housings
-                 select new LookUpDto(l.Id.ToString(), l.GetName())).ToList();
+                    select new LookUpDto(l.Id.ToString(), l.GetName())).ToList();
         }
 
         public async Task<HousingPersonDto> AddPersonAsync(CreateHousingPersonDto input)
@@ -98,7 +118,8 @@ namespace Sirius.Housings
             var housingPeople = await _housingPersonRepository.GetAllListAsync(p => p.HousingId == housingId);
 
             var peopleQuery = _personRepository.GetAll();
-            var people = await peopleQuery.WhereIf(housingPeople.Count > 0, p => housingPeople.Select(x => x.PersonId).Contains(p.Id) == false).ToListAsync();
+            var people = await peopleQuery.WhereIf(housingPeople.Count > 0,
+                p => housingPeople.Select(x => x.PersonId).Contains(p.Id) == false).ToListAsync();
 
 
             if (people.Count == 0)

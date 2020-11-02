@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -8,7 +8,9 @@ import {
 } from '@shared/paged-listing-component-base';
 import { CreatePersonDialogComponent } from './create-person/create-person-dialog.component';
 import { EditPersonDialogComponent } from './edit-person/edit-person-dialog.component';
-import { PersonDto, PersonServiceProxy, PersonDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { PersonDto, PersonServiceProxy, PersonDtoPagedResultDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
+import { LazyLoadEvent, SelectItem } from 'primeng/api';
+import { Table } from 'primeng/table';
 
 class PagedPeopleRequestDto extends PagedRequestDto {
   keyword: string;
@@ -18,27 +20,85 @@ class PagedPeopleRequestDto extends PagedRequestDto {
   templateUrl: './people.component.html',
   animations: [appModuleAnimation()]
 })
-export class PeopleComponent extends PagedListingComponentBase<PersonDto> {
+export class PeopleComponent extends PagedListingComponentBase<PersonDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
+  advancedFiltersVisible = false;
+
   people: PersonDto[] = [];
-  keyword = '';
+
+  peopleFilter: string[] = [];
+  selectedPersonFilter: string;
+
+  housingsFilter: SelectItem[] = [];
+  selectedHousingsFilter: string[] = [];
+
+  phoneNumberFilter: string;
 
   constructor(
     injector: Injector,
     private _peopleService: PersonServiceProxy,
+    private _housingService: HousingServiceProxy,
     private _modalService: BsModalService
   ) {
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this._housingService
+      .getHousingLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housingsFilter = result;
+      });
+
+    this.getDataPage(1);
+  }
+
+  searchPeople(event) {
+    this._peopleService
+      .getPeopleFromAutoCompleteFilter(event.query)
+      .subscribe((result) => {
+        this.peopleFilter = result;
+      });
+  }
+
+  createPerson(): void {
+    this.showCreateOrEditPersonDialog();
+  }
+
+  editPerson(person: PersonDto): void {
+    this.showCreateOrEditPersonDialog(person.id);
+  }
+
+  clearFilters(): void {
+    this.peopleFilter = [];
+    this.selectedPersonFilter = '';
+    this.phoneNumberFilter = '';
+    this.selectedHousingsFilter = [];
+    this.getDataPage(1);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedPeopleRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._peopleService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(
+        this.selectedPersonFilter,
+        this.phoneNumberFilter,
+        this.selectedHousingsFilter,
+        this.sortingColumn,
+        request.skipCount,
+        request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -50,7 +110,7 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto> {
       });
   }
 
-  delete(person: PersonDto): void {
+  protected delete(person: PersonDto): void {
     abp.message.confirm(
       this.l('PersonDeleteWarningMessage', person.firstName + ' ' + person.lastName),
       undefined,
@@ -64,21 +124,13 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto> {
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
   }
 
-  createPerson(): void {
-    this.showCreateOrEditPersonDialog();
-  }
-
-  editPerson(person: PersonDto): void {
-    this.showCreateOrEditPersonDialog(person.id);
-  }
-
-  showCreateOrEditPersonDialog(id?: string): void {
+  private showCreateOrEditPersonDialog(id?: string): void {
     let createOrEditPersonDialog: BsModalRef;
     if (!id) {
       createOrEditPersonDialog = this._modalService.show(
@@ -103,4 +155,5 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto> {
       this.refresh();
     });
   }
+
 }

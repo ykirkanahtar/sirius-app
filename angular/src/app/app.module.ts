@@ -57,11 +57,17 @@ import { CreateHousingDueAccountBookDialogComponent } from './account-books/crea
 import { CreateOtherPaymentAccountBookDialogComponent } from './account-books/create-account-book/create-other-payment-account-book-dialog.component';
 import { HousingsComponent } from './housings/housings.component';
 import { EditPaymentAccountDialogComponent } from './payment-accounts/edit-payment-account/edit-payment-account-dialog.component';
+// tslint:disable-next-line: max-line-length
 import { CreatePaymentCategoryDialogComponent } from './payment-categories/create-payment-category/create-payment-category-dialog.component';
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-payment-category/edit-payment-category-dialog.component';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { DropdownModule } from 'primeng/dropdown';
+import { TableModule } from 'primeng/table';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+
+// tslint:disable-next-line: max-line-length
 import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
 import { EditHousingCategoryDialogComponent } from './housing-categories/edit-housing-category/edit-housing-category-dialog.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
@@ -140,7 +146,10 @@ import { trLocale } from 'ngx-bootstrap/locale';
     SharedModule,
     NgxPaginationModule,
     BsDatepickerModule.forRoot(),
-    DropdownModule
+    DropdownModule,
+    TableModule,
+    MultiSelectModule,
+    AutoCompleteModule,
   ],
   providers: [],
   entryComponents: [

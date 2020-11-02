@@ -2,9 +2,8 @@ using Abp.Application.Services.Dto;
 
 namespace Sirius.PaymentAccounts.Dto
 {
-    public class PagedPaymentAccountResultRequestDto : PagedResultRequestDto
+    public class PagedPaymentAccountResultRequestDto : PagedAndSortedResultRequestDto
     {
-        public string Keyword { get; set; }
-        public bool? IsActive { get; set; }
+        
     }
 }

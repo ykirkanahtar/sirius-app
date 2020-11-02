@@ -58,20 +58,5 @@ namespace Sirius.PaymentCategories
             }
             return paymentCategory;
         }
-        
-        public async Task<List<PaymentCategory>> GetAllAsync(int tenantId, PagedResultRequestDto pagingRequest)
-        {
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = _paymentCategoryRepository
-                    .GetAll()
-                    .Where(p => p.TenantId == null || p.TenantId == tenantId);
-
-                if (pagingRequest != null)
-                    query = query.PageBy(pagingRequest);
-
-                return await query.ToListAsync();
-            }
-        }
     }
 }

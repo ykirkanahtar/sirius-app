@@ -9,6 +9,7 @@ namespace Sirius.People.Dto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string Name { get; set; } //FirstName + LastName
         public string Phone1 { get; set; }
         public string Phone2 { get; set; }
     }

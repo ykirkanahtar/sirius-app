@@ -112,7 +112,9 @@
     <text name="EditCashAccount">Nakit hesabı düzenle</text>
     <text name="EditAdvanceAccount">Avans hesabı düzenle</text>
     <text name="EditBankAccount">Banka hesabı düzenle</text>
-    <text name="CashAccount">Nakit Hesabı</text>    
+    <text name="CashAccount">Nakit Hesabı</text>
+    <text name="PaymentAccountName">Ödeme Hesabı</text>
+    <text name="Cash">Nakit</text>
     <text name="BankAccount">Banka Hesabı</text>
     <text name="AdvanceAccount">Avans Hesabı</text>
     <text name="PaymentAccountType">Hesap Tipi</text>
@@ -170,6 +172,7 @@
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
     <text name="CreateHousingPaymentPlan">Aidat Ödeme Planı Girişi</text>
     <text name="StartDate">Başlangıç Tarihi</text>
+    <text name="EndDate">Bitiş Tarihi</text>
     <text name="AmountPerMonth">Tutar / Ay</text>
     <text name="CountOfMonth">Ay Sayısı</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
@@ -191,6 +194,6 @@
     <text name="Hirer">Kiracı</text>
     <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
     <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
-    <text name="Payment">Ödeme</text>
+    <text name="AdvancedFilters">Detaylı Arama</text>
   </texts>
 </localizationDictionary>

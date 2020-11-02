@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -8,6 +8,8 @@ import {
 } from '@shared/paged-listing-component-base';
 import { CreatePaymentAccountDialogComponent } from './create-payment-account/create-payment-account-dialog.component';
 import { PaymentAccountDto, PaymentAccountServiceProxy, PaymentAccountDtoPagedResultDto, PaymentAccountType } from '@shared/service-proxies/service-proxies';
+import { LazyLoadEvent } from 'primeng/api';
+import { Table } from 'primeng/table';
 
 class PagedPaymentAccountRequestDto extends PagedRequestDto {
   keyword: string;
@@ -17,9 +19,14 @@ class PagedPaymentAccountRequestDto extends PagedRequestDto {
   templateUrl: './payment-accounts.component.html',
   animations: [appModuleAnimation()]
 })
-export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentAccountDto> {
+export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentAccountDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
   paymentAccounts: PaymentAccountDto[] = [];
-  keyword = '';
+
   paymentAccountTypeEnum = PaymentAccountType;
 
   constructor(
@@ -30,15 +37,26 @@ export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentA
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this.getDataPage(1);
+  }
+
+  createPaymentAccount(paymentAccountType: PaymentAccountType): void {
+    this.showCreateOrEditPaymentAccountDialog(paymentAccountType);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedPaymentAccountRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._paymentAccountService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(this.sortingColumn, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -50,7 +68,7 @@ export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentA
       });
   }
 
-  delete(paymentAccount: PaymentAccountDto): void {
+  protected delete(paymentAccount: PaymentAccountDto): void {
     abp.message.confirm(
       this.l('PaymentAccountDeleteWarningMessage', paymentAccount.accountName),
       undefined,
@@ -64,17 +82,15 @@ export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentA
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
   }
 
-  createPaymentAccount(paymentAccountType: PaymentAccountType): void {
-    this.showCreateOrEditPaymentAccountDialog(paymentAccountType);
-  }
 
-  showCreateOrEditPaymentAccountDialog(paymentAccountType: PaymentAccountType, id?: number): void {
+
+  private showCreateOrEditPaymentAccountDialog(paymentAccountType: PaymentAccountType, id?: number): void {
     let createOrEditPaymentAccountDialog: BsModalRef;
     if (!id) {
       createOrEditPaymentAccountDialog = this._modalService.show(
@@ -83,7 +99,7 @@ export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentA
           class: 'modal-lg',
         }
       );
-    } 
+    }
     // else {
     //   createOrEditPaymentAccountDialog = this._modalService.show(
     //     EditPaymentAccountDialogComponent,

@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -8,9 +8,11 @@ import {
 } from '@shared/paged-listing-component-base';
 import { CreateHousingDialogComponent } from './create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './edit-housing/edit-housing-dialog.component';
-import { HousingDto, HousingServiceProxy, HousingDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { HousingDto, HousingServiceProxy, HousingDtoPagedResultDto, HousingCategoryServiceProxy, LookUpDto, PersonServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
 import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
+import { LazyLoadEvent, SelectItem } from 'primeng/api';
+import { Table } from 'primeng/table';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -20,27 +22,92 @@ class PagedHousingsRequestDto extends PagedRequestDto {
   templateUrl: './housings.component.html',
   animations: [appModuleAnimation()]
 })
-export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
+export class HousingsComponent extends PagedListingComponentBase<HousingDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
+  advancedFiltersVisible = false;
+
   housings: HousingDto[] = [];
-  keyword = '';
+
+  housingCategoriesFilter: SelectItem[] = [];
+  selectedHousingCategoriesFilter: string[] = [];
+
+  housingsFilters: SelectItem[] = [];
+  selectedHousingsFilters: string[] = [];
+
+  peopleFilters: SelectItem[] = [];
+  selectedPeopleFilters: string[] = [];
+
+
 
   constructor(
     injector: Injector,
     private _housingService: HousingServiceProxy,
+    private _housingCategoryService: HousingCategoryServiceProxy,
+    private _personService: PersonServiceProxy,
     private _modalService: BsModalService
   ) {
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this._housingCategoryService
+      .getHousingCategoryLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housingCategoriesFilter = result;
+      });
+
+    this._housingService
+      .getHousingLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housingsFilters = result;
+      });
+
+    this._personService
+      .getPersonLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.peopleFilters = result;
+      });
+
+    this.getDataPage(1);
+  }
+
+  createHousing(): void {
+    this.showCreateOrEditHousingDialog();
+  }
+
+  editHousing(housing: HousingDto): void {
+    this.showCreateOrEditHousingDialog(housing.id);
+  }
+
+  clearFilters(): void {
+    this.selectedHousingCategoriesFilter = [];
+    this.selectedHousingsFilters = [];
+    this.selectedPeopleFilters = [];
+    this.getDataPage(1);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedHousingsRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._housingService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(
+        this.selectedHousingsFilters,
+        this.selectedHousingCategoriesFilter,
+        this.selectedPeopleFilters,
+        this.sortingColumn,
+        request.skipCount,
+        request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -52,7 +119,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
       });
   }
 
-  delete(housing: HousingDto): void {
+  protected delete(housing: HousingDto): void {
     abp.message.confirm(
       this.l('HousingDeleteWarningMessage', housing.block + ' ' + housing.apartment),
       undefined,
@@ -72,15 +139,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
     );
   }
 
-  createHousing(): void {
-    this.showCreateOrEditHousingDialog();
-  }
-
-  editHousing(housing: HousingDto): void {
-    this.showCreateOrEditHousingDialog(housing.id);
-  }
-
-  accountActivities(housing: HousingDto): void {
+  protected accountActivities(housing: HousingDto): void {
     let accountActivitiesDialog: BsModalRef;
     accountActivitiesDialog = this._modalService.show(
       AccountActivitiesDialogComponent,
@@ -90,9 +149,10 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
           id: housing.id
         }
       }
-    );  }
+    );
+  }
 
-  addPerson(housing: HousingDto): void {
+  protected addPerson(housing: HousingDto): void {
     let addPersonDialog: BsModalRef;
     addPersonDialog = this._modalService.show(
       AddPersonDialogComponent,
@@ -105,7 +165,7 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto> {
     );
   }
 
-  showCreateOrEditHousingDialog(id?: string): void {
+  private showCreateOrEditHousingDialog(id?: string): void {
     let createOrEditHousingDialog: BsModalRef;
     if (!id) {
       createOrEditHousingDialog = this._modalService.show(

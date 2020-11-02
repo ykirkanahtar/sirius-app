@@ -1,19 +1,28 @@
 import {
   Component,
   Injector,
-  OnInit,
   EventEmitter,
   Output,
+  ViewChild,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
-import { HousingDto, HousingPaymentPlanDto, HousingPaymentPlanDtoPagedResultDto, HousingPaymentPlanServiceProxy, HousingServiceProxy, PaymentPlanType } from '@shared/service-proxies/service-proxies';
+import {
+  HousingDto,
+  HousingPaymentPlanDto,
+  HousingPaymentPlanDtoPagedResultDto,
+  HousingPaymentPlanServiceProxy,
+  HousingServiceProxy,
+  PaymentPlanType
+} from '@shared/service-proxies/service-proxies';
 import {
   PagedListingComponentBase,
   PagedRequestDto
 } from '@shared/paged-listing-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { Table } from 'primeng/table';
+import { LazyLoadEvent } from 'primeng/api';
 
 class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   keyword: string;
@@ -23,12 +32,14 @@ class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   templateUrl: './account-activities.component.html',
   animations: [appModuleAnimation()]
 })
-export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingDto>
-{
+export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingDto> {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
 
   housingPaymentPlans: HousingPaymentPlanDto[] = [];
   housing = new HousingDto();
-  keyword = '';
   paymentPlanTypeEnum = PaymentPlanType;
 
   id: string;
@@ -43,7 +54,12 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
     super(injector);
   }
 
-  list(
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedHousingPaymentPlanResultRequestDto,
     pageNumber: number,
     finishedCallback: Function
@@ -54,8 +70,6 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
       .subscribe((result: HousingDto) => {
         this.housing = result;
       });
-
-    request.keyword = this.keyword;
 
     this._housingPaymentPlanService
       .getAllByHousingId(this.id, request.keyword, true, request.skipCount, request.maxResultCount)
@@ -70,7 +84,7 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
       });
   }
 
-  delete(): void {
+  protected delete(): void {
 
   }
 }

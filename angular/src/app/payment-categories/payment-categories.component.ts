@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -9,6 +9,8 @@ import {
 import { CreatePaymentCategoryDialogComponent } from './create-payment-category/create-payment-category-dialog.component';
 import { EditPaymentCategoryDialogComponent } from './edit-payment-category/edit-payment-category-dialog.component';
 import { PaymentCategoryDto, PaymentCategoryServiceProxy, PaymentCategoryDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { Table } from 'primeng/table';
+import { LazyLoadEvent } from 'primeng/api';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -18,9 +20,18 @@ class PagedHousingsRequestDto extends PagedRequestDto {
   templateUrl: './payment-categories.component.html',
   animations: [appModuleAnimation()]
 })
-export class PaymentCategoriesComponent extends PagedListingComponentBase<PaymentCategoryDto> {
+export class PaymentCategoriesComponent extends PagedListingComponentBase<PaymentCategoryDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
+  advancedFiltersVisible = false;
+
   paymentCategories: PaymentCategoryDto[] = [];
-  keyword = '';
+
+  paymentCategoriesFilter: string[] = [];
+  selectedPaymentCategoryFilter: string;
 
   constructor(
     injector: Injector,
@@ -30,15 +41,44 @@ export class PaymentCategoriesComponent extends PagedListingComponentBase<Paymen
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this.getDataPage(1);
+  }
+
+  searchPaymentCategory(event) {
+    this._paymentCategoryService
+      .getPaymentCategoryFromAutoCompleteFilter(event.query)
+      .subscribe((result) => {
+        this.paymentCategoriesFilter = result;
+      });
+  }
+
+  createPaymentCategory(): void {
+    this.showCreateOrEditPaymentCategoryDialog();
+  }
+
+  editPaymentCategory(paymentCategory: PaymentCategoryDto): void {
+    this.showCreateOrEditPaymentCategoryDialog(paymentCategory.id);
+  }
+
+  clearFilters(): void {
+    this.paymentCategoriesFilter = [];
+    this.selectedPaymentCategoryFilter = '';
+    this.getDataPage(1);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedHousingsRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._paymentCategoryService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(this.selectedPaymentCategoryFilter, this.sortingColumn, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -50,7 +90,7 @@ export class PaymentCategoriesComponent extends PagedListingComponentBase<Paymen
       });
   }
 
-  delete(paymentCategory: PaymentCategoryDto): void {
+  protected delete(paymentCategory: PaymentCategoryDto): void {
     abp.message.confirm(
       this.l('PaymentCategoryDeleteWarningMessage', paymentCategory.paymentCategoryName),
       undefined,
@@ -64,21 +104,13 @@ export class PaymentCategoriesComponent extends PagedListingComponentBase<Paymen
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
   }
 
-  createPaymentCategory(): void {
-    this.showCreateOrEditPaymentCategoryDialog();
-  }
-
-  editPaymentCategory(paymentCategory: PaymentCategoryDto): void {
-    this.showCreateOrEditPaymentCategoryDialog(paymentCategory.id);
-  }
-
-  showCreateOrEditPaymentCategoryDialog(id?: string): void {
+  private showCreateOrEditPaymentCategoryDialog(id?: string): void {
     let createOrEditPaymentCategoryDialog: BsModalRef;
     if (!id) {
       createOrEditPaymentCategoryDialog = this._modalService.show(

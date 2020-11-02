@@ -10,5 +10,6 @@ namespace Sirius.HousingCategories
     public interface IHousingCategoryAppService : IAsyncCrudAppService<HousingCategoryDto, Guid, PagedHousingCategoryResultRequestDto, CreateHousingCategoryDto, UpdateHousingCategoryDto>
     {
         Task<List<LookUpDto>> GetHousingCategoryLookUpAsync();
+        Task<List<string>> GetHousingCategoryFromAutoCompleteFilterAsync(string request);
     }
 }

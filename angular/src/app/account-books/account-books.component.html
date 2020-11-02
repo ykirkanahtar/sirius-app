@@ -9,16 +9,30 @@
           <div class="btn-group dropdown" dropdown>
             <button dropdownToggle class="dropdown-toggle btn bg-blue">
               <i class="fa fa-plus-square"></i>
-              {{"Create" | localize}}
+              {{ "Create" | localize }}
             </button>
-            <ul class="dropdown-menu" *dropdownMenu style="background-color:#007bff !important;">
+            <ul
+              class="dropdown-menu"
+              *dropdownMenu
+              style="background-color: #007bff !important"
+            >
               <li>
-                <a class="dropdown-item" href="javascript:;" style="color: black;"
-                  (click)="createHousingDueAccountBook()">{{'HousingDue' | localize}}</a>
+                <a
+                  class="dropdown-item"
+                  href="javascript:;"
+                  style="color: black"
+                  (click)="createHousingDueAccountBook()"
+                  >{{ "HousingDue" | localize }}</a
+                >
               </li>
               <li>
-                <a class="dropdown-item" href="javascript:;" style="color: black;"
-                  (click)="createOtherPaymentAccountBook()">{{'OtherPayments' | localize}}</a>
+                <a
+                  class="dropdown-item"
+                  href="javascript:;"
+                  style="color: black"
+                  (click)="createOtherPaymentAccountBook()"
+                  >{{ "OtherPayments" | localize }}</a
+                >
               </li>
             </ul>
           </div>
@@ -31,62 +45,323 @@
       <div class="card">
         <div class="card-header">
           <div class="input-group">
-            <div class="input-group-prepend">
-              <button type="button" class="btn bg-blue" (click)="getDataPage(1)">
-                <i class="fas fa-search"></i>
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="advancedFiltersVisible = !advancedFiltersVisible"
+              >
+                {{ "AdvancedFilters" | localize }}
+                <i
+                  class="fas"
+                  [class.fa-angle-up]="advancedFiltersVisible"
+                  [class.fa-angle-down]="!advancedFiltersVisible"
+                ></i>
               </button>
             </div>
-            <input type="text" class="form-control" name="keyword" [placeholder]="'SearchWithThreeDot' | localize"
-              [(ngModel)]="keyword" (keyup.enter)="getDataPage(1)" />
+          </div>
+          <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+            <div class="card-body">
+              <form class="form-horizontal">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "StartDate" | localize }}
+                      </label>
+                      <input
+                        type="text"
+                        id="startDateFilter"
+                        name="startDateFilter"
+                        [placeholder]="'StartDate' | localize"
+                        class="form-control"
+                        [(ngModel)]="startDateFilter"
+                        bsDatepicker
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "EndDate" | localize }}
+                      </label>
+                      <input
+                        type="text"
+                        id="endDateFilter"
+                        name="endDateFilter"
+                        [placeholder]="'EndDate' | localize"
+                        class="form-control"
+                        [(ngModel)]="endDateFilter"
+                        bsDatepicker
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "PaymentCategory" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="housingCategoriesSelect"
+                        [options]="paymentCategoriesFilter"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedPaymentCategoriesFilter"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('PaymentCategory')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-paymentCategory pTemplate="item">
+                          <div class="paymentCategory-item">
+                            <div>{{ paymentCategory.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "Housing" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="housingsFilters"
+                        [options]="housingsFilters"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedHousingsFilters"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('Housing')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-housing pTemplate="item">
+                          <div class="housing-item">
+                            <div>{{ housing.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "Person" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="peopleFilters"
+                        [options]="peopleFilters"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedPeopleFilters"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('Person')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-person pTemplate="item">
+                          <div class="person-item">
+                            <div>{{ person.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "FromPaymentAccount" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="fromPaymentAccountsFilter"
+                        [options]="fromPaymentAccountsFilter"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedFromPaymentAccountsFilter"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('FromPaymentAccount')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-fromPaymentAccount pTemplate="item">
+                          <div class="fromPaymentAccount-item">
+                            <div>{{ fromPaymentAccount.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "ToPaymentAccount" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="toPaymentAccountsFilter"
+                        [options]="toPaymentAccountsFilter"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedToPaymentAccountsFilter"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('ToPaymentAccount')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-toPaymentAccount pTemplate="item">
+                          <div class="toPaymentAccount-item">
+                            <div>{{ toPaymentAccount.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="getDataPage(1)"
+              >
+                {{ "Search" | localize }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-default float-right"
+                (click)="clearFilters()"
+              >
+                {{ "Clear" | localize }}
+              </button>
+            </div>
           </div>
         </div>
         <div class="card-body table-responsive p-0">
-          <table class="table table-hover text-nowrap" [busy]="isTableLoading">
-            <thead class="bg-light">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="accountBooks"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
               <tr>
-                <th>{{ "ProcessDateTime" | localize }}</th>
-                <th>{{ "PaymentCategoryName" | localize }}</th>
-                <th>{{ "Housing" | localize }}</th>
-                <th>{{ "Amount" | localize }}</th>
-                <th>{{ "FromPaymentAccount" | localize }}</th>
-                <th>{{ "ToPaymentAccount" | localize }}</th>
-                <th>{{ "FromPaymentAccountBalance" | localize }}</th>
-                <th>{{ "ToPaymentAccountBalance" | localize }}</th>
-                <th style="width: 200px;">{{ "Actions" | localize }}</th>
+                <th pSortableColumn="ProcessDateTime">
+                  {{ "ProcessDateTime" | localize }}
+                  <p-sortIcon field="ProcessDateTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="PaymentCategory.PaymentCategoryName">
+                  {{ "PaymentCategoryName" | localize }}
+                  <p-sortIcon
+                    field="PaymentCategory.PaymentCategoryName"
+                  ></p-sortIcon>
+                </th>
+                <th pSortableColumn="Housing">
+                  {{ "Housing" | localize }}
+                  <p-sortIcon field="Housing"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Amount">
+                  {{ "Amount" | localize }}
+                  <p-sortIcon field="Amount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="FromPaymentAccount">
+                  {{ "FromPaymentAccount" | localize }}
+                  <p-sortIcon field="FromPaymentAccount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="ToPaymentAccount">
+                  {{ "ToPaymentAccount" | localize }}
+                  <p-sortIcon field="ToPaymentAccount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="FromPaymentAccount.Balance">
+                  {{ "FromPaymentAccountBalance" | localize }}
+                  <p-sortIcon field="FromPaymentAccount.Balance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="ToPaymentAccount.Balance">
+                  {{ "ToPaymentAccountBalance" | localize }}
+                  <p-sortIcon field="ToPaymentAccount.Balance"></p-sortIcon>
+                </th>
+                <th style="width: 20%">{{ "Actions" | localize }}</th>
               </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="
-                  let accountBook of accountBooks
-                    | paginate
-                      : {
-                          id: 'server',
-                          itemsPerPage: pageSize,
-                          currentPage: pageNumber,
-                          totalItems: totalItems
-                        }
-                ">
-                <td>{{ accountBook.processDateTime.format('DD-MM-YYYY') }}</td>
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-accountBook
+              [ngForOf]="
+                accountBooks
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
+                <td>{{ accountBook.processDateTime.format("DD-MM-YYYY") }}</td>
                 <td>{{ accountBook.paymentCategory.paymentCategoryName }}</td>
-                <td>{{ accountBook.housing != null ? getHousingName(accountBook.housing) : '' }}</td>
-                <td>{{ accountBook.amount | number:'1.2-2'}}</td>
-                <td>{{ accountBook.fromPaymentAccount != null ? accountBook.fromPaymentAccount.accountName : '' }}</td>
-                <td>{{ accountBook.toPaymentAccount != null ? accountBook.toPaymentAccount.accountName : '' }}</td>
                 <td>
-                  {{ (accountBook.fromPaymentAccount != null ? accountBook.fromPaymentAccount.balance   : '')  | number:'1.2-2'  }}
+                  {{
+                    accountBook.housing != null
+                      ? getHousingName(accountBook.housing)
+                      : ""
+                  }}
+                </td>
+                <td>{{ accountBook.amount | number: "1.2-2" }}</td>
+                <td>
+                  {{
+                    accountBook.fromPaymentAccount != null
+                      ? accountBook.fromPaymentAccount.accountName
+                      : ""
+                  }}
                 </td>
                 <td>
-                  {{ (accountBook.toPaymentAccount != null ? accountBook.toPaymentAccount.balance : '')  | number:'1.2-2'  }}
+                  {{
+                    accountBook.toPaymentAccount != null
+                      ? accountBook.toPaymentAccount.accountName
+                      : ""
+                  }}
                 </td>
                 <td>
-                  <button type="button" class="btn btn-sm bg-danger mx-2" (click)="delete(accountBook)">
+                  {{
+                    (accountBook.fromPaymentAccount != null
+                      ? accountBook.fromPaymentAccount.balance
+                      : ""
+                    ) | number: "1.2-2"
+                  }}
+                </td>
+                <td>
+                  {{
+                    (accountBook.toPaymentAccount != null
+                      ? accountBook.toPaymentAccount.balance
+                      : ""
+                    ) | number: "1.2-2"
+                  }}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm bg-danger mx-2"
+                    (click)="delete(accountBook)"
+                  >
                     <i class="fas fa-trash"></i>
                     {{ "Delete" | localize }}
                   </button>
                 </td>
               </tr>
-            </tbody>
-          </table>
+            </ng-template>
+          </p-table>
         </div>
         <div class="card-footer bg-light border-top">
           <div class="row">
@@ -102,7 +377,10 @@
             </div>
             <div class="col-sm-4 col-12">
               <div class="float-sm-right m-auto">
-                <abp-pagination-controls id="server" (pageChange)="getDataPage($event)">
+                <abp-pagination-controls
+                  id="server"
+                  (pageChange)="getDataPage($event)"
+                >
                 </abp-pagination-controls>
               </div>
             </div>

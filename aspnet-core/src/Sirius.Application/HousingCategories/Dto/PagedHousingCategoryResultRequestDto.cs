@@ -2,9 +2,8 @@ using Abp.Application.Services.Dto;
 
 namespace Sirius.HousingCategories.Dto
 {
-    public class PagedHousingCategoryResultRequestDto : PagedResultRequestDto
+    public class PagedHousingCategoryResultRequestDto : PagedAndSortedResultRequestDto
     {
-        public string Keyword { get; set; }
-        public bool? IsActive { get; set; }
+        public string HousingCategoryName { get; set; }
     }
 }

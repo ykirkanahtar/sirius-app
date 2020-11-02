@@ -8,22 +8,35 @@
         <div class="col-6 text-right">
           <div class="btn-group dropdown" dropdown>
             <button dropdownToggle class="dropdown-toggle btn bg-blue">
-                <i class="fa fa-plus-square"></i>
-                {{"Create" | localize}}
+              <i class="fa fa-plus-square"></i>
+              {{ "Create" | localize }}
             </button>
             <ul class="dropdown-menu" *dropdownMenu>
-                <li>
-                    <a href="javascript:;"
-                        (click)="createPaymentAccount(paymentAccountTypeEnum.Cash)">{{'CashAccount' | localize}}</a>
-                </li>
-                <li>
-                    <a href="javascript:;" 
-                        (click)="createPaymentAccount(paymentAccountTypeEnum.BankAccount)">{{'BankAccount' | localize}}</a>
-                </li>
-                <li>
-                    <a href="javascript:;" 
-                        (click)="createPaymentAccount(paymentAccountTypeEnum.AdvanceAccount)">{{'AdvanceAccount' | localize}}</a>
-                </li>													
+              <li>
+                <a
+                  href="javascript:;"
+                  (click)="createPaymentAccount(paymentAccountTypeEnum.Cash)"
+                  >{{ "CashAccount" | localize }}</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:;"
+                  (click)="
+                    createPaymentAccount(paymentAccountTypeEnum.BankAccount)
+                  "
+                  >{{ "BankAccount" | localize }}</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:;"
+                  (click)="
+                    createPaymentAccount(paymentAccountTypeEnum.AdvanceAccount)
+                  "
+                  >{{ "AdvanceAccount" | localize }}</a
+                >
+              </li>
             </ul>
           </div>
         </div>
@@ -33,55 +46,63 @@
   <section class="content px-2">
     <div class="container-fluid">
       <div class="card">
-        <div class="card-header">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <button
-                type="button"
-                class="btn bg-blue"
-                (click)="getDataPage(1)"
-              >
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-            <input
-              type="text"
-              class="form-control"
-              name="keyword"
-              [placeholder]="'SearchWithThreeDot' | localize"
-              [(ngModel)]="keyword"
-              (keyup.enter)="getDataPage(1)"
-            />
-          </div>
-        </div>
         <div class="card-body table-responsive p-0">
-          <table class="table table-hover text-nowrap" [busy]="isTableLoading">
-            <thead class="bg-light">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="paymentAccounts"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
               <tr>
-                <th>{{ "AccountName" | localize }}</th>
-                <th>{{ "PaymentAccountType" | localize }}</th>
-                <th>{{ "Balance" | localize }}</th>
-                <th>{{ "TenantIsOwner" | localize }}</th>
-                <th style="width: 200px;">{{ "Actions" | localize }}</th>
+                <th pSortableColumn="AccountName">
+                  {{ "AccountName" | localize }}
+                  <p-sortIcon field="AccountName"></p-sortIcon>
+                </th>
+                <th>
+                  {{ "PaymentAccountName" | localize }}
+                </th>
+                <th pSortableColumn="Balance">
+                  {{ "Balance" | localize }}
+                  <p-sortIcon field="Balance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="TenantIsOwner">
+                  {{ "TenantIsOwner" | localize }}
+                  <p-sortIcon field="TenantIsOwner"></p-sortIcon>
+                </th>
+                <th>{{ "Actions" | localize }}</th>
               </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="
-                  let paymentAccount of paymentAccounts
-                    | paginate
-                      : {
-                          id: 'server',
-                          itemsPerPage: pageSize,
-                          currentPage: pageNumber,
-                          totalItems: totalItems
-                        }
-                "
-              >
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-paymentAccount
+              [ngForOf]="
+                paymentAccounts
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
                 <td>{{ paymentAccount.accountName }}</td>
-                <td>{{ paymentAccountTypeEnum[paymentAccount.paymentAccountType]}}</td>
-                <td>{{ paymentAccount.balance | number:'1.2-2' }}</td>
-                <td>{{ paymentAccount.tenantIsOwner ? 'Evet' : 'Hayır' }}</td>
+                <td>
+                  {{
+                    paymentAccountTypeEnum[paymentAccount.paymentAccountType] | localize
+                  }}
+                </td>
+                <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>
+                <td>
+                  {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}</td>
                 <td>
                   <!-- <button
                     type="button"
@@ -101,8 +122,8 @@
                   </button>
                 </td>
               </tr>
-            </tbody>
-          </table>
+            </ng-template>
+          </p-table>
         </div>
         <div class="card-footer bg-light border-top">
           <div class="row">

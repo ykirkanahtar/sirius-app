@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
+using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Sirius.AppPaymentAccounts;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.Shared.Dtos;
@@ -91,6 +95,18 @@ namespace Sirius.PaymentAccounts
                 input.PersonId, input.TenantIsOwner, input.Iban);
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
+        }
+        
+        public override async Task<PagedResultDto<PaymentAccountDto>> GetAllAsync(PagedPaymentAccountResultRequestDto input)
+        {
+            var query = _paymentAccountRepository.GetAll();
+
+            var paymentAccounts = await query.OrderBy(input.Sorting ?? $"{nameof(PaymentAccountDto.AccountName)}")
+                .PageBy(input)
+                .ToListAsync();
+
+            return new PagedResultDto<PaymentAccountDto>(query.Count(),
+                ObjectMapper.Map<List<PaymentAccountDto>>(paymentAccounts));
         }
     }
 }

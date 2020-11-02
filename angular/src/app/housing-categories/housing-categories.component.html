@@ -6,7 +6,11 @@
           <h1>{{ "HousingCategories" | localize }}</h1>
         </div>
         <div class="col-6 text-right">
-          <a href="javascript:;" class="btn bg-blue" (click)="createHousingCategory()">
+          <a
+            href="javascript:;"
+            class="btn bg-blue"
+            (click)="createHousingCategory()"
+          >
             <i class="fa fa-plus-square"></i>
             {{ "Create" | localize }}
           </a>
@@ -19,48 +23,98 @@
       <div class="card">
         <div class="card-header">
           <div class="input-group">
-            <div class="input-group-prepend">
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="advancedFiltersVisible = !advancedFiltersVisible"
+              >
+                {{ "AdvancedFilters" | localize }}
+                <i
+                  class="fas"
+                  [class.fa-angle-up]="advancedFiltersVisible"
+                  [class.fa-angle-down]="!advancedFiltersVisible"
+                ></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+            <div class="card-body">
+              <form class="form-horizontal">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "PaymentCategories" | localize }}
+                      </label>
+                      <p-autoComplete
+                        name="selectedPaymentCategoryFilter"
+                        [(ngModel)]="selectedHousingCategoryFilter"
+                        [suggestions]="housingCategoriesFilter"
+                        (completeMethod)="searchPaymentCategory($event)"
+                        [style]="{ minWidth: '100%' }"
+                      ></p-autoComplete>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
               <button
                 type="button"
                 class="btn bg-blue"
                 (click)="getDataPage(1)"
               >
-                <i class="fas fa-search"></i>
+                {{ "Search" | localize }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-default float-right"
+                (click)="clearFilters()"
+              >
+                {{ "Clear" | localize }}
               </button>
             </div>
-            <input
-              type="text"
-              class="form-control"
-              name="keyword"
-              [placeholder]="'SearchWithThreeDot' | localize"
-              [(ngModel)]="keyword"
-              (keyup.enter)="getDataPage(1)"
-            />
           </div>
         </div>
         <div class="card-body table-responsive p-0">
-          <table class="table table-hover text-nowrap" [busy]="isTableLoading">
-            <thead class="bg-light">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="housingCategories"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
               <tr>
-                <th>{{ "HousingCategoryName" | localize }}</th>
-                <th style="width: 200px;">{{ "Actions" | localize }}</th>
+                <th pSortableColumn="HousingCategoryName">
+                  {{ "HousingCategoryName" | localize }}
+                  <p-sortIcon field="HousingCategoryName"></p-sortIcon>
+                </th>
+                <th style="width: 40%">{{ "Actions" | localize }}</th>
               </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="
-                  let housingCategory of housingCategories
-                    | paginate
-                      : {
-                          id: 'server',
-                          itemsPerPage: pageSize,
-                          currentPage: pageNumber,
-                          totalItems: totalItems
-                        }
-                "
-              >
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-housingCategory
+              [ngForOf]="
+                housingCategories
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
                 <td>{{ housingCategory.housingCategoryName }}</td>
-
                 <td>
                   <button
                     type="button"
@@ -80,8 +134,8 @@
                   </button>
                 </td>
               </tr>
-            </tbody>
-          </table>
+            </ng-template>
+          </p-table>
         </div>
         <div class="card-footer bg-light border-top">
           <div class="row">

@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -9,6 +9,8 @@ import {
 import { CreateHousingCategoryDialogComponent } from './create-housing-category/create-housing-category-dialog.component';
 import { EditHousingCategoryDialogComponent } from './edit-housing-category/edit-housing-category-dialog.component';
 import { HousingCategoryDto, HousingCategoryServiceProxy, HousingCategoryDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { Table } from 'primeng/table';
+import { LazyLoadEvent } from 'primeng/api';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -18,9 +20,18 @@ class PagedHousingsRequestDto extends PagedRequestDto {
   templateUrl: './housing-categories.component.html',
   animations: [appModuleAnimation()]
 })
-export class HousingCategoriesComponent extends PagedListingComponentBase<HousingCategoryDto> {
+export class HousingCategoriesComponent extends PagedListingComponentBase<HousingCategoryDto>
+  implements OnInit {
+
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+
+  sortingColumn: string;
+  advancedFiltersVisible = false;
+
   housingCategories: HousingCategoryDto[] = [];
-  keyword = '';
+
+  housingCategoriesFilter: string[] = [];
+  selectedHousingCategoryFilter: string;
 
   constructor(
     injector: Injector,
@@ -30,15 +41,44 @@ export class HousingCategoriesComponent extends PagedListingComponentBase<Housin
     super(injector);
   }
 
-  list(
+  ngOnInit(): void {
+    this.getDataPage(1);
+  }
+
+  createHousingCategory(): void {
+    this.showCreateOrEditHousingCategoryDialog();
+  }
+
+  editHousingCategory(housingCategory: HousingCategoryDto): void {
+    this.showCreateOrEditHousingCategoryDialog(housingCategory.id);
+  }
+
+  searchPaymentCategory(event) {
+    this._housingCategoryService
+      .getHousingCategoryFromAutoCompleteFilter(event.query)
+      .subscribe((result) => {
+        this.housingCategoriesFilter = result;
+      });
+  }
+
+  clearFilters(): void {
+    this.housingCategoriesFilter = [];
+    this.selectedHousingCategoryFilter = '';
+    this.getDataPage(1);
+  }
+
+  getData(event?: LazyLoadEvent) {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    this.getDataPage(1);
+  }
+
+  protected list(
     request: PagedHousingsRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
-    request.keyword = this.keyword;
-
     this._housingCategoryService
-      .getAll(request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAll(this.selectedHousingCategoryFilter, this.sortingColumn, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -50,7 +90,7 @@ export class HousingCategoriesComponent extends PagedListingComponentBase<Housin
       });
   }
 
-  delete(housingCategory: HousingCategoryDto): void {
+  protected delete(housingCategory: HousingCategoryDto): void {
     abp.message.confirm(
       this.l('HousingCategoryDeleteWarningMessage', housingCategory.housingCategoryName),
       undefined,
@@ -64,21 +104,13 @@ export class HousingCategoriesComponent extends PagedListingComponentBase<Housin
                 this.refresh();
               })
             )
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       }
     );
   }
 
-  createHousingCategory(): void {
-    this.showCreateOrEditHousingCategoryDialog();
-  }
-
-  editHousingCategory(housingCategory: HousingCategoryDto): void {
-    this.showCreateOrEditHousingCategoryDialog(housingCategory.id);
-  }
-
-  showCreateOrEditHousingCategoryDialog(id?: string): void {
+  private showCreateOrEditHousingCategoryDialog(id?: string): void {
     let createOrEditHousingCategoryDialog: BsModalRef;
     if (!id) {
       createOrEditHousingCategoryDialog = this._modalService.show(

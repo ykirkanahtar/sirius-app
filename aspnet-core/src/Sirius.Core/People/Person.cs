@@ -35,6 +35,8 @@ namespace Sirius.People
         [StringLength(50)]
         public string Phone2 { get; private set; }
 
+        [NotMapped] public string Name => FirstName + " " + LastName;
+
         public static Person Create(Guid id, int tenantId, [NotNull] string firstName, [NotNull] string lastName, string phoneNumber1, string phoneNumber2)
         {
             return BindEntity(new Person(), id, tenantId, firstName, lastName, phoneNumber1, phoneNumber2);
