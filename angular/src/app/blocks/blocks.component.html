@@ -1,0 +1,106 @@
+<div [@routerTransition]>
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-6">
+          <h1>{{ "Blocks" | localize }}</h1>
+        </div>
+        <div class="col-6 text-right">
+          <a href="javascript:;" class="btn bg-blue" (click)="createBlock()">
+            <i class="fa fa-plus-square"></i>
+            {{ "Create" | localize }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="content px-2">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-body table-responsive p-0">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="blocks"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="BlockName">
+                  {{ "BlockName" | localize }}
+                  <p-sortIcon field="BlockName"></p-sortIcon>
+                </th>
+                <th style="width: 200px;">{{ "Actions" | localize }}</th>
+              </tr>
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-block
+              [ngForOf]="
+                blocks
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
+                <td>{{ block.blockName }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm bg-secondary"
+                    (click)="editBlock(block)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    {{ "Edit" | localize }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm bg-danger mx-2"
+                    (click)="delete(block)"
+                  >
+                    <i class="fas fa-trash"></i>
+                    {{ "Delete" | localize }}
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="card-footer bg-light border-top">
+          <div class="row">
+            <div class="col-sm-4 col-12 text-sm-left text-center">
+              <button class="btn btn-secondary" (click)="refresh()">
+                <i class="fas fa-redo-alt"></i>
+              </button>
+            </div>
+            <div class="col-sm-4 col-12 text-center">
+              <p class="mb-0 my-2">
+                {{ "TotalRecordsCount" | localize: totalItems }}
+              </p>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="float-sm-right m-auto">
+                <abp-pagination-controls
+                  id="server"
+                  (pageChange)="getDataPage($event)"
+                >
+                </abp-pagination-controls>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
