@@ -314,7 +314,7 @@
                 <td>
                   {{
                     accountBook.housing != null
-                      ? getHousingName(accountBook.housing)
+                      ? accountBook.housing.block.blockName + ' - ' + accountBook.housing.apartment
                       : ""
                   }}
                 </td>

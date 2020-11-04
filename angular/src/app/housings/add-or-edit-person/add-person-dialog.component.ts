@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { CreateHousingPersonDto, HousingDto, HousingPersonDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
+import { BlockDto, CreateHousingPersonDto, HousingDto, HousingPersonDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'add-person-dialog.component.html'
@@ -19,6 +19,7 @@ export class AddPersonDialogComponent extends AppComponentBase
   saving = false;
   id: string;
   housing = new HousingDto();
+  block = new BlockDto();
   people: LookUpDto[];
   housingPerson = new HousingPersonDto();
   housingPersonId: string;
@@ -38,6 +39,7 @@ export class AddPersonDialogComponent extends AppComponentBase
       .get(this.id)
       .subscribe((result: HousingDto) => {
         this.housing = result;
+        this.block = this.housing.block;
       });
 
     this._housingService

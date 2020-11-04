@@ -16,7 +16,7 @@ namespace Sirius.Housings
 
         public virtual int TenantId { get; set; }
 
-        [StringLength(50)] public string BlockName { get; set; }
+        [StringLength(50)] [Required] public string BlockName { get; set; }
 
         public static async Task<Block> CreateAsync(IBlockPolicy blockPolicy, Guid id, int tenantId, string blockName)
         {

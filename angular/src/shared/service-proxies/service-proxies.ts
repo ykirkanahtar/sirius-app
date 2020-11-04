@@ -5996,7 +5996,7 @@ export interface IPaymentCategoryDto {
 
 export class Block implements IBlock {
     tenantId: number;
-    blockName: string | undefined;
+    blockName: string;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -6062,7 +6062,7 @@ export class Block implements IBlock {
 
 export interface IBlock {
     tenantId: number;
-    blockName: string | undefined;
+    blockName: string;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

@@ -154,22 +154,6 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
       });
   }
 
-  protected getHousingName(housing: HousingDto): string {
-    if (housing.block && housing.apartment) {
-      return housing.block.blockName + ' - ' + housing.apartment;
-    }
-
-    if (!housing.block) {
-      return housing.apartment;
-    }
-
-    if (!housing.apartment) {
-      return housing.block.blockName;
-    }
-
-    return null;
-  }
-
   protected delete(accountBook: AccountBookDto): void {
     abp.message.confirm(
       this.l('AccountBookDeleteWarningMessage', accountBook.id),

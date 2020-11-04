@@ -4,11 +4,13 @@ import {
   EventEmitter,
   Output,
   ViewChild,
+  OnInit,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import {
+  BlockDto,
   HousingDto,
   HousingPaymentPlanDto,
   HousingPaymentPlanDtoPagedResultDto,
@@ -32,7 +34,8 @@ class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   templateUrl: './account-activities.component.html',
   animations: [appModuleAnimation()]
 })
-export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingDto> {
+export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingDto>
+  implements OnInit {
 
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
@@ -40,6 +43,7 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
 
   housingPaymentPlans: HousingPaymentPlanDto[] = [];
   housing = new HousingDto();
+  block = new BlockDto();
   paymentPlanTypeEnum = PaymentPlanType;
 
   id: string;
@@ -54,6 +58,18 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
     super(injector);
   }
 
+  ngOnInit(): void {
+
+    this._housingService
+      .get(this.id)
+      .subscribe((result: HousingDto) => {
+        this.housing = result;
+        this.block = this.housing.block;
+      });
+
+    this.getDataPage(1);
+  }
+
   getData(event?: LazyLoadEvent) {
     this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
     this.getDataPage(1);
@@ -64,12 +80,6 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
     pageNumber: number,
     finishedCallback: Function
   ): void {
-
-    this._housingService
-      .get(this.id)
-      .subscribe((result: HousingDto) => {
-        this.housing = result;
-      });
 
     this._housingPaymentPlanService
       .getAllByHousingId(this.id, request.keyword, true, request.skipCount, request.maxResultCount)
