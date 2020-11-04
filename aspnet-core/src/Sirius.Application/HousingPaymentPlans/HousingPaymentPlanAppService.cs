@@ -56,6 +56,7 @@ namespace Sirius.HousingPaymentPlans
         public async Task CreateDebtPaymentForHousingCategory(
             CreateDebtHousingPaymentPlanForHousingCategoryDto input)
         {
+            CheckCreatePermission();
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
             var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
@@ -113,6 +114,7 @@ namespace Sirius.HousingPaymentPlans
 
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)
         {
+            CheckCreatePermission();
             var housing = await _housingRepository.GetAsync(input.HousingId);
             var paymentCategory = await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
             var accountBook = await _accountBookRepository.GetAsync(input.AccountBookId);
@@ -134,6 +136,7 @@ namespace Sirius.HousingPaymentPlans
 
         public async Task<HousingPaymentPlanDto> CreateDebtPaymentAsync(CreateDebtHousingPaymentPlanDto input)
         {
+            CheckCreatePermission();
             var housing = await _housingRepository.GetAsync(input.HousingId);
             var paymentCategory = await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
 
@@ -159,6 +162,7 @@ namespace Sirius.HousingPaymentPlans
 
         public override async Task<HousingPaymentPlanDto> UpdateAsync(UpdateHousingPaymentPlanDto input)
         {
+            CheckUpdatePermission();
             var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(input.Id);
             var housingPaymentPlan = HousingPaymentPlan.Update(existingHousingPaymentPlan, input.Date,
                 input.Amount, input.Description);
@@ -169,6 +173,7 @@ namespace Sirius.HousingPaymentPlans
         public async Task<PagedResultDto<HousingPaymentPlanDto>> GetAllByHousingIdAsync(
             PagedHousingPaymentPlanResultRequestDto input)
         {
+            CheckGetAllPermission();
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var query = _housingPaymentPlanRepository.GetAll()

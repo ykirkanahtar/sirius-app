@@ -32,13 +32,14 @@ namespace Sirius.Housings
         private static async Task<Block> BindEntityAsync(IBlockPolicy blockPolicy, bool isUpdate, Block block, Guid id,
             int tenantId, string blockName)
         {
-            await blockPolicy.CheckCreateOrUpdateBlockAttemptAsync(block, isUpdate);
-
             block ??= new Block();
 
             block.Id = id;
             block.TenantId = tenantId;
             block.BlockName = blockName;
+            
+            await blockPolicy.CheckCreateOrUpdateBlockAttemptAsync(block, isUpdate);
+            
             return block;
         }
     }

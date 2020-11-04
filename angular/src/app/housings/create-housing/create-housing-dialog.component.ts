@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { HousingDto, HousingServiceProxy, CreateHousingDto, LookUpDto, HousingCategoryServiceProxy } from '@shared/service-proxies/service-proxies';
+import { HousingDto, HousingServiceProxy, CreateHousingDto, LookUpDto, HousingCategoryServiceProxy, BlockServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'create-housing-dialog.component.html'
@@ -19,6 +19,7 @@ export class CreateHousingDialogComponent extends AppComponentBase
   saving = false;
   housing = new HousingDto();
   housingCategories: LookUpDto[];
+  blocks: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -26,6 +27,7 @@ export class CreateHousingDialogComponent extends AppComponentBase
     injector: Injector,
     private _housingService: HousingServiceProxy,
     private _housingCategoryService: HousingCategoryServiceProxy,
+    private _blockService: BlockServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
@@ -36,6 +38,12 @@ export class CreateHousingDialogComponent extends AppComponentBase
       .getHousingCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.housingCategories = result;
+      });
+
+    this._blockService
+      .getBlockLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.blocks = result;
       });
   }
 

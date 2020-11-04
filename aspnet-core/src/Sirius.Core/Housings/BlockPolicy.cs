@@ -26,7 +26,7 @@ namespace Sirius.Housings
             {
                 throw new ArgumentNullException(nameof(Block));
             }
-            
+
             if (block.BlockName.IsNullOrWhiteSpace())
             {
                 throw new UserFriendlyException("Blok ismi dolu olmalıdır.");
@@ -35,7 +35,7 @@ namespace Sirius.Housings
             var blockWithSameNameQuery =
                 _blockRepository.GetAll().Where(p =>
                         string.Equals(p.BlockName.ToLower(), block.BlockName.ToLowerInvariant()))
-                    .WhereIf(isUpdate, p => p.Id == block.Id);
+                    .WhereIf(isUpdate, p => p.Id != block.Id);
 
             if ((await blockWithSameNameQuery.ToListAsync()).Count > 0)
             {

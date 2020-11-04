@@ -53,6 +53,7 @@ namespace Sirius.AccountBooks
 
         public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
         {
+            CheckCreatePermission();
             var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
             var housing = await _housingManager.GetAsync(input.HousingId);
             var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId);
@@ -86,6 +87,7 @@ namespace Sirius.AccountBooks
 
         public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
         {
+            CheckCreatePermission();
             await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
 
             var accountBook = AccountBook.Create(
@@ -120,6 +122,7 @@ namespace Sirius.AccountBooks
 
         public override async Task<AccountBookDto> UpdateAsync(UpdateAccountBookDto input)
         {
+            CheckUpdatePermission();
             var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
             var accountBook = AccountBook.Update(existingAccountBook, input.Description, input.DocumentDateTime,
                 input.DocumentNumber);
@@ -129,6 +132,7 @@ namespace Sirius.AccountBooks
 
         public override async Task<PagedResultDto<AccountBookDto>> GetAllAsync(PagedAccountBookResultRequestDto input)
         {
+            CheckGetAllPermission();
             var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
 
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))

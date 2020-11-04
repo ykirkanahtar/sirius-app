@@ -148,9 +148,9 @@
           >
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="block">
+                <th pSortableColumn="block.blockName">
                   {{ "Block" | localize }}
-                  <p-sortIcon field="block"></p-sortIcon>
+                  <p-sortIcon field="block.blockName"></p-sortIcon>
                 </th>
                 <th pSortableColumn="apartment">
                   {{ "Apartment" | localize }}
@@ -183,7 +183,7 @@
               "
             >
               <tr>
-                <td>{{ housing.block }}</td>
+                <td>{{ housing.block.blockName }}</td>
                 <td>{{ housing.apartment }}</td>
                 <td>{{ housing.housingCategory.housingCategoryName }}</td>
                 <td>{{ housing.balance | number: "1.2-2" }}</td>

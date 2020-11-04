@@ -37,6 +37,7 @@ namespace Sirius.People
 
         public override async Task<PersonDto> CreateAsync(CreatePersonDto input)
         {
+            CheckCreatePermission();
             var person = Person.Create(
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
@@ -51,6 +52,7 @@ namespace Sirius.People
 
         public override async Task<PersonDto> UpdateAsync(UpdatePersonDto input)
         {
+            CheckUpdatePermission();
             var existingPerson = await _personManager.GetAsync(input.Id);
             var person = Person.Update(existingPerson, input.FirstName, input.LastName, input.Phone1, input.Phone2);
             await _personManager.UpdateAsync(person);
@@ -59,12 +61,15 @@ namespace Sirius.People
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
+            CheckDeletePermission();
             var person = await _personManager.GetAsync(input.Id);
             await _personManager.DeleteAsync(person);
         }
 
         public override async Task<PagedResultDto<PersonDto>> GetAllAsync(PagedPersonResultRequestDto input)
         {
+            CheckGetAllPermission();
+
             var query = (from person in _personRepository.GetAll()
                     join housingPerson in _housingPersonRepository.GetAll() on person.Id equals housingPerson
                             .PersonId
@@ -90,6 +95,8 @@ namespace Sirius.People
         
         public async Task<List<LookUpDto>> GetPersonLookUpAsync()
         {
+            CheckGetAllPermission();
+
             var people = await _personRepository.GetAllListAsync();
 
             return
@@ -99,6 +106,8 @@ namespace Sirius.People
 
         public async Task<List<string>> GetPeopleFromAutoCompleteFilterAsync(string request)
         {
+            CheckGetAllPermission();
+
             var query = from p in _personRepository.GetAll()
                 where p.FirstName.Contains(request) || p.LastName.Contains(request)
                 select p.Name;

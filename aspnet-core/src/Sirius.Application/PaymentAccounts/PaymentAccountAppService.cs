@@ -31,6 +31,7 @@ namespace Sirius.PaymentAccounts
 
         public async Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input)
         {
+            CheckCreatePermission();
             var paymentAccount = PaymentAccount.CreateAdvanceAccount(
                     SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
@@ -46,6 +47,8 @@ namespace Sirius.PaymentAccounts
 
         public async Task<List<LookUpDto>> GetPaymentAccountLookUpAsync()
         {
+            CheckGetAllPermission();
+
             var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();         
                                                                                
             return                                                             
@@ -55,6 +58,7 @@ namespace Sirius.PaymentAccounts
 
         public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input)
         {
+            CheckUpdatePermission();
             var paymentAccount = PaymentAccount.CreateBankAccount(
                     SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
@@ -70,6 +74,7 @@ namespace Sirius.PaymentAccounts
 
         public async Task<PaymentAccountDto> CreateCashAccountAsync(CreateCashAccountDto input)
         {
+            CheckUpdatePermission();
             var paymentAccount = PaymentAccount.CreateCashAccount(
                     SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
@@ -90,6 +95,7 @@ namespace Sirius.PaymentAccounts
 
         public override async Task<PaymentAccountDto> UpdateAsync(UpdatePaymentAccountDto input)
         {
+            CheckUpdatePermission();
             var existingPaymentAccount = await _paymentAccountRepository.GetAsync(input.Id);
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
                 input.PersonId, input.TenantIsOwner, input.Iban);
@@ -99,6 +105,8 @@ namespace Sirius.PaymentAccounts
         
         public override async Task<PagedResultDto<PaymentAccountDto>> GetAllAsync(PagedPaymentAccountResultRequestDto input)
         {
+            CheckGetAllPermission();
+
             var query = _paymentAccountRepository.GetAll();
 
             var paymentAccounts = await query.OrderBy(input.Sorting ?? $"{nameof(PaymentAccountDto.AccountName)}")

@@ -38,6 +38,7 @@ namespace Sirius.PaymentCategories
 
         public override async Task<PaymentCategoryDto> CreateAsync(CreatePaymentCategoryDto input)
         {
+            CheckCreatePermission();
             if (input.HousingDueType == HousingDueType.RegularHousingDue)
             {
                 throw new UserFriendlyException("Geçersiz aidat ödemesi tipi");
@@ -51,6 +52,7 @@ namespace Sirius.PaymentCategories
 
         public override async Task<PaymentCategoryDto> UpdateAsync(UpdatePaymentCategoryDto input)
         {
+            CheckUpdatePermission();
             var existingPaymentCategory = await _paymentCategoryManager.GetAsync(input.Id);
             var paymentCategory = PaymentCategory.Update(existingPaymentCategory, input.PaymentCategoryName);
             await _paymentCategoryManager.UpdateAsync(paymentCategory);
@@ -59,6 +61,7 @@ namespace Sirius.PaymentCategories
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
+            CheckDeletePermission();
             var paymentCategory = await _paymentCategoryManager.GetAsync(input.Id);
             await _paymentCategoryManager.DeleteAsync(paymentCategory);
         }
@@ -66,6 +69,8 @@ namespace Sirius.PaymentCategories
         public override async Task<PagedResultDto<PaymentCategoryDto>> GetAllAsync(
             PagedPaymentCategoryResultRequestDto input)
         {
+            CheckGetAllPermission();
+
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var query = _paymentCategoryRepository
@@ -86,6 +91,8 @@ namespace Sirius.PaymentCategories
 
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
         {
+            CheckGetAllPermission();
+
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync();
@@ -98,6 +105,8 @@ namespace Sirius.PaymentCategories
         
         public async Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request)
         {
+            CheckGetAllPermission();
+
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var query = from p in _paymentCategoryRepository.GetAll()

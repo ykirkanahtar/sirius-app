@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.Extensions;
@@ -22,7 +23,7 @@ namespace Sirius.Housings
 
         public virtual int TenantId { get; set; }
 
-        public Guid? BlockId { get; private set; }
+        public Guid BlockId { get; private set; }
 
         [StringLength(50)] public string Apartment { get; private set; }
         public Guid HousingCategoryId { get; private set; }
@@ -38,47 +39,38 @@ namespace Sirius.Housings
 
         public string GetName()
         {
-            if (BlockId.HasValue && !string.IsNullOrWhiteSpace(Apartment))
-                return $"{Block.BlockName} - {Apartment}";
-
-            if (!BlockId.HasValue)
-                return Apartment;
-
-            if (string.IsNullOrWhiteSpace(Apartment))
-                return Block.BlockName;
-
-            return string.Empty;
+            return $"{Block.BlockName} - {Apartment}";
         }
 
-        public static Housing Create(Guid id, int tenantId, [CanBeNull] Block block, string apartment,
+        public static async Task<Housing> CreateAsync(IHousingPolicy housingPolicy, Guid id, int tenantId, Block block, string apartment,
             HousingCategory housingCategory)
         {
-            return BindEntity(new Housing(), id, tenantId, block, apartment, housingCategory);
+            return await BindEntityAsync(housingPolicy, false, new Housing(), id, tenantId, block, apartment, housingCategory);
         }
 
-        public static Housing Update(Housing existingHousing, [CanBeNull] Block block, string apartment,
+        public static async Task<Housing> UpdateAsync(IHousingPolicy housingPolicy, Housing existingHousing, Block block,
+            string apartment,
             HousingCategory housingCategory)
         {
-            return BindEntity(existingHousing, existingHousing.Id, existingHousing.TenantId, block, apartment,
+            return await BindEntityAsync(housingPolicy, true, existingHousing, existingHousing.Id, existingHousing.TenantId, block,
+                apartment,
                 housingCategory);
         }
 
-        private static Housing BindEntity(Housing housing, Guid id, int tenantId, [CanBeNull] Block block, string apartment,
+        private static async Task<Housing> BindEntityAsync(IHousingPolicy housingPolicy, bool isUpdate, Housing housing, Guid id,
+            int tenantId, Block block, string apartment,
             HousingCategory housingCategory)
         {
-            if (block == null && apartment.IsNullOrWhiteSpace())
-            {
-                throw new UserFriendlyException("Blok ve daire alanlarından en az biri dolu olmalıdır.");
-            }
-
             housing ??= new Housing();
 
             housing.Id = id;
             housing.TenantId = tenantId;
-            housing.BlockId = block?.Id;
+            housing.BlockId = block.Id;
             housing.Apartment = apartment;
             housing.HousingCategoryId = housingCategory.Id;
             housing.HousingPeople = new Collection<HousingPerson>();
+
+            await housingPolicy.CheckCreateOrUpdateHousingAttemptAsync(housing, isUpdate);
 
             return housing;
         }

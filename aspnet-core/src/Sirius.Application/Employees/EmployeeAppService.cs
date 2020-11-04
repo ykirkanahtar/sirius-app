@@ -31,6 +31,7 @@ namespace Sirius.Employees
 
         public override async Task<EmployeeDto> CreateAsync(CreateEmployeeDto input)
         {
+            CheckCreatePermission();
             var employee = Employee.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(),
                 input.FirstName, input.LastName, input.Phone1, input.Phone2);
             await _employeeManager.CreateAsync(employee);
@@ -39,6 +40,7 @@ namespace Sirius.Employees
 
         public override async Task<EmployeeDto> UpdateAsync(EmployeeDto input)
         {
+            CheckUpdatePermission();
             var existingEmployee = await _employeeManager.GetAsync(input.Id);
             var employee =
                 Employee.Update(existingEmployee, input.FirstName, input.LastName, input.Phone1, input.Phone2);
@@ -48,12 +50,14 @@ namespace Sirius.Employees
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
+            CheckDeletePermission();
             var employee = await _employeeManager.GetAsync(input.Id);
             await _employeeManager.DeleteAsync(employee);
         }
 
         public override async Task<PagedResultDto<EmployeeDto>> GetAllAsync(PagedEmployeeResultRequestDto input)
         {
+            CheckGetAllPermission();
             var query = _employeeRepository.GetAll()
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Name),
                     p => (p.FirstName + " " + p.LastName).Contains(input.Name))
@@ -71,6 +75,7 @@ namespace Sirius.Employees
         
         public async Task<List<LookUpDto>> GetEmployeeLookUpAsync()
         {
+            CheckGetAllPermission();
             var employees = await _employeeRepository.GetAllListAsync();
 
             return
@@ -81,6 +86,7 @@ namespace Sirius.Employees
 
         public async Task<List<string>> GetEmployeeFromAutoCompleteFilterAsync(string request)
         {
+            CheckGetAllPermission();
             var query = from p in _employeeRepository.GetAll()
                 where p.FirstName.Contains(request) || p.LastName.Contains(request)
                 select p.Name;

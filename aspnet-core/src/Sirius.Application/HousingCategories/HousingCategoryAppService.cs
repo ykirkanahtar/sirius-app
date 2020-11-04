@@ -30,6 +30,7 @@ namespace Sirius.HousingCategories
 
         public override async Task<HousingCategoryDto> CreateAsync(CreateHousingCategoryDto input)
         {
+            CheckCreatePermission();
             var housingCategory = HousingCategory.Create(SequentialGuidGenerator.Instance.Create(), AbpSession.GetTenantId(), input.HousingCategoryName);
             await _housingCategoryManager.CreateAsync(housingCategory);
             return ObjectMapper.Map<HousingCategoryDto>(housingCategory);
@@ -37,6 +38,7 @@ namespace Sirius.HousingCategories
         
         public override async Task<HousingCategoryDto> UpdateAsync(UpdateHousingCategoryDto input)
         {
+            CheckUpdatePermission();
             var existingHousingCategory = await _housingCategoryManager.GetAsync(input.Id);
             var housingCategory = HousingCategory.Update(existingHousingCategory, input.HousingCategoryName);
             await _housingCategoryManager.UpdateAsync(housingCategory);
@@ -45,6 +47,7 @@ namespace Sirius.HousingCategories
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
+            CheckDeletePermission();
             var housingCategory = await _housingCategoryManager.GetAsync(input.Id);
             await _housingCategoryManager.DeleteAsync(housingCategory);
         }
@@ -52,6 +55,7 @@ namespace Sirius.HousingCategories
         public override async Task<PagedResultDto<HousingCategoryDto>> GetAllAsync(
             PagedHousingCategoryResultRequestDto input)
         {
+            CheckGetAllPermission();
             var query = _housingCategoryRepository
                 .GetAll()
                 .WhereIf(!string.IsNullOrWhiteSpace(input.HousingCategoryName),
@@ -67,6 +71,7 @@ namespace Sirius.HousingCategories
 
         public async Task<List<LookUpDto>> GetHousingCategoryLookUpAsync()
         {           
+            CheckGetAllPermission();
             var housingCategories = await _housingCategoryRepository.GetAllListAsync();
             var selectList =  (from l in housingCategories
                 select new LookUpDto(l.Id.ToString(), l.HousingCategoryName)).ToList();
@@ -75,6 +80,7 @@ namespace Sirius.HousingCategories
         
         public async Task<List<string>> GetHousingCategoryFromAutoCompleteFilterAsync(string request)
         {
+            CheckGetAllPermission();
             var query = from p in _housingCategoryRepository.GetAll()
                 where p.HousingCategoryName.Contains(request)
                 select p.HousingCategoryName;

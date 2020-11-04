@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { HousingCategoryServiceProxy, HousingDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
+import { BlockServiceProxy, HousingCategoryServiceProxy, HousingDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'edit-housing-dialog.component.html'
@@ -20,6 +20,7 @@ export class EditHousingDialogComponent extends AppComponentBase
   id: string;
   housing = new HousingDto();
   housingCategories: LookUpDto[];
+  blocks: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -27,22 +28,29 @@ export class EditHousingDialogComponent extends AppComponentBase
     injector: Injector,
     private _housingService: HousingServiceProxy,
     private _housingCategoryService: HousingCategoryServiceProxy,
+    private _blockService: BlockServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
 
     this._housingCategoryService
-    .getHousingCategoryLookUp()
-    .subscribe((result: LookUpDto[]) => {
-      this.housingCategories = result;
-    });
+      .getHousingCategoryLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housingCategories = result;
+      });
   }
 
   ngOnInit(): void {
     this._housingService
       .get(this.id)
       .subscribe((result: HousingDto) => {
-          this.housing = result;
+        this.housing = result;
+      });
+
+    this._blockService
+      .getBlockLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.blocks = result;
       });
   }
 

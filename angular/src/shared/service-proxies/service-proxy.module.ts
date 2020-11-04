@@ -22,6 +22,7 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.PaymentAccountServiceProxy,
         ApiServiceProxies.PaymentCategoryServiceProxy,
         ApiServiceProxies.HousingCategoryServiceProxy,
+        ApiServiceProxies.BlockServiceProxy,
         { provide: HTTP_INTERCEPTORS, useClass: AbpHttpInterceptor, multi: true }
     ]
 })

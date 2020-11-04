@@ -156,7 +156,7 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
 
   protected getHousingName(housing: HousingDto): string {
     if (housing.block && housing.apartment) {
-      return housing.block + ' - ' + housing.apartment;
+      return housing.block.blockName + ' - ' + housing.apartment;
     }
 
     if (!housing.block) {
@@ -164,7 +164,7 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
     }
 
     if (!housing.apartment) {
-      return housing.block;
+      return housing.block.blockName;
     }
 
     return null;

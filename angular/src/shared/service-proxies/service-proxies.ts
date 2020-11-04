@@ -570,6 +570,357 @@ export class AccountBookServiceProxy {
 }
 
 @Injectable()
+export class BlockServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateBlockDto | undefined): Observable<BlockDto> {
+        let url_ = this.baseUrl + "/api/services/app/Block/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<BlockDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BlockDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<BlockDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BlockDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BlockDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: UpdateBlockDto | undefined): Observable<BlockDto> {
+        let url_ = this.baseUrl + "/api/services/app/Block/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<BlockDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BlockDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<BlockDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BlockDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BlockDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Block/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<BlockDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Block/GetAll?";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<BlockDtoPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BlockDtoPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<BlockDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BlockDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BlockDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getBlockLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Block/GetBlockLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetBlockLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetBlockLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetBlockLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<BlockDto> {
+        let url_ = this.baseUrl + "/api/services/app/Block/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<BlockDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BlockDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<BlockDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BlockDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BlockDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class ConfigurationServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -5643,6 +5994,85 @@ export interface IPaymentCategoryDto {
     id: string;
 }
 
+export class Block implements IBlock {
+    tenantId: number;
+    blockName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IBlock) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tenantId = _data["tenantId"];
+            this.blockName = _data["blockName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): Block {
+        data = typeof data === 'object' ? data : {};
+        let result = new Block();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tenantId"] = this.tenantId;
+        data["blockName"] = this.blockName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): Block {
+        const json = this.toJSON();
+        let result = new Block();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBlock {
+    tenantId: number;
+    blockName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
 export class HousingCategoryDto implements IHousingCategoryDto {
     housingCategoryName: string | undefined;
     isDeleted: boolean;
@@ -5901,10 +6331,11 @@ export interface IHousingPersonDto {
 }
 
 export class HousingDto implements IHousingDto {
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
     isDeleted: boolean;
@@ -5927,10 +6358,11 @@ export class HousingDto implements IHousingDto {
 
     init(_data?: any) {
         if (_data) {
-            this.block = _data["block"];
+            this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
             this.balance = _data["balance"];
+            this.block = _data["block"] ? Block.fromJS(_data["block"]) : <any>undefined;
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.housingPerson = _data["housingPerson"] ? HousingPersonDto.fromJS(_data["housingPerson"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
@@ -5953,10 +6385,11 @@ export class HousingDto implements IHousingDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["block"] = this.block;
+        data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         data["balance"] = this.balance;
+        data["block"] = this.block ? this.block.toJSON() : <any>undefined;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["housingPerson"] = this.housingPerson ? this.housingPerson.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
@@ -5979,10 +6412,11 @@ export class HousingDto implements IHousingDto {
 }
 
 export interface IHousingDto {
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
     isDeleted: boolean;
@@ -6491,6 +6925,273 @@ export interface IAccountBookDtoPagedResultDto {
     items: AccountBookDto[] | undefined;
 }
 
+export class CreateBlockDto implements ICreateBlockDto {
+    blockName: string | undefined;
+
+    constructor(data?: ICreateBlockDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.blockName = _data["blockName"];
+        }
+    }
+
+    static fromJS(data: any): CreateBlockDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateBlockDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["blockName"] = this.blockName;
+        return data; 
+    }
+
+    clone(): CreateBlockDto {
+        const json = this.toJSON();
+        let result = new CreateBlockDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateBlockDto {
+    blockName: string | undefined;
+}
+
+export class BlockDto implements IBlockDto {
+    blockName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IBlockDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.blockName = _data["blockName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): BlockDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BlockDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["blockName"] = this.blockName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): BlockDto {
+        const json = this.toJSON();
+        let result = new BlockDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBlockDto {
+    blockName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class UpdateBlockDto implements IUpdateBlockDto {
+    id: string;
+    blockName: string | undefined;
+
+    constructor(data?: IUpdateBlockDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.blockName = _data["blockName"];
+        }
+    }
+
+    static fromJS(data: any): UpdateBlockDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateBlockDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["blockName"] = this.blockName;
+        return data; 
+    }
+
+    clone(): UpdateBlockDto {
+        const json = this.toJSON();
+        let result = new UpdateBlockDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateBlockDto {
+    id: string;
+    blockName: string | undefined;
+}
+
+export class BlockDtoPagedResultDto implements IBlockDtoPagedResultDto {
+    totalCount: number;
+    items: BlockDto[] | undefined;
+
+    constructor(data?: IBlockDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(BlockDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BlockDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BlockDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): BlockDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new BlockDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBlockDtoPagedResultDto {
+    totalCount: number;
+    items: BlockDto[] | undefined;
+}
+
+export class LookUpDto implements ILookUpDto {
+    readonly value: string | undefined;
+    readonly label: string | undefined;
+
+    constructor(data?: ILookUpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).value = _data["value"];
+            (<any>this).label = _data["label"];
+        }
+    }
+
+    static fromJS(data: any): LookUpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LookUpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        data["label"] = this.label;
+        return data; 
+    }
+
+    clone(): LookUpDto {
+        const json = this.toJSON();
+        let result = new LookUpDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILookUpDto {
+    value: string | undefined;
+    label: string | undefined;
+}
+
 export class ChangeUiThemeInput implements IChangeUiThemeInput {
     theme: string;
 
@@ -6735,55 +7436,8 @@ export interface IEmployeeDtoPagedResultDto {
     items: EmployeeDto[] | undefined;
 }
 
-export class LookUpDto implements ILookUpDto {
-    readonly value: string | undefined;
-    readonly label: string | undefined;
-
-    constructor(data?: ILookUpDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            (<any>this).value = _data["value"];
-            (<any>this).label = _data["label"];
-        }
-    }
-
-    static fromJS(data: any): LookUpDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LookUpDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["value"] = this.value;
-        data["label"] = this.label;
-        return data; 
-    }
-
-    clone(): LookUpDto {
-        const json = this.toJSON();
-        let result = new LookUpDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ILookUpDto {
-    value: string | undefined;
-    label: string | undefined;
-}
-
 export class CreateHousingDto implements ICreateHousingDto {
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
 
@@ -6798,7 +7452,7 @@ export class CreateHousingDto implements ICreateHousingDto {
 
     init(_data?: any) {
         if (_data) {
-            this.block = _data["block"];
+            this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
         }
@@ -6813,7 +7467,7 @@ export class CreateHousingDto implements ICreateHousingDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["block"] = this.block;
+        data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         return data; 
@@ -6828,14 +7482,14 @@ export class CreateHousingDto implements ICreateHousingDto {
 }
 
 export interface ICreateHousingDto {
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
 }
 
 export class UpdateHousingDto implements IUpdateHousingDto {
     id: string;
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
 
@@ -6851,7 +7505,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.block = _data["block"];
+            this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
         }
@@ -6867,7 +7521,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["block"] = this.block;
+        data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         return data; 
@@ -6883,7 +7537,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
 
 export interface IUpdateHousingDto {
     id: string;
-    block: string | undefined;
+    blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
 }

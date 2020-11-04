@@ -196,5 +196,8 @@
     <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
     <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
     <text name="AdvancedFilters">Detaylı Arama</text>
+    <text name="Blocks">Blok / Apartman</text>
+    <text name="Date">Tarih</text>
+    <text name="PaymentPlanType">Borç / Alacak</text>
   </texts>
 </localizationDictionary>

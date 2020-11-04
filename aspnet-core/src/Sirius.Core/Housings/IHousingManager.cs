@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Sirius.People;
 using Sirius.Shared.Enums;
