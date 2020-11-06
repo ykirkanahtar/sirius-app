@@ -1,5 +1,4 @@
 ﻿using Abp.Modules;
-using Abp.MultiTenancy;
 using Abp.Reflection.Extensions;
 using Abp.Timing;
 using Abp.Zero;
@@ -32,7 +31,7 @@ namespace Sirius
 
             // Configure roles
             AppRoleConfig.Configure(Configuration.Modules.Zero().RoleManagement);
-   
+
             Configuration.Settings.Providers.Add<AppSettingProvider>();
         }
 
