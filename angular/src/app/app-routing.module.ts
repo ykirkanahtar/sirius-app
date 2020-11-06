@@ -18,32 +18,95 @@ import { PaymentCategoriesComponent } from './payment-categories/payment-categor
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
 import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/create-housing-payment-plan/create-housing-payment-plan.component';
 @NgModule({
-    imports: [
-        RouterModule.forChild([
-            {
-                path: '',
-                component: AppComponent,
-                children: [
-                    { path: 'home', component: HomeComponent, canActivate: [AppRouteGuard] },
-                    { path: 'account-books', component: AccountBooksComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'housings', component: HousingsComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'payment-accounts', component: PaymentAccountsComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'blocks', component: BlocksComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'employees', component: EmployeesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'people', component: PeopleComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'account-books', component: AccountBooksComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'payment-categories', component: PaymentCategoriesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'housing-categories', component: HousingCategoriesComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'create-housing-payment-plans', component: CreateHousingPaymentPlanComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
-                    { path: 'roles', component: RolesComponent, data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },
-                    { path: 'tenants', component: TenantsComponent, data: { permission: 'Pages.Tenants' }, canActivate: [AppRouteGuard] },
-                    { path: 'about', component: AboutComponent },
-                    { path: 'update-password', component: ChangePasswordComponent }
-                ]
-            }
-        ])
-    ],
-    exports: [RouterModule]
+  imports: [
+    RouterModule.forChild([
+      {
+        path: '',
+        component: AppComponent,
+        children: [
+          {
+            path: 'home',
+            component: HomeComponent,
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'account-books',
+            component: AccountBooksComponent,
+            data: { permission: 'Pages.AccountBooks' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'housings',
+            component: HousingsComponent,
+            data: { permission: 'Pages.Housings' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'payment-accounts',
+            component: PaymentAccountsComponent,
+            data: { permission: 'Pages.PaymentAccounts' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'blocks',
+            component: BlocksComponent,
+            data: { permission: 'Pages.Blocks' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'employees',
+            component: EmployeesComponent,
+            data: { permission: 'Pages.Employees' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'people',
+            component: PeopleComponent,
+            data: { permission: 'Pages.People' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'payment-categories',
+            component: PaymentCategoriesComponent,
+            data: { permission: 'Pages.PaymentCategories' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'housing-categories',
+            component: HousingCategoriesComponent,
+            data: { permission: 'Pages.HousingCategories' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'create-housing-payment-plans',
+            component: CreateHousingPaymentPlanComponent,
+            data: { permission: 'Pages.HousingPaymentPlans' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'users',
+            component: UsersComponent,
+            data: { permission: 'Pages.Users' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'roles',
+            component: RolesComponent,
+            data: { permission: 'Pages.Roles' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'tenants',
+            component: TenantsComponent,
+            data: { permission: 'Pages.Tenants' },
+            canActivate: [AppRouteGuard],
+          },
+          { path: 'about', component: AboutComponent },
+          { path: 'update-password', component: ChangePasswordComponent },
+        ],
+      },
+    ]),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

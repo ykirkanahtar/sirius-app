@@ -24,6 +24,34 @@ namespace Sirius.Authorization.Roles
                     MultiTenancySides.Tenant
                 )
             );
+            
+            roleManagementConfig.StaticRoles.Add(
+                new StaticRoleDefinition(
+                    StaticRoleNames.Tenants.SiteManager,
+                    MultiTenancySides.Tenant
+                )
+            );
+            
+            roleManagementConfig.StaticRoles.Add(
+                new StaticRoleDefinition(
+                    StaticRoleNames.Tenants.BlockManager,
+                    MultiTenancySides.Tenant
+                )
+            );
+            
+            roleManagementConfig.StaticRoles.Add(
+                new StaticRoleDefinition(
+                    StaticRoleNames.Tenants.HousingOwner,
+                    MultiTenancySides.Tenant
+                )
+            );
+            
+            roleManagementConfig.StaticRoles.Add(
+                new StaticRoleDefinition(
+                    StaticRoleNames.Tenants.HousingTenant,
+                    MultiTenancySides.Tenant
+                )
+            );
         }
     }
 }

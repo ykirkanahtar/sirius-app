@@ -54,49 +54,49 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         this.l('Housings'),
         '/app/housings',
         'fa fa-building',
-        'Pages.Users'
+        'Pages.Housings'
       ),
       new MenuItem(
         this.l('Blocks'),
         '/app/blocks',
         'fa fa-columns',
-        'Pages.Users'
+        'Pages.Blocks'
       ),
       new MenuItem(
         this.l('People'),
         '/app/people',
         'fa fa-address-card',
-        'Pages.Users'
+        'Pages.People'
       ),
       new MenuItem(
         this.l('Employees'),
         '/app/employees',
         'fa fa-briefcase',
-        'Pages.Users'
+        'Pages.Employees'
       ),
       new MenuItem(
         this.l('PaymentAccounts'),
         '/app/payment-accounts',
         'fa fa-university',
-        'Pages.Users'
+        'Pages.PaymentAccounts'
       ),
       new MenuItem(
         this.l('AccountBooks'),
         '/app/account-books',
         'fas fa-briefcase',
-        'Pages.Users'
+        'Pages.AccountBooks'
       ),
       new MenuItem(
         this.l('PaymentCategories'),
         '/app/payment-categories',
         'fas fa-book',
-        'Pages.Users'
+        'Pages.PaymentCategories'
       ),
       new MenuItem(
         this.l('HousingCategories'),
         '/app/housing-categories',
         'fas fa-laptop-house',
-        'Pages.Users'
+        'Pages.HousingCategories'
       ),
       new MenuItem(
         this.l('HousingPaymentPlan'),
@@ -108,7 +108,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             this.l('CreateHousingPaymentPlan'),
             '/app/create-housing-payment-plans',
             'fas fa-plus',
-            'Pages.Users'
+            'Pages.HousingPaymentPlans'
             )
       ]),
       new MenuItem(
