@@ -5,7 +5,10 @@
         <div class="col-6">
           <h1>{{ "Blocks" | localize }}</h1>
         </div>
-        <div class="col-6 text-right">
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createBlock()"
+        >
           <a href="javascript:;" class="btn bg-blue" (click)="createBlock()">
             <i class="fa fa-plus-square"></i>
             {{ "Create" | localize }}
@@ -35,7 +38,7 @@
                   {{ "BlockName" | localize }}
                   <p-sortIcon field="BlockName"></p-sortIcon>
                 </th>
-                <th style="width: 200px;">{{ "Actions" | localize }}</th>
+                <th style="width: 200px">{{ "Actions" | localize }}</th>
               </tr>
             </ng-template>
             <ng-template
@@ -58,6 +61,7 @@
                 <td>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.editBlock()"
                     class="btn btn-sm bg-secondary"
                     (click)="editBlock(block)"
                   >
@@ -66,6 +70,7 @@
                   </button>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.deleteBlock()"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(block)"
                   >

@@ -1,4 +1,3 @@
-
 <form
   class="form-horizontal"
   autocomplete="off"
@@ -17,16 +16,17 @@
             {{ "Block" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-              id="blocks" 
-              name="blocks" 
-              [options]="blocks" 
+            <p-dropdown
+              id="blocks"
+              name="blocks"
+              [options]="blocks"
               [placeholder]="'PleaseSelect' | localize"
-              [(ngModel)]="housing.blockId" 
+              [(ngModel)]="housing.blockId"
               [filter]="true"
-              [style]="{'width':'100%'}"
-              required>
-              </p-dropdown>
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
           </div>
         </div>
         <div class="form-group row">
@@ -56,24 +56,29 @@
             {{ "HousingCategory" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-              id="housingCategories" 
-              name="housingCategories" 
-              [options]="housingCategories" 
+            <p-dropdown
+              id="housingCategories"
+              name="housingCategories"
+              [options]="housingCategories"
               [placeholder]="'PleaseSelect' | localize"
-              [(ngModel)]="housing.housingCategoryId" 
+              [(ngModel)]="housing.housingCategoryId"
               [filter]="true"
-              [style]="{'width':'100%'}"
-              required>
-              </p-dropdown>
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
           </div>
-        </div>        
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!createHousingForm.form.valid || saving"
+    [saveDisabled]="
+      !createHousingForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createHousing()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

@@ -6,7 +6,7 @@ import {
   PagedListingComponentBase,
   PagedRequestDto
 } from '@shared/paged-listing-component-base';
-import { EmployeeDto, BlockDto, BlockServiceProxy, BlockDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { BlockDto, BlockServiceProxy, BlockDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
 import { Table } from 'primeng/table';
 import { LazyLoadEvent } from 'primeng/api';
 import { EditBlockDialogComponent } from './edit-block/edit-block-dialog.component';
@@ -69,10 +69,10 @@ export class BlocksComponent extends PagedListingComponentBase<BlockDto>
         request.skipCount,
         request.maxResultCount)
       .pipe(
-          finalize(() => {
-            finishedCallback();
-          })
-        )
+        finalize(() => {
+          finishedCallback();
+        })
+      )
       .subscribe((result: BlockDtoPagedResultDto) => {
         this.blocks = result.items;
         this.showPaging(result, pageNumber);

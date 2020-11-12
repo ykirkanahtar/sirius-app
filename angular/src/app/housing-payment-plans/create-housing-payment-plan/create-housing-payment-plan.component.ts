@@ -2,7 +2,6 @@ import { Component, Injector, OnInit } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
-  HousingCategoryDto,
   HousingPaymentPlanServiceProxy,
   CreateDebtHousingPaymentPlanForHousingCategoryDto,
   HousingCategoryServiceProxy,
@@ -32,10 +31,10 @@ export class CreateHousingPaymentPlanComponent
 
   ngOnInit(): void {
     this._housingCategoryService
-          .getHousingCategoryLookUp()
-          .subscribe((result: LookUpDto[]) => {
-              this.housingCategories = result;
-          });
+      .getHousingCategoryLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housingCategories = result;
+      });
   }
 
   save(): void {

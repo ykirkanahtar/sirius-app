@@ -56,7 +56,10 @@
             ></abp-validation-summary>
           </div>
         </div>
-        <div *ngIf="paymentAccountType != paymentAccountTypeEnum.Cash" class="form-group row">
+        <div
+          *ngIf="paymentAccountType != paymentAccountTypeEnum.Cash"
+          class="form-group row"
+        >
           <label class="col-md-3 col-form-label" for="iban">
             {{ "Iban" | localize }}
           </label>
@@ -77,13 +80,17 @@
               [controlEl]="ibanEl"
             ></abp-validation-summary>
           </div>
-        </div>                            
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!editPaymentAccountForm.form.valid || saving"
+    [saveDisabled]="
+      !editPaymentAccountForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editPaymentAccount()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

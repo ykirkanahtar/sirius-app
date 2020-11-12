@@ -34,7 +34,7 @@ export class EditPaymentCategoryDialogComponent extends AppComponentBase
     this._paymentCategoryService
       .get(this.id)
       .subscribe((result: PaymentCategoryDto) => {
-          this.paymentCategory = result;
+        this.paymentCategory = result;
       });
   }
 

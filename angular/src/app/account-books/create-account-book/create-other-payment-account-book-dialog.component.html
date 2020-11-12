@@ -1,5 +1,13 @@
-<form class="form-horizontal" autocomplete="off" #createOtherPaymentAccountBookForm="ngForm" (ngSubmit)="save()">
-  <abp-modal-header [title]="'CreateNewOtherPaymentAccountBook' | localize" (onCloseClick)="bsModalRef.hide()">
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #createOtherPaymentAccountBookForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'CreateNewOtherPaymentAccountBook' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  >
   </abp-modal-header>
   <div class="modal-body">
     <tabset>
@@ -9,8 +17,15 @@
             {{ "ProcessDateTime" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text" id="processDate" name="processDate" [placeholder]="'SelectDate' | localize"
-              class="form-control" [(ngModel)]="accountBook.processDateTime" bsDatepicker>
+            <input
+              type="text"
+              id="processDate"
+              name="processDate"
+              [placeholder]="'SelectDate' | localize"
+              class="form-control"
+              [(ngModel)]="accountBook.processDateTime"
+              bsDatepicker
+            />
           </div>
         </div>
         <div class="form-group row required">
@@ -18,9 +33,15 @@
             {{ "PaymentCategory" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown id="paymentCategories" name="paymentCategories" [placeholder]="'PleaseSelect' | localize"
-              [options]="paymentCategories" [(ngModel)]="accountBook.paymentCategoryId" [filter]="true"
-              [style]="{'width':'100%'}">
+            <p-dropdown
+              id="paymentCategories"
+              name="paymentCategories"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentCategories"
+              [(ngModel)]="accountBook.paymentCategoryId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
             </p-dropdown>
           </div>
         </div>
@@ -29,9 +50,15 @@
             {{ "FromPaymentAccount" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown id="paymentAccounts" name="paymentAccounts" [placeholder]="'PleaseSelect' | localize"
-              [options]="paymentAccounts" [(ngModel)]="accountBook.fromPaymentAccountId" [filter]="true"
-              [style]="{'width':'100%'}">
+            <p-dropdown
+              id="paymentAccounts"
+              name="paymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="accountBook.fromPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
             </p-dropdown>
           </div>
         </div>
@@ -40,9 +67,15 @@
             {{ "ToPaymentAccount" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown id="paymentAccounts" name="paymentAccounts" [placeholder]="'PleaseSelect' | localize"
-              [options]="paymentAccounts" [(ngModel)]="accountBook.toPaymentAccountId" [filter]="true"
-              [style]="{'width':'100%'}">
+            <p-dropdown
+              id="paymentAccounts"
+              name="paymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="accountBook.toPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
             </p-dropdown>
           </div>
         </div>
@@ -51,9 +84,21 @@
             {{ "Amount" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text" class="form-control" name="amount" id="amount" minlength="0" maxlength="10"
-              [(ngModel)]="accountBook.amount" #amountModel="ngModel" #amountEl />
-            <abp-validation-summary [control]="amountModel" [controlEl]="amountEl"></abp-validation-summary>
+            <input
+              type="text"
+              class="form-control"
+              name="amount"
+              id="amount"
+              minlength="0"
+              maxlength="10"
+              [(ngModel)]="accountBook.amount"
+              #amountModel="ngModel"
+              #amountEl
+            />
+            <abp-validation-summary
+              [control]="amountModel"
+              [controlEl]="amountEl"
+            ></abp-validation-summary>
           </div>
         </div>
         <div class="form-group row">
@@ -61,9 +106,21 @@
             {{ "Description" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text" class="form-control" name="description" id="description" minlength="0" maxlength="500"
-              [(ngModel)]="accountBook.description" #descriptionModel="ngModel" #descriptionEl />
-            <abp-validation-summary [control]="descriptionModel" [controlEl]="descriptionEl"></abp-validation-summary>
+            <input
+              type="text"
+              class="form-control"
+              name="description"
+              id="description"
+              minlength="0"
+              maxlength="500"
+              [(ngModel)]="accountBook.description"
+              #descriptionModel="ngModel"
+              #descriptionEl
+            />
+            <abp-validation-summary
+              [control]="descriptionModel"
+              [controlEl]="descriptionEl"
+            ></abp-validation-summary>
           </div>
         </div>
         <div class="form-group row">
@@ -71,8 +128,15 @@
             {{ "DocumentDateTime" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text" id="documentDateTime" name="documentDateTime" [placeholder]="'SelectDate' | localize"
-              class="form-control" [(ngModel)]="accountBook.documentDateTime" bsDatepicker>
+            <input
+              type="text"
+              id="documentDateTime"
+              name="documentDateTime"
+              [placeholder]="'SelectDate' | localize"
+              class="form-control"
+              [(ngModel)]="accountBook.documentDateTime"
+              bsDatepicker
+            />
           </div>
         </div>
         <div class="form-group row">
@@ -80,14 +144,33 @@
             {{ "DocumentNumber" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text" class="form-control" name="documentNumber" id="documentNumber" minlength="0" maxlength="20"
-              [(ngModel)]="accountBook.documentNumber" #documentNumberModel="ngModel" #documentNumberEl />
-            <abp-validation-summary [control]="documentNumberModel" [controlEl]="documentNumberEl"></abp-validation-summary>
+            <input
+              type="text"
+              class="form-control"
+              name="documentNumber"
+              id="documentNumber"
+              minlength="0"
+              maxlength="20"
+              [(ngModel)]="accountBook.documentNumber"
+              #documentNumberModel="ngModel"
+              #documentNumberEl
+            />
+            <abp-validation-summary
+              [control]="documentNumberModel"
+              [controlEl]="documentNumberEl"
+            ></abp-validation-summary>
           </div>
         </div>
       </tab>
     </tabset>
   </div>
-  <abp-modal-footer [cancelDisabled]="saving" [saveDisabled]="!createOtherPaymentAccountBookForm.form.valid || saving"
-    (onCancelClick)="bsModalRef.hide()"></abp-modal-footer>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="
+      !createOtherPaymentAccountBookForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createAccountBook()
+    "
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
 </form>

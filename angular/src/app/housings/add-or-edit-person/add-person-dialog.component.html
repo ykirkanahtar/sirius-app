@@ -1,5 +1,13 @@
-<form class="form-horizontal" autocomplete="off" #addPersonForm="ngForm" (ngSubmit)="save()">
-  <abp-modal-header [title]="'AddPerson' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #addPersonForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'AddPerson' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
   <div class="modal-body">
     <tabset>
       <tab [heading]="'Details' | localize" class="pt-3 px-2">
@@ -28,8 +36,16 @@
             {{ "Person" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown id="people" name="people" [placeholder]="'PleaseSelect' | localize" [options]="people"
-              [(ngModel)]="housingPerson.personId" [filter]="true" [style]="{'width':'100%'}" required>
+            <p-dropdown
+              id="people"
+              name="people"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="people"
+              [(ngModel)]="housingPerson.personId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+              required
+            >
             </p-dropdown>
           </div>
         </div>
@@ -39,8 +55,13 @@
           </label>
           <div class="col-md-9">
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="isTenant" id="isTenant"
-                [(ngModel)]="housingPerson.isTenant" />
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="isTenant"
+                id="isTenant"
+                [(ngModel)]="housingPerson.isTenant"
+              />
               <label class="custom-control-label mt-2" for="isTenant"></label>
             </div>
           </div>
@@ -51,8 +72,13 @@
           </label>
           <div class="col-md-9">
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="contact" id="contact"
-                [(ngModel)]="housingPerson.contact" />
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="contact"
+                id="contact"
+                [(ngModel)]="housingPerson.contact"
+              />
               <label class="custom-control-label mt-2" for="contact"></label>
             </div>
           </div>
@@ -60,6 +86,9 @@
       </tab>
     </tabset>
   </div>
-  <abp-modal-footer [cancelDisabled]="saving" [saveDisabled]="!addPersonForm.form.valid || saving"
-    (onCancelClick)="bsModalRef.hide()"></abp-modal-footer>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!addPersonForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
 </form>

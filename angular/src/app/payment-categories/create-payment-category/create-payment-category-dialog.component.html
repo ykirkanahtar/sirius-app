@@ -46,16 +46,23 @@
                 id="isValidForAllPeriods"
                 [(ngModel)]="paymentCategory.isValidForAllPeriods"
               />
-              <label class="custom-control-label mt-2" for="isValidForAllPeriods"></label>
+              <label
+                class="custom-control-label mt-2"
+                for="isValidForAllPeriods"
+              ></label>
             </div>
           </div>
-        </div>  
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!createPaymentCategoryForm.form.valid || saving"
+    [saveDisabled]="
+      !createPaymentCategoryForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createPaymentCategory()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

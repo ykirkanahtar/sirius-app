@@ -78,7 +78,7 @@
               [controlEl]="phone1El"
             ></abp-validation-summary>
           </div>
-        </div>    
+        </div>
         <div class="form-group row">
           <label class="col-md-3 col-form-label" for="phone2">
             {{ "Phone2" | localize }}
@@ -100,13 +100,17 @@
               [controlEl]="phone2El"
             ></abp-validation-summary>
           </div>
-        </div>             
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!editPersonForm.form.valid || saving"
+    [saveDisabled]="
+      !editPersonForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editPerson()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

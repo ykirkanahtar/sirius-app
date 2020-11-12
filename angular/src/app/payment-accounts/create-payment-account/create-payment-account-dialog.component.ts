@@ -39,7 +39,7 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
   save(): void {
     this.saving = true;
 
-    if(this.paymentAccountType === PaymentAccountType.Cash) {
+    if (this.paymentAccountType === PaymentAccountType.Cash) {
       const cashPaymentAccount = new CreateCashAccountDto();
       cashPaymentAccount.init(this.paymentAccount);
 

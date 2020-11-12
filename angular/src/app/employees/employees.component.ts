@@ -88,10 +88,10 @@ export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto>
         request.skipCount,
         request.maxResultCount)
       .pipe(
-          finalize(() => {
-            finishedCallback();
-          })
-        )
+        finalize(() => {
+          finishedCallback();
+        })
+      )
       .subscribe((result: EmployeeDtoPagedResultDto) => {
         this.employees = result.items;
         this.showPaging(result, pageNumber);

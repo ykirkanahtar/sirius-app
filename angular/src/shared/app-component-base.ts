@@ -13,6 +13,7 @@ import {
 
 import { AppSessionService } from '@shared/session/app-session.service';
 import { PrimengTableHelper } from 'shared/helpers/PrimengTableHelper';
+import { PermissionHelper } from 'shared/helpers/PermissionHelper';
 
 export abstract class AppComponentBase {
 
@@ -28,6 +29,7 @@ export abstract class AppComponentBase {
     appSession: AppSessionService;
     elementRef: ElementRef;
     primengTableHelper: PrimengTableHelper;
+    permissionHelper: PermissionHelper;
 
     constructor(injector: Injector) {
         this.localization = injector.get(LocalizationService);
@@ -40,6 +42,7 @@ export abstract class AppComponentBase {
         this.appSession = injector.get(AppSessionService);
         this.elementRef = injector.get(ElementRef);
         this.primengTableHelper = new PrimengTableHelper();
+        this.permissionHelper = injector.get(PermissionHelper);
     }
 
     l(key: string, ...args: any[]): string {

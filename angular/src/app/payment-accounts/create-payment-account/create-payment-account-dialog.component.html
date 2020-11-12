@@ -5,7 +5,9 @@
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'CreateNew' + paymentAccountTypeEnum[this.paymentAccountType] | localize"
+    [title]="
+      'CreateNew' + paymentAccountTypeEnum[this.paymentAccountType] | localize
+    "
     (onCloseClick)="bsModalRef.hide()"
   ></abp-modal-header>
   <div class="modal-body">
@@ -56,7 +58,10 @@
             ></abp-validation-summary>
           </div>
         </div>
-        <div *ngIf="paymentAccountType != paymentAccountTypeEnum.Cash" class="form-group row">
+        <div
+          *ngIf="paymentAccountType != paymentAccountTypeEnum.Cash"
+          class="form-group row"
+        >
           <label class="col-md-3 col-form-label" for="iban">
             {{ "Iban" | localize }}
           </label>
@@ -77,7 +82,7 @@
               [controlEl]="ibanEl"
             ></abp-validation-summary>
           </div>
-        </div>      
+        </div>
         <div class="form-group row mb-0">
           <label class="col-md-3 col-form-label">
             {{ "TenantIsOwner" | localize }}
@@ -91,21 +96,28 @@
                 id="tenantIsOwner"
                 [(ngModel)]="paymentAccount.tenantIsOwner"
               />
-              <label class="custom-control-label mt-2" for="tenantIsOwner"></label>
+              <label
+                class="custom-control-label mt-2"
+                for="tenantIsOwner"
+              ></label>
             </div>
           </div>
-        </div> 
+        </div>
         <div class="form-group row mb-0">
           <label class="col-md-12 col-form-label">
             {{ "TenantIsOwnerDescription" | localize }}
           </label>
-        </div>                          
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!createPaymentAccountForm.form.valid || saving"
+    [saveDisabled]="
+      !createPaymentAccountForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createPaymentAccount()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

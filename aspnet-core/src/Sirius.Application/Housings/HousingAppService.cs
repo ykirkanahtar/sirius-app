@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.Authorization;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.HousingCategories;
 using Sirius.Housings.Dto;
@@ -19,6 +21,7 @@ using Sirius.Shared.Dtos;
 
 namespace Sirius.Housings
 {
+    [AbpAuthorize(PermissionNames.Pages_Housings)]
     public class HousingAppService :
         AsyncCrudAppService<Housing, HousingDto, Guid, PagedHousingResultRequestDto, CreateHousingDto, UpdateHousingDto
         >, IHousingAppService

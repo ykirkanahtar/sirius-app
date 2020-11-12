@@ -5,7 +5,10 @@
         <div class="col-6">
           <h1>{{ "HousingCategories" | localize }}</h1>
         </div>
-        <div class="col-6 text-right">
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createHousingCategory()"
+        >
           <a
             href="javascript:;"
             class="btn bg-blue"
@@ -118,6 +121,7 @@
                 <td>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.editHousingCategory()"
                     class="btn btn-sm bg-secondary"
                     (click)="editHousingCategory(housingCategory)"
                   >
@@ -126,6 +130,7 @@
                   </button>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.deleteHousingCategory()"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(housingCategory)"
                   >

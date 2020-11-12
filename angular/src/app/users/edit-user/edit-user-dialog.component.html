@@ -132,7 +132,7 @@
                   (change)="onRoleChange(role, $event)"
                 />
                 <label class="custom-control-label" [for]="'role_' + i">
-                  {{ role.name }}
+                  {{ role.name | localize }}
                 </label>
               </div>
             </div>

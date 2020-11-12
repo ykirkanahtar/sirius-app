@@ -4,6 +4,7 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.EntityFrameworkCore.Uow;
 using Abp.Extensions;
 using Abp.IdentityFramework;
 using Abp.Linq.Extensions;
@@ -15,6 +16,8 @@ using Sirius.Authorization.Users;
 using Sirius.Editions;
 using Sirius.MultiTenancy.Dto;
 using Microsoft.AspNetCore.Identity;
+using Sirius.EntityFrameworkCore;
+using Sirius.EntityFrameworkCore.Seed.Tenants;
 
 namespace Sirius.MultiTenancy
 {
@@ -60,8 +63,9 @@ namespace Sirius.MultiTenancy
             }
 
             await _tenantManager.CreateAsync(tenant);
+            
             await CurrentUnitOfWork.SaveChangesAsync(); // To get new tenant's id.
-
+            
             // Create tenant database
             _abpZeroDbMigrator.CreateOrMigrateForTenant(tenant);
 
@@ -72,7 +76,7 @@ namespace Sirius.MultiTenancy
                 CheckErrors(await _roleManager.CreateStaticRoles(tenant.Id));
 
                 await CurrentUnitOfWork.SaveChangesAsync(); // To get static role ids
-
+                
                 // Grant all permissions to admin role
                 var adminRole = _roleManager.Roles.Single(r => r.Name == StaticRoleNames.Tenants.Admin);
                 await _roleManager.GrantAllPermissionsAsync(adminRole);
@@ -86,6 +90,8 @@ namespace Sirius.MultiTenancy
                 // Assign admin user to role!
                 CheckErrors(await _userManager.AddToRoleAsync(adminUser, adminRole.Name));
                 await CurrentUnitOfWork.SaveChangesAsync();
+                
+                StaticPermissionsBuilderForTenant.Build(CurrentUnitOfWork.GetDbContext<SiriusDbContext>(), tenant.Id);
             }
 
             return MapToEntityDto(tenant);

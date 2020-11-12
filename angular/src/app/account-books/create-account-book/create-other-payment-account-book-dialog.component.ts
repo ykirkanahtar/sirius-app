@@ -3,15 +3,20 @@ import {
   Injector,
   OnInit,
   EventEmitter,
-  Output,
-  Input
+  Output
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
 import {
-  AccountBookDto, AccountBookServiceProxy, HousingServiceProxy, PaymentAccountServiceProxy, LookUpDto, CreateHousingDueAccountBookDto, PaymentCategoryServiceProxy, CreateOtherPaymentAccountBookDto
+  AccountBookDto,
+  AccountBookServiceProxy,
+  HousingServiceProxy,
+  PaymentAccountServiceProxy,
+  LookUpDto,
+  PaymentCategoryServiceProxy,
+  CreateOtherPaymentAccountBookDto
 } from '@shared/service-proxies/service-proxies';
 
 @Component({

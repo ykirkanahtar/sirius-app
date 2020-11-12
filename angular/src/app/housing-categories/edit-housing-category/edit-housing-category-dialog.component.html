@@ -38,7 +38,11 @@
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!editHousingCategoryForm.form.valid || saving"
+    [saveDisabled]="
+      !editHousingCategoryForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editHousingCategory()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

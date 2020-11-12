@@ -10,7 +10,6 @@ import {
   AccountBookDto,
   AccountBookServiceProxy,
   AccountBookDtoPagedResultDto,
-  HousingDto,
   HousingServiceProxy,
   PersonServiceProxy,
   LookUpDto,

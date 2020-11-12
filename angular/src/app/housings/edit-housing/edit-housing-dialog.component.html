@@ -16,16 +16,17 @@
             {{ "Block" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-              id="blocks" 
-              name="blocks" 
-              [options]="blocks" 
+            <p-dropdown
+              id="blocks"
+              name="blocks"
+              [options]="blocks"
               [placeholder]="'PleaseSelect' | localize"
-              [(ngModel)]="housing.blockId" 
+              [(ngModel)]="housing.blockId"
               [filter]="true"
-              [style]="{'width':'100%'}"
-              required>
-              </p-dropdown>
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
           </div>
         </div>
         <div class="form-group row">
@@ -55,23 +56,28 @@
             {{ "HousingCategory" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-              id="housingCategories" 
-              name="housingCategories" 
+            <p-dropdown
+              id="housingCategories"
+              name="housingCategories"
               [placeholder]="'PleaseSelect' | localize"
-              [options]="housingCategories" 
-              [(ngModel)]="housing.housingCategoryId" 
+              [options]="housingCategories"
+              [(ngModel)]="housing.housingCategoryId"
               [filter]="true"
-              [style]="{'width':'100%'}">
-              </p-dropdown>
+              [style]="{ width: '100%' }"
+            >
+            </p-dropdown>
           </div>
-        </div>  
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!editHousingForm.form.valid || saving"
+    [saveDisabled]="
+      !editHousingForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editHousing()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

@@ -34,7 +34,7 @@ export class EditHousingCategoryDialogComponent extends AppComponentBase
     this._housingCategoryService
       .get(this.id)
       .subscribe((result: HousingCategoryDto) => {
-          this.housingCategory = result;
+        this.housingCategory = result;
       });
   }
 

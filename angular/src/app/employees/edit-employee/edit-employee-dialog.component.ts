@@ -35,7 +35,7 @@ export class EditEmployeeDialogComponent extends AppComponentBase
     this._employeeService
       .get(this.id)
       .subscribe((result: EmployeeDto) => {
-          this.employee = result;
+        this.employee = result;
       });
   }
 

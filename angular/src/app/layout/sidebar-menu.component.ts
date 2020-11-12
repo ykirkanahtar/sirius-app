@@ -57,12 +57,6 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         'Pages.Housings'
       ),
       new MenuItem(
-        this.l('Blocks'),
-        '/app/blocks',
-        'fa fa-columns',
-        'Pages.Blocks'
-      ),
-      new MenuItem(
         this.l('People'),
         '/app/people',
         'fa fa-address-card',
@@ -75,106 +69,126 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         'Pages.Employees'
       ),
       new MenuItem(
-        this.l('PaymentAccounts'),
-        '/app/payment-accounts',
-        'fa fa-university',
-        'Pages.PaymentAccounts'
-      ),
-      new MenuItem(
-        this.l('AccountBooks'),
-        '/app/account-books',
-        'fas fa-briefcase',
-        'Pages.AccountBooks'
-      ),
-      new MenuItem(
-        this.l('PaymentCategories'),
-        '/app/payment-categories',
-        'fas fa-book',
-        'Pages.PaymentCategories'
-      ),
-      new MenuItem(
-        this.l('HousingCategories'),
-        '/app/housing-categories',
-        'fas fa-laptop-house',
-        'Pages.HousingCategories'
-      ),
-      new MenuItem(
-        this.l('HousingPaymentPlan'),
+        this.l('FinancialOperations'),
         '',
-        'fas fa-table',
-        '',
+        'fas fa-wallet',
+        'Pages.FinancialOperations',
         [
+          new MenuItem(
+            this.l('PaymentAccounts'),
+            '/app/payment-accounts',
+            'fa fa-university',
+            'Pages.PaymentAccounts'
+          ),
+          new MenuItem(
+            this.l('AccountBooks'),
+            '/app/account-books',
+            'fas fa-briefcase',
+            'Pages.AccountBooks'
+          ),
+          new MenuItem(
+            this.l('PaymentCategories'),
+            '/app/payment-categories',
+            'fas fa-book',
+            'Pages.PaymentCategories'
+          ),
           new MenuItem(
             this.l('CreateHousingPaymentPlan'),
             '/app/create-housing-payment-plans',
             'fas fa-plus',
             'Pages.HousingPaymentPlans'
-            )
-      ]),
+          )
+        ]),
       new MenuItem(
-        this.l('Users'),
-        '/app/users',
-        'fas fa-users',
-        'Pages.Users'
-      ),
-      new MenuItem(
-        this.l('Roles'),
-        '/app/roles',
-        'fas fa-theater-masks',
-        'Pages.Roles'
-      ),
-      new MenuItem(this.l('About'), '/app/about', 'fas fa-info-circle'),
-      new MenuItem(this.l('MultiLevelMenu'), '', 'fas fa-circle', '', [
-        new MenuItem('ASP.NET Boilerplate', '', 'fas fa-dot-circle', '', [
+        this.l('Definitions'),
+        '',
+        'fas fa-users-cog',
+        'Pages.Definitions',
+        [
           new MenuItem(
-            'Home',
-            'https://aspnetboilerplate.com?ref=abptmpl',
-            'far fa-circle'
+            this.l('HousingCategories'),
+            '/app/housing-categories',
+            'fas fa-laptop-house',
+            'Pages.HousingCategories'
           ),
           new MenuItem(
-            'Templates',
-            'https://aspnetboilerplate.com/Templates?ref=abptmpl',
-            'far fa-circle'
-          ),
-          new MenuItem(
-            'Samples',
-            'https://aspnetboilerplate.com/Samples?ref=abptmpl',
-            'far fa-circle'
-          ),
-          new MenuItem(
-            'Documents',
-            'https://aspnetboilerplate.com/Pages/Documents?ref=abptmpl',
-            'far fa-circle'
+            this.l('Blocks'),
+            '/app/blocks',
+            'fa fa-columns',
+            'Pages.Blocks'
           ),
         ]),
-        new MenuItem('ASP.NET Zero', '', 'fas fa-dot-circle', '', [
+      new MenuItem(
+        this.l('Administration'),
+        '',
+        'fas fa-tools',
+        'Pages.Administration',
+        [
           new MenuItem(
-            'Home',
-            'https://aspnetzero.com?ref=abptmpl',
-            'far fa-circle'
+            this.l('Users'),
+            '/app/users',
+            'fas fa-users',
+            'Pages.Users'
           ),
           new MenuItem(
-            'Features',
-            'https://aspnetzero.com/Features?ref=abptmpl',
-            'far fa-circle'
+            this.l('Roles'),
+            '/app/roles',
+            'fas fa-theater-masks',
+            'Pages.Roles'
           ),
-          new MenuItem(
-            'Pricing',
-            'https://aspnetzero.com/Pricing?ref=abptmpl#pricing',
-            'far fa-circle'
-          ),
-          new MenuItem(
-            'Faq',
-            'https://aspnetzero.com/Faq?ref=abptmpl',
-            'far fa-circle'
-          ),
-          new MenuItem(
-            'Documents',
-            'https://aspnetzero.com/Documents?ref=abptmpl',
-            'far fa-circle'
-          )
-        ])
-      ])
+        ]),
+      //   new MenuItem(this.l('About'), '/app/about', 'fas fa-info-circle'),
+      //   new MenuItem(this.l('MultiLevelMenu'), '', 'fas fa-circle', '', [
+      //     new MenuItem('ASP.NET Boilerplate', '', 'fas fa-dot-circle', '', [
+      //       new MenuItem(
+      //         'Home',
+      //         'https://aspnetboilerplate.com?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Templates',
+      //         'https://aspnetboilerplate.com/Templates?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Samples',
+      //         'https://aspnetboilerplate.com/Samples?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Documents',
+      //         'https://aspnetboilerplate.com/Pages/Documents?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //     ]),
+      //     new MenuItem('ASP.NET Zero', '', 'fas fa-dot-circle', '', [
+      //       new MenuItem(
+      //         'Home',
+      //         'https://aspnetzero.com?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Features',
+      //         'https://aspnetzero.com/Features?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Pricing',
+      //         'https://aspnetzero.com/Pricing?ref=abptmpl#pricing',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Faq',
+      //         'https://aspnetzero.com/Faq?ref=abptmpl',
+      //         'far fa-circle'
+      //       ),
+      //       new MenuItem(
+      //         'Documents',
+      //         'https://aspnetzero.com/Documents?ref=abptmpl',
+      //         'far fa-circle'
+      //       )
+      //     ])
+      //   ])
     ];
   }
 

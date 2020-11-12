@@ -5,7 +5,10 @@
         <div class="col-6">
           <h1>{{ "PaymentAccounts" | localize }}</h1>
         </div>
-        <div class="col-6 text-right">
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createPaymentAccount()"
+        >
           <div class="btn-group dropdown" dropdown>
             <button dropdownToggle class="dropdown-toggle btn bg-blue">
               <i class="fa fa-plus-square"></i>
@@ -97,15 +100,18 @@
                 <td>{{ paymentAccount.accountName }}</td>
                 <td>
                   {{
-                    paymentAccountTypeEnum[paymentAccount.paymentAccountType] | localize
+                    paymentAccountTypeEnum[paymentAccount.paymentAccountType]
+                      | localize
                   }}
                 </td>
                 <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>
                 <td>
-                  {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}</td>
+                  {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}
+                </td>
                 <td>
                   <!-- <button
                     type="button"
+                    *ngIf="this.permissionHelper.editPaymentAccount()"
                     class="btn btn-sm bg-secondary"
                     (click)="editPaymentAccount(paymentAccount)"
                   >
@@ -114,6 +120,7 @@
                   </button> -->
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.deletePaymentAccount()"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(paymentAccount)"
                   >

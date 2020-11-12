@@ -16,13 +16,15 @@
             {{ "ProcessDateTime" | localize }}
           </label>
           <div class="col-md-9">
-            <input type="text"
+            <input
+              type="text"
               id="processDate"
               name="processDate"
               [placeholder]="'SelectDate' | localize"
               class="form-control"
               [(ngModel)]="accountBook.processDateTime"
-              bsDatepicker>
+              bsDatepicker
+            />
           </div>
         </div>
         <div class="form-group row required">
@@ -30,15 +32,16 @@
             {{ "Housing" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-              id="housings" 
-              name="housings" 
+            <p-dropdown
+              id="housings"
+              name="housings"
               [placeholder]="'PleaseSelect' | localize"
-              [options]="housings" 
-              [(ngModel)]="accountBook.housingId" 
+              [options]="housings"
+              [(ngModel)]="accountBook.housingId"
               [filter]="true"
-              [style]="{'width':'100%'}">
-              </p-dropdown>
+              [style]="{ width: '100%' }"
+            >
+            </p-dropdown>
           </div>
         </div>
         <div class="form-group row required">
@@ -46,14 +49,15 @@
             {{ "PaymentAccount" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown 
-            id="paymentAccounts" 
-            name="paymentAccounts" 
-            [placeholder]="'PleaseSelect' | localize"
-            [options]="paymentAccounts" 
-            [(ngModel)]="accountBook.toPaymentAccountId" 
-            [filter]="true"
-            [style]="{'width':'100%'}">
+            <p-dropdown
+              id="paymentAccounts"
+              name="paymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="accountBook.toPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
             </p-dropdown>
           </div>
         </div>
@@ -100,13 +104,17 @@
               [controlEl]="descriptionEl"
             ></abp-validation-summary>
           </div>
-        </div>                        
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!createHousingDueAccountBookForm.form.valid || saving"
+    [saveDisabled]="
+      !createHousingDueAccountBookForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createAccountBook()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

@@ -34,7 +34,7 @@ export class EditPersonDialogComponent extends AppComponentBase
     this._personService
       .get(this.id)
       .subscribe((result: PersonDto) => {
-          this.person = result;
+        this.person = result;
       });
   }
 

@@ -37,7 +37,7 @@ export class EditPaymentAccountDialogComponent extends AppComponentBase
     this._paymentAccountService
       .get(this.id)
       .subscribe((result: PaymentAccountDto) => {
-          this.paymentAccount = result;
+        this.paymentAccount = result;
       });
   }
 

@@ -1,16 +1,22 @@
 import {
-Component,
-Injector,
-OnInit,
+  Component,
+  Injector,
+  OnInit,
   EventEmitter,
-  Output,
-  Input
+  Output
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { AccountBookDto, AccountBookServiceProxy, HousingServiceProxy, PaymentAccountServiceProxy, LookUpDto, CreateHousingDueAccountBookDto } from '@shared/service-proxies/service-proxies';
+import {
+  AccountBookDto,
+  AccountBookServiceProxy,
+  HousingServiceProxy,
+  PaymentAccountServiceProxy,
+  LookUpDto,
+  CreateHousingDueAccountBookDto
+} from '@shared/service-proxies/service-proxies';
 
 @Component({
   templateUrl: 'create-housing-due-account-book-dialog.component.html'
@@ -37,16 +43,16 @@ export class CreateHousingDueAccountBookDialogComponent extends AppComponentBase
 
   ngOnInit(): void {
     this._housingServiceProxy
-          .getHousingLookUp()
-          .subscribe((result: LookUpDto[]) => {
-              this.housings = result;
-          });
+      .getHousingLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housings = result;
+      });
 
     this._paymentAccountServiceProxy
-          .getPaymentAccountLookUp()
-          .subscribe((result: LookUpDto[]) => {
-              this.paymentAccounts = result;
-          });
+      .getPaymentAccountLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.paymentAccounts = result;
+      });
   }
 
   save(): void {

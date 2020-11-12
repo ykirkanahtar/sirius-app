@@ -5,7 +5,10 @@
         <div class="col-6">
           <h1>{{ "AccountBooks" | localize }}</h1>
         </div>
-        <div class="col-6 text-right">
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createAccountBook()"
+        >
           <div class="btn-group dropdown" dropdown>
             <button dropdownToggle class="dropdown-toggle btn bg-blue">
               <i class="fa fa-plus-square"></i>
@@ -314,7 +317,9 @@
                 <td>
                   {{
                     accountBook.housing != null
-                      ? accountBook.housing.block.blockName + ' - ' + accountBook.housing.apartment
+                      ? accountBook.housing.block.blockName +
+                        " - " +
+                        accountBook.housing.apartment
                       : ""
                   }}
                 </td>
@@ -352,6 +357,7 @@
                 <td>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.deleteAccountBook()"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(accountBook)"
                   >

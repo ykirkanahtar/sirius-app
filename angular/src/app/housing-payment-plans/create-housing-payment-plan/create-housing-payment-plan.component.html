@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-6">
-          <h1>{{ "CreateHousingPaymentPlan" | localize }}</h1>
+          <h1>{{ "CreateNewHousingPaymentPlan" | localize }}</h1>
         </div>
       </div>
     </div>
@@ -148,7 +148,15 @@
           </div>
           <div class="card-footer bg-light border-top">
             <div class="row">
-              <button class="btn btn-primary" [disabled] = "!createHousingPaymentPlanForm.valid || saving" type="submit">
+              <button
+                class="btn btn-primary"
+                [disabled]="
+                  !createHousingPaymentPlanForm.valid ||
+                  saving ||
+                  !this.permissionHelper.createHousingPaymentPlan()
+                "
+                type="submit"
+              >
                 {{ "Save" | localize }}
               </button>
             </div>

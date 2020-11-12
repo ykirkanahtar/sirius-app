@@ -33,13 +33,17 @@
               [controlEl]="blockNameEl"
             ></abp-validation-summary>
           </div>
-        </div>             
+        </div>
       </tab>
     </tabset>
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!createBlockForm.form.valid || saving"
+    [saveDisabled]="
+      !createBlockForm.form.valid ||
+      saving ||
+      !this.permissionHelper.createBlock()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

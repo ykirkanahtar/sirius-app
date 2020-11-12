@@ -38,7 +38,11 @@
   </div>
   <abp-modal-footer
     [cancelDisabled]="saving"
-    [saveDisabled]="!editPaymentCategoryForm.form.valid || saving"
+    [saveDisabled]="
+      !editPaymentCategoryForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editPaymentCategory()
+    "
     (onCancelClick)="bsModalRef.hide()"
   ></abp-modal-footer>
 </form>

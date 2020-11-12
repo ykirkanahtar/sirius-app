@@ -35,7 +35,7 @@ export class EditBlockDialogComponent extends AppComponentBase
     this._blockService
       .get(this.id)
       .subscribe((result: BlockDto) => {
-          this.block = result;
+        this.block = result;
       });
   }
 

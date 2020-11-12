@@ -27,14 +27,14 @@ namespace Sirius.Authorization.Roles
             
             roleManagementConfig.StaticRoles.Add(
                 new StaticRoleDefinition(
-                    StaticRoleNames.Tenants.SiteManager,
+                    StaticRoleNames.Tenants.SiteManagement,
                     MultiTenancySides.Tenant
                 )
             );
             
             roleManagementConfig.StaticRoles.Add(
                 new StaticRoleDefinition(
-                    StaticRoleNames.Tenants.BlockManager,
+                    StaticRoleNames.Tenants.BlockManagement,
                     MultiTenancySides.Tenant
                 )
             );

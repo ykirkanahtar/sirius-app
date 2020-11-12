@@ -5,7 +5,10 @@
         <div class="col-6">
           <h1>{{ "Employees" | localize }}</h1>
         </div>
-        <div class="col-6 text-right">
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createEmployee()"
+        >
           <a href="javascript:;" class="btn bg-blue" (click)="createEmployee()">
             <i class="fa fa-plus-square"></i>
             {{ "Create" | localize }}
@@ -145,6 +148,7 @@
                 <td>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.editEmployee()"
                     class="btn btn-sm bg-secondary"
                     (click)="editEmployee(employee)"
                   >
@@ -153,6 +157,7 @@
                   </button>
                   <button
                     type="button"
+                    *ngIf="this.permissionHelper.deleteEmployee()"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(employee)"
                   >

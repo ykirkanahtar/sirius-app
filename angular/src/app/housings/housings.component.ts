@@ -41,8 +41,6 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto>
   peopleFilters: SelectItem[] = [];
   selectedPeopleFilters: string[] = [];
 
-
-
   constructor(
     injector: Injector,
     private _housingService: HousingServiceProxy,
