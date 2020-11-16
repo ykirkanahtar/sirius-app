@@ -12,18 +12,18 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_Roles, L("Roles"));
             context.CreatePermission(PermissionNames.Pages_Tenants, L("Tenants"), multiTenancySides: MultiTenancySides.Host);
             
-            context.CreatePermission(PermissionNames.Pages_AccountBooks, L("AccountBooks"));
-            context.CreatePermission(PermissionNames.Pages_Housings, L("Housings"));
-            context.CreatePermission(PermissionNames.Pages_PaymentAccounts, L("PaymentAccounts"));
-            context.CreatePermission(PermissionNames.Pages_Blocks, L("Blocks"));
-            context.CreatePermission(PermissionNames.Pages_Employees, L("Employees"));
-            context.CreatePermission(PermissionNames.Pages_People, L("People"));
-            context.CreatePermission(PermissionNames.Pages_PaymentCategories, L("PaymentCategories"));
-            context.CreatePermission(PermissionNames.Pages_HousingCategories, L("HousingCategories"));
-            context.CreatePermission(PermissionNames.Pages_HousingPaymentPlans, L("HousingPaymentPlans"));
-            context.CreatePermission(PermissionNames.Pages_Administration, L("Administration"));
-            context.CreatePermission(PermissionNames.Pages_Definitions, L("Definitions"));
-            context.CreatePermission(PermissionNames.Pages_FinancialOperations, L("FinancialOperations"));
+            context.CreatePermission(PermissionNames.Pages_AccountBooks, L("AccountBooksMenu"));
+            context.CreatePermission(PermissionNames.Pages_Housings, L("HousingsMenu"));
+            context.CreatePermission(PermissionNames.Pages_PaymentAccounts, L("PaymentAccountsMenu"));
+            context.CreatePermission(PermissionNames.Pages_Blocks, L("BlocksMenu"));
+            context.CreatePermission(PermissionNames.Pages_Employees, L("EmployeesMenu"));
+            context.CreatePermission(PermissionNames.Pages_People, L("PeopleMenu"));
+            context.CreatePermission(PermissionNames.Pages_PaymentCategories, L("PaymentCategoriesMenu"));
+            context.CreatePermission(PermissionNames.Pages_HousingCategories, L("HousingCategoriesMenu"));
+            context.CreatePermission(PermissionNames.Pages_HousingPaymentPlans, L("HousingPaymentPlansMenu"));
+            context.CreatePermission(PermissionNames.Pages_Administration, L("AdministrationMenu"));
+            context.CreatePermission(PermissionNames.Pages_Definitions, L("DefinitionsMenu"));
+            context.CreatePermission(PermissionNames.Pages_FinancialOperations, L("FinancialOperationsMenu"));
             
             context.CreatePermission(PermissionNames.Pages_CreateAccountBook, L("CreateAccountBook"));
             context.CreatePermission(PermissionNames.Pages_EditAccountBook, L("EditAccountBook"));
