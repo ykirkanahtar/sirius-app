@@ -13,6 +13,7 @@
     "test": "ng test",
     "prod-build-test": "ng build --prod --configuration=test --build-optimizer",
     "prod-build-staging": "ng build --prod --configuration=staging --build-optimizer",
+    "prod-build-prod": "ng build --prod --configuration=production --build-optimizer",
     "build": "ng build",
     "refresh.bat": "cd nswag/ && refresh.bat",
     "refresh.sh": "cd nswag/ && sh refresh.sh"
