@@ -3,13 +3,24 @@ import {
   Injector,
   OnInit,
   EventEmitter,
-  Output
+  Output,
+  AfterViewInit,
+  AfterViewChecked
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { HousingDto, HousingServiceProxy, CreateHousingDto, LookUpDto, HousingCategoryServiceProxy, BlockServiceProxy } from '@shared/service-proxies/service-proxies';
+import {
+  HousingServiceProxy,
+  CreateHousingDto,
+  LookUpDto,
+  HousingCategoryServiceProxy,
+  BlockServiceProxy,
+  CreateTransferForHousingDueDto,
+} from '@shared/service-proxies/service-proxies';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Component({
   templateUrl: 'create-housing-dialog.component.html'
@@ -17,9 +28,11 @@ import { HousingDto, HousingServiceProxy, CreateHousingDto, LookUpDto, HousingCa
 export class CreateHousingDialogComponent extends AppComponentBase
   implements OnInit {
   saving = false;
-  housing = new HousingDto();
+  housing = new CreateHousingDto();
   housingCategories: LookUpDto[];
   blocks: LookUpDto[];
+  isCredit: boolean;
+  dateForDatepicker = moment();
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -38,6 +51,9 @@ export class CreateHousingDialogComponent extends AppComponentBase
       .getHousingCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.housingCategories = result;
+        if (this.housingCategories.length === 1) {
+          this.housing.housingCategoryId = this.housingCategories[0].value;
+        }
       });
 
     this._blockService
@@ -45,6 +61,11 @@ export class CreateHousingDialogComponent extends AppComponentBase
       .subscribe((result: LookUpDto[]) => {
         this.blocks = result;
       });
+
+    this.housing.createTransferForHousingDue = new CreateTransferForHousingDueDto();
+    this.housing.createTransferForHousingDue.isDebt = true;
+    this.housing.createTransferForHousingDue.date = moment();
+    this.dateForDatepicker = moment();
   }
 
   save(): void {

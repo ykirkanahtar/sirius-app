@@ -2302,6 +2302,58 @@ export class HousingPaymentPlanServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createTransferForHousingDue(body: CreateTransferForHousingDueDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateTransferForHousingDue";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateTransferForHousingDue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateTransferForHousingDue(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateTransferForHousingDue(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createDebtPaymentForHousingCategory(body: CreateDebtHousingPaymentPlanForHousingCategoryDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateDebtPaymentForHousingCategory";
         url_ = url_.replace(/[?&]$/, "");
@@ -2576,22 +2628,19 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
-     * @param keyword (optional) 
-     * @param isActive (optional) 
+     * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllByHousingId(housingId: string | undefined, keyword: string | null | undefined, isActive: boolean | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAllByHousingId(housingId: string | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAllByHousingId?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
-        if (keyword !== undefined)
-            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
-        if (isActive !== undefined)
-            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -2704,22 +2753,19 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
-     * @param keyword (optional) 
-     * @param isActive (optional) 
+     * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(housingId: string | undefined, keyword: string | null | undefined, isActive: boolean | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAll(housingId: string | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAll?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
-        if (keyword !== undefined)
-            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
-        if (isActive !== undefined)
-            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -5907,8 +5953,10 @@ export interface ICreateAccountBookDto {
 
 export enum HousingDueType {
     RegularHousingDue = 1,
-    AdditionalHousingDueForResident = 2,
-    AdditionalHousingDueForOwner = 3,
+    TransferForRegularHousingDue = 2,
+    AdditionalHousingDueForResident = 3,
+    AdditionalHousingDueForOwner = 4,
+    TransferForAdditionalHousingDue = 5,
 }
 
 export class PaymentCategoryDto implements IPaymentCategoryDto {
@@ -7436,10 +7484,74 @@ export interface IEmployeeDtoPagedResultDto {
     items: EmployeeDto[] | undefined;
 }
 
+export class CreateTransferForHousingDueDto implements ICreateTransferForHousingDueDto {
+    housingId: string;
+    amount: number;
+    isDebt: boolean;
+    paymentCategoryId: string | undefined;
+    date: moment.Moment;
+    description: string | undefined;
+
+    constructor(data?: ICreateTransferForHousingDueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.amount = _data["amount"];
+            this.isDebt = _data["isDebt"];
+            this.paymentCategoryId = _data["paymentCategoryId"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateTransferForHousingDueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTransferForHousingDueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["amount"] = this.amount;
+        data["isDebt"] = this.isDebt;
+        data["paymentCategoryId"] = this.paymentCategoryId;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        return data; 
+    }
+
+    clone(): CreateTransferForHousingDueDto {
+        const json = this.toJSON();
+        let result = new CreateTransferForHousingDueDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateTransferForHousingDueDto {
+    housingId: string;
+    amount: number;
+    isDebt: boolean;
+    paymentCategoryId: string | undefined;
+    date: moment.Moment;
+    description: string | undefined;
+}
+
 export class CreateHousingDto implements ICreateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    createTransferForHousingDue: CreateTransferForHousingDueDto;
 
     constructor(data?: ICreateHousingDto) {
         if (data) {
@@ -7455,6 +7567,7 @@ export class CreateHousingDto implements ICreateHousingDto {
             this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
+            this.createTransferForHousingDue = _data["createTransferForHousingDue"] ? CreateTransferForHousingDueDto.fromJS(_data["createTransferForHousingDue"]) : <any>undefined;
         }
     }
 
@@ -7470,6 +7583,7 @@ export class CreateHousingDto implements ICreateHousingDto {
         data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
+        data["createTransferForHousingDue"] = this.createTransferForHousingDue ? this.createTransferForHousingDue.toJSON() : <any>undefined;
         return data; 
     }
 
@@ -7485,6 +7599,7 @@ export interface ICreateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    createTransferForHousingDue: CreateTransferForHousingDueDto;
 }
 
 export class UpdateHousingDto implements IUpdateHousingDto {

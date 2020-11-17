@@ -48,6 +48,17 @@ namespace Sirius.PaymentCategories
                 return query.Single();
             }
         }
+        
+        public async Task<PaymentCategory> GetTransferForRegularHousingDueAsync()
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+                    p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
+
+                return query.Single();
+            }
+        }
 
         public async Task<PaymentCategory> GetAsync(Guid id)
         {

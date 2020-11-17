@@ -18,17 +18,18 @@ namespace Sirius.EntityFrameworkCore.Seed.Host
 
         public void Create()
         {
-            AddPaymentCategoryIfNotExists(HousingDueType.RegularHousingDue);
+            AddPaymentCategoryIfNotExists(HousingDueType.RegularHousingDue, AppConstants.HousingDueString);
+            AddPaymentCategoryIfNotExists(HousingDueType.TransferForRegularHousingDue, AppConstants.TransferForHousingDueString);
         }
 
-        private void AddPaymentCategoryIfNotExists(HousingDueType housingDueType)
+        private void AddPaymentCategoryIfNotExists(HousingDueType housingDueType, string constant)
         {
             if (_context.PaymentCategories.IgnoreQueryFilters().Any(s => s.HousingDueType == housingDueType && s.TenantId == null))
             {
                 return;
             }
 
-            _context.PaymentCategories.Add(PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(), null, AppConstants.HousingDueString, HousingDueType.RegularHousingDue, true));
+            _context.PaymentCategories.Add(PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(), null, constant, housingDueType, true));
             _context.SaveChanges();
         }
     }

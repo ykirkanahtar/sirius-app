@@ -205,6 +205,7 @@
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
     <text name="HousingTenant">Kiracı</text>
+    <text name="IsDebtText">Site / Apt. alacaklı</text>
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
@@ -239,6 +240,8 @@
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
+    <text name="TransferBalance">Devir bakiyesi</text>
+    <text name="TransferDate">Devir tarihi</text>
     <text name="TransferFromThePreviousPeriod">Devir</text>
     <text name="TransferToAdvanceAccount">Avana hesaba transfer</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>

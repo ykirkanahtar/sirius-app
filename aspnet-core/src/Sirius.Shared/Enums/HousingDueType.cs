@@ -3,7 +3,9 @@ namespace Sirius.Shared.Enums
     public enum HousingDueType
     {
         RegularHousingDue = 1,
-        AdditionalHousingDueForResident = 2,
-        AdditionalHousingDueForOwner = 3,
+        TransferForRegularHousingDue = 2,
+        AdditionalHousingDueForResident = 3,
+        AdditionalHousingDueForOwner = 4,
+        TransferForAdditionalHousingDue = 5,
     }
 }

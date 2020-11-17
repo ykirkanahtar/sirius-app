@@ -48,21 +48,21 @@
                 >
                   <ng-template pTemplate="header">
                     <tr>
-                      <th pSortableColumn="Date">
+                      <th pSortableColumn="date">
                         {{ "Date" | localize }}
-                        <p-sortIcon field="Date"></p-sortIcon>
+                        <p-sortIcon field="date"></p-sortIcon>
                       </th>
-                      <th pSortableColumn="PaymentPlanType">
+                      <th pSortableColumn="paymentPlanType">
                         {{ "PaymentPlanType" | localize }}
-                        <p-sortIcon field="PaymentPlanType"></p-sortIcon>
+                        <p-sortIcon field="paymentPlanType"></p-sortIcon>
                       </th>
-                      <th pSortableColumn="PaymentCategory">
+                      <th pSortableColumn="paymentCategory.paymentCategoryName">
                         {{ "PaymentCategory" | localize }}
-                        <p-sortIcon field="PaymentCategory"></p-sortIcon>
+                        <p-sortIcon field="paymentCategory.paymentCategoryName"></p-sortIcon>
                       </th>
-                      <th pSortableColumn="Amount">
+                      <th pSortableColumn="amount">
                         {{ "Amount" | localize }}
-                        <p-sortIcon field="Amount"></p-sortIcon>
+                        <p-sortIcon field="amount"></p-sortIcon>
                       </th>
                     </tr>
                   </ng-template>

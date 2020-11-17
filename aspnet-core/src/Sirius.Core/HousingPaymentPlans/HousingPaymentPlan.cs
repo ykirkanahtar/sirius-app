@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using JetBrains.Annotations;
 using Sirius.AccountBooks;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
@@ -38,10 +39,10 @@ namespace Sirius.HousingPaymentPlans
 
         public static HousingPaymentPlan CreateCredit(Guid id, int tenantId, Housing housing,
             PaymentCategory paymentCategory, DateTime date, decimal amount, string description,
-            AccountBook accountBook) //tahsil edilen aidatlar
+            [CanBeNull] AccountBook accountBook) //tahsil edilen aidatlar
         {
             return BindEntity(new HousingPaymentPlan(), id, tenantId, PaymentPlanType.Credit, housing.Id,
-                paymentCategory.Id, date, amount, description, accountBook.Id);
+                paymentCategory.Id, date, amount, description, accountBook?.Id);
         }
 
         public static HousingPaymentPlan Update(HousingPaymentPlan existingHousingPaymentPlan, DateTime date,

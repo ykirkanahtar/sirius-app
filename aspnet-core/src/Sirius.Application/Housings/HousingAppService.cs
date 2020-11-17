@@ -15,7 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.Authorization;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.HousingCategories;
+using Sirius.HousingPaymentPlans;
 using Sirius.Housings.Dto;
+using Sirius.PaymentCategories;
 using Sirius.People;
 using Sirius.Shared.Dtos;
 
@@ -34,11 +36,14 @@ namespace Sirius.Housings
         private readonly IRepository<HousingPerson> _housingPersonRepository;
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IHousingPolicy _housingPolicy;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
 
         public HousingAppService(IHousingManager housingManager, IHousingRepository housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
             IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository,
-            IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy)
+            IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy,
+            IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -49,6 +54,8 @@ namespace Sirius.Housings
             _housingPersonRepository = housingPersonRepository;
             _blockRepository = blockRepository;
             _housingPolicy = housingPolicy;
+            _paymentCategoryManager = paymentCategoryManager;
+            _housingPaymentPlanManager = housingPaymentPlanManager;
         }
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
@@ -60,7 +67,44 @@ namespace Sirius.Housings
             var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(),
                 block, input.Apartment, housingCategory);
+
+            if (input.CreateTransferForHousingDue.Amount != 0)
+            {
+                housing = input.CreateTransferForHousingDue.IsDebt
+                    ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount)
+                    : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount);
+            }
+
             await _housingManager.CreateAsync(housing);
+
+            if (input.CreateTransferForHousingDue.Amount != 0)
+            {
+                var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
+
+                var housingPaymentPlan = input.CreateTransferForHousingDue.IsDebt
+                    ? HousingPaymentPlan.CreateDebt(
+                        SequentialGuidGenerator.Instance.Create()
+                        , AbpSession.GetTenantId()
+                        , housing
+                        , paymentCategory
+                        , input.CreateTransferForHousingDue.Date
+                        , input.CreateTransferForHousingDue.Amount
+                        , input.CreateTransferForHousingDue.Description
+                    )
+                    : HousingPaymentPlan.CreateCredit(
+                        SequentialGuidGenerator.Instance.Create()
+                        , AbpSession.GetTenantId()
+                        , housing
+                        , paymentCategory
+                        , input.CreateTransferForHousingDue.Date
+                        , input.CreateTransferForHousingDue.Amount
+                        , input.CreateTransferForHousingDue.Description
+                        , null
+                    );
+
+                await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
+            }
+
             return ObjectMapper.Map<HousingDto>(housing);
         }
 

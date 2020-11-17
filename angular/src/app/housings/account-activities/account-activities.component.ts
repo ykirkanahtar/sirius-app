@@ -34,7 +34,7 @@ class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   templateUrl: './account-activities.component.html',
   animations: [appModuleAnimation()]
 })
-export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingDto>
+export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingPaymentPlanDto>
   implements OnInit {
 
   @ViewChild('dataTable', { static: true }) dataTable: Table;
@@ -82,7 +82,7 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
   ): void {
 
     this._housingPaymentPlanService
-      .getAllByHousingId(this.id, request.keyword, true, request.skipCount, request.maxResultCount)
+      .getAllByHousingId(this.id, this.sortingColumn, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
