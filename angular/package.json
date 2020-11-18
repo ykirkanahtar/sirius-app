@@ -11,12 +11,13 @@
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --port 4300",
     "test": "ng test",
-    "publish-test": "gulp build && ng build --configuration=test",
-    "publish-staging": "gulp build && ng build --configuration=staging",
-    "publish-prod": "gulp build && ng build --configuration=production",
+    "publish-test": "ng build --prod --configuration=test --build-optimizer",
+    "publish-staging": "ng build --prod --configuration=staging --build-optimizer",
+    "publish-prod": "ng build --prod --configuration=production --build-optimizer",
     "build": "ng build",
     "refresh.bat": "cd nswag/ && refresh.bat",
-    "refresh.sh": "cd nswag/ && sh refresh.sh"
+    "refresh.sh": "cd nswag/ && sh refresh.sh",
+    "postinstall": "ngcc"
   },
   "dependencies": {
     "@angular/animations": "^9.1.4",
