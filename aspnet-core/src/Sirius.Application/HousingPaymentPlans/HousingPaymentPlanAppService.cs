@@ -207,6 +207,13 @@ namespace Sirius.HousingPaymentPlans
             await _housingPaymentPlanManager.UpdateAsync(housingPaymentPlan);
             return ObjectMapper.Map<HousingPaymentPlanDto>(housingPaymentPlan);
         }
+        
+        public override async Task DeleteAsync(EntityDto<Guid> input)
+        {
+            CheckDeletePermission();
+            var housingPaymentPlan = await _housingPaymentPlanManager.GetAsync(input.Id);
+            await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan);
+        }
 
         public async Task<PagedResultDto<HousingPaymentPlanDto>> GetAllByHousingIdAsync(
             PagedHousingPaymentPlanResultRequestDto input)
