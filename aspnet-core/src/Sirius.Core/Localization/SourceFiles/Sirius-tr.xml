@@ -182,7 +182,8 @@
     <text name="EditPaymentAccount">Ödeme hesabı düzenle</text>
     <text name="EditPaymentCategory">Ödeme türü düzenle</text>
     <text name="EditPerson">Kişi düzenle</text>
-    <text name="EftFee">Eft masrafı</text>
+    <text name="EftFee">Eft masrafı</text>  
+    <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>
     <text name="Employees">Çalışanlar</text>
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
     <text name="EndDate">Bitiş Tarihi</text>

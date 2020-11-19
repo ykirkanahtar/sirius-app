@@ -4,11 +4,15 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import { CreateEmployeeDialogComponent } from './create-employee/create-employee-dialog.component';
 import { EditEmployeeDialogComponent } from './edit-employee/edit-employee-dialog.component';
-import { EmployeeDto, EmployeeServiceProxy, EmployeeDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import {
+  EmployeeDto,
+  EmployeeServiceProxy,
+  EmployeeDtoPagedResultDto,
+} from '@shared/service-proxies/service-proxies';
 import { Table } from 'primeng/table';
 import { LazyLoadEvent } from 'primeng/api';
 
@@ -18,11 +22,11 @@ class PagedEmployeesRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './Employees.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto>
+export class EmployeesComponent
+  extends PagedListingComponentBase<EmployeeDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -86,7 +90,8 @@ export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto>
         this.phoneNumberFilter,
         this.sortingColumn,
         request.skipCount,
-        request.maxResultCount)
+        request.maxResultCount
+      )
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -100,19 +105,17 @@ export class EmployeesComponent extends PagedListingComponentBase<EmployeeDto>
 
   protected delete(employee: EmployeeDto): void {
     abp.message.confirm(
-      this.l('EmployeeDeleteWarningMessage', employee.firstName + ' ' + employee.lastName),
+      this.l(
+        'EmployeeDeleteWarningMessage',
+        employee.firstName + ' ' + employee.lastName
+      ),
       undefined,
       (result: boolean) => {
         if (result) {
-          this._employeesService
-            .delete(employee.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+          this._employeesService.delete(employee.id).subscribe(() => {
+            abp.notify.success(this.l('SuccessfullyDeleted'));
+            this.refresh();
+          });
         }
       }
     );

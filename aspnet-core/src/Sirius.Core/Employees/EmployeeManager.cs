@@ -1,20 +1,20 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.UI;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Sirius.Employees;
+using Sirius.AppPaymentAccounts;
 
 namespace Sirius.Employees
 {
     public class EmployeeManager : IEmployeeManager
     {
         private readonly IRepository<Employee, Guid> _employeeRepository;
+        private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
 
-        public EmployeeManager(IRepository<Employee, Guid> employeeRepository)
+        public EmployeeManager(IRepository<Employee, Guid> employeeRepository, IRepository<PaymentAccount, Guid> paymentAccountRepository)
         {
             _employeeRepository = employeeRepository;
+            _paymentAccountRepository = paymentAccountRepository;
         }
 
         public async Task CreateAsync(Employee employee)
@@ -29,6 +29,19 @@ namespace Sirius.Employees
         
         public async Task DeleteAsync(Employee employee)
         {
+            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync(p => p.EmployeeId == employee.Id);
+            if (paymentAccounts.Count > 0)
+            {
+                if (paymentAccounts.Count == 1)
+                {
+                    throw new UserFriendlyException($"Bu çalışana ait {paymentAccounts[0].AccountName} hesabı tanımlıdır. Silmek için önce tanımı kaldırınız.");
+                }
+                else
+                {
+                    throw new UserFriendlyException("Bu çalışan için birden fazla hesap tanımlıdır. Silmek için önce tanımları kaldırınız.");
+                }
+            }
+
             await _employeeRepository.DeleteAsync(employee);
         }
         
