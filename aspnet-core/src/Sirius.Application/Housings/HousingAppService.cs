@@ -123,16 +123,9 @@ namespace Sirius.Housings
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
-            try
-            {
-                CheckDeletePermission();
-                var housing = await _housingManager.GetAsync(input.Id);
-                await _housingManager.DeleteAsync(housing);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
+            CheckDeletePermission();
+            var housing = await _housingManager.GetAsync(input.Id);
+            await _housingManager.DeleteAsync(housing);
         }
 
         public override async Task<PagedResultDto<HousingDto>> GetAllAsync(PagedHousingResultRequestDto input)
