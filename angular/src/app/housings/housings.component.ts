@@ -4,11 +4,18 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import { CreateHousingDialogComponent } from './create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './edit-housing/edit-housing-dialog.component';
-import { HousingDto, HousingServiceProxy, HousingDtoPagedResultDto, HousingCategoryServiceProxy, LookUpDto, PersonServiceProxy } from '@shared/service-proxies/service-proxies';
+import {
+  HousingDto,
+  HousingServiceProxy,
+  HousingDtoPagedResultDto,
+  HousingCategoryServiceProxy,
+  LookUpDto,
+  PersonServiceProxy,
+} from '@shared/service-proxies/service-proxies';
 import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
 import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
@@ -20,11 +27,11 @@ class PagedHousingsRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './housings.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class HousingsComponent extends PagedListingComponentBase<HousingDto>
+export class HousingsComponent
+  extends PagedListingComponentBase<HousingDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -58,17 +65,13 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto>
         this.housingCategoriesFilter = result;
       });
 
-    this._housingService
-      .getHousingLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housingsFilters = result;
-      });
+    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+      this.housingsFilters = result;
+    });
 
-    this._personService
-      .getPersonLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.peopleFilters = result;
-      });
+    this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
+      this.peopleFilters = result;
+    });
 
     this.getDataPage(1);
   }
@@ -105,7 +108,8 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto>
         this.selectedPeopleFilters,
         this.sortingColumn,
         request.skipCount,
-        request.maxResultCount)
+        request.maxResultCount
+      )
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -119,19 +123,17 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto>
 
   protected delete(housing: HousingDto): void {
     abp.message.confirm(
-      this.l('HousingDeleteWarningMessage', housing.block + ' ' + housing.apartment),
+      this.l(
+        'HousingDeleteWarningMessage',
+        housing.block + ' ' + housing.apartment
+      ),
       undefined,
       (result: boolean) => {
         if (result) {
-          this._housingService
-            .delete(housing.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+          this._housingService.delete(housing.id).subscribe(() => {
+            abp.notify.success(this.l('SuccessfullyDeleted'));
+            this.refresh();
+          });
         }
       }
     );
@@ -144,23 +146,20 @@ export class HousingsComponent extends PagedListingComponentBase<HousingDto>
       {
         class: 'modal-lg, modal-xl',
         initialState: {
-          id: housing.id
-        }
+          id: housing.id,
+        },
       }
     );
   }
 
   protected addPerson(housing: HousingDto): void {
     let addPersonDialog: BsModalRef;
-    addPersonDialog = this._modalService.show(
-      AddPersonDialogComponent,
-      {
-        class: 'modal-lg,',
-        initialState: {
-          id: housing.id
-        }
-      }
-    );
+    addPersonDialog = this._modalService.show(AddPersonDialogComponent, {
+      class: 'modal-lg,',
+      initialState: {
+        id: housing.id,
+      },
+    });
   }
 
   private showCreateOrEditHousingDialog(id?: string): void {

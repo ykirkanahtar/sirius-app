@@ -6,6 +6,8 @@ using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.AccountBooks;
+using Sirius.HousingPaymentPlans;
 using Sirius.People;
 using Sirius.Shared.Enums;
 
@@ -15,13 +17,17 @@ namespace Sirius.Housings
     {
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IHousingPersonPolicy _housingPersonPolicy;
 
-        public HousingManager(IRepository<Housing, Guid> housingRepository, IRepository<HousingPerson> housingPersonRepository, IHousingPersonPolicy housingPersonPolicy)
+        public HousingManager(IRepository<Housing, Guid> housingRepository, IRepository<HousingPerson> housingPersonRepository, IHousingPersonPolicy housingPersonPolicy, IRepository<AccountBook, Guid> accountBookRepository, IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
         {
             _housingRepository = housingRepository;
             _housingPersonRepository = housingPersonRepository;
             _housingPersonPolicy = housingPersonPolicy;
+            _accountBookRepository = accountBookRepository;
+            _housingPaymentPlanRepository = housingPaymentPlanRepository;
         }
 
         public async Task CreateAsync(Housing housing)
@@ -36,6 +42,23 @@ namespace Sirius.Housings
 
         public async Task DeleteAsync(Housing housing)
         {
+            var housingPaymentPlans = await _housingPaymentPlanRepository.GetAllListAsync(p => p.HousingId == housing.Id);
+            if(housingPaymentPlans.Count > 0)
+            {
+                throw new UserFriendlyException("Aidat ödeme planı oluşmuş bir konut silinemez.");
+            }
+
+            var housingAccountBooks = await _accountBookRepository.GetAllListAsync(p => p.HousingId == housing.Id);
+            if(housingAccountBooks.Count > 0)
+            {
+                throw new UserFriendlyException("İşletme defteri kaydı olan bir konut silinemez.");
+            }
+
+            var housingPeople = await _housingPersonRepository.GetAllListAsync(p => p.HousingId == housing.Id);
+            foreach (var housingPerson in housingPeople)
+            {
+                await _housingPersonRepository.DeleteAsync(housingPerson);
+            }
             await _housingRepository.DeleteAsync(housing);
         }
 

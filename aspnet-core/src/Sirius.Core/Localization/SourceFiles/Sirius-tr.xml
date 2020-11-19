@@ -197,6 +197,7 @@
     <text name="HousingCategoriesMenu">Konut grubu (Menü)</text>
     <text name="HousingCategory">Konut grubu</text>
     <text name="HousingCategoryName">Konut Grup Adı</text>
+    <text name="HousingDeleteWarningMessage">Konutu silmek istediğinize emin misiniz?</text>
     <text name="HousingDue">Aidat ödemesi</text>
     <text name="HousingOwner">Ev Sahibi</text>
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
