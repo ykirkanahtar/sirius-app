@@ -11,7 +11,6 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
 using Sirius.HousingCategories.Dto;
-using Sirius.PaymentCategories.Dto;
 using Sirius.Shared.Dtos;
 
 namespace Sirius.HousingCategories
@@ -48,6 +47,7 @@ namespace Sirius.HousingCategories
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
             CheckDeletePermission();
+
             var housingCategory = await _housingCategoryManager.GetAsync(input.Id);
             await _housingCategoryManager.DeleteAsync(housingCategory);
         }
