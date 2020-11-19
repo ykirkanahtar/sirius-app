@@ -4,11 +4,15 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import { CreatePaymentCategoryDialogComponent } from './create-payment-category/create-payment-category-dialog.component';
 import { EditPaymentCategoryDialogComponent } from './edit-payment-category/edit-payment-category-dialog.component';
-import { PaymentCategoryDto, PaymentCategoryServiceProxy, PaymentCategoryDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import {
+  PaymentCategoryDto,
+  PaymentCategoryServiceProxy,
+  PaymentCategoryDtoPagedResultDto,
+} from '@shared/service-proxies/service-proxies';
 import { Table } from 'primeng/table';
 import { LazyLoadEvent } from 'primeng/api';
 
@@ -18,11 +22,11 @@ class PagedHousingsRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './payment-categories.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class PaymentCategoriesComponent extends PagedListingComponentBase<PaymentCategoryDto>
+export class PaymentCategoriesComponent
+  extends PagedListingComponentBase<PaymentCategoryDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -78,7 +82,12 @@ export class PaymentCategoriesComponent extends PagedListingComponentBase<Paymen
     finishedCallback: Function
   ): void {
     this._paymentCategoryService
-      .getAll(this.selectedPaymentCategoryFilter, this.sortingColumn, request.skipCount, request.maxResultCount)
+      .getAll(
+        this.selectedPaymentCategoryFilter,
+        this.sortingColumn,
+        request.skipCount,
+        request.maxResultCount
+      )
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -92,19 +101,19 @@ export class PaymentCategoriesComponent extends PagedListingComponentBase<Paymen
 
   protected delete(paymentCategory: PaymentCategoryDto): void {
     abp.message.confirm(
-      this.l('PaymentCategoryDeleteWarningMessage', paymentCategory.paymentCategoryName),
+      this.l(
+        'PaymentCategoryDeleteWarningMessage',
+        paymentCategory.paymentCategoryName
+      ),
       undefined,
       (result: boolean) => {
         if (result) {
           this._paymentCategoryService
             .delete(paymentCategory.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+            .subscribe(() => {
+              abp.notify.success(this.l('SuccessfullyDeleted'));
+              this.refresh();
+            });
         }
       }
     );

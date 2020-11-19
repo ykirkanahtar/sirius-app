@@ -224,6 +224,7 @@
     <text name="PaymentCategories">Ödeme Kategorileri</text>
     <text name="PaymentCategoriesMenu">Ödeme Kategorileri (Menü)</text>
     <text name="PaymentCategory">Ödeme türü</text>
+    <text name="PaymentCategoryDeleteWarningMessage">Ödeme türünü silmek istediğinize emin misiniz?</text>
     <text name="PaymentCategoryName">Kategori Adı</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
     <text name="PaymentPlanType">Borç / Alacak</text>

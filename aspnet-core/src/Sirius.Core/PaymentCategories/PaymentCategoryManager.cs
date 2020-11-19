@@ -8,6 +8,8 @@ using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.AccountBooks;
+using Sirius.HousingPaymentPlans;
 using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentCategories
@@ -15,12 +17,16 @@ namespace Sirius.PaymentCategories
     public class PaymentCategoryManager : IPaymentCategoryManager
     {
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
+        private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
+        public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager, IRepository<AccountBook, Guid> accountBookRepository, IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
         {
             _paymentCategoryRepository = paymentCategoryRepository;
             _unitOfWorkManager = unitOfWorkManager;
+            _accountBookRepository = accountBookRepository;
+            _housingPaymentPlanRepository = housingPaymentPlanRepository;
         }
 
         public async Task CreateAsync(PaymentCategory paymentCategory)
@@ -35,6 +41,18 @@ namespace Sirius.PaymentCategories
         
         public async Task DeleteAsync(PaymentCategory paymentCategory)
         {
+            var accountBooks = await _accountBookRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
+            if (accountBooks.Count > 0)
+            {
+                throw new UserFriendlyException("Bu ödeme türü için bir ya da birden fazla işlem hareketi tanımlıdır. Silmek için önce tanımları kaldırınız.");
+            }
+
+            var housingPaymentPlans = await _housingPaymentPlanRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
+            if (housingPaymentPlans.Count > 0)
+            {
+                throw new UserFriendlyException("Bu ödeme türü için bir ya da birden fazla aidat ödeme planı tanımlıdır. Silmek için önce tanımları kaldırınız.");
+            }
+
             await _paymentCategoryRepository.DeleteAsync(paymentCategory);
         }
 
