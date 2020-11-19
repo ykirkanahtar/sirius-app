@@ -4,9 +4,13 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
-import { BlockDto, BlockServiceProxy, BlockDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import {
+  BlockDto,
+  BlockServiceProxy,
+  BlockDtoPagedResultDto,
+} from '@shared/service-proxies/service-proxies';
 import { Table } from 'primeng/table';
 import { LazyLoadEvent } from 'primeng/api';
 import { EditBlockDialogComponent } from './edit-block/edit-block-dialog.component';
@@ -18,11 +22,11 @@ class PagedEmployeesRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './blocks.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class BlocksComponent extends PagedListingComponentBase<BlockDto>
+export class BlocksComponent
+  extends PagedListingComponentBase<BlockDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -64,10 +68,7 @@ export class BlocksComponent extends PagedListingComponentBase<BlockDto>
     finishedCallback: Function
   ): void {
     this._blockService
-      .getAll(
-        this.sortingColumn,
-        request.skipCount,
-        request.maxResultCount)
+      .getAll(this.sortingColumn, request.skipCount, request.maxResultCount)
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -87,13 +88,10 @@ export class BlocksComponent extends PagedListingComponentBase<BlockDto>
         if (result) {
           this._blockService
             .delete(block.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+            .subscribe(() => {
+              abp.notify.success(this.l('SuccessfullyDeleted'));
+              this.refresh();
+            });
         }
       }
     );

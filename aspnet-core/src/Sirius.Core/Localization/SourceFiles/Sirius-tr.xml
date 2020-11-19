@@ -124,6 +124,7 @@
     <text name="BankTransferFee">Havale masrafı</text>
     <text name="BillPayment">Fatura ödemesi</text>
     <text name="Block">Blok</text>
+    <text name="BlockDeleteWarningMessage">Blok/Apt. silmek istediğinize emin misiniz?</text>
     <text name="BlockManagement">Blok/Apt. Yönetimi</text>
     <text name="BlockName">Blok Adı</text>
     <text name="Blocks">Blok / Apartman</text>
