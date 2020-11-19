@@ -37,6 +37,7 @@ namespace Sirius.Housings
 
         [ForeignKey("HousingId")] public virtual ICollection<HousingPerson> HousingPeople { get; protected set; }
 
+        //TODO Block entity'sinin her Housing Get metodunda otomatik çağırılmasını sağla
         public string GetName()
         {
             return $"{Block.BlockName} - {Apartment}";

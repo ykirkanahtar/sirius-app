@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.UI;
+using Microsoft.EntityFrameworkCore;
 using Sirius.AppPaymentAccounts;
 using Sirius.Housings;
 
@@ -39,7 +41,7 @@ namespace Sirius.People
             {
                 if (housingPeople.Count == 1)
                 {
-                    var housing = await _housingRepository.GetAsync(housingPeople[0].HousingId);
+                    var housing = await _housingRepository.GetAll().Include(p => p.Block).Where(p => p.Id == housingPeople[0].HousingId).SingleAsync();
                     throw new UserFriendlyException($"Bu kişi {housing.GetName()} konutu için tanımlıdır. Silmek için önce tanımı kaldırınız.");
                 }
                 else
