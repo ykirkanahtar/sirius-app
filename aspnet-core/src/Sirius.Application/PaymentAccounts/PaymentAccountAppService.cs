@@ -105,7 +105,14 @@ namespace Sirius.PaymentAccounts
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
-        
+
+        public override async Task DeleteAsync(EntityDto<Guid> input)
+        {
+            CheckDeletePermission();
+            var paymentAccount = await _paymentAccountManager.GetAsync(input.Id);
+            await _paymentAccountManager.DeleteAsync(paymentAccount);
+        }
+
         public override async Task<PagedResultDto<PaymentAccountDto>> GetAllAsync(PagedPaymentAccountResultRequestDto input)
         {
             CheckGetAllPermission();

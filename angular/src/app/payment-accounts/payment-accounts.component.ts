@@ -4,10 +4,15 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import { CreatePaymentAccountDialogComponent } from './create-payment-account/create-payment-account-dialog.component';
-import { PaymentAccountDto, PaymentAccountServiceProxy, PaymentAccountDtoPagedResultDto, PaymentAccountType } from '@shared/service-proxies/service-proxies';
+import {
+  PaymentAccountDto,
+  PaymentAccountServiceProxy,
+  PaymentAccountDtoPagedResultDto,
+  PaymentAccountType,
+} from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
 
@@ -17,11 +22,11 @@ class PagedPaymentAccountRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './payment-accounts.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentAccountDto>
+export class PaymentAccountsComponent
+  extends PagedListingComponentBase<PaymentAccountDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -76,21 +81,19 @@ export class PaymentAccountsComponent extends PagedListingComponentBase<PaymentA
         if (result) {
           this._paymentAccountService
             .delete(paymentAccount.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+            .subscribe(() => {
+              abp.notify.success(this.l('SuccessfullyDeleted'));
+              this.refresh();
+            });
         }
       }
     );
   }
 
-
-
-  private showCreateOrEditPaymentAccountDialog(paymentAccountType: PaymentAccountType, id?: number): void {
+  private showCreateOrEditPaymentAccountDialog(
+    paymentAccountType: PaymentAccountType,
+    id?: number
+  ): void {
     let createOrEditPaymentAccountDialog: BsModalRef;
     if (!id) {
       createOrEditPaymentAccountDialog = this._modalService.show(

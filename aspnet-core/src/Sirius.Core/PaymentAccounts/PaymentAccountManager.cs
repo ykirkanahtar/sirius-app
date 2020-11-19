@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.UI;
+using Sirius.AccountBooks;
 using Sirius.AppPaymentAccounts;
 
 namespace Sirius.PaymentAccounts
@@ -9,10 +10,12 @@ namespace Sirius.PaymentAccounts
     public class PaymentAccountManager : IPaymentAccountManager
     {
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
+        private readonly IRepository<AccountBook, Guid> _accountBookRepository;
 
-        public PaymentAccountManager(IRepository<PaymentAccount, Guid> paymentAccountRepository)
+        public PaymentAccountManager(IRepository<PaymentAccount, Guid> paymentAccountRepository, IRepository<AccountBook, Guid> accountBookRepository)
         {
             _paymentAccountRepository = paymentAccountRepository;
+            _accountBookRepository = accountBookRepository;
         }
 
         public async Task CreateAsync(PaymentAccount paymentAccount)
@@ -24,7 +27,18 @@ namespace Sirius.PaymentAccounts
         {
             await _paymentAccountRepository.UpdateAsync(paymentAccount);
         }
-        
+
+        public async Task DeleteAsync(PaymentAccount paymentAccount)
+        {
+            var accountBooks = await _accountBookRepository.GetAllListAsync(p => p.FromPaymentAccountId == paymentAccount.Id || p.ToPaymentAccountId == paymentAccount.Id);
+            if (accountBooks.Count > 0)
+            {
+                throw new UserFriendlyException("Bu ödeme hesabı için bir ya da birden fazla işlem hareketi tanımlıdır. Silmek için önce tanımları kaldırınız.");
+            }
+
+            await _paymentAccountRepository.DeleteAsync(paymentAccount);
+        }
+
         public async Task<PaymentAccount> GetAsync(Guid id)
         {
             var paymentAccount = await _paymentAccountRepository.GetAsync(id);

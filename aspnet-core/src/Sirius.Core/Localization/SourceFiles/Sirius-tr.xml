@@ -218,6 +218,7 @@
     <text name="PaymentAccount">Ödeme hesabı</text>
     <text name="PaymentAccountName">Ödeme Hesabı</text>
     <text name="PaymentAccounts">Hesaplar</text>
+    <text name="PaymentAccountDeleteWarningMessage">Hesabı silmek istediğinize emin misiniz?</text>
     <text name="PaymentAccountsMenu">Hesaplar (Menü)</text>
     <text name="PaymentAccountType">Hesap Tipi</text>
     <text name="PaymentCategories">Ödeme Kategorileri</text>
