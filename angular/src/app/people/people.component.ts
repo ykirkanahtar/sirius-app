@@ -4,11 +4,17 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import { CreatePersonDialogComponent } from './create-person/create-person-dialog.component';
 import { EditPersonDialogComponent } from './edit-person/edit-person-dialog.component';
-import { PersonDto, PersonServiceProxy, PersonDtoPagedResultDto, HousingServiceProxy, LookUpDto } from '@shared/service-proxies/service-proxies';
+import {
+  PersonDto,
+  PersonServiceProxy,
+  PersonDtoPagedResultDto,
+  HousingServiceProxy,
+  LookUpDto,
+} from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 
@@ -18,11 +24,11 @@ class PagedPeopleRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './people.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class PeopleComponent extends PagedListingComponentBase<PersonDto>
+export class PeopleComponent
+  extends PagedListingComponentBase<PersonDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -48,11 +54,9 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto>
   }
 
   ngOnInit(): void {
-    this._housingService
-      .getHousingLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housingsFilter = result;
-      });
+    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+      this.housingsFilter = result;
+    });
 
     this.getDataPage(1);
   }
@@ -98,7 +102,8 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto>
         this.selectedHousingsFilter,
         this.sortingColumn,
         request.skipCount,
-        request.maxResultCount)
+        request.maxResultCount
+      )
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -112,19 +117,17 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto>
 
   protected delete(person: PersonDto): void {
     abp.message.confirm(
-      this.l('PersonDeleteWarningMessage', person.firstName + ' ' + person.lastName),
+      this.l(
+        'PersonDeleteWarningMessage',
+        person.firstName + ' ' + person.lastName
+      ),
       undefined,
       (result: boolean) => {
         if (result) {
-          this._peopleService
-            .delete(person.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+          this._peopleService.delete(person.id).subscribe(() => {
+            abp.notify.success(this.l('SuccessfullyDeleted'));
+            this.refresh();
+          });
         }
       }
     );
@@ -155,5 +158,4 @@ export class PeopleComponent extends PagedListingComponentBase<PersonDto>
       this.refresh();
     });
   }
-
 }

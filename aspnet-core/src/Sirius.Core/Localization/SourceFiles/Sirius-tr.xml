@@ -226,6 +226,7 @@
     <text name="People">Kişiler</text>
     <text name="PeopleMenu">Kişiler (Menü)</text>
     <text name="Person">Kişi</text>
+    <text name="PersonDeleteWarningMessage">Kişiyi silmek istediğinize emin misiniz?</text>        
     <text name="PersonOptions">Kişi Seçenekleri</text>
     <text name="Phone1">Telefon numarası(1)</text>
     <text name="Phone2">Telefon numarası(2)</text>
