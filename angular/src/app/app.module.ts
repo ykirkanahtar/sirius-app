@@ -44,6 +44,7 @@ import { CreateHousingDialogComponent } from './housings/create-housing/create-h
 import { EditHousingDialogComponent } from './housings/edit-housing/edit-housing-dialog.component';
 import { AddPersonDialogComponent } from './housings/add-or-edit-person/add-person-dialog.component';
 import { AccountActivitiesDialogComponent } from './housings/account-activities/account-activities.component';
+import { HousingPeopleDialogComponent } from './housings/housing-people/housing-people.component';
 import { BlocksComponent } from './blocks/blocks.component';
 import { CreateBlockDialogComponent } from './blocks/create-block/create-block-dialog.component';
 import { EditBlockDialogComponent } from './blocks/edit-block/edit-block-dialog.component';
@@ -113,6 +114,7 @@ import { trLocale } from 'ngx-bootstrap/locale';
     EditHousingDialogComponent,
     AddPersonDialogComponent,
     AccountActivitiesDialogComponent,
+    HousingPeopleDialogComponent,
     BlocksComponent,
     CreateBlockDialogComponent,
     EditBlockDialogComponent,

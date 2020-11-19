@@ -196,10 +196,18 @@
                   <button
                     type="button"
                     class="btn btn-sm bg-primary mx-2"
-                    (click)="accountActivities(housing)"
+                    (click)="getAccountActivities(housing)"
                   >
                     <i class="fas fa-clipboard-list"></i>
                     {{ "AccountActivities" | localize }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm bg-primary mx-2"
+                    (click)="getPeople(housing)"
+                  >
+                    <i class="fas fa-clipboard-list"></i>
+                    {{ "People" | localize }}
                   </button>
                   <button
                     type="button"

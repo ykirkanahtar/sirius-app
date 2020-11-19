@@ -15,5 +15,6 @@ namespace Sirius.Housings.Dto
         public bool Contact { get; set; }
 
         public virtual PersonDto Person { get; set; }
+        public virtual HousingDto Housing { get; set; }
     }
 }

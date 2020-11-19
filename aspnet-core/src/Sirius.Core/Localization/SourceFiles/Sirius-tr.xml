@@ -207,6 +207,7 @@
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
     <text name="HousingPaymentPlans">Aidat Ödeme Planları</text>
     <text name="HousingPaymentPlansMenu">Aidat Ödeme Planları (Menü)</text>
+    <text name="HousingPersonDeleteWarningMessage">Kişi tanımını kaldırmak istediğinize emin misiniz?</text>
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
     <text name="HousingTenant">Kiracı</text>
@@ -240,6 +241,7 @@
     <text name="ProcessDateTime">İşlem tarihi</text>
     <text name="RefundHousingDue">Aidat iadesi</text>
     <text name="RegularHousingDue">Olağan aidat ödemesi</text>
+    <text name="RemovePerson">Kişi tanımını kaldır</text>
     <text name="SalaryPayment">Maaş ödemesi</text>
     <text name="SelectDate">Tarih Seçiniz</text>
     <text name="SiteManagement">Site Yönetimi</text>

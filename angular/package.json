@@ -15,9 +15,9 @@
     "publish-staging": "ng build --prod --configuration=staging --build-optimizer",
     "publish-prod": "ng build --prod --configuration=production --build-optimizer",
     "build": "ng build",
+    "postinstall": "ngcc",
     "refresh.bat": "cd nswag/ && refresh.bat",
-    "refresh.sh": "cd nswag/ && sh refresh.sh",
-    "postinstall": "ngcc"
+    "refresh.sh": "cd nswag/ && sh refresh.sh"
   },
   "dependencies": {
     "@angular/animations": "^9.1.4",

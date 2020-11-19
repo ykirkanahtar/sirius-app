@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -13,6 +12,8 @@ namespace Sirius.Housings
     {
         Task<List<LookUpDto>> GetHousingLookUpAsync();
         Task<HousingPersonDto> AddPersonAsync(CreateHousingPersonDto input);
+        Task RemovePersonAsync(RemoveHousingPersonDto input);
         Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId);
+        Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input);
     }
 }

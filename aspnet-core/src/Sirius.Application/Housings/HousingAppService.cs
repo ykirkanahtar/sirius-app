@@ -19,6 +19,7 @@ using Sirius.HousingPaymentPlans;
 using Sirius.Housings.Dto;
 using Sirius.PaymentCategories;
 using Sirius.People;
+using Sirius.People.Dto;
 using Sirius.Shared.Dtos;
 
 namespace Sirius.Housings
@@ -174,6 +175,17 @@ namespace Sirius.Housings
             var housingPerson = await _housingManager.AddPersonAsync(housing, person, input.IsTenant, input.Contact);
             return ObjectMapper.Map<HousingPersonDto>(housingPerson);
         }
+        
+        public async Task RemovePersonAsync(RemoveHousingPersonDto input)
+        {
+            CheckUpdatePermission();
+            var housing = await _housingManager.GetAsync(input.HousingId);
+            var person = await _personManager.GetAsync(input.PersonId);
+
+            var housingPerson = await _housingPersonRepository.GetAll()
+                .Where(p => p.HousingId == input.HousingId && p.PersonId == input.PersonId).SingleAsync();
+            await _housingPersonRepository.DeleteAsync(housingPerson);
+        }
 
         public async Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId)
         {
@@ -193,6 +205,30 @@ namespace Sirius.Housings
             }
 
             return people.Select(p => new LookUpDto(p.Id.ToString(), $"{p.FirstName} {p.LastName}")).ToList();
+        }
+
+        public async Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input)
+        {
+            try
+            {
+                CheckGetAllPermission();
+                await _housingRepository.GetAsync(input.HousingId);
+                var query = _housingPersonRepository.GetAll().Include(p => p.Person)
+                    .Where(p => p.HousingId == input.HousingId);
+
+                var housingPeople = await query
+                    .OrderBy(input.Sorting ?? $"{nameof(Person)}.{nameof(PersonDto.FirstName)} ASC, {nameof(Person)}.{nameof(PersonDto.LastName)}")
+                    .PageBy(input)
+                    .ToListAsync();
+
+                return new PagedResultDto<HousingPersonDto>(query.Count(),
+                    ObjectMapper.Map<List<HousingPersonDto>>(housingPeople));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

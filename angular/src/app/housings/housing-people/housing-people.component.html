@@ -1,0 +1,134 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #housingPeopleForm="ngForm"
+>
+  <abp-modal-header
+    [title]="'People' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row readonly">
+          <label class="col-md-3 col-form-label" for="block">
+            {{ "Block" | localize }}
+          </label>
+          <div class="col-md-9">
+            <label class="col-md-3 col-form-label">
+              {{ block.blockName }}
+            </label>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "Apartment" | localize }}
+          </label>
+          <div class="col-md-9">
+            <label class="col-md-3 col-form-label">
+              {{ housing.apartment }}
+            </label>
+          </div>
+        </div>
+
+        <section class="content px-2">
+          <div class="container-fluid">
+            <div class="card">
+              <div class="card-body table-responsive p-0">
+                <p-table
+                #dataTable
+                class="table table-hover text-nowrap"
+                [value]="housingPeople"
+                [resizableColumns]="true"
+                [autoLayout]="true"
+                [busy]="isTableLoading"
+                (onLazyLoad)="getData($event)"
+                [lazy]="true"
+                [loading]="isTableLoading"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="FirstName">
+                      {{ "FirstName" | localize }}
+                      <p-sortIcon field="FirstName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="LastName">
+                      {{ "LastName" | localize }}
+                      <p-sortIcon field="LastName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="Phone1">
+                      {{ "Phone1" | localize }}
+                      <p-sortIcon field="Phone1"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="Phone2">
+                      {{ "Phone2" | localize }}
+                      <p-sortIcon field="Phone2"></p-sortIcon>
+                    </th>
+                    <th>{{ "Actions" | localize }}</th>
+                  </tr>
+                </ng-template>
+                <ng-template
+                  pTemplate="body"
+                  ngFor
+                  let-housingPerson
+                  [ngForOf]="
+                    housingPeople
+                      | paginate
+                        : {
+                            id: 'server',
+                            itemsPerPage: pageSize,
+                            currentPage: pageNumber,
+                            totalItems: totalItems
+                          }
+                  "
+                >
+                  <tr>
+                    <td>{{ housingPerson.person.firstName }}</td>
+                    <td>{{ housingPerson.person.lastName }}</td>
+                    <td>{{ housingPerson.person.phone1 }}</td>
+                    <td>{{ housingPerson.person.phone2 }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        *ngIf="this.permissionHelper.deletePerson()"
+                        class="btn btn-sm bg-danger mx-2"
+                        (click)="delete(housingPerson)"
+                      >
+                        <i class="fas fa-trash"></i>
+                        {{ "RemovePerson" | localize }}
+                      </button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+              </div>
+              <div class="card-footer bg-light border-top">
+                <div class="row">
+                  <div class="col-sm-4 col-12 text-sm-left text-center">
+                    <button class="btn btn-secondary" (click)="refresh()">
+                      <i class="fas fa-redo-alt"></i>
+                    </button>
+                  </div>
+                  <div class="col-sm-4 col-12 text-center">
+                    <p class="mb-0 my-2">
+                      {{ "TotalRecordsCount" | localize: totalItems }}
+                    </p>
+                  </div>
+                  <div class="col-sm-4 col-12">
+                    <div class="float-sm-right m-auto">
+                      <abp-pagination-controls
+                        id="server"
+                        (pageChange)="getDataPage($event)"
+                      >
+                      </abp-pagination-controls>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </tab>
+    </tabset>
+  </div>
+</form>

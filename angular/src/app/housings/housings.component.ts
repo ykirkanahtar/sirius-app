@@ -20,6 +20,7 @@ import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog
 import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { HousingPeopleDialogComponent } from './housing-people/housing-people.component';
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -139,10 +140,23 @@ export class HousingsComponent
     );
   }
 
-  protected accountActivities(housing: HousingDto): void {
+  protected getAccountActivities(housing: HousingDto): void {
     let accountActivitiesDialog: BsModalRef;
     accountActivitiesDialog = this._modalService.show(
       AccountActivitiesDialogComponent,
+      {
+        class: 'modal-lg, modal-xl',
+        initialState: {
+          id: housing.id,
+        },
+      }
+    );
+  }
+
+  protected getPeople(housing: HousingDto): void {
+    let housingPeopleDialog: BsModalRef;
+    housingPeopleDialog = this._modalService.show(
+      HousingPeopleDialogComponent,
       {
         class: 'modal-lg, modal-xl',
         initialState: {
