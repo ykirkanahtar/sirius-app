@@ -6489,6 +6489,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
     balance: number;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDeleted: boolean;
@@ -6516,6 +6517,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
             this.balance = _data["balance"];
             this.description = _data["description"];
             this.personId = _data["personId"];
+            this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
             this.isDeleted = _data["isDeleted"];
@@ -6543,6 +6545,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         data["balance"] = this.balance;
         data["description"] = this.description;
         data["personId"] = this.personId;
+        data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
         data["isDeleted"] = this.isDeleted;
@@ -6570,6 +6573,7 @@ export interface IPaymentAccountDto {
     balance: number;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDeleted: boolean;
@@ -8347,6 +8351,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
 
@@ -8364,6 +8369,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
             this.accountName = _data["accountName"];
             this.description = _data["description"];
             this.personId = _data["personId"];
+            this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
         }
@@ -8381,6 +8387,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         data["accountName"] = this.accountName;
         data["description"] = this.description;
         data["personId"] = this.personId;
+        data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
         return data; 
@@ -8398,6 +8405,7 @@ export interface ICreateBankOrAdvanceAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
 }
@@ -8406,6 +8414,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     tenantIsOwner: boolean;
 
     constructor(data?: ICreateCashAccountDto) {
@@ -8422,6 +8431,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.accountName = _data["accountName"];
             this.description = _data["description"];
             this.personId = _data["personId"];
+            this.employeeId = _data["employeeId"];
             this.tenantIsOwner = _data["tenantIsOwner"];
         }
     }
@@ -8438,6 +8448,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["accountName"] = this.accountName;
         data["description"] = this.description;
         data["personId"] = this.personId;
+        data["employeeId"] = this.employeeId;
         data["tenantIsOwner"] = this.tenantIsOwner;
         return data; 
     }
@@ -8454,6 +8465,7 @@ export interface ICreateCashAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     tenantIsOwner: boolean;
 }
 
@@ -8461,6 +8473,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDeleted: boolean;
@@ -8486,6 +8499,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
             this.accountName = _data["accountName"];
             this.description = _data["description"];
             this.personId = _data["personId"];
+            this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
             this.isDeleted = _data["isDeleted"];
@@ -8511,6 +8525,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
         data["accountName"] = this.accountName;
         data["description"] = this.description;
         data["personId"] = this.personId;
+        data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
         data["isDeleted"] = this.isDeleted;
@@ -8536,6 +8551,7 @@ export interface IUpdatePaymentAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
+    employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDeleted: boolean;

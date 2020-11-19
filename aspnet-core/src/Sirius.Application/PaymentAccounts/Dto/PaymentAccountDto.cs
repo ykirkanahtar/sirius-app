@@ -16,6 +16,7 @@ namespace Sirius.PaymentAccounts.Dto
         public decimal Balance { get; set; }
         public string Description { get; set; }
         public Guid? PersonId { get; set; }
+        public Guid? EmployeeId { get; set; }
         public string Iban { get; set; }
         public bool TenantIsOwner { get; set; }
     }

@@ -39,6 +39,7 @@ namespace Sirius.PaymentAccounts
                     , input.Description
                     , input.Iban
                     , input.PersonId
+                    , input.EmployeeId
                     , input.TenantIsOwner
                     );
             await _paymentAccountManager.CreateAsync(paymentAccount);
@@ -66,6 +67,7 @@ namespace Sirius.PaymentAccounts
                     , input.Description
                     , input.Iban
                     , input.PersonId
+                    , input.EmployeeId
                     , input.TenantIsOwner
                     );
             await _paymentAccountManager.CreateAsync(paymentAccount);
@@ -81,6 +83,7 @@ namespace Sirius.PaymentAccounts
                     , input.AccountName
                     , input.Description
                     , input.PersonId
+                    , input.EmployeeId
                     , input.TenantIsOwner
                     );
             await _paymentAccountManager.CreateAsync(paymentAccount);
@@ -98,7 +101,7 @@ namespace Sirius.PaymentAccounts
             CheckUpdatePermission();
             var existingPaymentAccount = await _paymentAccountRepository.GetAsync(input.Id);
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
-                input.PersonId, input.TenantIsOwner, input.Iban);
+                input.PersonId, input.EmployeeId, input.TenantIsOwner, input.Iban);
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
