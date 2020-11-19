@@ -103,6 +103,7 @@
     <text name="ConfirmNewPassword">Yeni şifreyi doğrula</text>
 
     <text name="AccountActivities">Hesap Hareketleri</text>
+    <text name="AccountBookDeleteWarningMessage">İşletme Defteri kaydınız silmek istediğinize emin misiniz?</text>
     <text name="AccountBookProcessType">İşlem tipi</text>
     <text name="AccountBooks">İşletme Defteri</text>
     <text name="AccountBooksMenu">İşletme Defteri (Menü)</text>

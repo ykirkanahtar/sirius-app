@@ -2,18 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Entities;
-using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sirius.Housings;
 
 namespace Sirius.EntityFrameworkCore.Repositories
 {
-    public interface IHousingRepository : IRepository<Housing, Guid>
-    {
-        
-    }
-    
     public class HousingRepository : SiriusRepositoryBase<Housing, Guid>, IHousingRepository
     {
         public HousingRepository(IDbContextProvider<SiriusDbContext> dbContextProvider) : base(dbContextProvider)

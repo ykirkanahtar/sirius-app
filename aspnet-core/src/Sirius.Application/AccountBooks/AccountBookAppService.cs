@@ -53,44 +53,36 @@ namespace Sirius.AccountBooks
 
         public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
         {
-            try
-            {
-                CheckCreatePermission();
-                var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
-                var housing = await _housingManager.GetAsync(input.HousingId);
-                var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId);
+            CheckCreatePermission();
+            var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+            var housing = await _housingManager.GetAsync(input.HousingId);
+            var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId);
 
-                var accountBook = AccountBook.CreateHousingDue(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , input.ProcessDateTime
-                    , housingDuePaymentCategory.Id
-                    , input.HousingId
-                    , input.ToPaymentAccountId
-                    , input.Amount
-                    , input.Description);
+            var accountBook = AccountBook.CreateHousingDue(
+                SequentialGuidGenerator.Instance.Create()
+                , AbpSession.GetTenantId()
+                , input.ProcessDateTime
+                , housingDuePaymentCategory.Id
+                , input.HousingId
+                , input.ToPaymentAccountId
+                , input.Amount
+                , input.Description);
 
-                await _accountBookManager.CreateAsync(accountBook);
-                await _housingManager.DecreaseBalance(housing, input.Amount);
-                await _paymentAccountManager.IncreaseBalance(toPaymentAccount, input.Amount);
-                await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , housing
-                    , housingDuePaymentCategory
-                    , input.ProcessDateTime
-                    , input.Amount
-                    , input.Description
-                    , accountBook
-                ));
+            await _accountBookManager.CreateAsync(accountBook);
+            await _housingManager.DecreaseBalance(housing, input.Amount);
+            await _paymentAccountManager.IncreaseBalance(toPaymentAccount, input.Amount);
+            await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
+                SequentialGuidGenerator.Instance.Create()
+                , AbpSession.GetTenantId()
+                , housing
+                , housingDuePaymentCategory
+                , input.ProcessDateTime
+                , input.Amount
+                , input.Description
+                , accountBook
+            ));
 
-                return ObjectMapper.Map<AccountBookDto>(accountBook);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
         public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
@@ -137,6 +129,13 @@ namespace Sirius.AccountBooks
             await _accountBookManager.UpdateAsync(accountBook);
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
+        
+        public override async Task DeleteAsync(EntityDto<Guid> input)
+        {
+            CheckDeletePermission();
+            var accountBook = await _accountBookManager.GetAsync(input.Id);
+            await _accountBookManager.DeleteAsync(accountBook);
+        }
 
         public override async Task<PagedResultDto<AccountBookDto>> GetAllAsync(PagedAccountBookResultRequestDto input)
         {
@@ -146,7 +145,8 @@ namespace Sirius.AccountBooks
             using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var query = _accountBookRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId)
-                    .Include(p => p.PaymentCategory).Include(p => p.Housing).ThenInclude(p => p.Block).Include(p => p.FromPaymentAccount)
+                    .Include(p => p.PaymentCategory).Include(p => p.Housing).ThenInclude(p => p.Block)
+                    .Include(p => p.FromPaymentAccount)
                     .Include(p => p.ToPaymentAccount)
                     .WhereIf(input.StartDate.HasValue, p => p.ProcessDateTime > input.StartDate.Value)
                     .WhereIf(input.EndDate.HasValue, p => p.ProcessDateTime < input.EndDate.Value)

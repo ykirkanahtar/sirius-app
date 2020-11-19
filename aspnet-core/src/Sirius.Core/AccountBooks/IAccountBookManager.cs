@@ -6,8 +6,9 @@ namespace Sirius.AccountBooks
 {
     public interface IAccountBookManager : IDomainService
     {
-        Task<AccountBook> GetAsync(Guid id);
         Task CreateAsync(AccountBook accountBook);
         Task UpdateAsync(AccountBook accountBook);
+        Task DeleteAsync(AccountBook accountBook);
+        Task<AccountBook> GetAsync(Guid id);
     }
 }

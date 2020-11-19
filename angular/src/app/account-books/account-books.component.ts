@@ -4,7 +4,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from '@shared/paged-listing-component-base';
 import {
   AccountBookDto,
@@ -14,7 +14,7 @@ import {
   PersonServiceProxy,
   LookUpDto,
   PaymentCategoryServiceProxy,
-  PaymentAccountServiceProxy
+  PaymentAccountServiceProxy,
 } from '@shared/service-proxies/service-proxies';
 import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
 import { CreateOtherPaymentAccountBookDialogComponent } from './create-account-book/create-other-payment-account-book-dialog.component';
@@ -28,11 +28,11 @@ class PagedAccountBooksRequestDto extends PagedRequestDto {
 
 @Component({
   templateUrl: './account-books.component.html',
-  animations: [appModuleAnimation()]
+  animations: [appModuleAnimation()],
 })
-export class AccountBooksComponent extends PagedListingComponentBase<AccountBookDto>
+export class AccountBooksComponent
+  extends PagedListingComponentBase<AccountBookDto>
   implements OnInit {
-
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
@@ -77,17 +77,13 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
         this.paymentCategoriesFilter = result;
       });
 
-    this._housingService
-      .getHousingLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housingsFilters = result;
-      });
+    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+      this.housingsFilters = result;
+    });
 
-    this._personService
-      .getPersonLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.peopleFilters = result;
-      });
+    this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
+      this.peopleFilters = result;
+    });
 
     this._paymentAccountService
       .getPaymentAccountLookUp()
@@ -141,7 +137,10 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
         this.selectedPeopleFilters,
         this.selectedFromPaymentAccountsFilter,
         this.selectedToPaymentAccountsFilter,
-        this.sortingColumn, request.skipCount, request.maxResultCount)
+        this.sortingColumn,
+        request.skipCount,
+        request.maxResultCount
+      )
       .pipe(
         finalize(() => {
           finishedCallback();
@@ -159,26 +158,24 @@ export class AccountBooksComponent extends PagedListingComponentBase<AccountBook
       undefined,
       (result: boolean) => {
         if (result) {
-          this._accountBooksService
-            .delete(accountBook.id)
-            .pipe(
-              finalize(() => {
-                abp.notify.success(this.l('SuccessfullyDeleted'));
-                this.refresh();
-              })
-            )
-            .subscribe(() => { });
+          this._accountBooksService.delete(accountBook.id).subscribe(() => {
+            abp.notify.success(this.l('SuccessfullyDeleted'));
+            this.refresh();
+          });
         }
       }
     );
   }
 
-  private showCreateOrEditAccountBookDialog(isHousingDue: boolean, id?: number): void {
+  private showCreateOrEditAccountBookDialog(
+    isHousingDue: boolean,
+    id?: number
+  ): void {
     let createOrEditAccountBookDialog: BsModalRef;
     if (!id) {
       createOrEditAccountBookDialog = this._modalService.show(
-        isHousingDue ?
-          CreateHousingDueAccountBookDialogComponent
+        isHousingDue
+          ? CreateHousingDueAccountBookDialogComponent
           : CreateOtherPaymentAccountBookDialogComponent,
         {
           class: 'modal-lg',

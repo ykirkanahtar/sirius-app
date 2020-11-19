@@ -1,10 +1,11 @@
 ﻿using System;
 using Abp.AutoMapper;
+using Abp.Runtime.Validation;
 
 namespace Sirius.AccountBooks.Dto
 {
     [AutoMapTo(typeof(AccountBook))]
-    public class CreateAccountBookDto
+    public class CreateAccountBookDto : IShouldNormalize
     {
         public DateTime ProcessDateTime { get; set; }
         public Guid? HousingId { get; set; }
@@ -14,6 +15,10 @@ namespace Sirius.AccountBooks.Dto
         public string Description { get; set; }
         public DateTime? DocumentDateTime { get; set; }
         public string DocumentNumber { get; set; }
+        public void Normalize()
+        {
+            Amount = Math.Abs(Amount);
+        }
     }
 
     // [AutoMapTo(typeof(AccountBook))]

@@ -35,9 +35,9 @@ namespace Sirius.HousingPaymentPlans
             await _housingPaymentPlanRepository.UpdateAsync(housingPaymentPlan);
         }
 
-        public async Task DeleteAsync(HousingPaymentPlan housingPaymentPlan)
+        public async Task DeleteAsync(HousingPaymentPlan housingPaymentPlan, bool fromAccountBook = false)
         {
-            if (housingPaymentPlan.AccountBookId.HasValue)
+            if (!fromAccountBook && housingPaymentPlan.AccountBookId.HasValue)
             {
                 throw new UserFriendlyException("Bu kayıt işletme defterine girilen kayıt sonrası otomatik oluşmuştur. İşletme defterindeki kaydı siliniz.");
             }
@@ -46,11 +46,11 @@ namespace Sirius.HousingPaymentPlans
 
             if (housingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
             {
-                await _housingManager.DecreaseBalance(housing, housingPaymentPlan.Amount);
+                await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount));
             }
             else
             {
-                await _housingManager.IncreaseBalance(housing, housingPaymentPlan.Amount);
+                await _housingManager.IncreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount));
             }
 
             await _housingPaymentPlanRepository.DeleteAsync(housingPaymentPlan);

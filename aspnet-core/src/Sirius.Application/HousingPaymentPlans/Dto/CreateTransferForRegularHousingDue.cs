@@ -1,11 +1,12 @@
 using System;
 using Abp.AutoMapper;
+using Abp.Runtime.Validation;
 using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
     [AutoMapTo(typeof(HousingPaymentPlan))]
-    public class CreateTransferForHousingDueDto
+    public class CreateTransferForHousingDueDto : IShouldNormalize
     {
         public Guid HousingId { get; set; }
         public decimal Amount { get; set; }
@@ -14,5 +15,10 @@ namespace Sirius.HousingPaymentPlans.Dto
 
         public DateTime Date { get; set; }
         public string Description { get; set; }
+        
+        public void Normalize()
+        {
+            Amount = Math.Abs(Amount);
+        }
     }
 }
