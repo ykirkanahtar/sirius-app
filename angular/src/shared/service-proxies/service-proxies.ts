@@ -6680,7 +6680,7 @@ export class HousingPersonDto implements IHousingPersonDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: number;
+    id: string;
 
     constructor(data?: IHousingPersonDto) {
         if (data) {
@@ -6758,7 +6758,7 @@ export interface IHousingPersonDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: number;
+    id: string;
 }
 
 export class HousingDto implements IHousingDto {

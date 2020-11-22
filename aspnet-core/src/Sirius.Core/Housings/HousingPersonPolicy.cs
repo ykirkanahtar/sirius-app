@@ -8,9 +8,9 @@ namespace Sirius.Housings
 {
     public class HousingPersonPolicy : IHousingPersonPolicy
     {
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
 
-        public HousingPersonPolicy(IRepository<HousingPerson> housingPersonRepository)
+        public HousingPersonPolicy(IRepository<HousingPerson, Guid> housingPersonRepository)
         {
             _housingPersonRepository = housingPersonRepository;
         }

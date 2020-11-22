@@ -37,7 +37,7 @@ namespace Sirius.HousingPaymentPlans
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public HousingPaymentPlanGroupAppService(
@@ -48,7 +48,7 @@ namespace Sirius.HousingPaymentPlans
             IRepository<HousingCategory, Guid> housingCategoryRepository,
             IPaymentCategoryManager paymentCategoryManager, IRepository<Person, Guid> personRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
-            IRepository<HousingPerson> housingPersonRepository,
+            IRepository<HousingPerson, Guid> housingPersonRepository,
             IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
             : base(housingPaymentPlanGroupRepository)
         {

@@ -7,7 +7,7 @@ using Sirius.Shared.Enums;
 namespace Sirius.Housings.Dto
 {
     [AutoMapFrom(typeof(HousingPerson))]
-    public class HousingPersonDto : FullAuditedEntityDto
+    public class HousingPersonDto : FullAuditedEntityDto<Guid>
     {
         public Guid HousingId { get; set; }
         public Guid PersonId { get; set; }

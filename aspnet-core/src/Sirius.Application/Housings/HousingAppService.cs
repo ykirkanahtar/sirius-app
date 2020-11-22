@@ -34,7 +34,7 @@ namespace Sirius.Housings
         private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
         private readonly IPersonManager _personManager;
         private readonly IRepository<Person, Guid> _personRepository;
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IHousingPolicy _housingPolicy;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
@@ -42,7 +42,7 @@ namespace Sirius.Housings
 
         public HousingAppService(IHousingManager housingManager, IHousingRepository housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
-            IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository,
+            IRepository<Person, Guid> personRepository, IRepository<HousingPerson, Guid> housingPersonRepository,
             IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy,
             IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager)
             : base(housingRepository)

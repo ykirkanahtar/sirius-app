@@ -10,8 +10,8 @@ using Sirius.EntityFrameworkCore;
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    [Migration("20201119103056_AddEmployeeIdToPaymentAccountTable")]
-    partial class AddEmployeeIdToPaymentAccountTable
+    [Migration("20201122205051_AppInit")]
+    partial class AppInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1771,6 +1771,9 @@ namespace Sirius.Migrations
                     b.Property<Guid>("HousingId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("HousingPaymentPlanGroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1791,9 +1794,74 @@ namespace Sirius.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HousingPaymentPlanGroupId");
+
                     b.HasIndex("PaymentCategoryId");
 
                     b.ToTable("AppHousingPaymentPlans");
+                });
+
+            modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountPerMonth")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CountOfMonth")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("HousingCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HousingPaymentPlanGroupName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("PaymentCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PaymentDayOfMonth")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HousingCategoryId");
+
+                    b.HasIndex("PaymentCategoryId");
+
+                    b.ToTable("AppHousingPaymentPlanGroups");
                 });
 
             modelBuilder.Entity("Sirius.Housings.Block", b =>
@@ -1890,10 +1958,9 @@ namespace Sirius.Migrations
 
             modelBuilder.Entity("Sirius.Housings.HousingPerson", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Contact")
                         .HasColumnType("bit");
@@ -1904,11 +1971,26 @@ namespace Sirius.Migrations
                     b.Property<long?>("CreatorUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("HousingId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsTenant")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
@@ -2305,6 +2387,25 @@ namespace Sirius.Migrations
 
             modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlan", b =>
                 {
+                    b.HasOne("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", null)
+                        .WithMany("HousingPaymentPlans")
+                        .HasForeignKey("HousingPaymentPlanGroupId");
+
+                    b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
+                        .WithMany()
+                        .HasForeignKey("PaymentCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", b =>
+                {
+                    b.HasOne("Sirius.HousingCategories.HousingCategory", "HousingCategory")
+                        .WithMany()
+                        .HasForeignKey("HousingCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
                         .WithMany()
                         .HasForeignKey("PaymentCategoryId")

@@ -10,7 +10,7 @@ using Sirius.Shared.Enums;
 namespace Sirius.Housings
 {
     [Table("AppHousingPeople")]
-    public class HousingPerson : CreationAuditedEntity, IMustHaveTenant
+    public class HousingPerson : FullAuditedEntity<Guid>, IMustHaveTenant
     {
         protected HousingPerson()
         {

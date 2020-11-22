@@ -88,6 +88,7 @@ namespace Sirius.Migrations
                     Balance = table.Column<decimal>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     PersonId = table.Column<Guid>(nullable: true),
+                    EmployeeId = table.Column<Guid>(nullable: true),
                     Iban = table.Column<string>(nullable: true),
                     TenantIsOwner = table.Column<bool>(nullable: false)
                 },
@@ -177,7 +178,7 @@ namespace Sirius.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppHousingPaymentPlans",
+                name: "AppHousingPaymentPlanGroups",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -189,19 +190,26 @@ namespace Sirius.Migrations
                     DeleterUserId = table.Column<long>(nullable: true),
                     DeletionTime = table.Column<DateTime>(nullable: true),
                     TenantId = table.Column<int>(nullable: false),
-                    HousingId = table.Column<Guid>(nullable: false),
+                    HousingPaymentPlanGroupName = table.Column<string>(nullable: true),
+                    HousingCategoryId = table.Column<Guid>(nullable: false),
                     PaymentCategoryId = table.Column<Guid>(nullable: false),
-                    Date = table.Column<DateTime>(nullable: false),
-                    PaymentPlanType = table.Column<int>(nullable: false),
-                    Amount = table.Column<decimal>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    AccountBookId = table.Column<Guid>(nullable: true)
+                    AmountPerMonth = table.Column<decimal>(nullable: false),
+                    CountOfMonth = table.Column<int>(nullable: false),
+                    PaymentDayOfMonth = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AppHousingPaymentPlans", x => x.Id);
+                    table.PrimaryKey("PK_AppHousingPaymentPlanGroups", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AppHousingPaymentPlans_AppPaymentCategories_PaymentCategoryId",
+                        name: "FK_AppHousingPaymentPlanGroups_AppHousingCategories_HousingCategoryId",
+                        column: x => x.HousingCategoryId,
+                        principalTable: "AppHousingCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AppHousingPaymentPlanGroups_AppPaymentCategories_PaymentCategoryId",
                         column: x => x.PaymentCategoryId,
                         principalTable: "AppPaymentCategories",
                         principalColumn: "Id",
@@ -264,10 +272,14 @@ namespace Sirius.Migrations
                 name: "AppHousingPeople",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(nullable: false),
                     CreationTime = table.Column<DateTime>(nullable: false),
                     CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeleterUserId = table.Column<long>(nullable: true),
+                    DeletionTime = table.Column<DateTime>(nullable: true),
                     TenantId = table.Column<int>(nullable: false),
                     HousingId = table.Column<Guid>(nullable: false),
                     PersonId = table.Column<Guid>(nullable: false),
@@ -291,6 +303,45 @@ namespace Sirius.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AppHousingPaymentPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeleterUserId = table.Column<long>(nullable: true),
+                    DeletionTime = table.Column<DateTime>(nullable: true),
+                    TenantId = table.Column<int>(nullable: false),
+                    HousingPaymentPlanGroupId = table.Column<Guid>(nullable: true),
+                    HousingId = table.Column<Guid>(nullable: false),
+                    PaymentCategoryId = table.Column<Guid>(nullable: false),
+                    Date = table.Column<DateTime>(nullable: false),
+                    PaymentPlanType = table.Column<int>(nullable: false),
+                    Amount = table.Column<decimal>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    AccountBookId = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppHousingPaymentPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AppHousingPaymentPlans_AppHousingPaymentPlanGroups_HousingPaymentPlanGroupId",
+                        column: x => x.HousingPaymentPlanGroupId,
+                        principalTable: "AppHousingPaymentPlanGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AppHousingPaymentPlans_AppPaymentCategories_PaymentCategoryId",
+                        column: x => x.PaymentCategoryId,
+                        principalTable: "AppPaymentCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AppAccountBooks_FromPaymentAccountId",
                 table: "AppAccountBooks",
@@ -310,6 +361,21 @@ namespace Sirius.Migrations
                 name: "IX_AppAccountBooks_ToPaymentAccountId",
                 table: "AppAccountBooks",
                 column: "ToPaymentAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppHousingPaymentPlanGroups_HousingCategoryId",
+                table: "AppHousingPaymentPlanGroups",
+                column: "HousingCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppHousingPaymentPlanGroups_PaymentCategoryId",
+                table: "AppHousingPaymentPlanGroups",
+                column: "PaymentCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppHousingPaymentPlans_HousingPaymentPlanGroupId",
+                table: "AppHousingPaymentPlans",
+                column: "HousingPaymentPlanGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppHousingPaymentPlans_PaymentCategoryId",
@@ -355,13 +421,16 @@ namespace Sirius.Migrations
                 name: "AppPaymentAccounts");
 
             migrationBuilder.DropTable(
-                name: "AppPaymentCategories");
+                name: "AppHousingPaymentPlanGroups");
 
             migrationBuilder.DropTable(
                 name: "AppHousings");
 
             migrationBuilder.DropTable(
                 name: "AppPeople");
+
+            migrationBuilder.DropTable(
+                name: "AppPaymentCategories");
 
             migrationBuilder.DropTable(
                 name: "AppBlocks");

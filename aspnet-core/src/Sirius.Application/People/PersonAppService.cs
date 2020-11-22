@@ -22,11 +22,11 @@ namespace Sirius.People
     {
         private readonly IPersonManager _personManager;
         private readonly IRepository<Person, Guid> _personRepository;
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
 
         public PersonAppService(IPersonManager personManager, IRepository<Person, Guid> personRepository,
-            IRepository<HousingPerson> housingPersonRepository, IRepository<Housing, Guid> housingRepository)
+            IRepository<HousingPerson, Guid> housingPersonRepository, IRepository<Housing, Guid> housingRepository)
             : base(personRepository)
         {
             _personManager = personManager;

@@ -1956,10 +1956,9 @@ namespace Sirius.Migrations
 
             modelBuilder.Entity("Sirius.Housings.HousingPerson", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Contact")
                         .HasColumnType("bit");
@@ -1970,11 +1969,26 @@ namespace Sirius.Migrations
                     b.Property<long?>("CreatorUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("HousingId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsTenant")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uniqueidentifier");
@@ -2371,8 +2385,8 @@ namespace Sirius.Migrations
 
             modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlan", b =>
                 {
-                    b.HasOne("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", "HousingPaymentPlanGroup")
-                        .WithMany()
+                    b.HasOne("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", null)
+                        .WithMany("HousingPaymentPlans")
                         .HasForeignKey("HousingPaymentPlanGroupId");
 
                     b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")

@@ -16,12 +16,12 @@ namespace Sirius.Housings
     public class HousingManager : IHousingManager
     {
         private readonly IRepository<Housing, Guid> _housingRepository;
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IHousingPersonPolicy _housingPersonPolicy;
 
-        public HousingManager(IRepository<Housing, Guid> housingRepository, IRepository<HousingPerson> housingPersonRepository, IHousingPersonPolicy housingPersonPolicy, IRepository<AccountBook, Guid> accountBookRepository, IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
+        public HousingManager(IRepository<Housing, Guid> housingRepository, IRepository<HousingPerson, Guid> housingPersonRepository, IHousingPersonPolicy housingPersonPolicy, IRepository<AccountBook, Guid> accountBookRepository, IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
         {
             _housingRepository = housingRepository;
             _housingPersonRepository = housingPersonRepository;

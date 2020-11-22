@@ -13,10 +13,10 @@ namespace Sirius.People
     {
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
-        private readonly IRepository<HousingPerson> _housingPersonRepository;
+        private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
 
-        public PersonManager(IRepository<Person, Guid> personRepository, IRepository<HousingPerson> housingPersonRepository, IRepository<Housing, Guid> housingRepository, IRepository<PaymentAccount, Guid> paymentAccountRepository)
+        public PersonManager(IRepository<Person, Guid> personRepository, IRepository<HousingPerson, Guid> housingPersonRepository, IRepository<Housing, Guid> housingRepository, IRepository<PaymentAccount, Guid> paymentAccountRepository)
         {
             _personRepository = personRepository;
             _housingPersonRepository = housingPersonRepository;
