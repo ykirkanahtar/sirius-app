@@ -94,10 +94,10 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_EditHousingCategory),
                 new Permission(PermissionNames.Pages_DeleteHousingCategory),
 
-                new Permission(PermissionNames.Pages_HousingPaymentPlans),
-                new Permission(PermissionNames.Pages_CreateHousingPaymentPlan),
-                new Permission(PermissionNames.Pages_EditHousingPaymentPlan),
-                new Permission(PermissionNames.Pages_DeleteHousingPaymentPlan),
+                new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
+                new Permission(PermissionNames.Pages_CreateHousingPaymentPlanGroup),
+                new Permission(PermissionNames.Pages_EditHousingPaymentPlanGroup),
+                new Permission(PermissionNames.Pages_DeleteHousingPaymentPlanGroup),
 
                 new Permission(PermissionNames.Pages_Housings),
                 new Permission(PermissionNames.Pages_CreateHousing),
@@ -161,10 +161,10 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_EditHousingCategory),
                 new Permission(PermissionNames.Pages_DeleteHousingCategory),
 
-                new Permission(PermissionNames.Pages_HousingPaymentPlans),
-                new Permission(PermissionNames.Pages_CreateHousingPaymentPlan),
-                new Permission(PermissionNames.Pages_EditHousingPaymentPlan),
-                new Permission(PermissionNames.Pages_DeleteHousingPaymentPlan),
+                new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
+                new Permission(PermissionNames.Pages_CreateHousingPaymentPlanGroup),
+                new Permission(PermissionNames.Pages_EditHousingPaymentPlanGroup),
+                new Permission(PermissionNames.Pages_DeleteHousingPaymentPlanGroup),
 
                 new Permission(PermissionNames.Pages_Housings),
                 new Permission(PermissionNames.Pages_CreateHousing),
@@ -210,7 +210,7 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_Employees),
                 new Permission(PermissionNames.Pages_People),
                 new Permission(PermissionNames.Pages_PaymentCategories),
-                new Permission(PermissionNames.Pages_HousingPaymentPlans),
+                new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
                 new Permission(PermissionNames.Pages_FinancialOperations),
             };
 

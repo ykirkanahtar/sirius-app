@@ -20,7 +20,7 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_People, L("PeopleMenu"));
             context.CreatePermission(PermissionNames.Pages_PaymentCategories, L("PaymentCategoriesMenu"));
             context.CreatePermission(PermissionNames.Pages_HousingCategories, L("HousingCategoriesMenu"));
-            context.CreatePermission(PermissionNames.Pages_HousingPaymentPlans, L("HousingPaymentPlansMenu"));
+            context.CreatePermission(PermissionNames.Pages_HousingPaymentPlanGroups, L("HousingPaymentPlanGroupsMenu"));
             context.CreatePermission(PermissionNames.Pages_Administration, L("AdministrationMenu"));
             context.CreatePermission(PermissionNames.Pages_Definitions, L("DefinitionsMenu"));
             context.CreatePermission(PermissionNames.Pages_FinancialOperations, L("FinancialOperationsMenu"));
@@ -41,9 +41,9 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_EditHousingCategory, L("EditHousingCategory"));
             context.CreatePermission(PermissionNames.Pages_DeleteHousingCategory, L("DeleteHousingCategory"));
             
-            context.CreatePermission(PermissionNames.Pages_CreateHousingPaymentPlan, L("CreateHousingPaymentPlan"));
-            context.CreatePermission(PermissionNames.Pages_EditHousingPaymentPlan, L("EditHousingPaymentPlan"));
-            context.CreatePermission(PermissionNames.Pages_DeleteHousingPaymentPlan, L("DeleteHousingPaymentPlan"));
+            context.CreatePermission(PermissionNames.Pages_CreateHousingPaymentPlanGroup, L("CreateHousingPaymentPlan"));
+            context.CreatePermission(PermissionNames.Pages_EditHousingPaymentPlanGroup, L("EditHousingPaymentPlan"));
+            context.CreatePermission(PermissionNames.Pages_DeleteHousingPaymentPlanGroup, L("DeleteHousingPaymentPlan"));
             
             context.CreatePermission(PermissionNames.Pages_CreateHousing, L("CreateHousing"));
             context.CreatePermission(PermissionNames.Pages_EditHousing, L("EditHousing"));

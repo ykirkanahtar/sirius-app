@@ -58,16 +58,16 @@ export class PermissionHelper {
         return this._permissionCheckerService.isGranted('Pages.DeleteHousingCategory');
     }
 
-    createHousingPaymentPlan(): boolean {
-        return this._permissionCheckerService.isGranted('Pages.CreateHousingPaymentPlan');
+    createHousingPaymentPlanGroup(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.CreateHousingPaymentPlanGroup');
     }
 
-    editHousingPaymentPlan(): boolean {
-        return this._permissionCheckerService.isGranted('Pages.EditHousingPaymentPlan');
+    editHousingPaymentPlanGroup(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.EditHousingPaymentPlanGroup');
     }
 
-    deleteHousingPaymentPlan(): boolean {
-        return this._permissionCheckerService.isGranted('Pages.DeleteHousingPaymentPlan');
+    deleteHousingPaymentPlanGroup(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.DeleteHousingPaymentPlanGroup');
     }
 
     createHousing(): boolean {

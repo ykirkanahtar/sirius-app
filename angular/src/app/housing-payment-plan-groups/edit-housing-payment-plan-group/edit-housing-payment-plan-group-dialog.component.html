@@ -1,0 +1,48 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #editHousingPaymentPlanGroupForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'EditHousingPaymentPlanGroup' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "HousingPaymentPlanGroupName" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="housingPaymentPlanGroupName"
+              id="housingPaymentPlanGroupName"
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="housingPaymentPlanGroup.housingPaymentPlanGroupName"
+              #housingPaymentPlanGroupNameModel="ngModel"
+              #housingPaymentPlanGroupNameEl
+            />
+            <abp-validation-summary
+              [control]="housingPaymentPlanGroupNameModel"
+              [controlEl]="housingPaymentPlanGroupNameEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="
+      !editHousingPaymentPlanGroupForm.form.valid ||
+      saving ||
+      !this.permissionHelper.editHousingPaymentPlanGroup()
+    "
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>

@@ -39,7 +39,7 @@ import { SidebarLogoComponent } from './layout/sidebar-logo.component';
 import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
 import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 
-//custom-components
+// custom-components
 import { CreateHousingDialogComponent } from './housings/create-housing/create-housing-dialog.component';
 import { EditHousingDialogComponent } from './housings/edit-housing/edit-housing-dialog.component';
 import { AddPersonDialogComponent } from './housings/add-or-edit-person/add-person-dialog.component';
@@ -75,7 +75,9 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
 import { EditHousingCategoryDialogComponent } from './housing-categories/edit-housing-category/edit-housing-category-dialog.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
-import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/create-housing-payment-plan/create-housing-payment-plan.component';
+import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
+import { CreateHousingPaymentPlanGroupDialogComponent } from './housing-payment-plan-groups/create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component';
+import { EditHousingPaymentPlanGroupDialogComponent } from './housing-payment-plan-groups/edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { trLocale } from 'ngx-bootstrap/locale';
 
@@ -136,7 +138,9 @@ import { trLocale } from 'ngx-bootstrap/locale';
     CreateHousingCategoryDialogComponent,
     EditHousingCategoryDialogComponent,
     HousingCategoriesComponent,
-    CreateHousingPaymentPlanComponent,
+    HousingPaymentPlanGroupsComponent,
+    CreateHousingPaymentPlanGroupDialogComponent,
+    EditHousingPaymentPlanGroupDialogComponent,
     CreateOtherPaymentAccountBookDialogComponent
   ],
   imports: [

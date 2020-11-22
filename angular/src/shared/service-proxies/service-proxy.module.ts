@@ -18,6 +18,7 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.EmployeeServiceProxy,
         ApiServiceProxies.PersonServiceProxy,
         ApiServiceProxies.HousingPaymentPlanServiceProxy,
+        ApiServiceProxies.HousingPaymentPlanGroupServiceProxy,
         ApiServiceProxies.AccountBookServiceProxy,
         ApiServiceProxies.PaymentAccountServiceProxy,
         ApiServiceProxies.PaymentCategoryServiceProxy,

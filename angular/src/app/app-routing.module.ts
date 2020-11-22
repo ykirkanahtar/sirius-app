@@ -16,7 +16,7 @@ import { AccountBooksComponent } from './account-books/account-books.component';
 import { PaymentAccountsComponent } from './payment-accounts/payment-accounts.component';
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
-import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/create-housing-payment-plan/create-housing-payment-plan.component';
+import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
 @NgModule({
   imports: [
     RouterModule.forChild([
@@ -78,9 +78,9 @@ import { CreateHousingPaymentPlanComponent } from './housing-payment-plans/creat
             canActivate: [AppRouteGuard],
           },
           {
-            path: 'create-housing-payment-plans',
-            component: CreateHousingPaymentPlanComponent,
-            data: { permission: 'Pages.HousingPaymentPlans' },
+            path: 'housing-payment-plan-groups',
+            component: HousingPaymentPlanGroupsComponent,
+            data: { permission: 'Pages.HousingPaymentPlanGroups' },
             canActivate: [AppRouteGuard],
           },
           {

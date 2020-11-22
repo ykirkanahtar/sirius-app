@@ -29,10 +29,10 @@
         public const string Pages_EditHousingCategory = "Pages.EditHousingCategory";
         public const string Pages_DeleteHousingCategory = "Pages.DeleteHousingCategory";
         
-        public const string Pages_HousingPaymentPlans = "Pages.HousingPaymentPlans";
-        public const string Pages_CreateHousingPaymentPlan = "Pages.CreateHousingPaymentPlan";
-        public const string Pages_EditHousingPaymentPlan = "Pages.EditHousingPaymentPlan";
-        public const string Pages_DeleteHousingPaymentPlan = "Pages.DeleteHousingPaymentPlan";
+        public const string Pages_HousingPaymentPlanGroups = "Pages.HousingPaymentPlanGroups";
+        public const string Pages_CreateHousingPaymentPlanGroup = "Pages.CreateHousingPaymentPlanGroup";
+        public const string Pages_EditHousingPaymentPlanGroup = "Pages.EditHousingPaymentPlanGroup";
+        public const string Pages_DeleteHousingPaymentPlanGroup = "Pages.DeleteHousingPaymentPlanGroup";
         
         public const string Pages_Housings = "Pages.Housings";
         public const string Pages_CreateHousing = "Pages.CreateHousing";

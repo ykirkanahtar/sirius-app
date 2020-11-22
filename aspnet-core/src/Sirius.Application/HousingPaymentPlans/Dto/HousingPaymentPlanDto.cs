@@ -19,5 +19,8 @@ namespace Sirius.HousingPaymentPlans.Dto
         public Guid? AccountBookId { get; set; }
 
         public virtual PaymentCategoryDto PaymentCategory { get; set; }
+        
+        //Burayı açınca Angular tarafında circular dependency oluşuyor
+        // public virtual HousingPaymentPlanGroupDto HousingPaymentPlanGroup { get; set; }
     }
 }

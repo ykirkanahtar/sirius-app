@@ -117,7 +117,7 @@
     <text name="AdvanceAccount">Avans Hesabı</text>
     <text name="AdvancedFilters">Detaylı Arama</text>
     <text name="Amount">Tutar</text>
-    <text name="AmountPerMonth">Tutar / Ay</text>
+    <text name="AmountPerMonth">Tutar/Ay</text>
     <text name="Apartment">Daire</text>
     <text name="Balance">Bakiye</text>
     <text name="BankAccount">Banka Hesabı</text>
@@ -139,7 +139,7 @@
     <text name="CreateBlock">Blok / Apt. oluştur</text>
     <text name="CreateEmployee">Çalışan oluştur</text>
     <text name="CreateHousingCategory">Konut grubu oluştur</text>
-    <text name="CreateHousingPaymentPlan">Aidat ödeme planı oluştur</text>
+    <text name="CreateHousingPaymentPlanGroup">Aidat ödeme planı oluştur</text>
     <text name="CreateHousing">Konut oluştur</text>
     <text name="CreatePaymentAccount">Ödeme hesabı oluştur</text>
     <text name="CreatePaymentCategory">Ödeme türü oluştur</text>
@@ -150,7 +150,7 @@
     <text name="CreateNewEmployee">Çalışan ekle</text>
     <text name="CreateNewHousing">Konut ekle</text>
     <text name="CreateNewHousingCategory">Konut Grubu Oluştur</text>
-    <text name="CreateNewHousingPaymentPlan">Aidat Ödeme Planı Girişi</text>
+    <text name="CreateNewHousingPaymentPlanGroup">Aidat Ödeme Planı Girişi</text>
     <text name="CreateNewHousingDueAccountBook">Aidat ödemesi ekle</text>
     <text name="CreateNewPaymentCategory">Ödeme Kategorisi Ekle</text>
     <text name="CreateNewPerson">Kişi ekle</text>
@@ -163,7 +163,7 @@
     <text name="DeleteBlock">Blok / Apt. sil</text>
     <text name="DeleteEmployee">Çalışan sil</text>
     <text name="DeleteHousingCategory">Konut grubu sil</text>
-    <text name="DeleteHousingPaymentPlan">Aidat ödeme planı sil</text>
+    <text name="DeleteHousingPaymentPlanGroup">Aidat ödeme planı sil</text>
     <text name="DeleteHousing">Konut sil</text>
     <text name="DeletePaymentAccount">Ödeme hesabı sil</text>
     <text name="DeletePaymentCategory">Ödeme türü sil</text>
@@ -179,7 +179,7 @@
     <text name="EditCashAccount">Nakit hesabı düzenle</text>
     <text name="EditEmployee">Çalışan düzenle</text>
     <text name="EditHousingCategory">Konut grubu düzenle</text>
-    <text name="EditHousingPaymentPlan">Aidat ödeme planı düzenle</text>
+    <text name="EditHousingPaymentPlanGroup">Aidat ödeme planı düzenle</text>
     <text name="EditHousing">Konut düzenle</text>
     <text name="EditPaymentAccount">Ödeme hesabı düzenle</text>
     <text name="EditPaymentCategory">Ödeme türü düzenle</text>
@@ -201,12 +201,16 @@
     <text name="HousingCategory">Konut grubu</text>
     <text name="HousingCategoryDeleteWarningMessage">Konut Grubunu silmek istediğinize emin misiniz?</text>
     <text name="HousingCategoryName">Konut Grup Adı</text>
+    <text name="HousingCategoryNameShort">Konut Grup</text>
     <text name="HousingDeleteWarningMessage">Konutu silmek istediğinize emin misiniz?</text>
     <text name="HousingDue">Aidat ödemesi</text>
     <text name="HousingOwner">Ev Sahibi</text>
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
-    <text name="HousingPaymentPlans">Aidat Ödeme Planları</text>
-    <text name="HousingPaymentPlansMenu">Aidat Ödeme Planları (Menü)</text>
+    <text name="HousingPaymentPlanGroupDeleteWarningMessage">Aidat ödeme planı tanımını kaldırmak istediğinize emin misiniz?</text>
+    <text name="HousingPaymentPlanGroupName">Aidat Ödeme Planı adı</text>
+    <text name="HousingPaymentPlanGroupNameShort">Ödeme Planı</text>
+    <text name="HousingPaymentPlanGroupsMenu">Aidat Ödeme Planları (Menü)</text>
+    <text name="HousingPaymentPlanGroups">Aidat Ödeme Planları</text>
     <text name="HousingPersonDeleteWarningMessage">Kişi tanımını kaldırmak istediğinize emin misiniz?</text>
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
@@ -228,6 +232,7 @@
     <text name="PaymentCategory">Ödeme türü</text>
     <text name="PaymentCategoryDeleteWarningMessage">Ödeme türünü silmek istediğinize emin misiniz?</text>
     <text name="PaymentCategoryName">Kategori Adı</text>
+    <text name="PaymentCategoryNameShort">Kategori</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
     <text name="PaymentPlanType">Borç / Alacak</text>
     <text name="People">Kişiler</text>
@@ -246,6 +251,7 @@
     <text name="SelectDate">Tarih Seçiniz</text>
     <text name="SiteManagement">Site Yönetimi</text>
     <text name="StartDate">Başlangıç Tarihi</text>
+    <text name="StartDateShort">Baş. Tarihi</text>
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>

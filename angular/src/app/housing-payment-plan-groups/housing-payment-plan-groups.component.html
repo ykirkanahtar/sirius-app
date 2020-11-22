@@ -1,0 +1,260 @@
+<div [@routerTransition]>
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-6">
+          <h1>{{ "HousingPaymentPlanGroups" | localize }}</h1>
+        </div>
+        <div
+          class="col-6 text-right"
+          *ngIf="this.permissionHelper.createHousingPaymentPlanGroup()"
+        >
+          <a href="javascript:;" class="btn bg-blue" (click)="createHousingPaymentPlanGroup()">
+            <i class="fa fa-plus-square"></i>
+            {{ "Create" | localize }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="content px-2">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header">
+          <div class="input-group">
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="advancedFiltersVisible = !advancedFiltersVisible"
+              >
+                {{ "AdvancedFilters" | localize }}
+                <i
+                  class="fas"
+                  [class.fa-angle-up]="advancedFiltersVisible"
+                  [class.fa-angle-down]="!advancedFiltersVisible"
+                ></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+            <div class="card-body">
+              <form class="form-horizontal">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "HousingCategory" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="housingCategoriesFilter"
+                        [options]="housingCategoriesFilter"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedHousingCategoriesFilter"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('HousingCategory')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-housingCategory pTemplate="item">
+                          <div class="housingCategory-item">
+                            <div>{{ housingCategory.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "Housing" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="housingsFilters"
+                        [options]="housingsFilters"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedHousingsFilters"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('Housing')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-housing pTemplate="item">
+                          <div class="housing-item">
+                            <div>{{ housing.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "Person" | localize }}
+                      </label>
+                      <p-multiSelect
+                        name="peopleFilters"
+                        [options]="peopleFilters"
+                        [showToggleAll]="false"
+                        [(ngModel)]="selectedPeopleFilters"
+                        [virtualScroll]="true"
+                        [filter]="true"
+                        [itemSize]="34"
+                        [defaultLabel]="l('Person')"
+                        class="multiselect-custom-virtual-scroll"
+                        [style]="{ minWidth: '100%' }"
+                      >
+                        <ng-template let-person pTemplate="item">
+                          <div class="person-item">
+                            <div>{{ person.label }}</div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="getDataPage(1)"
+              >
+                {{ "Search" | localize }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-default float-right"
+                (click)="clearFilters()"
+              >
+                {{ "Clear" | localize }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body table-responsive p-0">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="housingPaymentPlanGroups"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="housingPaymentPlanGroupName">
+                  {{ "HousingPaymentPlanGroupNameShort" | localize }}
+                  <p-sortIcon field="housingPaymentPlanGroupName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="housingCategory.housingCategoryName">
+                  {{ "HousingCategoryNameShort" | localize }}
+                  <p-sortIcon field="housingCategory.housingCategoryName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="paymentCategory.paymentCategoryName">
+                  {{ "PaymentCategoryNameShort" | localize }}
+                  <p-sortIcon
+                    field="paymentCategory.paymentCategoryName"
+                  ></p-sortIcon>
+                </th>
+                <th pSortableColumn="amountPerMonth">
+                  {{ "AmountPerMonth" | localize }}
+                  <p-sortIcon field="amountPerMonth"></p-sortIcon>
+                </th>
+                <th pSortableColumn="countOfMonth">
+                  {{ "CountOfMonth" | localize }}
+                  <p-sortIcon field="countOfMonth"></p-sortIcon>
+                </th>
+                <th pSortableColumn="paymentDayOfMonth">
+                  {{ "PaymentDayOfMonth" | localize }}
+                  <p-sortIcon field="paymentDayOfMonth"></p-sortIcon>
+                </th>
+                <th pSortableColumn="startDate">
+                  {{ "StartDateShort" | localize }}
+                  <p-sortIcon field="startDate"></p-sortIcon>
+                </th>
+                <th style="width: 350px">{{ "Actions" | localize }}</th>
+              </tr>
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-housingPaymentPlanGroup
+              [ngForOf]="
+                housingPaymentPlanGroups
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
+                <td>{{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}</td>
+                <td>{{ housingPaymentPlanGroup.housingCategory.housingCategoryName }}</td>
+                <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName }}</td>
+                <td>{{ housingPaymentPlanGroup.amountPerMonth | number: "1.2-2" }}</td>
+                <td>{{ housingPaymentPlanGroup.countOfMonth | number }}</td>
+                <td>{{ housingPaymentPlanGroup.paymentDayOfMonth | number }}</td>
+                <td>{{ housingPaymentPlanGroup.startDate.format("DD-MM-YYYY") }}</td>
+                <td>
+                  <button
+                    type="button"
+                    *ngIf="this.permissionHelper.editHousingPaymentPlanGroup()"
+                    class="btn btn-sm bg-secondary mx-2"
+                    (click)="editHousingPaymentPlanGroup(housingPaymentPlanGroup)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    {{ "Edit" | localize }}
+                  </button>
+                  <button
+                    type="button"
+                    *ngIf="this.permissionHelper.deleteHousingPaymentPlanGroup()"
+                    class="btn btn-sm bg-danger mx-2"
+                    (click)="delete(housingPaymentPlanGroup)"
+                  >
+                    <i class="fas fa-trash"></i>
+                    {{ "Delete" | localize }}
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="card-footer bg-light border-top">
+          <div class="row">
+            <div class="col-sm-4 col-12 text-sm-left text-center">
+              <button class="btn btn-secondary" (click)="refresh()">
+                <i class="fas fa-redo-alt"></i>
+              </button>
+            </div>
+            <div class="col-sm-4 col-12 text-center">
+              <p class="mb-0 my-2">
+                {{ "TotalRecordsCount" | localize: totalItems }}
+              </p>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="float-sm-right m-auto">
+                <abp-pagination-controls
+                  id="server"
+                  (pageChange)="getDataPage($event)"
+                >
+                </abp-pagination-controls>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

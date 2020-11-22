@@ -86,6 +86,7 @@ namespace Sirius.Housings
                     ? HousingPaymentPlan.CreateDebt(
                         SequentialGuidGenerator.Instance.Create()
                         , AbpSession.GetTenantId()
+                        , null
                         , housing
                         , paymentCategory
                         , input.CreateTransferForHousingDue.Date

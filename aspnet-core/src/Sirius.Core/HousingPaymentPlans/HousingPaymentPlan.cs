@@ -18,6 +18,7 @@ namespace Sirius.HousingPaymentPlans
         }
 
         public virtual int TenantId { get; set; }
+        public Guid? HousingPaymentPlanGroupId { get; private set; }
         public Guid HousingId { get; private set; }
 
         public Guid PaymentCategoryId { get; private set; }
@@ -28,20 +29,23 @@ namespace Sirius.HousingPaymentPlans
         public Guid? AccountBookId { get; private set; }
 
         [ForeignKey(nameof(PaymentCategoryId))]
-        public virtual PaymentCategory PaymentCategory { get; set; }
+        public virtual PaymentCategory PaymentCategory { get; protected set; }
+        
 
-        public static HousingPaymentPlan CreateDebt(Guid id, int tenantId, Housing housing,
+        public static HousingPaymentPlan CreateDebt(Guid id, int tenantId,
+            [CanBeNull] HousingPaymentPlanGroup housingPaymentPlanGroup, Housing housing,
             PaymentCategory paymentCategory, DateTime date, decimal amount, string description) //tanımlanacak aidatlar
         {
-            return BindEntity(new HousingPaymentPlan(), id, tenantId, PaymentPlanType.Debt, housing.Id,
-                paymentCategory.Id, date, amount, description, null);
+            return BindEntity(new HousingPaymentPlan(), id, tenantId, housingPaymentPlanGroup?.Id,
+                PaymentPlanType.Debt, housing.Id, paymentCategory.Id, date, amount, description, null);
         }
 
-        public static HousingPaymentPlan CreateCredit(Guid id, int tenantId, Housing housing,
-            PaymentCategory paymentCategory, DateTime date, decimal amount, string description,
+        public static HousingPaymentPlan CreateCredit(Guid id, int tenantId,
+            Housing housing, PaymentCategory paymentCategory, DateTime date, decimal amount, string description,
             [CanBeNull] AccountBook accountBook) //tahsil edilen aidatlar
         {
-            return BindEntity(new HousingPaymentPlan(), id, tenantId, PaymentPlanType.Credit, housing.Id,
+            return BindEntity(new HousingPaymentPlan(), id, tenantId, null,
+                PaymentPlanType.Credit, housing.Id,
                 paymentCategory.Id, date, amount, description, accountBook?.Id);
         }
 
@@ -49,19 +53,21 @@ namespace Sirius.HousingPaymentPlans
             decimal amount, string description)
         {
             return BindEntity(existingHousingPaymentPlan, existingHousingPaymentPlan.Id,
-                existingHousingPaymentPlan.TenantId, existingHousingPaymentPlan.PaymentPlanType,
-                existingHousingPaymentPlan.HousingId, existingHousingPaymentPlan.PaymentCategoryId, date, amount,
+                existingHousingPaymentPlan.TenantId, existingHousingPaymentPlan.HousingPaymentPlanGroupId,
+                existingHousingPaymentPlan.PaymentPlanType, existingHousingPaymentPlan.HousingId,
+                existingHousingPaymentPlan.PaymentCategoryId, date, amount,
                 description, null);
         }
 
         private static HousingPaymentPlan BindEntity(HousingPaymentPlan housingPaymentPlan, Guid id, int tenantId,
-            PaymentPlanType paymentPlanType, Guid housingId, Guid paymentCategoryId, DateTime date, decimal amount,
-            string description, Guid? accountBookId)
+            Guid? housingPaymentPlanGroupId, PaymentPlanType paymentPlanType, Guid housingId, Guid paymentCategoryId,
+            DateTime date, decimal amount, string description, Guid? accountBookId)
         {
             housingPaymentPlan ??= new HousingPaymentPlan();
 
             housingPaymentPlan.Id = id;
             housingPaymentPlan.TenantId = tenantId;
+            housingPaymentPlan.HousingPaymentPlanGroupId = housingPaymentPlanGroupId;
             housingPaymentPlan.HousingId = housingId;
             housingPaymentPlan.PaymentCategoryId = paymentCategoryId;
             housingPaymentPlan.PaymentPlanType = paymentPlanType;

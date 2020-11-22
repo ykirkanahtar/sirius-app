@@ -19,6 +19,7 @@ namespace Sirius.EntityFrameworkCore
         /* Define a DbSet for each entity of the application */
         public virtual DbSet<AccountBook> AccountBooks { get; set; }
         public virtual DbSet<HousingPaymentPlan> HousingPaymentPlans { get; set; }
+        public virtual DbSet<HousingPaymentPlanGroup> HousingPaymentPlanGroups { get; set; }
         public virtual DbSet<PaymentAccount> PaymentAccounts { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Housing> Housings { get; set; }

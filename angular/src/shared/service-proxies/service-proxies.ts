@@ -2480,58 +2480,6 @@ export class HousingPaymentPlanServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createDebtPaymentForHousingCategory(body: CreateDebtHousingPaymentPlanForHousingCategoryDto | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateDebtPaymentForHousingCategory";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateDebtPaymentForHousingCategory(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateDebtPaymentForHousingCategory(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreateDebtPaymentForHousingCategory(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
     createCreditPayment(body: CreateCreditHousingPaymentPlanDto | undefined): Observable<HousingPaymentPlanDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateCreditPayment";
         url_ = url_.replace(/[?&]$/, "");
@@ -2996,6 +2944,311 @@ export class HousingPaymentPlanServiceProxy {
             }));
         }
         return _observableOf<HousingPaymentPlanDtoPagedResultDto>(<any>null);
+    }
+}
+
+@Injectable()
+export class HousingPaymentPlanGroupServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreateHousingPaymentPlanGroupDto | undefined): Observable<HousingPaymentPlanGroupDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<HousingPaymentPlanGroupDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingPaymentPlanGroupDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingPaymentPlanGroupDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: UpdateHousingPaymentPlanGroupDto | undefined): Observable<HousingPaymentPlanGroupDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<HousingPaymentPlanGroupDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingPaymentPlanGroupDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingPaymentPlanGroupDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @param housingIds (optional) 
+     * @param housingCategoryIds (optional) 
+     * @param personIds (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(housingIds: string[] | null | undefined, housingCategoryIds: string[] | null | undefined, personIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanGroupDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/GetAll?";
+        if (housingIds !== undefined)
+            housingIds && housingIds.forEach(item => { url_ += "HousingIds=" + encodeURIComponent("" + item) + "&"; });
+        if (housingCategoryIds !== undefined)
+            housingCategoryIds && housingCategoryIds.forEach(item => { url_ += "HousingCategoryIds=" + encodeURIComponent("" + item) + "&"; });
+        if (personIds !== undefined)
+            personIds && personIds.forEach(item => { url_ += "PersonIds=" + encodeURIComponent("" + item) + "&"; });
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingPaymentPlanGroupDtoPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingPaymentPlanGroupDtoPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<HousingPaymentPlanGroupDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingPaymentPlanGroupDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingPaymentPlanGroupDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<HousingPaymentPlanGroupDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<HousingPaymentPlanGroupDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<HousingPaymentPlanGroupDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = HousingPaymentPlanGroupDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<HousingPaymentPlanGroupDto>(<any>null);
     }
 }
 
@@ -8101,69 +8354,6 @@ export interface IHousingCategoryDtoPagedResultDto {
     items: HousingCategoryDto[] | undefined;
 }
 
-export class CreateDebtHousingPaymentPlanForHousingCategoryDto implements ICreateDebtHousingPaymentPlanForHousingCategoryDto {
-    housingCategoryId: string;
-    amountPerMonth: number;
-    countOfMonth: number;
-    paymentDayOfMonth: number;
-    startDate: moment.Moment;
-    description: string | undefined;
-
-    constructor(data?: ICreateDebtHousingPaymentPlanForHousingCategoryDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.housingCategoryId = _data["housingCategoryId"];
-            this.amountPerMonth = _data["amountPerMonth"];
-            this.countOfMonth = _data["countOfMonth"];
-            this.paymentDayOfMonth = _data["paymentDayOfMonth"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.description = _data["description"];
-        }
-    }
-
-    static fromJS(data: any): CreateDebtHousingPaymentPlanForHousingCategoryDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateDebtHousingPaymentPlanForHousingCategoryDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["housingCategoryId"] = this.housingCategoryId;
-        data["amountPerMonth"] = this.amountPerMonth;
-        data["countOfMonth"] = this.countOfMonth;
-        data["paymentDayOfMonth"] = this.paymentDayOfMonth;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["description"] = this.description;
-        return data; 
-    }
-
-    clone(): CreateDebtHousingPaymentPlanForHousingCategoryDto {
-        const json = this.toJSON();
-        let result = new CreateDebtHousingPaymentPlanForHousingCategoryDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateDebtHousingPaymentPlanForHousingCategoryDto {
-    housingCategoryId: string;
-    amountPerMonth: number;
-    countOfMonth: number;
-    paymentDayOfMonth: number;
-    startDate: moment.Moment;
-    description: string | undefined;
-}
-
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {
     housingId: string;
     readonly paymentCategoryId: string;
@@ -8530,6 +8720,326 @@ export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanD
 export interface IHousingPaymentPlanDtoPagedResultDto {
     totalCount: number;
     items: HousingPaymentPlanDto[] | undefined;
+}
+
+export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    housingCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
+
+    constructor(data?: ICreateHousingPaymentPlanGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
+            this.housingCategoryId = _data["housingCategoryId"];
+            this.amountPerMonth = _data["amountPerMonth"];
+            this.countOfMonth = _data["countOfMonth"];
+            this.paymentDayOfMonth = _data["paymentDayOfMonth"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateHousingPaymentPlanGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateHousingPaymentPlanGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
+        data["housingCategoryId"] = this.housingCategoryId;
+        data["amountPerMonth"] = this.amountPerMonth;
+        data["countOfMonth"] = this.countOfMonth;
+        data["paymentDayOfMonth"] = this.paymentDayOfMonth;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        return data; 
+    }
+
+    clone(): CreateHousingPaymentPlanGroupDto {
+        const json = this.toJSON();
+        let result = new CreateHousingPaymentPlanGroupDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    housingCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
+}
+
+export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    housingCategoryId: string;
+    paymentCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
+    housingCategory: HousingCategoryDto;
+    paymentCategory: PaymentCategoryDto;
+    housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IHousingPaymentPlanGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
+            this.housingCategoryId = _data["housingCategoryId"];
+            this.paymentCategoryId = _data["paymentCategoryId"];
+            this.amountPerMonth = _data["amountPerMonth"];
+            this.countOfMonth = _data["countOfMonth"];
+            this.paymentDayOfMonth = _data["paymentDayOfMonth"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.description = _data["description"];
+            this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
+            this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
+            if (Array.isArray(_data["housingPaymentPlans"])) {
+                this.housingPaymentPlans = [] as any;
+                for (let item of _data["housingPaymentPlans"])
+                    this.housingPaymentPlans.push(HousingPaymentPlanDto.fromJS(item));
+            }
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
+        data["housingCategoryId"] = this.housingCategoryId;
+        data["paymentCategoryId"] = this.paymentCategoryId;
+        data["amountPerMonth"] = this.amountPerMonth;
+        data["countOfMonth"] = this.countOfMonth;
+        data["paymentDayOfMonth"] = this.paymentDayOfMonth;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
+        data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
+        if (Array.isArray(this.housingPaymentPlans)) {
+            data["housingPaymentPlans"] = [];
+            for (let item of this.housingPaymentPlans)
+                data["housingPaymentPlans"].push(item.toJSON());
+        }
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanGroupDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanGroupDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    housingCategoryId: string;
+    paymentCategoryId: string;
+    amountPerMonth: number;
+    countOfMonth: number;
+    paymentDayOfMonth: number;
+    startDate: moment.Moment;
+    description: string | undefined;
+    housingCategory: HousingCategoryDto;
+    paymentCategory: PaymentCategoryDto;
+    housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class UpdateHousingPaymentPlanGroupDto implements IUpdateHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IUpdateHousingPaymentPlanGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateHousingPaymentPlanGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateHousingPaymentPlanGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): UpdateHousingPaymentPlanGroupDto {
+        const json = this.toJSON();
+        let result = new UpdateHousingPaymentPlanGroupDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateHousingPaymentPlanGroupDto {
+    housingPaymentPlanGroupName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class HousingPaymentPlanGroupDtoPagedResultDto implements IHousingPaymentPlanGroupDtoPagedResultDto {
+    totalCount: number;
+    items: HousingPaymentPlanGroupDto[] | undefined;
+
+    constructor(data?: IHousingPaymentPlanGroupDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(HousingPaymentPlanGroupDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanGroupDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanGroupDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanGroupDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanGroupDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanGroupDtoPagedResultDto {
+    totalCount: number;
+    items: HousingPaymentPlanGroupDto[] | undefined;
 }
 
 export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccountDto {

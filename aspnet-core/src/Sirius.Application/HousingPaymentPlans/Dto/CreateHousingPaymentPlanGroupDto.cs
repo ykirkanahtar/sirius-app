@@ -5,8 +5,9 @@ using Abp.Runtime.Validation;
 namespace Sirius.HousingPaymentPlans.Dto
 {
     [AutoMapTo(typeof(HousingPaymentPlan))]
-    public class CreateDebtHousingPaymentPlanForHousingCategoryDto : IShouldNormalize
+    public class CreateHousingPaymentPlanGroupDto : IShouldNormalize
     {
+        public string HousingPaymentPlanGroupName { get; set; }
         public Guid HousingCategoryId { get; set; }
         public decimal AmountPerMonth { get; set; }
         public int CountOfMonth { get; set; }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201120065511_AddHousingPaymentPlanGroupTable")]
+    partial class AddHousingPaymentPlanGroupTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1855,10 +1857,6 @@ namespace Sirius.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HousingCategoryId");
-
-                    b.HasIndex("PaymentCategoryId");
-
                     b.ToTable("AppHousingPaymentPlanGroups");
                 });
 
@@ -2374,21 +2372,6 @@ namespace Sirius.Migrations
                     b.HasOne("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", "HousingPaymentPlanGroup")
                         .WithMany()
                         .HasForeignKey("HousingPaymentPlanGroupId");
-
-                    b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
-                        .WithMany()
-                        .HasForeignKey("PaymentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", b =>
-                {
-                    b.HasOne("Sirius.HousingCategories.HousingCategory", "HousingCategory")
-                        .WithMany()
-                        .HasForeignKey("HousingCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
                         .WithMany()
