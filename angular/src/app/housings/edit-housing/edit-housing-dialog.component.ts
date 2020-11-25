@@ -21,6 +21,7 @@ export class EditHousingDialogComponent extends AppComponentBase
   housing = new HousingDto();
   housingCategories: LookUpDto[];
   blocks: LookUpDto[];
+  oldTenantIsResidingValue = false;
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -45,6 +46,7 @@ export class EditHousingDialogComponent extends AppComponentBase
       .get(this.id)
       .subscribe((result: HousingDto) => {
         this.housing = result;
+        this.oldTenantIsResidingValue = this.housing.tenantIsResiding;
       });
 
     this._blockService

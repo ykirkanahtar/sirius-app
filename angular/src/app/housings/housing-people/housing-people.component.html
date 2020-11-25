@@ -56,6 +56,10 @@
                       {{ "LastName" | localize }}
                       <p-sortIcon field="LastName"></p-sortIcon>
                     </th>
+                    <th pSortableColumn="IsTenant">
+                      {{ "IsTenant" | localize }}
+                      <p-sortIcon field="IsTenant"></p-sortIcon>
+                    </th>                    
                     <th pSortableColumn="Phone1">
                       {{ "Phone1" | localize }}
                       <p-sortIcon field="Phone1"></p-sortIcon>
@@ -85,6 +89,7 @@
                   <tr>
                     <td>{{ housingPerson.person.firstName }}</td>
                     <td>{{ housingPerson.person.lastName }}</td>
+                    <td>{{ housingPerson.isTenant.toString() | localize }}</td>
                     <td>{{ housingPerson.person.phone1 }}</td>
                     <td>{{ housingPerson.person.phone2 }}</td>
                     <td>
