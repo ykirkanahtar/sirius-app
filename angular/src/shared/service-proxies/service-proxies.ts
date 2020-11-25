@@ -6766,6 +6766,7 @@ export class HousingDto implements IHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    tenantIsResiding: boolean;
     block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
@@ -6793,6 +6794,7 @@ export class HousingDto implements IHousingDto {
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
             this.balance = _data["balance"];
+            this.tenantIsResiding = _data["tenantIsResiding"];
             this.block = _data["block"] ? Block.fromJS(_data["block"]) : <any>undefined;
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.housingPerson = _data["housingPerson"] ? HousingPersonDto.fromJS(_data["housingPerson"]) : <any>undefined;
@@ -6820,6 +6822,7 @@ export class HousingDto implements IHousingDto {
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         data["balance"] = this.balance;
+        data["tenantIsResiding"] = this.tenantIsResiding;
         data["block"] = this.block ? this.block.toJSON() : <any>undefined;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["housingPerson"] = this.housingPerson ? this.housingPerson.toJSON() : <any>undefined;
@@ -6847,6 +6850,7 @@ export interface IHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    tenantIsResiding: boolean;
     block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
@@ -7938,6 +7942,7 @@ export class CreateHousingDto implements ICreateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    tenantIsResiding: boolean;
     createTransferForHousingDue: CreateTransferForHousingDueDto;
 
     constructor(data?: ICreateHousingDto) {
@@ -7954,6 +7959,7 @@ export class CreateHousingDto implements ICreateHousingDto {
             this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
+            this.tenantIsResiding = _data["tenantIsResiding"];
             this.createTransferForHousingDue = _data["createTransferForHousingDue"] ? CreateTransferForHousingDueDto.fromJS(_data["createTransferForHousingDue"]) : <any>undefined;
         }
     }
@@ -7970,6 +7976,7 @@ export class CreateHousingDto implements ICreateHousingDto {
         data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
+        data["tenantIsResiding"] = this.tenantIsResiding;
         data["createTransferForHousingDue"] = this.createTransferForHousingDue ? this.createTransferForHousingDue.toJSON() : <any>undefined;
         return data; 
     }
@@ -7986,6 +7993,7 @@ export interface ICreateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    tenantIsResiding: boolean;
     createTransferForHousingDue: CreateTransferForHousingDueDto;
 }
 
@@ -7994,6 +8002,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    tenantIsResiding: boolean;
 
     constructor(data?: IUpdateHousingDto) {
         if (data) {
@@ -8010,6 +8019,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
             this.blockId = _data["blockId"];
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
+            this.tenantIsResiding = _data["tenantIsResiding"];
         }
     }
 
@@ -8026,6 +8036,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
         data["blockId"] = this.blockId;
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
+        data["tenantIsResiding"] = this.tenantIsResiding;
         return data; 
     }
 
@@ -8042,6 +8053,7 @@ export interface IUpdateHousingDto {
     blockId: string;
     apartment: string | undefined;
     housingCategoryId: string;
+    tenantIsResiding: boolean;
 }
 
 export class HousingDtoPagedResultDto implements IHousingDtoPagedResultDto {

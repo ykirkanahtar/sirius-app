@@ -189,6 +189,7 @@
     <text name="Employees">Çalışanlar</text>
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
     <text name="EndDate">Bitiş Tarihi</text>
+    <text name="false">Hayır</text>
     <text name="FinancialOperations">Finansal İşlemler</text>
     <text name="FinancialOperationsMenu">Finansal İşlemler (Menü)</text>
     <text name="FirstName">Ad</text>
@@ -254,12 +255,15 @@
     <text name="StartDateShort">Baş. Tarihi</text>
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
+    <text name="TenantIsResiding">Kiracı oturuyor</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
     <text name="TransferBalance">Devir bakiyesi</text>
     <text name="TransferDate">Devir tarihi</text>
     <text name="TransferFromThePreviousPeriod">Devir</text>
     <text name="TransferToAdvanceAccount">Avana hesaba transfer</text>
+    <text name="true">Evet</text>
+    <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>
     <text name="WorkerWarmingFee">Görevli ısınma ödemesi</text>
   </texts>

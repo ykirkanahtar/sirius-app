@@ -51,6 +51,31 @@
             ></abp-validation-summary>
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">
+            {{ "TenantIsResiding" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="tenantIsResiding"
+                id="tenantIsResiding"
+                [(ngModel)]="housing.tenantIsResiding"
+              />
+              <label
+                class="custom-control-label mt-2"
+                for="tenantIsResiding"
+              ></label>
+            </div>
+          </div>
+        </div>   
+        <div class="form-group row mt-0" *ngIf="this.oldTenantIsResidingValue && !this.housing.tenantIsResiding">
+          <label class="col-md-12 col-form-label text-danger">
+            {{ "UncheckTenantIsResidingText" | localize }}
+          </label>
+        </div>         
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="apartment">
             {{ "HousingCategory" | localize }}

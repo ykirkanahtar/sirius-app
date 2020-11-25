@@ -29,6 +29,8 @@ namespace Sirius.Housings
         public Guid HousingCategoryId { get; private set; }
 
         [DefaultValue(0)] public decimal Balance { get; private set; }
+        
+        public bool TenantIsResiding { get; private set; }
 
         [ForeignKey(nameof(HousingCategoryId))]
         public virtual HousingCategory HousingCategory { get; set; }
@@ -44,23 +46,23 @@ namespace Sirius.Housings
         }
 
         public static async Task<Housing> CreateAsync(IHousingPolicy housingPolicy, Guid id, int tenantId, Block block, string apartment,
-            HousingCategory housingCategory)
+            HousingCategory housingCategory, bool tenantIsResiding)
         {
-            return await BindEntityAsync(housingPolicy, false, new Housing(), id, tenantId, block, apartment, housingCategory);
+            return await BindEntityAsync(housingPolicy, false, new Housing(), id, tenantId, block, apartment, housingCategory, tenantIsResiding);
         }
 
         public static async Task<Housing> UpdateAsync(IHousingPolicy housingPolicy, Housing existingHousing, Block block,
             string apartment,
-            HousingCategory housingCategory)
+            HousingCategory housingCategory, bool tenantIsResiding)
         {
             return await BindEntityAsync(housingPolicy, true, existingHousing, existingHousing.Id, existingHousing.TenantId, block,
                 apartment,
-                housingCategory);
+                housingCategory, tenantIsResiding);
         }
 
         private static async Task<Housing> BindEntityAsync(IHousingPolicy housingPolicy, bool isUpdate, Housing housing, Guid id,
             int tenantId, Block block, string apartment,
-            HousingCategory housingCategory)
+            HousingCategory housingCategory, bool tenantIsResiding)
         {
             housing ??= new Housing();
 
@@ -68,6 +70,7 @@ namespace Sirius.Housings
             housing.TenantId = tenantId;
             housing.BlockId = block.Id;
             housing.Apartment = apartment;
+            housing.TenantIsResiding = tenantIsResiding;
             housing.HousingCategoryId = housingCategory.Id;
             housing.HousingPeople = new Collection<HousingPerson>();
 

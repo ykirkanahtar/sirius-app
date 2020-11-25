@@ -67,7 +67,7 @@ namespace Sirius.Housings
 
             var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(),
-                block, input.Apartment, housingCategory);
+                block, input.Apartment, housingCategory, input.TenantIsResiding);
 
             if (input.CreateTransferForHousingDue.Amount != 0)
             {
@@ -114,12 +114,25 @@ namespace Sirius.Housings
         {
             CheckUpdatePermission();
             var existingHousing = await _housingManager.GetAsync(input.Id);
+            var oldTenantIsResidingValue = existingHousing.TenantIsResiding;
+            
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var block = await _blockRepository.GetAsync(input.BlockId);
 
             var housing = await Housing.UpdateAsync(_housingPolicy, existingHousing, block, input.Apartment,
-                housingCategory);
+                housingCategory, input.TenantIsResiding);
             await _housingManager.UpdateAsync(housing);
+
+            //Eğer kiralık seçeneği kaldırılırsa, kiracı olarak işaretlenen kişiler de siliniyor
+            if (oldTenantIsResidingValue && housing.TenantIsResiding == false)
+            {
+                var tenantPeople =
+                    await _housingPersonRepository.GetAllListAsync(p =>
+                        p.HousingId == existingHousing.Id && p.IsTenant);
+
+                tenantPeople.ForEach(async x => await _housingPersonRepository.DeleteAsync(x.Id));
+            }
+
             return ObjectMapper.Map<HousingDto>(housing);
         }
 
@@ -176,7 +189,7 @@ namespace Sirius.Housings
             var housingPerson = await _housingManager.AddPersonAsync(housing, person, input.IsTenant, input.Contact);
             return ObjectMapper.Map<HousingPersonDto>(housingPerson);
         }
-        
+
         public async Task RemovePersonAsync(RemoveHousingPersonDto input)
         {
             CheckUpdatePermission();
@@ -208,28 +221,22 @@ namespace Sirius.Housings
             return people.Select(p => new LookUpDto(p.Id.ToString(), $"{p.FirstName} {p.LastName}")).ToList();
         }
 
-        public async Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input)
+        public async Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(
+            PagedHousingPersonResultRequestDto input)
         {
-            try
-            {
-                CheckGetAllPermission();
-                await _housingRepository.GetAsync(input.HousingId);
-                var query = _housingPersonRepository.GetAll().Include(p => p.Person)
-                    .Where(p => p.HousingId == input.HousingId);
+            CheckGetAllPermission();
+            await _housingRepository.GetAsync(input.HousingId);
+            var query = _housingPersonRepository.GetAll().Include(p => p.Person)
+                .Where(p => p.HousingId == input.HousingId);
 
-                var housingPeople = await query
-                    .OrderBy(input.Sorting ?? $"{nameof(Person)}.{nameof(PersonDto.FirstName)} ASC, {nameof(Person)}.{nameof(PersonDto.LastName)}")
-                    .PageBy(input)
-                    .ToListAsync();
+            var housingPeople = await query
+                .OrderBy(input.Sorting ??
+                         $"{nameof(Person)}.{nameof(PersonDto.FirstName)} ASC, {nameof(Person)}.{nameof(PersonDto.LastName)}")
+                .PageBy(input)
+                .ToListAsync();
 
-                return new PagedResultDto<HousingPersonDto>(query.Count(),
-                    ObjectMapper.Map<List<HousingPersonDto>>(housingPeople));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return new PagedResultDto<HousingPersonDto>(query.Count(),
+                ObjectMapper.Map<List<HousingPersonDto>>(housingPeople));
         }
     }
 }

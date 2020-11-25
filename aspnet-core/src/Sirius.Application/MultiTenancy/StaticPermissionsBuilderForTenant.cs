@@ -101,7 +101,7 @@ namespace Sirius.MultiTenancy
 
                 new Permission(PermissionNames.Pages_Housings),
                 new Permission(PermissionNames.Pages_CreateHousing),
-                new Permission(PermissionNames.Pages_CreateHousing),
+                new Permission(PermissionNames.Pages_EditHousing),
                 new Permission(PermissionNames.Pages_DeleteHousing),
                 new Permission(PermissionNames.Pages_AddPersonToHousing),
 
@@ -168,7 +168,7 @@ namespace Sirius.MultiTenancy
 
                 new Permission(PermissionNames.Pages_Housings),
                 new Permission(PermissionNames.Pages_CreateHousing),
-                new Permission(PermissionNames.Pages_CreateHousing),
+                new Permission(PermissionNames.Pages_EditHousing),
                 new Permission(PermissionNames.Pages_DeleteHousing),
                 new Permission(PermissionNames.Pages_AddPersonToHousing),
 
