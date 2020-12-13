@@ -7,10 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
-using Abp.Extensions;
 using Abp.UI;
-using JetBrains.Annotations;
-using Sirius.HousingCategories;
 
 namespace Sirius.Housings
 {
@@ -43,6 +40,11 @@ namespace Sirius.Housings
         public string GetName()
         {
             return $"{Block.BlockName} - {Apartment}";
+        }
+        
+        public string GetName(Block block)
+        {
+            return $"{block.BlockName} - {Apartment}";
         }
 
         public static async Task<Housing> CreateAsync(IHousingPolicy housingPolicy, Guid id, int tenantId, Block block, string apartment,

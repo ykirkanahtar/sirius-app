@@ -20,14 +20,4 @@ namespace Sirius.AccountBooks.Dto
             Amount = Math.Abs(Amount);
         }
     }
-
-    // [AutoMapTo(typeof(AccountBook))]
-    // public class CreateAccountBookDto
-    // {
-    //     public DateTime ProcessDateTime { get; set; }
-    //     public Guid FromPaymentAccountId { get; set; }
-    //     public Guid ToPaymentAccountId { get; set; }
-    //     public decimal Amount { get; set; }
-    //     public string Description { get; set; }
-    // }
 }

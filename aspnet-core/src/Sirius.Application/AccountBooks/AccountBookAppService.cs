@@ -12,10 +12,14 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
+using Sirius.AppPaymentAccounts;
+using Sirius.EntityFrameworkCore.Repositories;
+using Sirius.FileServices;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
+using Sirius.Shared.Constants;
 
 namespace Sirius.AccountBooks
 {
@@ -25,16 +29,29 @@ namespace Sirius.AccountBooks
     {
         private readonly IAccountBookManager _accountBookManager;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
+        private readonly IHousingRepository _housingRepository;
+        private readonly IRepository<Block, Guid> _blockRepository;
+        private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IHousingManager _housingManager;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
+        private readonly IBlobService _blobService;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
-            IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager,
-            IUnitOfWorkManager unitOfWorkManager, IHousingManager housingManager,
-            IPaymentAccountManager paymentAccountManager, IHousingPaymentPlanManager housingPaymentPlanManager)
+            IRepository<AccountBook, Guid> accountBookRepository,
+            IPaymentCategoryManager paymentCategoryManager,
+            IUnitOfWorkManager unitOfWorkManager,
+            IHousingManager housingManager,
+            IPaymentAccountManager paymentAccountManager,
+            IHousingPaymentPlanManager housingPaymentPlanManager,
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository,
+            IHousingRepository housingRepository,
+            IRepository<Block, Guid> blockRepository,
+            IRepository<PaymentAccount, Guid> paymentAccountRepository, 
+            IBlobService blobService)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -44,6 +61,11 @@ namespace Sirius.AccountBooks
             _housingManager = housingManager;
             _paymentAccountManager = paymentAccountManager;
             _housingPaymentPlanManager = housingPaymentPlanManager;
+            _paymentCategoryRepository = paymentCategoryRepository;
+            _housingRepository = housingRepository;
+            _blockRepository = blockRepository;
+            _paymentAccountRepository = paymentAccountRepository;
+            _blobService = blobService;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -58,15 +80,34 @@ namespace Sirius.AccountBooks
             var housing = await _housingManager.GetAsync(input.HousingId);
             var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId);
 
+            var accountBookGuid = SequentialGuidGenerator.Instance.Create();
+            
+            var accountBookFiles = new List<AccountBookFile>();
+            foreach (var accountBookFileUrl in input.AccountBookFileUrls)
+            {
+                var newFileUrl = await _blobService.MoveBetweenContainersAsync(accountBookFileUrl, AppConstants.TempContainerName,
+                    AppConstants.AccountBookContainerName);
+                
+                var entity = AccountBookFile.Create(
+                    SequentialGuidGenerator.Instance.Create()
+                    , AbpSession.GetTenantId()
+                    , newFileUrl
+                    ,accountBookGuid
+                );
+                accountBookFiles.Add(entity);
+            }
+            
             var accountBook = AccountBook.CreateHousingDue(
-                SequentialGuidGenerator.Instance.Create()
+                accountBookGuid
                 , AbpSession.GetTenantId()
                 , input.ProcessDateTime
                 , housingDuePaymentCategory.Id
                 , input.HousingId
                 , input.ToPaymentAccountId
                 , input.Amount
-                , input.Description);
+                , input.Description
+                , accountBookFiles
+                , AbpSession.GetUserId());
 
             await _accountBookManager.CreateAsync(accountBook);
             await _housingManager.DecreaseBalance(housing, input.Amount);
@@ -90,8 +131,22 @@ namespace Sirius.AccountBooks
             CheckCreatePermission();
             await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
 
+            var accountBookGuid = SequentialGuidGenerator.Instance.Create();
+            
+            var accountBookFiles = new List<AccountBookFile>();
+            foreach (var accountBookFileUrl in input.AccountBookFileUrls)
+            {
+                var entity = AccountBookFile.Create(
+                    SequentialGuidGenerator.Instance.Create()
+                    , AbpSession.GetTenantId()
+                    , accountBookFileUrl
+                    ,accountBookGuid
+                );
+                accountBookFiles.Add(entity);
+            }
+            
             var accountBook = AccountBook.Create(
-                SequentialGuidGenerator.Instance.Create()
+                accountBookGuid
                 , AbpSession.GetTenantId()
                 , input.ProcessDateTime
                 , input.PaymentCategoryId
@@ -101,7 +156,9 @@ namespace Sirius.AccountBooks
                 , input.Amount
                 , input.Description
                 , input.DocumentDateTime
-                , input.DocumentNumber);
+                , input.DocumentNumber
+                , accountBookFiles
+                , AbpSession.GetUserId());
 
             await _accountBookManager.CreateAsync(accountBook);
 
@@ -124,12 +181,44 @@ namespace Sirius.AccountBooks
         {
             CheckUpdatePermission();
             var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
+
+            var currentAccountBookFileUrls = existingAccountBook.AccountBookFiles.Select(p => p.FileUrl);
+            var inputAccountBookFileUrls = input.AccountBookFiles;
+
+            var newAccountBookFileUrls = inputAccountBookFileUrls
+                .Where(accountBookFileUrl => !currentAccountBookFileUrls.Contains(accountBookFileUrl)).ToList();
+            
+            var accountBookFiles = new List<AccountBookFile>();
+            foreach (var newAccountBookFileUrl in newAccountBookFileUrls)
+            {
+                var entity = AccountBookFile.Create(
+                    SequentialGuidGenerator.Instance.Create()
+                    , AbpSession.GetTenantId()
+                    , newAccountBookFileUrl
+                    , existingAccountBook.Id
+                );
+                accountBookFiles.Add(entity);
+            }
+            
+            var existingAccountBookFileUrls = inputAccountBookFileUrls
+                .Where(accountBookFileUrl => currentAccountBookFileUrls.Contains(accountBookFileUrl)).ToList();
+            foreach (var existingAccountBookFileUrl in existingAccountBookFileUrls)
+            {
+                var existingAccountBookFile =
+                    await _accountBookManager.GetAccountBookFileByUrlAsync(existingAccountBookFileUrl);
+                
+                accountBookFiles.Add(existingAccountBookFile);
+            }
+            
+            // var deletingAccountBookFiles = existingAccountBookFileUrls
+            //     .Where(existingAccountBookFileUrl => !inputAccountBookFileUrls.Contains(existingAccountBookFileUrl)).ToList();
+
             var accountBook = AccountBook.Update(existingAccountBook, input.Description, input.DocumentDateTime,
-                input.DocumentNumber);
+                input.DocumentNumber, accountBookFiles, AbpSession.GetUserId());
             await _accountBookManager.UpdateAsync(accountBook);
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
-        
+
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
             CheckDeletePermission();
@@ -137,202 +226,79 @@ namespace Sirius.AccountBooks
             await _accountBookManager.DeleteAsync(accountBook);
         }
 
-        public override async Task<PagedResultDto<AccountBookDto>> GetAllAsync(PagedAccountBookResultRequestDto input)
+        public async Task<PagedResultDto<AccountBookGetAllOutput>> GetAllListAsync(PagedAccountBookResultRequestDto input)
         {
-            CheckGetAllPermission();
-            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
-
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            try
             {
-                var query = _accountBookRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId)
-                    .Include(p => p.PaymentCategory).Include(p => p.Housing).ThenInclude(p => p.Block)
-                    .Include(p => p.FromPaymentAccount)
-                    .Include(p => p.ToPaymentAccount)
-                    .WhereIf(input.StartDate.HasValue, p => p.ProcessDateTime > input.StartDate.Value)
-                    .WhereIf(input.EndDate.HasValue, p => p.ProcessDateTime < input.EndDate.Value)
-                    .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.HousingId ?? Guid.Empty))
-                    .WhereIf(input.PaymentCategoryIds.Count > 0,
-                        p => input.PaymentCategoryIds.Contains(p.PaymentCategoryId))
-                    .WhereIf(housingIdsFromPersonFilter.Count > 0,
-                        p => housingIdsFromPersonFilter.Select(s => s.Id).Contains(p.HousingId ?? Guid.Empty))
-                    .WhereIf(input.FromPaymentAccountIds.Count > 0,
-                        p => input.FromPaymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty))
-                    .WhereIf(input.ToPaymentAccountIds.Count > 0,
-                        p => input.ToPaymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty));
+                CheckGetAllPermission();
+                var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
 
-                var accountBooks = await query.OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.CreationTime)} DESC")
-                    .PageBy(input)
-                    .ToListAsync();
+                using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+                {
+                    var query = (from accountBook in _accountBookRepository.GetAll()
+                                .Where(p => p.TenantId == AbpSession.TenantId)
+                            join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
+                                equals paymentCategory.Id
+                            join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
+                                housing
+                            from subHousing in housing.DefaultIfEmpty()
+                            join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
+                            from subBlock in block.DefaultIfEmpty()
+                            join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                                .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
+                            from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
+                            join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                                    .ToPaymentAccountId
+                                equals toPaymentAccount.Id into toPaymentAccount
+                            from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
+                            select new
+                            {
+                                accountBook,
+                                paymentCategory,
+                                subHousing,
+                                subBlock,
+                                subFromPaymentAccount,
+                                subToPaymentAccount
+                            })
+                        .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
+                        .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
+                        .WhereIf(input.HousingIds.Count > 0,
+                            p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
+                        .WhereIf(input.PaymentCategoryIds.Count > 0,
+                            p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId))
+                        .WhereIf(housingIdsFromPersonFilter.Count > 0,
+                            p => housingIdsFromPersonFilter.Select(s => s.Id)
+                                .Contains(p.accountBook.HousingId ?? Guid.Empty))
+                        .WhereIf(input.FromPaymentAccountIds.Count > 0,
+                            p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
+                        .WhereIf(input.ToPaymentAccountIds.Count > 0,
+                            p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
+                        .Select(p => new AccountBookGetAllOutput
+                        {
+                            ProcessDateTime = p.accountBook.ProcessDateTime,
+                            PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
+                            HousingName = p.subHousing != null ? p.subBlock.BlockName + "-" + p.subHousing.Apartment : string.Empty,
+                            Amount = p.accountBook.Amount,
+                            FromPaymentAccountName = p.subFromPaymentAccount != null ? p.subFromPaymentAccount.AccountName : string.Empty,
+                            ToPaymentAccountName = p.subToPaymentAccount != null ? p.subToPaymentAccount.AccountName : string.Empty,
+                            FromPaymentAccountBalance = p.subFromPaymentAccount != null ? (decimal?)p.subFromPaymentAccount.Balance : null,
+                            ToPaymentAccountBalance = p.subToPaymentAccount != null ? (decimal?)p.subToPaymentAccount.Balance : null,
+                            AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
+                        });
 
-                return new PagedResultDto<AccountBookDto>(accountBooks.Count,
-                    ObjectMapper.Map<List<AccountBookDto>>(accountBooks));
+                    var accountBooks = await query
+                        .OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.ProcessDateTime)} DESC")
+                        .PageBy(input)
+                        .ToListAsync();
+
+                    return new PagedResultDto<AccountBookGetAllOutput>(await query.CountAsync(), accountBooks);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
-
-        // public async Task<AccountBookDto> CreateBankingAndInsuranceTransactionTaxAsync(CreateBankTransferOrEftOrBankTaxFeeAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateBankingAndIssuranceTransactionTax(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateBankTransferFeeAsync(CreateBankTransferOrEftOrBankTaxFeeAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateBankTransferFee(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateBillPaymentAsync(CreateBillPaymentAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateBillPayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description
-        //         , input.DocumentDateTime
-        //         , input.DocumentNumber);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateBonusPaymentAsync(CreateAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateBonusPayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateEftFeeAsync(CreateBankTransferOrEftOrBankTaxFeeAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateEftFee(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateOtherPayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.HousingId
-        //         , input.FromPaymentAccountId
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description
-        //         , input.DocumentDateTime
-        //         , input.DocumentNumber
-        //         );
-        //
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateRefundHousingDueAsync(CreateRefundHousingDueAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateRefundHousingDue(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.HousingId
-        //         , input.FromPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateSalaryPaymentAsync(CreateAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateSalaryPayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateTransferFromThePreviousPeriodAsync(CreateTransferFromPreviousPeriodAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateTransferFromPreviousPeriod(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateTransferToAdvanceAccountAsync(CreateAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateTransferToAdvanceAccountPayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
-        //
-        // public async Task<AccountBookDto> CreateWorkerWarmingFeeAsync(CreateAccountBookDto input)
-        // {
-        //     var accountBook = AccountBook.CreateWorkerWarmingFeePayment(
-        //         SequentialGuidGenerator.Instance.Create()
-        //         , AbpSession.GetTenantId()
-        //         , input.ProcessDateTime
-        //         , input.FromPaymentAccountId
-        //         , input.ToPaymentAccountId
-        //         , input.Amount
-        //         , input.Description);
-        //     
-        //     await _accountBookManager.CreateAsync(accountBook);
-        //     return ObjectMapper.Map<AccountBookDto>(accountBook);
-        // }
     }
 }

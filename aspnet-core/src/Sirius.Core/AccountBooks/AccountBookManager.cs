@@ -19,19 +19,22 @@ namespace Sirius.AccountBooks
     public class AccountBookManager : IAccountBookManager
     {
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly IRepository<AccountBookFile, Guid> _accountBookFileRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IPaymentAccountManager _paymentAccountManager;
-        
+
         public AccountBookManager(IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
-            IHousingPaymentPlanManager housingPaymentPlanManager, 
-            IPaymentAccountManager paymentAccountManager)
+            IHousingPaymentPlanManager housingPaymentPlanManager,
+            IPaymentAccountManager paymentAccountManager,
+            IRepository<AccountBookFile, Guid> accountBookFileRepository)
         {
             _accountBookRepository = accountBookRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _paymentAccountManager = paymentAccountManager;
+            _accountBookFileRepository = accountBookFileRepository;
         }
 
         public async Task CreateAsync(AccountBook accountBook)
@@ -53,7 +56,7 @@ namespace Sirius.AccountBooks
             {
                 await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan, true);
             }
-            
+
             if (accountBook.FromPaymentAccountId.HasValue)
             {
                 var fromPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value);
@@ -65,7 +68,7 @@ namespace Sirius.AccountBooks
                 var toPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value);
                 await _paymentAccountManager.DecreaseBalance(toPaymentAccount, Math.Abs(accountBook.Amount));
             }
-            
+
             await _accountBookRepository.DeleteAsync(accountBook);
         }
 
@@ -78,6 +81,18 @@ namespace Sirius.AccountBooks
             }
 
             return accountBook;
+        }
+
+        public async Task<AccountBookFile> GetAccountBookFileByUrlAsync(string url)
+        {
+            var accountBookFile = await _accountBookFileRepository.GetAll().Where(p => p.FileUrl == url)
+                .SingleOrDefaultAsync();
+            if (accountBookFile == null)
+            {
+                throw new UserFriendlyException("İşletme defteri görseli bulunamadı");
+            }
+
+            return accountBookFile;
         }
     }
 }

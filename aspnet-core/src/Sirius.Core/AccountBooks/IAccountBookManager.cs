@@ -10,5 +10,6 @@ namespace Sirius.AccountBooks
         Task UpdateAsync(AccountBook accountBook);
         Task DeleteAsync(AccountBook accountBook);
         Task<AccountBook> GetAsync(Guid id);
+        Task<AccountBookFile> GetAccountBookFileByUrlAsync(string url);
     }
 }

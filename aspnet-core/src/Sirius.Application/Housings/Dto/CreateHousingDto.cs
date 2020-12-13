@@ -1,6 +1,5 @@
 ﻿using System;
 using Abp.AutoMapper;
-using Sirius.HousingCategories;
 using Sirius.HousingPaymentPlans.Dto;
 
 namespace Sirius.Housings.Dto

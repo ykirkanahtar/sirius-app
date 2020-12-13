@@ -1,6 +1,6 @@
 ﻿using Abp.AutoMapper;
 
-namespace Sirius.HousingCategories.Dto
+namespace Sirius.Housings.Dto
 {
     [AutoMapTo(typeof(HousingCategory))]
 

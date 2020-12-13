@@ -11,12 +11,9 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.Timing;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AccountBooks;
-using Sirius.HousingCategories;
 using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
-using Sirius.Shared.Enums;
 using System.Linq.Dynamic.Core;
 using Sirius.People;
 

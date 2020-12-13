@@ -1,6 +1,6 @@
 using Abp.Application.Services.Dto;
 
-namespace Sirius.HousingCategories.Dto
+namespace Sirius.Housings.Dto
 {
     public class PagedHousingCategoryResultRequestDto : PagedAndSortedResultRequestDto
     {

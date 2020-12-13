@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
-using Sirius.HousingCategories.Dto;
+using Sirius.Housings.Dto;
 using Sirius.PaymentCategories.Dto;
 
 namespace Sirius.HousingPaymentPlans.Dto

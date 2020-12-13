@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Abp.Domain.Services;
 
-namespace Sirius.HousingCategories
+namespace Sirius.Housings
 {
     public interface IHousingCategoryManager : IDomainService
     {

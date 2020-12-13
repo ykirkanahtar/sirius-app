@@ -133,6 +133,7 @@
     <text name="BonusPayment">İkramiye ödemesi</text>
     <text name="Cash">Nakit</text>
     <text name="CashAccount">Nakit Hesabı</text>
+    <text name="ChooseFile">Dosya seçiniz</text>
     <text name="ContactText">İletişim</text>
     <text name="CountOfMonth">Ay Sayısı</text>
     <text name="CreateAccountBook">İşletme Defteri oluştur</text>
@@ -190,6 +191,7 @@
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
     <text name="EndDate">Bitiş Tarihi</text>
     <text name="false">Hayır</text>
+    <text name="File(s)IsUploading">Dosya(lar) karşıya yükleniyor...</text>
     <text name="FinancialOperations">Finansal İşlemler</text>
     <text name="FinancialOperationsMenu">Finansal İşlemler (Menü)</text>
     <text name="FirstName">Ad</text>
@@ -216,6 +218,7 @@
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
     <text name="HousingTenant">Kiracı</text>
+    <text name="Images">Görseller</text>
     <text name="IsDebtText">Site / Apt. alacaklı</text>
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
@@ -245,6 +248,7 @@
     <text name="Phone2">Telefon numarası(2)</text>
     <text name="PleaseSelect">Lütfen Seçiniz</text>
     <text name="ProcessDateTime">İşlem tarihi</text>
+    <text name="Processing">İşlem sürüyor...</text>
     <text name="RefundHousingDue">Aidat iadesi</text>
     <text name="RegularHousingDue">Olağan aidat ödemesi</text>
     <text name="RemovePerson">Kişi tanımını kaldır</text>
@@ -265,6 +269,7 @@
     <text name="true">Evet</text>
     <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>
+    <text name="UploadFile">Dosya yükle</text>
     <text name="WorkerWarmingFee">Görevli ısınma ödemesi</text>
   </texts>
 </localizationDictionary>

@@ -1,20 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
-using Sirius.AppPaymentAccounts;
-using Sirius.Housings;
-using Sirius.PaymentCategories;
-using Sirius.Shared.Enums;
 
 namespace Sirius.AccountBooks
 {
     [Table("AppAccountBooks")]
-    public class AccountBook : FullAuditedEntity<Guid>, IMustHaveTenant
+    public class AccountBook : AggregateRoot<Guid>, IFullAudited, IMustHaveTenant
     {
         protected AccountBook()
         {
-
+            AccountBookFiles = new List<AccountBookFile>();
         }
 
         public int TenantId { get; set; }
@@ -29,20 +26,36 @@ namespace Sirius.AccountBooks
         public string Description { get; private set; }
         public DateTime? DocumentDateTime { get; private set; }
         public string DocumentNumber { get; private set; }
+        
+        public DateTime CreationTime { get; set; }
+        public long? CreatorUserId { get; set; }
+        public DateTime? LastModificationTime { get; set; }
+        public long? LastModifierUserId { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletionTime { get; set; }
+        public long? DeleterUserId { get; set; }
+        
+        public virtual ICollection<AccountBookFile> AccountBookFiles { get; private set; }
 
-        [ForeignKey(nameof(PaymentCategoryId))]
-        public virtual PaymentCategory PaymentCategory { get; set; }
-        
-        [ForeignKey(nameof(HousingId))]
-        public virtual Housing Housing { get; set; }
-        
-        [ForeignKey(nameof(FromPaymentAccountId))]
-        public virtual PaymentAccount FromPaymentAccount { get; set; }
-        
-        [ForeignKey(nameof(ToPaymentAccountId))]
-        public virtual PaymentAccount ToPaymentAccount { get; set; }
-        
-        private static AccountBook BindEntity(AccountBook accountBook, Guid id, int tenantId, DateTime processDateTime, Guid paymentCategoryId, Guid? housingId, Guid? fromPaymentAccountId, Guid? toPaymentAccountId, decimal amount, string description, DateTime? documentDateTime, string documentNumber)
+        private static AccountBook BindEntity(
+            AccountBook accountBook, 
+            Guid id, 
+            int tenantId, 
+            DateTime processDateTime, 
+            Guid paymentCategoryId, 
+            Guid? housingId, 
+            Guid? fromPaymentAccountId, 
+            Guid? toPaymentAccountId, 
+            decimal amount, 
+            string description, 
+            DateTime? documentDateTime, 
+            string documentNumber,
+            ICollection<AccountBookFile> accountBookFiles,
+            DateTime? creationTime,
+            long? creatorUserId,
+            DateTime? modificationDateTime,
+            long? modifierUserId
+            )
         {
             accountBook ??= new AccountBook();
             
@@ -57,98 +70,79 @@ namespace Sirius.AccountBooks
             accountBook.Amount = amount;
             accountBook.FromPaymentAccountId = fromPaymentAccountId;
             accountBook.ToPaymentAccountId = toPaymentAccountId;
+            accountBook.AccountBookFiles = accountBookFiles;
+
+            if (creationTime.HasValue)
+            {
+                accountBook.CreationTime = creationTime.Value;
+            }
+            
+            if (creatorUserId.HasValue)
+            {
+                accountBook.CreatorUserId = creatorUserId.Value;
+            }
+            
+            if (modificationDateTime.HasValue)
+            {
+                accountBook.LastModificationTime = modificationDateTime.Value;
+            }
+            
+            if (modifierUserId.HasValue)
+            {
+                accountBook.LastModifierUserId = modifierUserId.Value;
+            }
 
             return accountBook;
         }
 
-        public static AccountBook Update(AccountBook existingAccountBook, string description,
-            DateTime? documentDateTime, string documentNumber)
+        public static AccountBook Update(
+            AccountBook existingAccountBook, 
+            string description,
+            DateTime? documentDateTime, 
+            string documentNumber,
+            ICollection<AccountBookFile> accountBookFiles,
+            long modifierUserId)
         {
-            
             return BindEntity(existingAccountBook, existingAccountBook.Id, existingAccountBook.TenantId, existingAccountBook.ProcessDateTime,
                 existingAccountBook.PaymentCategoryId, existingAccountBook.HousingId,
                 existingAccountBook.FromPaymentAccountId, existingAccountBook.ToPaymentAccountId,
-                existingAccountBook.Amount, description, documentDateTime, documentNumber);
+                existingAccountBook.Amount, description, documentDateTime, documentNumber, accountBookFiles, null, null, DateTime.UtcNow, modifierUserId);
         }
         
-        public static AccountBook CreateHousingDue(Guid id, int tenantId, DateTime processDateTime,Guid paymentCategoryId, Guid housingId, Guid paymentAccountId, decimal amount, string description)
+        public static AccountBook CreateHousingDue(
+            Guid id, 
+            int tenantId, 
+            DateTime processDateTime,
+            Guid paymentCategoryId, 
+            Guid housingId, 
+            Guid paymentAccountId, 
+            decimal amount, 
+            string description,
+            ICollection<AccountBookFile> accountBookFiles,
+            long creatorUserId)
         {
             return BindEntity(new AccountBook(), id, tenantId, processDateTime, paymentCategoryId, housingId, null,
-                paymentAccountId, amount, description, null, null);
+                paymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId, null, null);
         }
 
-        public static AccountBook Create(Guid id, int tenantId, DateTime processDateTime,Guid paymentCategoryId, Guid? housingId, Guid? fromPaymentAccountId, Guid? toPaymentAccountId, decimal amount, string description, DateTime? documentDateTime, string documentNumber)
+        public static AccountBook Create(
+            Guid id, 
+            int tenantId, 
+            DateTime processDateTime,
+            Guid paymentCategoryId, 
+            Guid? housingId, 
+            Guid? fromPaymentAccountId, 
+            Guid? toPaymentAccountId, 
+            decimal amount, 
+            string description, 
+            DateTime? documentDateTime, 
+            string documentNumber,
+            ICollection<AccountBookFile> accountBookFiles,
+            long creatorUserId)
         {
 
             return BindEntity(new AccountBook(),  id, tenantId, processDateTime, paymentCategoryId, housingId, fromPaymentAccountId,
-                toPaymentAccountId, amount, description, documentDateTime, documentNumber);
+                toPaymentAccountId, amount, description, documentDateTime, documentNumber, accountBookFiles, DateTime.UtcNow, creatorUserId, null, null);
         }
-        // public static AccountBook CreateRefundHousingDue(Guid id, int tenantId, DateTime processDateTime, Guid housingId, Guid paymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.HousingDue, housingId, paymentAccountId,
-        //         null, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateBillPayment(Guid id, int tenantId, DateTime processDateTime, Guid paymentAccountId, decimal amount, string description, DateTime? documentDateTime, string documentNumber)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.BillPayment, null, paymentAccountId,
-        //         null, amount, description, documentDateTime, documentNumber);
-        // }
-        //
-        // public static AccountBook CreateTransferFromPreviousPeriod(Guid id, int tenantId, DateTime processDateTime, Guid paymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.TransferFromThePreviousPeriod, null,
-        //         null, paymentAccountId, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateSalaryPayment(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, Guid toPaymentAccountId,  decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.SalaryPayment, null,
-        //         fromPaymentAccountId, toPaymentAccountId, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateBankTransferFee(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.BankTransferFee, null,
-        //         fromPaymentAccountId, null, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateEftFee(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.EftFee, null, fromPaymentAccountId,
-        //         null, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateBankingAndIssuranceTransactionTax(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.BankingAndInsuranceTransactionTax, null,
-        //         fromPaymentAccountId, null, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateWorkerWarmingFeePayment(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, Guid toPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.WorkerWarmingFee, null,
-        //         fromPaymentAccountId, toPaymentAccountId, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateBonusPayment(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, Guid toPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.BonusPayment, null,
-        //         fromPaymentAccountId, toPaymentAccountId, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateTransferToAdvanceAccountPayment(Guid id, int tenantId, DateTime processDateTime, Guid fromPaymentAccountId, Guid toPaymentAccountId, decimal amount, string description)
-        // {
-        //     return BindEntity(new AccountBook(), id, tenantId, processDateTime, AccountBookProcessType.TransferToAdvanceAccount, null,
-        //         fromPaymentAccountId, toPaymentAccountId, amount, description, null, null);
-        // }
-        //
-        // public static AccountBook CreateOtherPayment(Guid id, int tenantId, DateTime processDateTime, Guid? housingId, Guid? fromPaymentAccountId, Guid? toPaymentAccountId, decimal amount, string description, DateTime? documentDateTime, string documentNumber)
-        // {
-        //
-        //     return BindEntity(new AccountBook(),  id, tenantId, processDateTime, AccountBookProcessType.Other, housingId, fromPaymentAccountId,
-        //         toPaymentAccountId, amount, description, documentDateTime, documentNumber);
-        // }
-        
     }
 }

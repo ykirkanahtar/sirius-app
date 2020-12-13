@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -9,12 +9,13 @@ import {
 import {
   AccountBookDto,
   AccountBookServiceProxy,
-  AccountBookDtoPagedResultDto,
   HousingServiceProxy,
   PersonServiceProxy,
   LookUpDto,
   PaymentCategoryServiceProxy,
   PaymentAccountServiceProxy,
+  AccountBookGetAllOutputPagedResultDto,
+  AccountBookGetAllOutput,
 } from '@shared/service-proxies/service-proxies';
 import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
 import { CreateOtherPaymentAccountBookDialogComponent } from './create-account-book/create-other-payment-account-book-dialog.component';
@@ -38,7 +39,8 @@ export class AccountBooksComponent
   sortingColumn: string;
   advancedFiltersVisible = false;
 
-  accountBooks: AccountBookDto[] = [];
+  accountBooks: AccountBookGetAllOutput[] = [];
+  accountBookFiles: string[] = [];
 
   paymentCategoriesFilter: SelectItem[] = [];
   selectedPaymentCategoriesFilter: string[] = [];
@@ -58,6 +60,28 @@ export class AccountBooksComponent
   startDateFilter: moment.Moment;
   endDateFilter: moment.Moment;
 
+  display: boolean = false;
+  closeDialog: boolean = false;
+
+  responsiveOptions2:any[] = [
+    {
+        breakpoint: '1500px',
+        numVisible: 5
+    },
+    {
+        breakpoint: '1024px',
+        numVisible: 3
+    },
+    {
+        breakpoint: '768px',
+        numVisible: 2
+    },
+    {
+        breakpoint: '560px',
+        numVisible: 1
+    }
+ ];
+
   constructor(
     injector: Injector,
     private _accountBooksService: AccountBookServiceProxy,
@@ -71,6 +95,7 @@ export class AccountBooksComponent
   }
 
   ngOnInit(): void {
+
     this._paymentCategoryService
       .getPaymentCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
@@ -123,13 +148,24 @@ export class AccountBooksComponent
     this.getDataPage(1);
   }
 
+  showImages(accountBookFiles: string[]) {
+    this.display = true;
+    this.accountBookFiles = accountBookFiles;
+  }
+
+  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    if (this.display) {
+      this.display = !this.display;
+    }
+  }
+
   protected list(
     request: PagedAccountBooksRequestDto,
     pageNumber: number,
     finishedCallback: Function
   ): void {
     this._accountBooksService
-      .getAll(
+      .getAllList(
         this.startDateFilter,
         this.endDateFilter,
         this.selectedPaymentCategoriesFilter,
@@ -146,7 +182,7 @@ export class AccountBooksComponent
           finishedCallback();
         })
       )
-      .subscribe((result: AccountBookDtoPagedResultDto) => {
+      .subscribe((result: AccountBookGetAllOutputPagedResultDto) => {
         this.accountBooks = result.items;
         this.showPaging(result, pageNumber);
       });

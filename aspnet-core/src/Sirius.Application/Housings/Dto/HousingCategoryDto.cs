@@ -2,7 +2,7 @@
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 
-namespace Sirius.HousingCategories.Dto
+namespace Sirius.Housings.Dto
 {
     [AutoMapFrom(typeof(HousingCategory))]
     public class HousingCategoryDto : FullAuditedEntityDto<Guid>

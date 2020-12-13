@@ -10,10 +10,10 @@ using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
-using Sirius.HousingCategories.Dto;
+using Sirius.Housings.Dto;
 using Sirius.Shared.Dtos;
 
-namespace Sirius.HousingCategories
+namespace Sirius.Housings
 {
     public class HousingCategoryAppService : AsyncCrudAppService<HousingCategory, HousingCategoryDto, Guid, PagedHousingCategoryResultRequestDto, CreateHousingCategoryDto, UpdateHousingCategoryDto>, IHousingCategoryAppService
     {

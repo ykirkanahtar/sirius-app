@@ -14,7 +14,6 @@ using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.Authorization;
 using Sirius.EntityFrameworkCore.Repositories;
-using Sirius.HousingCategories;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings.Dto;
 using Sirius.PaymentCategories;

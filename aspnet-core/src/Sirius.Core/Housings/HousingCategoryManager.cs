@@ -6,7 +6,7 @@ using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.Housings;
 
-namespace Sirius.HousingCategories
+namespace Sirius.Housings
 {
     public class HousingCategoryManager : IHousingCategoryManager
     {

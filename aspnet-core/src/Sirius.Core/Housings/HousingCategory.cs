@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 
-namespace Sirius.HousingCategories
+namespace Sirius.Housings
 {
     [Table("AppHousingCategories")]
     public class HousingCategory : FullAuditedEntity<Guid>, IMustHaveTenant

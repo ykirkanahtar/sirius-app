@@ -263,35 +263,38 @@
                   {{ "ProcessDateTime" | localize }}
                   <p-sortIcon field="ProcessDateTime"></p-sortIcon>
                 </th>
-                <th pSortableColumn="PaymentCategory.PaymentCategoryName">
+                <th pSortableColumn="PaymentCategoryName">
                   {{ "PaymentCategoryName" | localize }}
                   <p-sortIcon
-                    field="PaymentCategory.PaymentCategoryName"
+                    field="PaymentCategoryName"
                   ></p-sortIcon>
                 </th>
-                <th pSortableColumn="Housing">
+                <th pSortableColumn="HousingName">
                   {{ "Housing" | localize }}
-                  <p-sortIcon field="Housing"></p-sortIcon>
+                  <p-sortIcon field="HousingName"></p-sortIcon>
                 </th>
                 <th pSortableColumn="Amount">
                   {{ "Amount" | localize }}
                   <p-sortIcon field="Amount"></p-sortIcon>
                 </th>
-                <th pSortableColumn="FromPaymentAccount">
+                <th pSortableColumn="FromPaymentAccountName">
                   {{ "FromPaymentAccount" | localize }}
-                  <p-sortIcon field="FromPaymentAccount"></p-sortIcon>
+                  <p-sortIcon field="FromPaymentAccountName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="ToPaymentAccount">
+                <th pSortableColumn="ToPaymentAccountName">
                   {{ "ToPaymentAccount" | localize }}
-                  <p-sortIcon field="ToPaymentAccount"></p-sortIcon>
+                  <p-sortIcon field="ToPaymentAccountName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="FromPaymentAccount.Balance">
+                <th pSortableColumn="FromPaymentAccountBalance">
                   {{ "FromPaymentAccountBalance" | localize }}
-                  <p-sortIcon field="FromPaymentAccount.Balance"></p-sortIcon>
+                  <p-sortIcon field="FromPaymentAccountBalance"></p-sortIcon>
                 </th>
-                <th pSortableColumn="ToPaymentAccount.Balance">
+                <th pSortableColumn="ToPaymentAccountBalance">
                   {{ "ToPaymentAccountBalance" | localize }}
-                  <p-sortIcon field="ToPaymentAccount.Balance"></p-sortIcon>
+                  <p-sortIcon field="ToPaymentAccountBalance"></p-sortIcon>
+                </th>
+                <th>
+                  {{ "Images" | localize }}
                 </th>
                 <th style="width: 20%">{{ "Actions" | localize }}</th>
               </tr>
@@ -313,46 +316,19 @@
             >
               <tr>
                 <td>{{ accountBook.processDateTime.format("DD-MM-YYYY") }}</td>
-                <td>{{ accountBook.paymentCategory.paymentCategoryName }}</td>
-                <td>
-                  {{
-                    accountBook.housing != null
-                      ? accountBook.housing.block.blockName +
-                        " - " +
-                        accountBook.housing.apartment
-                      : ""
-                  }}
-                </td>
+                <td>{{ accountBook.paymentCategoryName }}</td>
+                <td>{{ accountBook.housingName }}</td>
                 <td>{{ accountBook.amount | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    accountBook.fromPaymentAccount != null
-                      ? accountBook.fromPaymentAccount.accountName
-                      : ""
-                  }}
-                </td>
-                <td>
-                  {{
-                    accountBook.toPaymentAccount != null
-                      ? accountBook.toPaymentAccount.accountName
-                      : ""
-                  }}
-                </td>
-                <td>
-                  {{
-                    (accountBook.fromPaymentAccount != null
-                      ? accountBook.fromPaymentAccount.balance
-                      : ""
-                    ) | number: "1.2-2"
-                  }}
-                </td>
-                <td>
-                  {{
-                    (accountBook.toPaymentAccount != null
-                      ? accountBook.toPaymentAccount.balance
-                      : ""
-                    ) | number: "1.2-2"
-                  }}
+                <td>{{ accountBook.fromPaymentAccountName }}</td>
+                <td>{{ accountBook.toPaymentAccountName }}</td>
+                <td>{{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }}</td>
+                <td>{{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}</td>
+                <td class="text-center">
+                  <i 
+                    class="far fa-file-image" 
+                    *ngIf="accountBook.accountBookFiles.length > 0" 
+                    (click)="showImages(accountBook.accountBookFiles)">
+                  </i>
                 </td>
                 <td>
                   <button
@@ -369,6 +345,7 @@
             </ng-template>
           </p-table>
         </div>
+
         <div class="card-footer bg-light border-top">
           <div class="row">
             <div class="col-sm-4 col-12 text-sm-left text-center">
@@ -396,3 +373,15 @@
     </div>
   </section>
 </div>
+
+<p-galleria [(value)]="accountBookFiles" [(visible)]="display" [responsiveOptions]="responsiveOptions2" [containerStyle]="{'max-width': '660px'}" [numVisible]="9"
+    [circular]="true" [fullScreen]="true" [showItemNavigators]="true" [baseZIndex]="100000"> 
+    <ng-template pTemplate="item" let-item>
+        <img [src]="item" style="width: 100%; display: block; max-width: 660px; max-height: 660px;"/>
+    </ng-template>
+    <ng-template pTemplate="thumbnail" let-item>
+        <div class="p-grid p-nogutter p-justify-center">
+            <img [src]="item" style="display: block;" style="max-width: 50px; max-height: 50px;"/>
+        </div>
+    </ng-template>
+</p-galleria>

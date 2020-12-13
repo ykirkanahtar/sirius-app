@@ -6,7 +6,6 @@ using Sirius.Authorization.Users;
 using Sirius.MultiTenancy;
 using Sirius.Employees;
 using Sirius.AppPaymentAccounts;
-using Sirius.HousingCategories;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
@@ -18,6 +17,7 @@ namespace Sirius.EntityFrameworkCore
     {
         /* Define a DbSet for each entity of the application */
         public virtual DbSet<AccountBook> AccountBooks { get; set; }
+        public virtual DbSet<AccountBookFile> AccountBookFiles { get; set; }
         public virtual DbSet<HousingPaymentPlan> HousingPaymentPlans { get; set; }
         public virtual DbSet<HousingPaymentPlanGroup> HousingPaymentPlanGroups { get; set; }
         public virtual DbSet<PaymentAccount> PaymentAccounts { get; set; }

@@ -440,6 +440,147 @@ export class AccountBookServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
+    getAllList(startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AccountBookGetAllOutputPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AccountBook/GetAllList?";
+        if (startDate !== undefined)
+            url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&";
+        if (endDate !== undefined)
+            url_ += "EndDate=" + encodeURIComponent(endDate ? "" + endDate.toJSON() : "") + "&";
+        if (paymentCategoryIds !== undefined)
+            paymentCategoryIds && paymentCategoryIds.forEach(item => { url_ += "PaymentCategoryIds=" + encodeURIComponent("" + item) + "&"; });
+        if (housingIds !== undefined)
+            housingIds && housingIds.forEach(item => { url_ += "HousingIds=" + encodeURIComponent("" + item) + "&"; });
+        if (personIds !== undefined)
+            personIds && personIds.forEach(item => { url_ += "PersonIds=" + encodeURIComponent("" + item) + "&"; });
+        if (fromPaymentAccountIds !== undefined)
+            fromPaymentAccountIds && fromPaymentAccountIds.forEach(item => { url_ += "FromPaymentAccountIds=" + encodeURIComponent("" + item) + "&"; });
+        if (toPaymentAccountIds !== undefined)
+            toPaymentAccountIds && toPaymentAccountIds.forEach(item => { url_ += "ToPaymentAccountIds=" + encodeURIComponent("" + item) + "&"; });
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllList(<any>response_);
+                } catch (e) {
+                    return <Observable<AccountBookGetAllOutputPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AccountBookGetAllOutputPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllList(response: HttpResponseBase): Observable<AccountBookGetAllOutputPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AccountBookGetAllOutputPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AccountBookGetAllOutputPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<AccountBookDto> {
+        let url_ = this.baseUrl + "/api/services/app/AccountBook/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<AccountBookDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AccountBookDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<AccountBookDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AccountBookDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AccountBookDto>(<any>null);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @param paymentCategoryIds (optional) 
+     * @param housingIds (optional) 
+     * @param personIds (optional) 
+     * @param fromPaymentAccountIds (optional) 
+     * @param toPaymentAccountIds (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
     getAll(startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AccountBookDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/GetAll?";
         if (startDate !== undefined)
@@ -510,62 +651,6 @@ export class AccountBookServiceProxy {
             }));
         }
         return _observableOf<AccountBookDtoPagedResultDto>(<any>null);
-    }
-
-    /**
-     * @param id (optional) 
-     * @return Success
-     */
-    get(id: string | undefined): Observable<AccountBookDto> {
-        let url_ = this.baseUrl + "/api/services/app/AccountBook/Get?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "Id=" + encodeURIComponent("" + id) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGet(<any>response_);
-                } catch (e) {
-                    return <Observable<AccountBookDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<AccountBookDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGet(response: HttpResponseBase): Observable<AccountBookDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AccountBookDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<AccountBookDto>(<any>null);
     }
 }
 
@@ -6330,6 +6415,85 @@ export interface ICreateAccountBookDto {
     documentNumber: string | undefined;
 }
 
+export class AccountBookFileDto implements IAccountBookFileDto {
+    fileUrl: string | undefined;
+    accountBookId: string;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IAccountBookFileDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fileUrl = _data["fileUrl"];
+            this.accountBookId = _data["accountBookId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AccountBookFileDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountBookFileDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fileUrl"] = this.fileUrl;
+        data["accountBookId"] = this.accountBookId;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): AccountBookFileDto {
+        const json = this.toJSON();
+        let result = new AccountBookFileDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAccountBookFileDto {
+    fileUrl: string | undefined;
+    accountBookId: string;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
 export enum HousingDueType {
     RegularHousingDue = 1,
     TransferForRegularHousingDue = 2,
@@ -6983,6 +7147,7 @@ export class AccountBookDto implements IAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFiles: AccountBookFileDto[] | undefined;
     paymentCategory: PaymentCategoryDto;
     housing: HousingDto;
     fromPaymentAccount: PaymentAccountDto;
@@ -7016,6 +7181,11 @@ export class AccountBookDto implements IAccountBookDto {
             this.description = _data["description"];
             this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
             this.documentNumber = _data["documentNumber"];
+            if (Array.isArray(_data["accountBookFiles"])) {
+                this.accountBookFiles = [] as any;
+                for (let item of _data["accountBookFiles"])
+                    this.accountBookFiles.push(AccountBookFileDto.fromJS(item));
+            }
             this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
             this.housing = _data["housing"] ? HousingDto.fromJS(_data["housing"]) : <any>undefined;
             this.fromPaymentAccount = _data["fromPaymentAccount"] ? PaymentAccountDto.fromJS(_data["fromPaymentAccount"]) : <any>undefined;
@@ -7049,6 +7219,11 @@ export class AccountBookDto implements IAccountBookDto {
         data["description"] = this.description;
         data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
         data["documentNumber"] = this.documentNumber;
+        if (Array.isArray(this.accountBookFiles)) {
+            data["accountBookFiles"] = [];
+            for (let item of this.accountBookFiles)
+                data["accountBookFiles"].push(item.toJSON());
+        }
         data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
         data["housing"] = this.housing ? this.housing.toJSON() : <any>undefined;
         data["fromPaymentAccount"] = this.fromPaymentAccount ? this.fromPaymentAccount.toJSON() : <any>undefined;
@@ -7082,6 +7257,7 @@ export interface IAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFiles: AccountBookFileDto[] | undefined;
     paymentCategory: PaymentCategoryDto;
     housing: HousingDto;
     fromPaymentAccount: PaymentAccountDto;
@@ -7102,6 +7278,7 @@ export class CreateHousingDueAccountBookDto implements ICreateHousingDueAccountB
     toPaymentAccountId: string;
     amount: number;
     description: string | undefined;
+    accountBookFileUrls: string[] | undefined;
 
     constructor(data?: ICreateHousingDueAccountBookDto) {
         if (data) {
@@ -7119,6 +7296,11 @@ export class CreateHousingDueAccountBookDto implements ICreateHousingDueAccountB
             this.toPaymentAccountId = _data["toPaymentAccountId"];
             this.amount = _data["amount"];
             this.description = _data["description"];
+            if (Array.isArray(_data["accountBookFileUrls"])) {
+                this.accountBookFileUrls = [] as any;
+                for (let item of _data["accountBookFileUrls"])
+                    this.accountBookFileUrls.push(item);
+            }
         }
     }
 
@@ -7136,6 +7318,11 @@ export class CreateHousingDueAccountBookDto implements ICreateHousingDueAccountB
         data["toPaymentAccountId"] = this.toPaymentAccountId;
         data["amount"] = this.amount;
         data["description"] = this.description;
+        if (Array.isArray(this.accountBookFileUrls)) {
+            data["accountBookFileUrls"] = [];
+            for (let item of this.accountBookFileUrls)
+                data["accountBookFileUrls"].push(item);
+        }
         return data; 
     }
 
@@ -7153,6 +7340,7 @@ export interface ICreateHousingDueAccountBookDto {
     toPaymentAccountId: string;
     amount: number;
     description: string | undefined;
+    accountBookFileUrls: string[] | undefined;
 }
 
 export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAccountBookDto {
@@ -7164,6 +7352,7 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFileUrls: string[] | undefined;
 
     constructor(data?: ICreateOtherPaymentAccountBookDto) {
         if (data) {
@@ -7184,6 +7373,11 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
             this.description = _data["description"];
             this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
             this.documentNumber = _data["documentNumber"];
+            if (Array.isArray(_data["accountBookFileUrls"])) {
+                this.accountBookFileUrls = [] as any;
+                for (let item of _data["accountBookFileUrls"])
+                    this.accountBookFileUrls.push(item);
+            }
         }
     }
 
@@ -7204,6 +7398,11 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
         data["description"] = this.description;
         data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
         data["documentNumber"] = this.documentNumber;
+        if (Array.isArray(this.accountBookFileUrls)) {
+            data["accountBookFileUrls"] = [];
+            for (let item of this.accountBookFileUrls)
+                data["accountBookFileUrls"].push(item);
+        }
         return data; 
     }
 
@@ -7224,12 +7423,14 @@ export interface ICreateOtherPaymentAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFileUrls: string[] | undefined;
 }
 
 export class UpdateAccountBookDto implements IUpdateAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFiles: string[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -7253,6 +7454,11 @@ export class UpdateAccountBookDto implements IUpdateAccountBookDto {
             this.description = _data["description"];
             this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
             this.documentNumber = _data["documentNumber"];
+            if (Array.isArray(_data["accountBookFiles"])) {
+                this.accountBookFiles = [] as any;
+                for (let item of _data["accountBookFiles"])
+                    this.accountBookFiles.push(item);
+            }
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -7276,6 +7482,11 @@ export class UpdateAccountBookDto implements IUpdateAccountBookDto {
         data["description"] = this.description;
         data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
         data["documentNumber"] = this.documentNumber;
+        if (Array.isArray(this.accountBookFiles)) {
+            data["accountBookFiles"] = [];
+            for (let item of this.accountBookFiles)
+                data["accountBookFiles"].push(item);
+        }
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -7299,6 +7510,7 @@ export interface IUpdateAccountBookDto {
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFiles: string[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -7307,6 +7519,176 @@ export interface IUpdateAccountBookDto {
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: string;
+}
+
+export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
+    processDateTime: moment.Moment;
+    paymentCategoryName: string | undefined;
+    housingName: string | undefined;
+    amount: number;
+    fromPaymentAccountName: string | undefined;
+    toPaymentAccountName: string | undefined;
+    fromPaymentAccountBalance: number | undefined;
+    toPaymentAccountBalance: number | undefined;
+    accountBookFiles: string[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IAccountBookGetAllOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.housingName = _data["housingName"];
+            this.amount = _data["amount"];
+            this.fromPaymentAccountName = _data["fromPaymentAccountName"];
+            this.toPaymentAccountName = _data["toPaymentAccountName"];
+            this.fromPaymentAccountBalance = _data["fromPaymentAccountBalance"];
+            this.toPaymentAccountBalance = _data["toPaymentAccountBalance"];
+            if (Array.isArray(_data["accountBookFiles"])) {
+                this.accountBookFiles = [] as any;
+                for (let item of _data["accountBookFiles"])
+                    this.accountBookFiles.push(item);
+            }
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AccountBookGetAllOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountBookGetAllOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["housingName"] = this.housingName;
+        data["amount"] = this.amount;
+        data["fromPaymentAccountName"] = this.fromPaymentAccountName;
+        data["toPaymentAccountName"] = this.toPaymentAccountName;
+        data["fromPaymentAccountBalance"] = this.fromPaymentAccountBalance;
+        data["toPaymentAccountBalance"] = this.toPaymentAccountBalance;
+        if (Array.isArray(this.accountBookFiles)) {
+            data["accountBookFiles"] = [];
+            for (let item of this.accountBookFiles)
+                data["accountBookFiles"].push(item);
+        }
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): AccountBookGetAllOutput {
+        const json = this.toJSON();
+        let result = new AccountBookGetAllOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAccountBookGetAllOutput {
+    processDateTime: moment.Moment;
+    paymentCategoryName: string | undefined;
+    housingName: string | undefined;
+    amount: number;
+    fromPaymentAccountName: string | undefined;
+    toPaymentAccountName: string | undefined;
+    fromPaymentAccountBalance: number | undefined;
+    toPaymentAccountBalance: number | undefined;
+    accountBookFiles: string[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class AccountBookGetAllOutputPagedResultDto implements IAccountBookGetAllOutputPagedResultDto {
+    totalCount: number;
+    items: AccountBookGetAllOutput[] | undefined;
+
+    constructor(data?: IAccountBookGetAllOutputPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(AccountBookGetAllOutput.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AccountBookGetAllOutputPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountBookGetAllOutputPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): AccountBookGetAllOutputPagedResultDto {
+        const json = this.toJSON();
+        let result = new AccountBookGetAllOutputPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAccountBookGetAllOutputPagedResultDto {
+    totalCount: number;
+    items: AccountBookGetAllOutput[] | undefined;
 }
 
 export class AccountBookDtoPagedResultDto implements IAccountBookDtoPagedResultDto {
