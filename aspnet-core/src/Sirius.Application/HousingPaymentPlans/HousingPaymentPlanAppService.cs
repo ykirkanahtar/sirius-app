@@ -97,7 +97,7 @@ namespace Sirius.HousingPaymentPlans
                 await _housingManager.DecreaseBalance(housing, input.Amount);
             }
         }
-        
+
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)
         {
             CheckCreatePermission();
@@ -156,7 +156,7 @@ namespace Sirius.HousingPaymentPlans
             await _housingPaymentPlanManager.UpdateAsync(housingPaymentPlan);
             return ObjectMapper.Map<HousingPaymentPlanDto>(housingPaymentPlan);
         }
-        
+
         public override async Task DeleteAsync(EntityDto<Guid> input)
         {
             CheckDeletePermission();
@@ -168,20 +168,17 @@ namespace Sirius.HousingPaymentPlans
             PagedHousingPaymentPlanResultRequestDto input)
         {
             CheckGetAllPermission();
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = _housingPaymentPlanRepository.GetAll()
-                    .Where(p => p.TenantId == AbpSession.TenantId && p.HousingId == input.HousingId)
-                    .Include(p => p.PaymentCategory);
+            var query = _housingPaymentPlanRepository.GetAll()
+                .Where(p => p.HousingId == input.HousingId)
+                .Include(p => p.PaymentCategory);
 
-                var list = await query
-                    .OrderBy(input.Sorting ?? "Date")
-                    .PageBy(input)
-                    .ToListAsync();
+            var list = await query
+                .OrderBy(input.Sorting ?? "Date")
+                .PageBy(input)
+                .ToListAsync();
 
-                return new PagedResultDto<HousingPaymentPlanDto>(query.Count(),
-                    ObjectMapper.Map<List<HousingPaymentPlanDto>>(list));
-            }
+            return new PagedResultDto<HousingPaymentPlanDto>(query.Count(),
+                ObjectMapper.Map<List<HousingPaymentPlanDto>>(list));
         }
     }
 }

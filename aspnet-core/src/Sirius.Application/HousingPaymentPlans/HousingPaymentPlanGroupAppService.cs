@@ -147,62 +147,55 @@ namespace Sirius.HousingPaymentPlans
         {
             CheckGetAllPermission();
 
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = (from housingPaymentPlanGroup in _housingPaymentPlanGroupRepository.GetAll()
-                            .Include(p => p.HousingCategory)
-                            .Include(p => p.PaymentCategory)
-                            .Include(p => p.HousingPaymentPlans)
-                        join housingCategory in _housingCategoryRepository.GetAll()
-                            .Where(p => p.TenantId == AbpSession.TenantId) on housingPaymentPlanGroup
-                            .HousingCategoryId equals housingCategory.Id
-                        join paymentCategory in _paymentCategoryRepository.GetAll() on housingPaymentPlanGroup
-                            .PaymentCategoryId equals paymentCategory.Id
-                        join housingPaymentPlan in _housingPaymentPlanRepository.GetAll()
-                                .Where(p => p.TenantId == AbpSession.TenantId) on housingPaymentPlanGroup.Id
-                            equals housingPaymentPlan.HousingPaymentPlanGroupId
-                        join housing in _housingRepository.GetAll().Include(p => p.Block)
-                                .Where(p => p.TenantId == AbpSession.TenantId) on housingPaymentPlan
-                                .HousingId
-                            equals housing.Id
-                        join housingPerson in _housingPersonRepository.GetAll()
-                                .Where(p => p.TenantId == AbpSession.TenantId) on housing.Id equals housingPerson
-                                .HousingId
-                            into g1
-                        from housingPerson in g1.DefaultIfEmpty()
-                        join person in _personRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId) on
-                            housingPerson.PersonId equals person.Id into g2
-                        from person in g2.DefaultIfEmpty()
-                        select new
-                        {
-                            housingPaymentPlanGroup, housingCategory, paymentCategory, housingPaymentPlan, housing,
-                            housingPerson, person
-                        })
-                    .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
-                    .WhereIf(input.HousingCategoryIds.Count > 0,
-                        p => input.HousingCategoryIds.Contains(p.housingCategory.Id))
-                    .WhereIf(input.PersonIds.Count > 0,
-                        p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty));
+            var query = (from housingPaymentPlanGroup in _housingPaymentPlanGroupRepository.GetAll()
+                        .Include(p => p.HousingCategory)
+                        .Include(p => p.PaymentCategory)
+                        .Include(p => p.HousingPaymentPlans)
+                    join housingCategory in _housingCategoryRepository.GetAll() on housingPaymentPlanGroup
+                        .HousingCategoryId equals housingCategory.Id
+                    join paymentCategory in _paymentCategoryRepository.GetAll() on housingPaymentPlanGroup
+                        .PaymentCategoryId equals paymentCategory.Id
+                    join housingPaymentPlan in _housingPaymentPlanRepository.GetAll() on housingPaymentPlanGroup.Id
+                        equals housingPaymentPlan.HousingPaymentPlanGroupId
+                    join housing in _housingRepository.GetAll().Include(p => p.Block) on housingPaymentPlan
+                            .HousingId
+                        equals housing.Id
+                    join housingPerson in _housingPersonRepository.GetAll() on housing.Id equals housingPerson
+                            .HousingId
+                        into g1
+                    from housingPerson in g1.DefaultIfEmpty()
+                    join person in _personRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId) on
+                        housingPerson.PersonId equals person.Id into g2
+                    from person in g2.DefaultIfEmpty()
+                    select new
+                    {
+                        housingPaymentPlanGroup, housingCategory, paymentCategory, housingPaymentPlan, housing,
+                        housingPerson, person
+                    })
+                .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
+                .WhereIf(input.HousingCategoryIds.Count > 0,
+                    p => input.HousingCategoryIds.Contains(p.housingCategory.Id))
+                .WhereIf(input.PersonIds.Count > 0,
+                    p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty));
 
-                //TODO linq sorgusu düzeltilecek
-                var list = (await query.ToListAsync())
-                    .AsQueryable()
-                    .GroupBy(p => p.housingPaymentPlanGroup)
-                    .Select(p => p.Key)
-                    .OrderBy(input.Sorting ?? $"{nameof(HousingPaymentPlanGroupDto.StartDate)} ASC");
+            //TODO linq sorgusu düzeltilecek
+            var list = (await query.ToListAsync())
+                .AsQueryable()
+                .GroupBy(p => p.housingPaymentPlanGroup)
+                .Select(p => p.Key)
+                .OrderBy(input.Sorting ?? $"{nameof(HousingPaymentPlanGroupDto.StartDate)} ASC");
 
-                var housingPaymentPlanGroups = list
-                    .PageBy(input)
-                    .ToList();
+            var housingPaymentPlanGroups = list
+                .PageBy(input)
+                .ToList();
 
-                // var housingPaymentPlanGroups = await query
-                //     .OrderBy(input.Sorting ?? $"{nameof(HousingPaymentPlanGroupDto.StartDate)} ASC")
-                //     .PageBy(input)
-                //     .ToListAsync();
+            // var housingPaymentPlanGroups = await query
+            //     .OrderBy(input.Sorting ?? $"{nameof(HousingPaymentPlanGroupDto.StartDate)} ASC")
+            //     .PageBy(input)
+            //     .ToListAsync();
 
-                return new PagedResultDto<HousingPaymentPlanGroupDto>(query.Count(),
-                    ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups));
-            }
+            return new PagedResultDto<HousingPaymentPlanGroupDto>(query.Count(),
+                ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups));
         }
     }
 }

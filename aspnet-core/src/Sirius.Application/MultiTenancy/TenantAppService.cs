@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
@@ -10,6 +11,7 @@ using Abp.IdentityFramework;
 using Abp.Linq.Extensions;
 using Abp.MultiTenancy;
 using Abp.Runtime.Security;
+using Abp.Runtime.Session;
 using Sirius.Authorization;
 using Sirius.Authorization.Roles;
 using Sirius.Authorization.Users;
@@ -18,6 +20,8 @@ using Sirius.MultiTenancy.Dto;
 using Microsoft.AspNetCore.Identity;
 using Sirius.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Seed.Tenants;
+using Sirius.PaymentCategories;
+using Sirius.Shared.Enums;
 
 namespace Sirius.MultiTenancy
 {
@@ -29,6 +33,7 @@ namespace Sirius.MultiTenancy
         private readonly UserManager _userManager;
         private readonly RoleManager _roleManager;
         private readonly IAbpZeroDbMigrator _abpZeroDbMigrator;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
 
         public TenantAppService(
             IRepository<Tenant, int> repository,
@@ -36,7 +41,8 @@ namespace Sirius.MultiTenancy
             EditionManager editionManager,
             UserManager userManager,
             RoleManager roleManager,
-            IAbpZeroDbMigrator abpZeroDbMigrator)
+            IAbpZeroDbMigrator abpZeroDbMigrator, 
+            IPaymentCategoryManager paymentCategoryManager)
             : base(repository)
         {
             _tenantManager = tenantManager;
@@ -44,6 +50,7 @@ namespace Sirius.MultiTenancy
             _userManager = userManager;
             _roleManager = roleManager;
             _abpZeroDbMigrator = abpZeroDbMigrator;
+            _paymentCategoryManager = paymentCategoryManager;
         }
 
         public override async Task<TenantDto> CreateAsync(CreateTenantDto input)
@@ -92,6 +99,15 @@ namespace Sirius.MultiTenancy
                 await CurrentUnitOfWork.SaveChangesAsync();
                 
                 StaticPermissionsBuilderForTenant.Build(CurrentUnitOfWork.GetDbContext<SiriusDbContext>(), tenant.Id);
+                
+                //Custom changes
+                var housingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, HousingDueType.RegularHousingDue.ToString(), HousingDueType.RegularHousingDue, true);
+                await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
+                
+                var transferForHousingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(), HousingDueType.TransferForRegularHousingDue, true);
+                await _paymentCategoryManager.CreateAsync(transferForHousingDuePaymentCategory);
             }
 
             return MapToEntityDto(tenant);

@@ -264,6 +264,7 @@
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
     <text name="TransferBalance">Devir bakiyesi</text>
     <text name="TransferDate">Devir tarihi</text>
+    <text name="TransferForRegularHousingDue">Aidat hesabı devir</text>
     <text name="TransferFromThePreviousPeriod">Devir</text>
     <text name="TransferToAdvanceAccount">Avana hesaba transfer</text>
     <text name="true">Evet</text>

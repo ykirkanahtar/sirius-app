@@ -21,7 +21,9 @@ namespace Sirius.PaymentCategories
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager, IRepository<AccountBook, Guid> accountBookRepository, IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
+        public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository,
+            IUnitOfWorkManager unitOfWorkManager, IRepository<AccountBook, Guid> accountBookRepository,
+            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
         {
             _paymentCategoryRepository = paymentCategoryRepository;
             _unitOfWorkManager = unitOfWorkManager;
@@ -38,19 +40,23 @@ namespace Sirius.PaymentCategories
         {
             await _paymentCategoryRepository.UpdateAsync(paymentCategory);
         }
-        
+
         public async Task DeleteAsync(PaymentCategory paymentCategory)
         {
-            var accountBooks = await _accountBookRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
+            var accountBooks =
+                await _accountBookRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
             if (accountBooks.Count > 0)
             {
-                throw new UserFriendlyException("Bu ödeme türü için bir ya da birden fazla işlem hareketi tanımlıdır. Silmek için önce tanımları kaldırınız.");
+                throw new UserFriendlyException(
+                    "Bu ödeme türü için bir ya da birden fazla işlem hareketi tanımlıdır. Silmek için önce tanımları kaldırınız.");
             }
 
-            var housingPaymentPlans = await _housingPaymentPlanRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
+            var housingPaymentPlans =
+                await _housingPaymentPlanRepository.GetAllListAsync(p => p.PaymentCategoryId == paymentCategory.Id);
             if (housingPaymentPlans.Count > 0)
             {
-                throw new UserFriendlyException("Bu ödeme türü için bir ya da birden fazla aidat ödeme planı tanımlıdır. Silmek için önce tanımları kaldırınız.");
+                throw new UserFriendlyException(
+                    "Bu ödeme türü için bir ya da birden fazla aidat ödeme planı tanımlıdır. Silmek için önce tanımları kaldırınız.");
             }
 
             await _paymentCategoryRepository.DeleteAsync(paymentCategory);
@@ -58,33 +64,28 @@ namespace Sirius.PaymentCategories
 
         public async Task<PaymentCategory> GetRegularHousingDueAsync()
         {
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = await _paymentCategoryRepository.GetAllListAsync(p =>
-                    p.HousingDueType == HousingDueType.RegularHousingDue);
+            var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+                p.HousingDueType == HousingDueType.RegularHousingDue);
 
-                return query.Single();
-            }
+            return query.Single();
         }
-        
+
         public async Task<PaymentCategory> GetTransferForRegularHousingDueAsync()
         {
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = await _paymentCategoryRepository.GetAllListAsync(p =>
-                    p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
+            var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+                p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
 
-                return query.Single();
-            }
+            return query.Single();
         }
 
         public async Task<PaymentCategory> GetAsync(Guid id)
         {
             var paymentCategory = await _paymentCategoryRepository.GetAsync(id);
-            if(paymentCategory == null)
+            if (paymentCategory == null)
             {
                 throw new UserFriendlyException("Kategori bulunamadı");
             }
+
             return paymentCategory;
         }
     }

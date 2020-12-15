@@ -71,50 +71,40 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = _paymentCategoryRepository
-                    .GetAll()
-                    .Where(p => p.TenantId == null || p.TenantId == AbpSession.TenantId)
-                    .WhereIf(!string.IsNullOrWhiteSpace(input.PaymentCategoryName),
-                        p => p.PaymentCategoryName.Contains(input.PaymentCategoryName));
+            var query = _paymentCategoryRepository
+                .GetAll()
+                .WhereIf(!string.IsNullOrWhiteSpace(input.PaymentCategoryName),
+                    p => p.PaymentCategoryName.Contains(input.PaymentCategoryName));
 
-                var paymentCategories = await query
-                    .OrderBy(input.Sorting ?? $"{nameof(PaymentCategoryDto.PaymentCategoryName)}")
-                    .PageBy(input)
-                    .ToListAsync();
+            var paymentCategories = await query
+                .OrderBy(input.Sorting ?? $"{nameof(PaymentCategoryDto.PaymentCategoryName)}")
+                .PageBy(input)
+                .ToListAsync();
 
-                return new PagedResultDto<PaymentCategoryDto>(query.Count(),
-                    ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories));
-            }
+            return new PagedResultDto<PaymentCategoryDto>(query.Count(),
+                ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories));
         }
 
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
         {
             CheckGetAllPermission();
 
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync();
+            var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync();
 
-                return
-                    (from l in paymentAccounts
-                        select new LookUpDto(l.Id.ToString(), l.PaymentCategoryName)).ToList();
-            }
+            return
+                (from l in paymentAccounts
+                    select new LookUpDto(l.Id.ToString(), l.PaymentCategoryName)).ToList();
         }
-        
+
         public async Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request)
         {
             CheckGetAllPermission();
 
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
-                var query = from p in _paymentCategoryRepository.GetAll()
-                    where p.PaymentCategoryName.Contains(request)
-                    select p.PaymentCategoryName;
+            var query = from p in _paymentCategoryRepository.GetAll()
+                where p.PaymentCategoryName.Contains(request)
+                select p.PaymentCategoryName;
 
-                return await query.ToListAsync();
-            }
+            return await query.ToListAsync();
         }
     }
 }

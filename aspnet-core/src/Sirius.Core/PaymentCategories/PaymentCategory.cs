@@ -10,14 +10,14 @@ using Sirius.Shared.Enums;
 namespace Sirius.PaymentCategories
 {
     [Table("AppPaymentCategories")]
-    public class PaymentCategory : FullAuditedEntity<Guid>, IMayHaveTenant
+    public class PaymentCategory : FullAuditedEntity<Guid>, IMustHaveTenant
     {
         protected PaymentCategory()
         {
 
         }
 
-        public virtual int? TenantId { get; set; }
+        public virtual int TenantId { get; set; }
 
         [StringLength(50)]
         public string PaymentCategoryName { get; private set; }
@@ -25,7 +25,7 @@ namespace Sirius.PaymentCategories
         public HousingDueType? HousingDueType { get; private set; }
         public bool IsValidForAllPeriods { get; private set; }
         
-        public static PaymentCategory Create(Guid id, int? tenantId, string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods)
+        public static PaymentCategory Create(Guid id, int tenantId, string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods)
         {
             return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, housingDueType, isValidForAllPeriods);
         }
@@ -36,7 +36,7 @@ namespace Sirius.PaymentCategories
                 paymentCategoryName, existingPaymentCategory.HousingDueType, existingPaymentCategory.IsValidForAllPeriods);
         }
 
-        private static PaymentCategory BindEntity(PaymentCategory paymentCategory, Guid id, int? tenantId,
+        private static PaymentCategory BindEntity(PaymentCategory paymentCategory, Guid id, int tenantId,
             string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
