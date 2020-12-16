@@ -78,7 +78,7 @@ namespace Sirius.AccountBooks
             CheckCreatePermission();
             var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
             var housing = await _housingManager.GetAsync(input.HousingId);
-            var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId);
+            var toPaymentAccount = await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId);
 
             var accountBookGuid = SequentialGuidGenerator.Instance.Create();
 
@@ -110,19 +110,7 @@ namespace Sirius.AccountBooks
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateAsync(accountBook);
-            await _housingManager.DecreaseBalance(housing, input.Amount);
-            await _paymentAccountManager.IncreaseBalance(toPaymentAccount, input.Amount);
-            await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
-                SequentialGuidGenerator.Instance.Create()
-                , AbpSession.GetTenantId()
-                , housing
-                , housingDuePaymentCategory
-                , input.ProcessDateTime
-                , input.Amount
-                , input.Description
-                , accountBook
-            ));
+            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount);
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -130,6 +118,19 @@ namespace Sirius.AccountBooks
         public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
         {
             CheckCreatePermission();
+            PaymentAccount fromPaymentAccount = null;
+            PaymentAccount toPaymentAccount = null;
+
+            if (input.FromPaymentAccountId.HasValue)
+            {
+                fromPaymentAccount = await _paymentAccountRepository.GetAsync(input.FromPaymentAccountId.Value);
+            }
+
+            if (input.ToPaymentAccountId.HasValue)
+            {
+                toPaymentAccount = await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId.Value);
+            }
+
             await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
 
             var accountBookGuid = SequentialGuidGenerator.Instance.Create();
@@ -161,19 +162,9 @@ namespace Sirius.AccountBooks
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateAsync(accountBook);
-
-            if (input.FromPaymentAccountId.HasValue)
-            {
-                var fromPaymentAccount = await _paymentAccountManager.GetAsync(input.FromPaymentAccountId.Value);
-                await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, input.Amount);
-            }
-
-            if (input.ToPaymentAccountId.HasValue)
-            {
-                var toPaymentAccount = await _paymentAccountManager.GetAsync(input.ToPaymentAccountId.Value);
-                await _paymentAccountManager.IncreaseBalance(toPaymentAccount, input.Amount);
-            }
+            await _accountBookManager.CreateAsync(accountBook,
+                input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
+                input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }

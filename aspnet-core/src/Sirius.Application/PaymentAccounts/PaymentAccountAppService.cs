@@ -11,89 +11,110 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sirius.AccountBooks;
+using Sirius.AccountBooks.Dto;
 using Sirius.AppPaymentAccounts;
 using Sirius.PaymentAccounts.Dto;
+using Sirius.PaymentCategories;
 using Sirius.Shared.Dtos;
 
 namespace Sirius.PaymentAccounts
 {
-    public class PaymentAccountAppService : AsyncCrudAppService<PaymentAccount, PaymentAccountDto, Guid, PagedPaymentAccountResultRequestDto, CreateCashAccountDto, UpdatePaymentAccountDto>,  IPaymentAccountAppService
+    public class PaymentAccountAppService :
+        AsyncCrudAppService<PaymentAccount, PaymentAccountDto, Guid, PagedPaymentAccountResultRequestDto,
+            CreateCashAccountDto, UpdatePaymentAccountDto>, IPaymentAccountAppService
     {
         private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
+        private readonly IAccountBookManager _accountBookManager;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
 
-        public PaymentAccountAppService(IPaymentAccountManager paymentAccountManager, IRepository<PaymentAccount, Guid> paymentAccountRepository)
-            :base(paymentAccountRepository)
+        public PaymentAccountAppService(
+            IPaymentAccountManager paymentAccountManager,
+            IRepository<PaymentAccount, Guid> paymentAccountRepository,
+            IAccountBookManager accountBookManager,
+            IPaymentCategoryManager paymentCategoryManager)
+            : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
             _paymentAccountRepository = paymentAccountRepository;
+            _accountBookManager = accountBookManager;
+            _paymentCategoryManager = paymentCategoryManager;
+            _accountBookManager = accountBookManager;
         }
 
         public async Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input)
         {
             CheckCreatePermission();
+
+            var newPaymentAccountId = SequentialGuidGenerator.Instance.Create();
             var paymentAccount = PaymentAccount.CreateAdvanceAccount(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , input.AccountName
-                    , input.Description
-                    , input.Iban
-                    , input.PersonId
-                    , input.EmployeeId
-                    , input.TenantIsOwner
-                    );
+                newPaymentAccountId
+                , AbpSession.GetTenantId()
+                , input.AccountName
+                , input.Description
+                , input.Iban
+                , input.PersonId
+                , input.EmployeeId
+                , input.TenantIsOwner
+                , input.CreateTransferForPaymentAccount.Amount
+            );
             await _paymentAccountManager.CreateAsync(paymentAccount);
+
+            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
-        }
-
-        public async Task<List<LookUpDto>> GetPaymentAccountLookUpAsync()
-        {
-            CheckGetAllPermission();
-
-            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();         
-                                                                               
-            return                                                             
-                (from l in paymentAccounts                                            
-                    select new LookUpDto(l.Id.ToString(), l.AccountName)).ToList();  
         }
 
         public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input)
         {
             CheckUpdatePermission();
+
+            var newPaymentAccountId = SequentialGuidGenerator.Instance.Create();
             var paymentAccount = PaymentAccount.CreateBankAccount(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , input.AccountName
-                    , input.Description
-                    , input.Iban
-                    , input.PersonId
-                    , input.EmployeeId
-                    , input.TenantIsOwner
-                    );
+                newPaymentAccountId
+                , AbpSession.GetTenantId()
+                , input.AccountName
+                , input.Description
+                , input.Iban
+                , input.PersonId
+                , input.EmployeeId
+                , input.TenantIsOwner
+                , input.CreateTransferForPaymentAccount.Amount
+            );
             await _paymentAccountManager.CreateAsync(paymentAccount);
+
+            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
 
         public async Task<PaymentAccountDto> CreateCashAccountAsync(CreateCashAccountDto input)
         {
             CheckUpdatePermission();
+            
+            var newPaymentAccountId = SequentialGuidGenerator.Instance.Create();
             var paymentAccount = PaymentAccount.CreateCashAccount(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , input.AccountName
-                    , input.Description
-                    , input.PersonId
-                    , input.EmployeeId
-                    , input.TenantIsOwner
-                    );
+                newPaymentAccountId
+                , AbpSession.GetTenantId()
+                , input.AccountName
+                , input.Description
+                , input.PersonId
+                , input.EmployeeId
+                , input.TenantIsOwner
+                , input.CreateTransferForPaymentAccount.Amount
+            );
             await _paymentAccountManager.CreateAsync(paymentAccount);
+            
+            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+            
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
 
         [NonAction]
         public override Task<PaymentAccountDto> CreateAsync(CreateCashAccountDto input)
         {
-            throw  new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override async Task<PaymentAccountDto> UpdateAsync(UpdatePaymentAccountDto input)
@@ -113,7 +134,8 @@ namespace Sirius.PaymentAccounts
             await _paymentAccountManager.DeleteAsync(paymentAccount);
         }
 
-        public override async Task<PagedResultDto<PaymentAccountDto>> GetAllAsync(PagedPaymentAccountResultRequestDto input)
+        public override async Task<PagedResultDto<PaymentAccountDto>> GetAllAsync(
+            PagedPaymentAccountResultRequestDto input)
         {
             CheckGetAllPermission();
 
@@ -125,6 +147,43 @@ namespace Sirius.PaymentAccounts
 
             return new PagedResultDto<PaymentAccountDto>(query.Count(),
                 ObjectMapper.Map<List<PaymentAccountDto>>(paymentAccounts));
+        }
+
+        public async Task<List<LookUpDto>> GetPaymentAccountLookUpAsync()
+        {
+            CheckGetAllPermission();
+
+            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();
+
+            return
+                (from l in paymentAccounts
+                    select new LookUpDto(l.Id.ToString(), l.AccountName)).ToList();
+        }
+
+        private async Task CreateAccountBookAsync(CreateTransferForPaymentAccountDto input, PaymentAccount paymentAccount)
+        {
+            if (input.Amount != 0)
+            {
+                var paymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
+
+                var accountBook = AccountBook.Create(
+                    SequentialGuidGenerator.Instance.Create()
+                    , AbpSession.GetTenantId()
+                    , input.ProcessDateTime
+                    , paymentCategory.Id
+                    , null
+                    , null
+                    , paymentAccount.Id
+                    , input.Amount
+                    , string.Empty
+                    , null
+                    , string.Empty
+                    , new List<AccountBookFile>()
+                    , AbpSession.GetUserId()
+                );
+
+                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook);
+            }
         }
     }
 }

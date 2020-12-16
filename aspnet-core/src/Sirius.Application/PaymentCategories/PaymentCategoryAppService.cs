@@ -9,11 +9,14 @@ using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
+using Abp.Localization;
+using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.PaymentCategories.Dto;
 using Sirius.People.Dto;
+using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
 
@@ -25,15 +28,16 @@ namespace Sirius.PaymentCategories
     {
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
-
-        public PaymentCategoryAppService(IPaymentCategoryManager paymentCategoryManager,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
+        private readonly ILocalizationSource _localizationSource;
+        public PaymentCategoryAppService(
+            IPaymentCategoryManager paymentCategoryManager,
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository
+            , ILocalizationManager localizationManager)
             : base(paymentCategoryRepository)
         {
             _paymentCategoryManager = paymentCategoryManager;
             _paymentCategoryRepository = paymentCategoryRepository;
-            _unitOfWorkManager = unitOfWorkManager;
+            _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
         public override async Task<PaymentCategoryDto> CreateAsync(CreatePaymentCategoryDto input)
@@ -89,11 +93,11 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync();
+            var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync(p => p.ShowInLists);
 
             return
                 (from l in paymentAccounts
-                    select new LookUpDto(l.Id.ToString(), l.PaymentCategoryName)).ToList();
+                    select new LookUpDto(l.Id.ToString(), _localizationSource.GetString(l.PaymentCategoryName))).ToList();
         }
 
         public async Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request)
@@ -101,8 +105,8 @@ namespace Sirius.PaymentCategories
             CheckGetAllPermission();
 
             var query = from p in _paymentCategoryRepository.GetAll()
-                where p.PaymentCategoryName.Contains(request)
-                select p.PaymentCategoryName;
+                where p.PaymentCategoryName.Contains(request) && p.ShowInLists
+                select _localizationSource.GetString(p.PaymentCategoryName);
 
             return await query.ToListAsync();
         }

@@ -24,20 +24,21 @@ namespace Sirius.PaymentCategories
         
         public HousingDueType? HousingDueType { get; private set; }
         public bool IsValidForAllPeriods { get; private set; }
-        
-        public static PaymentCategory Create(Guid id, int tenantId, string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods)
+        public bool ShowInLists { get; private set; }
+
+        public static PaymentCategory Create(Guid id, int tenantId, string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods, bool showInLists = true)
         {
-            return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, housingDueType, isValidForAllPeriods);
+            return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, housingDueType, isValidForAllPeriods, showInLists);
         }
 
-        public static PaymentCategory Update(PaymentCategory existingPaymentCategory, string paymentCategoryName)
+        public static PaymentCategory Update(PaymentCategory existingPaymentCategory, string paymentCategoryName, bool showInLists = true)
         {
             return BindEntity(existingPaymentCategory, existingPaymentCategory.Id, existingPaymentCategory.TenantId,
-                paymentCategoryName, existingPaymentCategory.HousingDueType, existingPaymentCategory.IsValidForAllPeriods);
+                paymentCategoryName, existingPaymentCategory.HousingDueType, existingPaymentCategory.IsValidForAllPeriods, showInLists);
         }
 
         private static PaymentCategory BindEntity(PaymentCategory paymentCategory, Guid id, int tenantId,
-            string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods)
+            string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods, bool showInLists)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
             {
@@ -51,6 +52,7 @@ namespace Sirius.PaymentCategories
             paymentCategory.PaymentCategoryName = paymentCategoryName;
             paymentCategory.HousingDueType = housingDueType;
             paymentCategory.IsValidForAllPeriods = isValidForAllPeriods;
+            paymentCategory.ShowInLists = showInLists;
 
             return paymentCategory;
         }

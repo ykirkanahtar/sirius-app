@@ -3405,61 +3405,6 @@ export class PaymentAccountServiceProxy {
     }
 
     /**
-     * @return Success
-     */
-    getPaymentAccountLookUp(): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentAccount/GetPaymentAccountLookUp";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetPaymentAccountLookUp(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetPaymentAccountLookUp(<any>response_);
-                } catch (e) {
-                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetPaymentAccountLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200.push(LookUpDto.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<LookUpDto[]>(<any>null);
-    }
-
-    /**
      * @param body (optional) 
      * @return Success
      */
@@ -3741,6 +3686,61 @@ export class PaymentAccountServiceProxy {
             }));
         }
         return _observableOf<PaymentAccountDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getPaymentAccountLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentAccount/GetPaymentAccountLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentAccountLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentAccountLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentAccountLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -9436,6 +9436,53 @@ export interface IHousingPaymentPlanGroupDtoPagedResultDto {
     items: HousingPaymentPlanGroupDto[] | undefined;
 }
 
+export class CreateTransferForPaymentAccountDto implements ICreateTransferForPaymentAccountDto {
+    processDateTime: moment.Moment;
+    amount: number;
+
+    constructor(data?: ICreateTransferForPaymentAccountDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): CreateTransferForPaymentAccountDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTransferForPaymentAccountDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["amount"] = this.amount;
+        return data; 
+    }
+
+    clone(): CreateTransferForPaymentAccountDto {
+        const json = this.toJSON();
+        let result = new CreateTransferForPaymentAccountDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateTransferForPaymentAccountDto {
+    processDateTime: moment.Moment;
+    amount: number;
+}
+
 export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccountDto {
     accountName: string | undefined;
     description: string | undefined;
@@ -9443,6 +9490,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 
     constructor(data?: ICreateBankOrAdvanceAccountDto) {
         if (data) {
@@ -9461,6 +9509,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.createTransferForPaymentAccount = _data["createTransferForPaymentAccount"] ? CreateTransferForPaymentAccountDto.fromJS(_data["createTransferForPaymentAccount"]) : <any>undefined;
         }
     }
 
@@ -9479,6 +9528,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["createTransferForPaymentAccount"] = this.createTransferForPaymentAccount ? this.createTransferForPaymentAccount.toJSON() : <any>undefined;
         return data; 
     }
 
@@ -9497,6 +9547,7 @@ export interface ICreateBankOrAdvanceAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 }
 
 export class CreateCashAccountDto implements ICreateCashAccountDto {
@@ -9505,6 +9556,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
+    createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 
     constructor(data?: ICreateCashAccountDto) {
         if (data) {
@@ -9522,6 +9574,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.personId = _data["personId"];
             this.employeeId = _data["employeeId"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.createTransferForPaymentAccount = _data["createTransferForPaymentAccount"] ? CreateTransferForPaymentAccountDto.fromJS(_data["createTransferForPaymentAccount"]) : <any>undefined;
         }
     }
 
@@ -9539,6 +9592,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["personId"] = this.personId;
         data["employeeId"] = this.employeeId;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["createTransferForPaymentAccount"] = this.createTransferForPaymentAccount ? this.createTransferForPaymentAccount.toJSON() : <any>undefined;
         return data; 
     }
 
@@ -9556,6 +9610,7 @@ export interface ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
+    createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 }
 
 export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {

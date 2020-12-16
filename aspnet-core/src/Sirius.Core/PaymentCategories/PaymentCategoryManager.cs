@@ -10,6 +10,7 @@ using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks;
 using Sirius.HousingPaymentPlans;
+using Sirius.Shared.Constants;
 using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentCategories
@@ -64,18 +65,20 @@ namespace Sirius.PaymentCategories
 
         public async Task<PaymentCategory> GetRegularHousingDueAsync()
         {
-            var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+            return await _paymentCategoryRepository.SingleAsync(p =>
                 p.HousingDueType == HousingDueType.RegularHousingDue);
-
-            return query.Single();
         }
 
         public async Task<PaymentCategory> GetTransferForRegularHousingDueAsync()
         {
-            var query = await _paymentCategoryRepository.GetAllListAsync(p =>
+            return await _paymentCategoryRepository.SingleAsync(p =>
                 p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
-
-            return query.Single();
+        }
+        
+        public async Task<PaymentCategory> GetTransferForPaymentAccountAsync()
+        {
+            return await _paymentCategoryRepository.SingleAsync(p =>
+                p.PaymentCategoryName == AppConstants.TransferForPaymentAccount);
         }
 
         public async Task<PaymentCategory> GetAsync(Guid id)

@@ -15,18 +15,14 @@ namespace Sirius.AppPaymentAccounts
     {
         protected PaymentAccount()
         {
-
         }
 
         public int TenantId { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string AccountName { get; private set; }
+        [Required] [StringLength(50)] public string AccountName { get; private set; }
 
         public PaymentAccountType PaymentAccountType { get; private set; }
-        [DefaultValue(0)]
-        public decimal Balance { get; private set; }
+        [DefaultValue(0)] public decimal Balance { get; private set; }
         public string Description { get; private set; }
 
         public Guid? PersonId { get; private set; }
@@ -36,32 +32,41 @@ namespace Sirius.AppPaymentAccounts
         public string Iban { get; private set; }
         public bool TenantIsOwner { get; private set; }
 
-        public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description, Guid? personId, Guid? employeeId, bool tenantIsOwner)
+        public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description,
+            Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
         {
-            return BindEntity(new PaymentAccount(),  id, tenantId, PaymentAccountType.Cash, accountName, description, personId, employeeId,
-                tenantIsOwner);
+            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.Cash, accountName, description,
+                personId, employeeId,
+                tenantIsOwner, null, balance);
         }
 
-        public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description, string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner)
+        public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description,
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
         {
-            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName, description, personId, employeeId,
-                tenantIsOwner, iban);
+            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName,
+                description, personId, employeeId,
+                tenantIsOwner, iban, balance);
         }
 
-        public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description, string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner)
+        public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description,
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
         {
-            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName, description, personId, employeeId,
-                tenantIsOwner, iban);
+            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName,
+                description, personId, employeeId,
+                tenantIsOwner, iban, balance);
         }
 
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
-            string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, string iban = null)
+            string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, string iban = null, decimal? balance = null)
         {
             return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
-                existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId, tenantIsOwner, iban);
+                existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId,
+                tenantIsOwner, iban, balance);
         }
-        
-        private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId, PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, string iban = null)
+
+        private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId,
+            PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId,
+            Guid? employeeId, bool tenantIsOwner, string iban = null, decimal? balance = null)
         {
             paymentAccount ??= new PaymentAccount();
 
@@ -75,27 +80,29 @@ namespace Sirius.AppPaymentAccounts
             paymentAccount.PaymentAccountType = paymentAccountType;
             paymentAccount.Iban = iban;
             paymentAccount.TenantIsOwner = tenantIsOwner;
-
+            paymentAccount.Balance = balance ?? 0;
+            
             return paymentAccount;
-        }     
-        
+        }
+
         public static PaymentAccount IncreaseBalance(PaymentAccount paymentAccount, decimal amount)
         {
             if (amount < 0)
             {
                 throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
             }
+
             paymentAccount.Balance += amount;
             return paymentAccount;
         }
-        
+
         public static PaymentAccount DecreaseBalance(PaymentAccount paymentAccount, decimal amount)
         {
             if (amount < 0)
             {
                 throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
             }
-            
+
             paymentAccount.Balance -= amount;
             return paymentAccount;
         }

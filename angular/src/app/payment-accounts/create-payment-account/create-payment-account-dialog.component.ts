@@ -10,7 +10,15 @@ import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import { AppComponentBase } from '@shared/app-component-base';
-import { PaymentAccountDto, PaymentAccountServiceProxy, CreateCashAccountDto, CreateBankOrAdvanceAccountDto, PaymentAccountType } from '@shared/service-proxies/service-proxies';
+import { 
+  PaymentAccountDto, 
+  PaymentAccountServiceProxy, 
+  CreateCashAccountDto, 
+  CreateBankOrAdvanceAccountDto, 
+  PaymentAccountType,
+  CreateTransferForPaymentAccountDto,
+} from '@shared/service-proxies/service-proxies';
+import * as moment from 'moment';
 
 @Component({
   templateUrl: 'create-payment-account-dialog.component.html'
@@ -19,6 +27,9 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
   implements OnInit {
   saving = false;
   paymentAccount = new PaymentAccountDto();
+  transferForPaymentAccount = new CreateTransferForPaymentAccountDto();
+  dateForDatepicker = moment();
+
   paymentAccountTypeEnum = PaymentAccountType;
 
   @Input() paymentAccountType: PaymentAccountType;
@@ -42,6 +53,7 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
     if (this.paymentAccountType === PaymentAccountType.Cash) {
       const cashPaymentAccount = new CreateCashAccountDto();
       cashPaymentAccount.init(this.paymentAccount);
+      cashPaymentAccount.createTransferForPaymentAccount = this.transferForPaymentAccount;
 
       this._paymentAccountService
         .createCashAccount(cashPaymentAccount)
@@ -58,6 +70,7 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
     } else if (this.paymentAccountType === PaymentAccountType.BankAccount) {
       const bankAccountPaymentAccount = new CreateBankOrAdvanceAccountDto();
       bankAccountPaymentAccount.init(this.paymentAccount);
+      bankAccountPaymentAccount.createTransferForPaymentAccount = this.transferForPaymentAccount;
 
       this._paymentAccountService
         .createBankAccount(bankAccountPaymentAccount)

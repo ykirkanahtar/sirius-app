@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Identity;
 using Sirius.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Seed.Tenants;
 using Sirius.PaymentCategories;
+using Sirius.Shared.Constants;
 using Sirius.Shared.Enums;
 
 namespace Sirius.MultiTenancy
@@ -108,6 +109,10 @@ namespace Sirius.MultiTenancy
                 var transferForHousingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
                     tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(), HousingDueType.TransferForRegularHousingDue, true);
                 await _paymentCategoryManager.CreateAsync(transferForHousingDuePaymentCategory);
+                
+                var transferForPaymentAccountCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, AppConstants.TransferForPaymentAccount, null, true, false);
+                await _paymentCategoryManager.CreateAsync(transferForPaymentAccountCategory);
             }
 
             return MapToEntityDto(tenant);

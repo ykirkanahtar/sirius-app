@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Abp;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AppPaymentAccounts;
 using Sirius.HousingPaymentPlans;
@@ -23,21 +25,64 @@ namespace Sirius.AccountBooks
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IPaymentAccountManager _paymentAccountManager;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IHousingManager _housingManager;
 
         public AccountBookManager(IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IHousingPaymentPlanManager housingPaymentPlanManager,
             IPaymentAccountManager paymentAccountManager,
-            IRepository<AccountBookFile, Guid> accountBookFileRepository)
+            IRepository<AccountBookFile, Guid> accountBookFileRepository, 
+            IPaymentCategoryManager paymentCategoryManager, 
+            IHousingManager housingManager)
         {
             _accountBookRepository = accountBookRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _paymentAccountManager = paymentAccountManager;
             _accountBookFileRepository = accountBookFileRepository;
+            _paymentCategoryManager = paymentCategoryManager;
+            _housingManager = housingManager;
         }
 
-        public async Task CreateAsync(AccountBook accountBook)
+        public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount)
+        {
+            await _accountBookRepository.InsertAsync(accountBook);
+
+            var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+
+            await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+            
+            await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
+                SequentialGuidGenerator.Instance.Create()
+                , accountBook.TenantId
+                , housing
+                , housingDuePaymentCategory
+                , accountBook.ProcessDateTime
+                , accountBook.Amount
+                , accountBook.Description
+                , accountBook
+            ));
+            
+            await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+        }
+
+        public async Task CreateAsync(AccountBook accountBook, [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
+        {
+            await _accountBookRepository.InsertAsync(accountBook);
+
+            if (fromPaymentAccount != null)
+            {
+                await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
+            }
+
+            if (toPaymentAccount != null)
+            {
+                await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+            }
+        }
+        
+        public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
         {
             await _accountBookRepository.InsertAsync(accountBook);
         }
