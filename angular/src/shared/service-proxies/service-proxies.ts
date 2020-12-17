@@ -7043,6 +7043,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -7071,6 +7072,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -7099,6 +7101,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -7127,6 +7130,7 @@ export interface IPaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -9490,6 +9494,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 
     constructor(data?: ICreateBankOrAdvanceAccountDto) {
@@ -9509,6 +9514,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.isDefault = _data["isDefault"];
             this.createTransferForPaymentAccount = _data["createTransferForPaymentAccount"] ? CreateTransferForPaymentAccountDto.fromJS(_data["createTransferForPaymentAccount"]) : <any>undefined;
         }
     }
@@ -9528,6 +9534,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["isDefault"] = this.isDefault;
         data["createTransferForPaymentAccount"] = this.createTransferForPaymentAccount ? this.createTransferForPaymentAccount.toJSON() : <any>undefined;
         return data; 
     }
@@ -9547,6 +9554,7 @@ export interface ICreateBankOrAdvanceAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 }
 
@@ -9556,6 +9564,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 
     constructor(data?: ICreateCashAccountDto) {
@@ -9574,6 +9583,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.personId = _data["personId"];
             this.employeeId = _data["employeeId"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.isDefault = _data["isDefault"];
             this.createTransferForPaymentAccount = _data["createTransferForPaymentAccount"] ? CreateTransferForPaymentAccountDto.fromJS(_data["createTransferForPaymentAccount"]) : <any>undefined;
         }
     }
@@ -9592,6 +9602,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["personId"] = this.personId;
         data["employeeId"] = this.employeeId;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["isDefault"] = this.isDefault;
         data["createTransferForPaymentAccount"] = this.createTransferForPaymentAccount ? this.createTransferForPaymentAccount.toJSON() : <any>undefined;
         return data; 
     }
@@ -9610,6 +9621,7 @@ export interface ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     createTransferForPaymentAccount: CreateTransferForPaymentAccountDto;
 }
 
@@ -9620,6 +9632,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -9646,6 +9659,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
+            this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -9672,6 +9686,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
+        data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -9698,6 +9713,7 @@ export interface IUpdatePaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

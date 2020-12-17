@@ -87,7 +87,7 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
     } else if (this.paymentAccountType === PaymentAccountType.AdvanceAccount) {
       const advanceAccountPaymentAccount = new CreateBankOrAdvanceAccountDto();
       advanceAccountPaymentAccount.init(this.paymentAccount);
-
+      
       this._paymentAccountService
         .createAdvanceAccount(advanceAccountPaymentAccount)
         .pipe(

@@ -18,6 +18,7 @@ namespace Sirius.PaymentAccounts.Dto
         public Guid? PersonId { get; set; }
         public Guid? EmployeeId { get; set; }
         public bool TenantIsOwner { get; set; }
+        public bool IsDefault { get; set; }
         
         public CreateTransferForPaymentAccountDto CreateTransferForPaymentAccount { get; set; }
     }

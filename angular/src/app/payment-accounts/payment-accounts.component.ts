@@ -1,33 +1,34 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { Component, Injector, OnInit, ViewChild } from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { appModuleAnimation } from "@shared/animations/routerTransition";
 import {
   PagedListingComponentBase,
   PagedRequestDto,
-} from '@shared/paged-listing-component-base';
-import { CreatePaymentAccountDialogComponent } from './create-payment-account/create-payment-account-dialog.component';
+} from "@shared/paged-listing-component-base";
+import { CreatePaymentAccountDialogComponent } from "./create-payment-account/create-payment-account-dialog.component";
 import {
   PaymentAccountDto,
   PaymentAccountServiceProxy,
   PaymentAccountDtoPagedResultDto,
   PaymentAccountType,
-} from '@shared/service-proxies/service-proxies';
-import { LazyLoadEvent } from 'primeng/api';
-import { Table } from 'primeng/table';
+} from "@shared/service-proxies/service-proxies";
+import { LazyLoadEvent } from "primeng/api";
+import { Table } from "primeng/table";
+import { EditPaymentAccountDialogComponent } from "./edit-payment-account/edit-payment-account-dialog.component";
 
 class PagedPaymentAccountRequestDto extends PagedRequestDto {
   keyword: string;
 }
 
 @Component({
-  templateUrl: './payment-accounts.component.html',
+  templateUrl: "./payment-accounts.component.html",
   animations: [appModuleAnimation()],
 })
 export class PaymentAccountsComponent
   extends PagedListingComponentBase<PaymentAccountDto>
   implements OnInit {
-  @ViewChild('dataTable', { static: true }) dataTable: Table;
+  @ViewChild("dataTable", { static: true }) dataTable: Table;
 
   sortingColumn: string;
   paymentAccounts: PaymentAccountDto[] = [];
@@ -47,7 +48,11 @@ export class PaymentAccountsComponent
   }
 
   createPaymentAccount(paymentAccountType: PaymentAccountType): void {
-    this.showCreateOrEditPaymentAccountDialog(paymentAccountType);
+    this.showCreatePaymentAccountDialog(paymentAccountType);
+  }
+
+  editPaymentAccount(paymentAccount: PaymentAccountDto): void {
+    this.showEditPaymentAccountDialog(paymentAccount);
   }
 
   getData(event?: LazyLoadEvent) {
@@ -75,14 +80,14 @@ export class PaymentAccountsComponent
 
   protected delete(paymentAccount: PaymentAccountDto): void {
     abp.message.confirm(
-      this.l('PaymentAccountDeleteWarningMessage', paymentAccount.accountName),
+      this.l("PaymentAccountDeleteWarningMessage", paymentAccount.accountName),
       undefined,
       (result: boolean) => {
         if (result) {
           this._paymentAccountService
             .delete(paymentAccount.id)
             .subscribe(() => {
-              abp.notify.success(this.l('SuccessfullyDeleted'));
+              abp.notify.success(this.l("SuccessfullyDeleted"));
               this.refresh();
             });
         }
@@ -90,32 +95,40 @@ export class PaymentAccountsComponent
     );
   }
 
-  private showCreateOrEditPaymentAccountDialog(
-    paymentAccountType: PaymentAccountType,
-    id?: number
+  private showCreatePaymentAccountDialog(
+    paymentAccountType: PaymentAccountType
   ): void {
     let createOrEditPaymentAccountDialog: BsModalRef;
-    if (!id) {
-      createOrEditPaymentAccountDialog = this._modalService.show(
-        CreatePaymentAccountDialogComponent,
-        {
-          class: 'modal-lg',
-        }
-      );
-    }
-    // else {
-    //   createOrEditPaymentAccountDialog = this._modalService.show(
-    //     EditPaymentAccountDialogComponent,
-    //     {
-    //       class: 'modal-lg',
-    //       initialState: {
-    //         id: id,
-    //       },
-    //     }
-    //   );
-    // }
+    createOrEditPaymentAccountDialog = this._modalService.show(
+      CreatePaymentAccountDialogComponent,
+      {
+        class: "modal-lg",
+      }
+    );
 
     createOrEditPaymentAccountDialog.content.paymentAccountType = paymentAccountType;
+
+    createOrEditPaymentAccountDialog.content.onSave.subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  private showEditPaymentAccountDialog(
+    paymentAccount: PaymentAccountDto
+  ): void {
+    let createOrEditPaymentAccountDialog: BsModalRef;
+
+    createOrEditPaymentAccountDialog = this._modalService.show(
+      EditPaymentAccountDialogComponent,
+      {
+        class: "modal-lg",
+        initialState: {
+          id: paymentAccount.id,
+        },
+      }
+    );
+
+    createOrEditPaymentAccountDialog.content.paymentAccountType = paymentAccount.paymentAccountType;
 
     createOrEditPaymentAccountDialog.content.onSave.subscribe(() => {
       this.refresh();

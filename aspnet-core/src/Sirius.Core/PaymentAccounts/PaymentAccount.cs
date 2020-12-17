@@ -31,42 +31,44 @@ namespace Sirius.AppPaymentAccounts
 
         public string Iban { get; private set; }
         public bool TenantIsOwner { get; private set; }
+        public bool IsDefault { get; private set; }
 
         public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description,
-            Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
+            Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.Cash, accountName, description,
                 personId, employeeId,
-                tenantIsOwner, null, balance);
+                tenantIsOwner, isDefault, null, balance);
         }
 
         public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, iban, balance);
+                tenantIsOwner, isDefault, iban, balance);
         }
 
         public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, decimal? balance = null)
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, iban, balance);
+                tenantIsOwner, isDefault, iban, balance);
         }
 
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
-            string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, string iban = null, decimal? balance = null)
+            string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
+            string iban = null, decimal? balance = null)
         {
             return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
                 existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId,
-                tenantIsOwner, iban, balance);
+                tenantIsOwner, isDefault, iban, balance);
         }
 
         private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId,
             PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId,
-            Guid? employeeId, bool tenantIsOwner, string iban = null, decimal? balance = null)
+            Guid? employeeId, bool tenantIsOwner, bool isDefault, string iban = null, decimal? balance = null)
         {
             paymentAccount ??= new PaymentAccount();
 
@@ -80,8 +82,9 @@ namespace Sirius.AppPaymentAccounts
             paymentAccount.PaymentAccountType = paymentAccountType;
             paymentAccount.Iban = iban;
             paymentAccount.TenantIsOwner = tenantIsOwner;
+            paymentAccount.IsDefault = isDefault;
             paymentAccount.Balance = balance ?? 0;
-            
+
             return paymentAccount;
         }
 
@@ -104,6 +107,12 @@ namespace Sirius.AppPaymentAccounts
             }
 
             paymentAccount.Balance -= amount;
+            return paymentAccount;
+        }
+
+        public static PaymentAccount UnSetDefaultPaymentAccount(PaymentAccount paymentAccount)
+        {
+            paymentAccount.IsDefault = false;
             return paymentAccount;
         }
     }

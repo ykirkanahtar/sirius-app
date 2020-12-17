@@ -221,6 +221,8 @@
     <text name="HousingTenant">Kiracı</text>
     <text name="Images">Görseller</text>
     <text name="IsDebtText">Site / Apt. alacaklı</text>
+    <text name="IsDefaultPaymentAccount">Varsayılan ödeme hesabı</text>
+    <text name="IsDefaultPaymentAccountShort">Varsayılan öd. hsb.</text>
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>

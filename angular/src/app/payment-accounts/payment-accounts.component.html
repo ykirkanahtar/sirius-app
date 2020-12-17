@@ -74,6 +74,10 @@
                   {{ "Balance" | localize }}
                   <p-sortIcon field="Balance"></p-sortIcon>
                 </th>
+                <th pSortableColumn="IsDefault">
+                  {{ "IsDefaultPaymentAccountShort" | localize }}
+                  <p-sortIcon field="IsDefault"></p-sortIcon>
+                </th>                
                 <th pSortableColumn="TenantIsOwner">
                   {{ "TenantIsOwner" | localize }}
                   <p-sortIcon field="TenantIsOwner"></p-sortIcon>
@@ -106,10 +110,13 @@
                 </td>
                 <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>
                 <td>
+                  {{ (paymentAccount.isDefault ? "Yes" : "No") | localize }}
+                </td>                
+                <td>
                   {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}
                 </td>
                 <td>
-                  <!-- <button
+                  <button
                     type="button"
                     *ngIf="this.permissionHelper.editPaymentAccount()"
                     class="btn btn-sm bg-secondary"
@@ -117,7 +124,7 @@
                   >
                     <i class="fas fa-pencil-alt"></i>
                     {{ "Edit" | localize }}
-                  </button> -->
+                  </button>
                   <button
                     type="button"
                     *ngIf="this.permissionHelper.deletePaymentAccount()"
