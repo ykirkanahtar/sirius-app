@@ -94,7 +94,7 @@ namespace Sirius.PaymentAccounts
         public async Task<PaymentAccountDto> CreateCashAccountAsync(CreateCashAccountDto input)
         {
             CheckUpdatePermission();
-            
+
             var newPaymentAccountId = SequentialGuidGenerator.Instance.Create();
             var paymentAccount = PaymentAccount.CreateCashAccount(
                 newPaymentAccountId
@@ -108,9 +108,9 @@ namespace Sirius.PaymentAccounts
                 , input.CreateTransferForPaymentAccount.Amount
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
-            
+
             await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
-            
+
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
 
@@ -125,7 +125,8 @@ namespace Sirius.PaymentAccounts
             CheckUpdatePermission();
             var existingPaymentAccount = await _paymentAccountRepository.GetAsync(input.Id);
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
-                input.PersonId, input.EmployeeId, input.TenantIsOwner, input.IsDefault, input.Iban);
+                input.PersonId, input.EmployeeId, input.TenantIsOwner, input.IsDefault, existingPaymentAccount.Balance,
+                input.Iban);
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
@@ -163,7 +164,8 @@ namespace Sirius.PaymentAccounts
                     select new LookUpDto(l.Id.ToString(), l.AccountName)).ToList();
         }
 
-        private async Task CreateAccountBookAsync(CreateTransferForPaymentAccountDto input, PaymentAccount paymentAccount)
+        private async Task CreateAccountBookAsync(CreateTransferForPaymentAccountDto input,
+            PaymentAccount paymentAccount)
         {
             if (input.Amount != 0)
             {

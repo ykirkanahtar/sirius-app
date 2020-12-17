@@ -59,7 +59,7 @@ namespace Sirius.AppPaymentAccounts
 
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
             string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
-            string iban = null, decimal? balance = null)
+            decimal balance, string iban = null)
         {
             return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
                 existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId,
