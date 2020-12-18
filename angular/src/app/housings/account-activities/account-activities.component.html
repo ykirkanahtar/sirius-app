@@ -12,21 +12,11 @@
       <tab [heading]="'Details' | localize" class="pt-3 px-2">
         <div class="form-group row readonly">
           <label class="col-md-3 col-form-label" for="block">
-            {{ "Block" | localize }}
+            {{ "BlockAndApartment" | localize }}
           </label>
           <div class="col-md-9">
             <label class="col-md-3 col-form-label">
-              {{ block.blockName }}
-            </label>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label" for="apartment">
-            {{ "Apartment" | localize }}
-          </label>
-          <div class="col-md-9">
-            <label class="col-md-3 col-form-label">
-              {{ housing.apartment }}
+              {{ block.blockName + ' / ' + housing.apartment }}
             </label>
           </div>
         </div>
@@ -45,6 +35,9 @@
                   (onLazyLoad)="getData($event)"
                   [lazy]="true"
                   [loading]="isTableLoading"
+                  [paginator]="true" 
+                  [rows]="10" 
+                  [totalRecords]="totalRecords"
                 >
                   <ng-template pTemplate="header">
                     <tr>
@@ -66,21 +59,7 @@
                       </th>
                     </tr>
                   </ng-template>
-                  <ng-template
-                    pTemplate="body"
-                    ngFor
-                    let-housingPaymentPlan
-                    [ngForOf]="
-                      housingPaymentPlans
-                        | paginate
-                          : {
-                              id: 'server',
-                              itemsPerPage: pageSize,
-                              currentPage: pageNumber,
-                              totalItems: totalItems
-                            }
-                    "
-                  >
+                  <ng-template pTemplate="body" let-housingPaymentPlan>
                     <tr>
                       <td>
                         {{ housingPaymentPlan.date.format("DD-MM-YYYY") }}
@@ -102,30 +81,12 @@
                       <td>{{ housingPaymentPlan.amount | number: "1.2-2" }}</td>
                     </tr>
                   </ng-template>
-                </p-table>
-              </div>
-              <div class="card-footer bg-light border-top">
-                <div class="row">
-                  <div class="col-sm-4 col-12 text-sm-left text-center">
-                    <button class="btn btn-secondary" (click)="refresh()">
-                      <i class="fas fa-redo-alt"></i>
-                    </button>
-                  </div>
-                  <div class="col-sm-4 col-12 text-center">
+                  <ng-template pTemplate="paginatorleft">
                     <p class="mb-0 my-2">
-                      {{ "TotalRecordsCount" | localize: totalItems }}
+                      {{ "TotalRecordsCount" | localize: totalRecords }}
                     </p>
-                  </div>
-                  <div class="col-sm-4 col-12">
-                    <div class="float-sm-right m-auto">
-                      <abp-pagination-controls
-                        id="server"
-                        (pageChange)="getDataPage($event)"
-                      >
-                      </abp-pagination-controls>
-                    </div>
-                  </div>
-                </div>
+                  </ng-template>
+                </p-table>
               </div>
             </div>
           </div>
