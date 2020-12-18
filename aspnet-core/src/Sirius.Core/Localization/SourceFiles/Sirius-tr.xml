@@ -276,6 +276,7 @@
     <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>
     <text name="UploadFile">Dosya yükle</text>
+    <text name="UsersActivation">Kullanıcı aktivasyonu</text>
     <text name="WorkerWarmingFee">Görevli ısınma ödemesi</text>
   </texts>
 </localizationDictionary>

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201218071242_Upgraded_To_Abp_6_0_0")]
+    partial class Upgraded_To_Abp_6_0_0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

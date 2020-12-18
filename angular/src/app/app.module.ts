@@ -73,7 +73,6 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FileUploadModule } from 'primeng/fileupload';
 import { GalleriaModule } from 'primeng/galleria';
 import { DialogModule } from 'primeng/dialog';
-import { ModalGalleryModule } from 'angular-modal-gallery';
 
 // tslint:disable-next-line: max-line-length
 import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
@@ -169,7 +168,6 @@ import { trLocale } from 'ngx-bootstrap/locale';
     FileUploadModule,
     GalleriaModule,
     DialogModule,
-    ModalGalleryModule.forRoot() // <-------------------------------------------- angular-modal-gallery module import
   ],
   providers: [],
   entryComponents: [

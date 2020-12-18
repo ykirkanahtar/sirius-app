@@ -1,6 +1,4 @@
-﻿using Abp;
-
-namespace Sirius.EntityFrameworkCore.Seed.Host
+﻿namespace Sirius.EntityFrameworkCore.Seed.Host
 {
     public class InitialHostDbBuilder
     {
@@ -17,6 +15,7 @@ namespace Sirius.EntityFrameworkCore.Seed.Host
             new DefaultLanguagesCreator(_context).Create();
             new HostRoleAndUserCreator(_context).Create();
             new DefaultSettingsCreator(_context).Create();
+
             _context.SaveChanges();
         }
     }
