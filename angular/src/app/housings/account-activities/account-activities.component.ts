@@ -25,6 +25,7 @@ import {
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
 import { LazyLoadEvent } from 'primeng/api';
+import { AppComponentBase } from '@shared/app-component-base';
 
 class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   keyword: string;
@@ -34,12 +35,14 @@ class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   templateUrl: './account-activities.component.html',
   animations: [appModuleAnimation()]
 })
-export class AccountActivitiesDialogComponent extends PagedListingComponentBase<HousingPaymentPlanDto>
+export class AccountActivitiesDialogComponent extends AppComponentBase
   implements OnInit {
 
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
+  totalRecords: number;
+  isTableLoading: boolean = false;
 
   housingPaymentPlans: HousingPaymentPlanDto[] = [];
   housing = new HousingDto();
@@ -66,35 +69,22 @@ export class AccountActivitiesDialogComponent extends PagedListingComponentBase<
         this.housing = result;
         this.block = this.housing.block;
       });
-
-    this.getDataPage(1);
   }
 
   getData(event?: LazyLoadEvent) {
-    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
-    this.getDataPage(1);
-  }
+    this.isTableLoading = true;
 
-  protected list(
-    request: PagedHousingPaymentPlanResultRequestDto,
-    pageNumber: number,
-    finishedCallback: Function
-  ): void {
+    this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
+    
+    let skipCount = event.first;
+    let maxResultCount = event.first + event.rows;
 
     this._housingPaymentPlanService
-      .getAllByHousingId(this.id, this.sortingColumn, request.skipCount, request.maxResultCount)
-      .pipe(
-        finalize(() => {
-          finishedCallback();
-        })
-      )
+      .getAllByHousingId(this.id, this.sortingColumn, skipCount, maxResultCount)
       .subscribe((result: HousingPaymentPlanDtoPagedResultDto) => {
         this.housingPaymentPlans = result.items;
-        this.showPaging(result, pageNumber);
+        this.totalRecords = result.totalCount;
+        this.isTableLoading = false;
       });
-  }
-
-  protected delete(): void {
-
   }
 }
