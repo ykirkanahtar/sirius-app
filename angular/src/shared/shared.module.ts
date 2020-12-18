@@ -17,7 +17,6 @@ import { LayoutStoreService } from './layout/layout-store.service';
 
 import { BusyDirective } from './directives/busy.directive';
 import { EqualValidator } from './directives/equal-validator.directive';
-import { PermissionHelper } from './helpers/PermissionHelper';
 
 @NgModule({
     imports: [
@@ -53,8 +52,7 @@ export class SharedModule {
                 AppUrlService,
                 AppAuthService,
                 AppRouteGuard,
-                LayoutStoreService,
-                PermissionHelper
+                LayoutStoreService
             ]
         };
     }

@@ -39,52 +39,6 @@ import { SidebarLogoComponent } from './layout/sidebar-logo.component';
 import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
 import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 
-// custom-components
-import { CreateHousingDialogComponent } from './housings/create-housing/create-housing-dialog.component';
-import { EditHousingDialogComponent } from './housings/edit-housing/edit-housing-dialog.component';
-import { AddPersonDialogComponent } from './housings/add-or-edit-person/add-person-dialog.component';
-import { AccountActivitiesDialogComponent } from './housings/account-activities/account-activities.component';
-import { HousingPeopleDialogComponent } from './housings/housing-people/housing-people.component';
-import { BlocksComponent } from './blocks/blocks.component';
-import { CreateBlockDialogComponent } from './blocks/create-block/create-block-dialog.component';
-import { EditBlockDialogComponent } from './blocks/edit-block/edit-block-dialog.component';
-import { EmployeesComponent } from './employees/employees.component';
-import { CreateEmployeeDialogComponent } from './employees/create-employee/create-employee-dialog.component';
-import { EditEmployeeDialogComponent } from './employees/edit-employee/edit-employee-dialog.component';
-import { PeopleComponent } from './people/people.component';
-import { CreatePersonDialogComponent } from './people/create-person/create-person-dialog.component';
-import { EditPersonDialogComponent } from './people/edit-person/edit-person-dialog.component';
-import { AccountBooksComponent } from './account-books/account-books.component';
-import { PaymentAccountsComponent } from './payment-accounts/payment-accounts.component';
-import { CreatePaymentAccountDialogComponent } from './payment-accounts/create-payment-account/create-payment-account-dialog.component';
-import { CreateHousingDueAccountBookDialogComponent } from './account-books/create-account-book/create-housing-due-account-book-dialog.component';
-import { CreateOtherPaymentAccountBookDialogComponent } from './account-books/create-account-book/create-other-payment-account-book-dialog.component';
-import { HousingsComponent } from './housings/housings.component';
-import { EditPaymentAccountDialogComponent } from './payment-accounts/edit-payment-account/edit-payment-account-dialog.component';
-// tslint:disable-next-line: max-line-length
-import { CreatePaymentCategoryDialogComponent } from './payment-categories/create-payment-category/create-payment-category-dialog.component';
-import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
-import { EditPaymentCategoryDialogComponent } from './payment-categories/edit-payment-category/edit-payment-category-dialog.component';
-import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { AutoCompleteModule } from 'primeng/autocomplete';
-import { FileUploadModule } from 'primeng/fileupload';
-import { GalleriaModule } from 'primeng/galleria';
-import { DialogModule } from 'primeng/dialog';
-import { ModalGalleryModule } from 'angular-modal-gallery';
-
-// tslint:disable-next-line: max-line-length
-import { CreateHousingCategoryDialogComponent } from './housing-categories/create-housing-category/create-housing-category-dialog.component';
-import { EditHousingCategoryDialogComponent } from './housing-categories/edit-housing-category/edit-housing-category-dialog.component';
-import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
-import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
-import { CreateHousingPaymentPlanGroupDialogComponent } from './housing-payment-plan-groups/create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component';
-import { EditHousingPaymentPlanGroupDialogComponent } from './housing-payment-plan-groups/edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component';
-import { defineLocale } from 'ngx-bootstrap/chronos';
-import { trLocale } from 'ngx-bootstrap/locale';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -113,39 +67,7 @@ import { trLocale } from 'ngx-bootstrap/locale';
     SidebarComponent,
     SidebarLogoComponent,
     SidebarUserPanelComponent,
-    SidebarMenuComponent,
-    // custom-components
-    HousingsComponent,
-    CreateHousingDialogComponent,
-    EditHousingDialogComponent,
-    AddPersonDialogComponent,
-    AccountActivitiesDialogComponent,
-    HousingPeopleDialogComponent,
-    BlocksComponent,
-    CreateBlockDialogComponent,
-    EditBlockDialogComponent,
-    EmployeesComponent,
-    CreateEmployeeDialogComponent,
-    EditEmployeeDialogComponent,
-    PeopleComponent,
-    CreatePersonDialogComponent,
-    EditPersonDialogComponent,
-    AccountBooksComponent,
-    PaymentAccountsComponent,
-    CreatePaymentAccountDialogComponent,
-    CreateHousingDialogComponent,
-    EditPaymentAccountDialogComponent,
-    CreateHousingDueAccountBookDialogComponent,
-    CreatePaymentCategoryDialogComponent,
-    EditPaymentCategoryDialogComponent,
-    PaymentCategoriesComponent,
-    CreateHousingCategoryDialogComponent,
-    EditHousingCategoryDialogComponent,
-    HousingCategoriesComponent,
-    HousingPaymentPlanGroupsComponent,
-    CreateHousingPaymentPlanGroupDialogComponent,
-    EditHousingPaymentPlanGroupDialogComponent,
-    CreateOtherPaymentAccountBookDialogComponent
+    SidebarMenuComponent
   ],
   imports: [
     CommonModule,
@@ -161,15 +83,6 @@ import { trLocale } from 'ngx-bootstrap/locale';
     ServiceProxyModule,
     SharedModule,
     NgxPaginationModule,
-    BsDatepickerModule.forRoot(),
-    DropdownModule,
-    TableModule,
-    MultiSelectModule,
-    AutoCompleteModule,
-    FileUploadModule,
-    GalleriaModule,
-    DialogModule,
-    ModalGalleryModule.forRoot() // <-------------------------------------------- angular-modal-gallery module import
   ],
   providers: [],
   entryComponents: [
@@ -185,10 +98,4 @@ import { trLocale } from 'ngx-bootstrap/locale';
     ResetPasswordDialogComponent,
   ],
 })
-export class AppModule {
-  constructor(private bsLocaleService: BsLocaleService) {
-    trLocale.invalidDate = 'Geçersiz tarih';
-    defineLocale('tr', trLocale);
-    this.bsLocaleService.use('tr');
-  }
-}
+export class AppModule {}

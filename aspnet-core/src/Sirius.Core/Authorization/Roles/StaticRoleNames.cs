@@ -10,10 +10,6 @@ namespace Sirius.Authorization.Roles
         public static class Tenants
         {
             public const string Admin = "Admin";
-            public const string SiteManagement = "SiteManagement";
-            public const string BlockManagement = "BlockManagement";
-            public const string HousingOwner = "HousingOwner";
-            public const string HousingTenant = "HousingTenant";
         }
     }
 }

@@ -16,11 +16,8 @@ using Sirius.Identity;
 using Abp.AspNetCore.SignalR.Hubs;
 using Abp.Dependency;
 using Abp.Json;
-using Azure.Storage.Blobs;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using Sirius.FileServices;
-using Sirius.Web.Host.Filters;
 
 namespace Sirius.Web.Host.Startup
 {
@@ -39,10 +36,6 @@ namespace Sirius.Web.Host.Startup
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped(x => new BlobServiceClient(_appConfiguration["AzureBlobStorage:ConnectionString"]));
-            services.AddScoped<IImageService, ImageService>();
-            services.AddSingleton<IBlobService, BlobService>();
-
             //MVC
             services.AddControllersWithViews(
                 options =>
@@ -56,7 +49,9 @@ namespace Sirius.Web.Host.Startup
                     NamingStrategy = new CamelCaseNamingStrategy()
                 };
             });
-            
+
+
+
             IdentityRegistrar.Register(services);
             AuthConfigurer.Configure(services, _appConfiguration);
 
@@ -111,8 +106,6 @@ namespace Sirius.Web.Host.Startup
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
                 });
-                options.SchemaFilter<EnumSchemaFilter>();
-
             });
 
             // Configure Abp and Dependency Injection
