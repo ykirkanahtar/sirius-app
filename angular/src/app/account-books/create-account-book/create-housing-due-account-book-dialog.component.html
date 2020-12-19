@@ -24,6 +24,7 @@
               class="form-control"
               [(ngModel)]="accountBook.processDateTime"
               bsDatepicker
+              required
             />
           </div>
         </div>
@@ -40,7 +41,7 @@
               (onChange)="onSelectedPersonChange($event)"
               [filter]="true"
               [style]="{ width: '100%' }"
-              required
+              [showClear]="true"
             >
             </p-dropdown>
           </div>
@@ -58,6 +59,7 @@
               [(ngModel)]="accountBook.housingId"
               [filter]="true"
               [style]="{ width: '100%' }"
+              required
             >
             </p-dropdown>
           </div>
@@ -75,6 +77,7 @@
               [(ngModel)]="accountBook.toPaymentAccountId"
               [filter]="true"
               [style]="{ width: '100%' }"
+              required
             >
             </p-dropdown>
           </div>
@@ -91,6 +94,7 @@
               id="amount"
               minlength="0"
               maxlength="10"
+              required
               [(ngModel)]="accountBook.amount"
               #amountModel="ngModel"
               #amountEl

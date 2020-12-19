@@ -86,17 +86,17 @@ export class CreateHousingDueAccountBookDialogComponent
   onSelectedPersonChange(event) {
     var selectedPerson = event.value;
 
-    if (selectedPerson) {
-      this._housingServiceProxy
-        .getHousingsLookUpByPersonId(selectedPerson)
-        .subscribe((result: LookUpDto[]) => {
-          this.housings = result;
-          if (this.housings.length === 1) {
-            this.accountBook.housingId = this.housings[0].value;
-          }
-        });
-    } else {
+    if (!selectedPerson) {
       this.getHousings();
+    } else {
+      this._housingServiceProxy
+      .getHousingsLookUpByPersonId(selectedPerson)
+      .subscribe((result: LookUpDto[]) => {
+        this.housings = result;
+        if (this.housings.length === 1) {
+          this.accountBook.housingId = this.housings[0].value;
+        }
+      });
     }
   }
 
@@ -105,6 +105,7 @@ export class CreateHousingDueAccountBookDialogComponent
       .getHousingLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.housings = result;
+        this.accountBook.housingId = null;
       });
   }
 
