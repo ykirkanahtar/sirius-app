@@ -14,5 +14,6 @@ namespace Sirius.PaymentAccounts
         Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input);
         Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input);
         Task<List<LookUpDto>> GetPaymentAccountLookUpAsync();
+        Task<PaymentAccountDto> GetDefaultPaymentAccountAsync();
     }
 }
