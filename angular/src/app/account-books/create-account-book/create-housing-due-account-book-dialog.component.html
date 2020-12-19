@@ -27,6 +27,24 @@
             />
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="apartment">
+            {{ "Person" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-dropdown
+              id="people"
+              name="people"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="people"
+              (onChange)="onSelectedPersonChange($event)"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
+          </div>
+        </div>
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="housingId">
             {{ "Housing" | localize }}

@@ -21,6 +21,7 @@ import {
   LookUpDto,
   CreateHousingDueAccountBookDto,
   PaymentAccountDto,
+  PersonServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { API_BASE_URL } from "@shared/service-proxies/service-proxies";
 import { throwError as _observableThrow, of as _observableOf } from "rxjs";
@@ -38,6 +39,7 @@ export class CreateHousingDueAccountBookDialogComponent
 
   housings: LookUpDto[];
   paymentAccounts: LookUpDto[];
+  people: LookUpDto[];
 
   uploadedFileUrls: any[] = [];
   baseUrl: string;
@@ -50,6 +52,7 @@ export class CreateHousingDueAccountBookDialogComponent
     private _accountBookServiceProxy: AccountBookServiceProxy,
     private _housingServiceProxy: HousingServiceProxy,
     private _paymentAccountServiceProxy: PaymentAccountServiceProxy,
+    private _personServiceProxy: PersonServiceProxy,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
@@ -59,11 +62,7 @@ export class CreateHousingDueAccountBookDialogComponent
   }
 
   ngOnInit(): void {
-    this._housingServiceProxy
-      .getHousingLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housings = result;
-      });
+    this.getHousings();
 
     this._paymentAccountServiceProxy
       .getPaymentAccountLookUp()
@@ -75,6 +74,37 @@ export class CreateHousingDueAccountBookDialogComponent
       .getDefaultPaymentAccount()
       .subscribe((result) => {
         this.accountBook.toPaymentAccountId = result.id;
+      });
+
+    this._personServiceProxy
+      .getPersonLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.people = result;
+      });
+  }
+
+  onSelectedPersonChange(event) {
+    var selectedPerson = event.value;
+
+    if (selectedPerson) {
+      this._housingServiceProxy
+        .getHousingsLookUpByPersonId(selectedPerson)
+        .subscribe((result: LookUpDto[]) => {
+          this.housings = result;
+          if (this.housings.length === 1) {
+            this.accountBook.housingId = this.housings[0].value;
+          }
+        });
+    } else {
+      this.getHousings();
+    }
+  }
+
+  getHousings() {
+    this._housingServiceProxy
+      .getHousingLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.housings = result;
       });
   }
 

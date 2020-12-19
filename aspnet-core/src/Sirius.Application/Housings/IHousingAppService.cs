@@ -15,5 +15,6 @@ namespace Sirius.Housings
         Task RemovePersonAsync(RemoveHousingPersonDto input);
         Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId);
         Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input);
+        Task<List<LookUpDto>> GetHousingsLookUpByPersonIdAsync(Guid personId);
     }
 }

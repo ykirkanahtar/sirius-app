@@ -114,7 +114,7 @@ namespace Sirius.Housings
             CheckUpdatePermission();
             var existingHousing = await _housingManager.GetAsync(input.Id);
             var oldTenantIsResidingValue = existingHousing.TenantIsResiding;
-            
+
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var block = await _blockRepository.GetAsync(input.BlockId);
 
@@ -236,6 +236,21 @@ namespace Sirius.Housings
 
             return new PagedResultDto<HousingPersonDto>(query.Count(),
                 ObjectMapper.Map<List<HousingPersonDto>>(housingPeople));
+        }
+
+        public async Task<List<LookUpDto>> GetHousingsLookUpByPersonIdAsync(Guid personId)
+        {
+            var housings = await (from h in _housingRepository.GetAll().Include(p => p.Block)
+                join hp in _housingPersonRepository.GetAll() on h.Id equals hp.HousingId
+                where hp.PersonId == personId
+                select h).ToListAsync();
+
+            if (housings.Count == 0)
+            {
+                throw new UserFriendlyException("Sistemde uygun konut bulunamadı.");
+            }
+
+            return housings.Select(p => new LookUpDto(p.Id.ToString(), p.GetName())).ToList();
         }
     }
 }
