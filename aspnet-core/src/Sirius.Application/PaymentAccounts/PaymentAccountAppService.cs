@@ -164,6 +164,14 @@ namespace Sirius.PaymentAccounts
                     select new LookUpDto(l.Id.ToString(), l.AccountName)).ToList();
         }
 
+        public async Task<PaymentAccountDto> GetDefaultPaymentAccountAsync()
+        {
+            CheckGetAllPermission();
+
+            var defaultPaymentAccount = await _paymentAccountRepository.GetAll().Where(p => p.IsDefault).SingleOrDefaultAsync();
+            return ObjectMapper.Map<PaymentAccountDto>(defaultPaymentAccount);
+        }
+
         private async Task CreateAccountBookAsync(CreateTransferForPaymentAccountDto input,
             PaymentAccount paymentAccount)
         {
