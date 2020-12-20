@@ -3,7 +3,11 @@ import {
   Injector,
   OnInit,
   EventEmitter,
-  Output
+  Output,
+  ViewChild,
+  ElementRef,
+  AfterContentChecked,
+  AfterViewInit
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -20,6 +24,7 @@ export class CreateBlockDialogComponent extends AppComponentBase
   block = new BlockDto();
 
   @Output() onSave = new EventEmitter<any>();
+  @ViewChild('blockNameEl') blockNameEl: ElementRef;
 
   constructor(
     injector: Injector,
@@ -29,8 +34,10 @@ export class CreateBlockDialogComponent extends AppComponentBase
     super(injector);
   }
 
-  ngOnInit(): void {
-
+  ngOnInit() {
+    setTimeout(() => {
+      this.blockNameEl.nativeElement.focus();
+    }, 100);
   }
 
   save(): void {

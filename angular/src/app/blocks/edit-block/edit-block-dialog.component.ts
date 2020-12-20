@@ -4,6 +4,8 @@ import {
   OnInit,
   EventEmitter,
   Output,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -22,6 +24,7 @@ export class EditBlockDialogComponent extends AppComponentBase
   block = new BlockDto();
 
   @Output() onSave = new EventEmitter<any>();
+  @ViewChild('blockNameEl') blockNameEl: ElementRef;
 
   constructor(
     injector: Injector,
@@ -37,6 +40,10 @@ export class EditBlockDialogComponent extends AppComponentBase
       .subscribe((result: BlockDto) => {
         this.block = result;
       });
+
+      setTimeout(() => {
+        this.blockNameEl.nativeElement.focus();
+      }, 100);
   }
 
   save(): void {
