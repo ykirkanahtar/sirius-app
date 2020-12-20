@@ -64,8 +64,6 @@ export class CreateHousingDialogComponent extends AppComponentBase
 
     this.housing.createTransferForHousingDue = new CreateTransferForHousingDueDto();
     this.housing.createTransferForHousingDue.isDebt = true;
-    this.housing.createTransferForHousingDue.date = moment();
-    this.dateForDatepicker = moment();
   }
 
   save(): void {

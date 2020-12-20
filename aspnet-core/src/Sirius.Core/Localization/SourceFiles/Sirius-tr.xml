@@ -148,6 +148,7 @@
     <text name="CreatePerson">Kişi oluştur</text>
     <text name="CreateNewAdvanceAccount">Avans hesabı ekle</text>
     <text name="CreateNewBankAccount">Banka hesabı ekle</text>
+    <text name="CreateNewBlock">Blok ekle</text>
     <text name="CreateNewCash">Nakit hesabı ekle</text>
     <text name="CreateNewEmployee">Çalışan ekle</text>
     <text name="CreateNewHousing">Konut ekle</text>
