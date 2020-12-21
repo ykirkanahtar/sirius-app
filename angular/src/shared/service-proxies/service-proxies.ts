@@ -1668,7 +1668,7 @@ export class HousingServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllList(housingIds: string[] | null | undefined, housingCategoryIds: string[] | null | undefined, personIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingListDtoPagedResultDto> {
+    getAllList(housingIds: string[] | null | undefined, housingCategoryIds: string[] | null | undefined, personIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingForListDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Housing/GetAllList?";
         if (housingIds !== undefined)
             housingIds && housingIds.forEach(item => { url_ += "HousingIds=" + encodeURIComponent("" + item) + "&"; });
@@ -1703,14 +1703,14 @@ export class HousingServiceProxy {
                 try {
                     return this.processGetAllList(<any>response_);
                 } catch (e) {
-                    return <Observable<HousingListDtoPagedResultDto>><any>_observableThrow(e);
+                    return <Observable<HousingForListDtoPagedResultDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<HousingListDtoPagedResultDto>><any>_observableThrow(response_);
+                return <Observable<HousingForListDtoPagedResultDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAllList(response: HttpResponseBase): Observable<HousingListDtoPagedResultDto> {
+    protected processGetAllList(response: HttpResponseBase): Observable<HousingForListDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1721,7 +1721,7 @@ export class HousingServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = HousingListDtoPagedResultDto.fromJS(resultData200);
+            result200 = HousingForListDtoPagedResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1729,7 +1729,7 @@ export class HousingServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<HousingListDtoPagedResultDto>(<any>null);
+        return _observableOf<HousingForListDtoPagedResultDto>(<any>null);
     }
 
     /**
@@ -8730,7 +8730,7 @@ export interface IUpdateHousingDto {
     tenantIsResiding: boolean;
 }
 
-export class HousingListDto implements IHousingListDto {
+export class HousingForListDto implements IHousingForListDto {
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryName: string | undefined;
@@ -8745,7 +8745,7 @@ export class HousingListDto implements IHousingListDto {
     creatorUserId: number | undefined;
     id: string;
 
-    constructor(data?: IHousingListDto) {
+    constructor(data?: IHousingForListDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -8772,9 +8772,9 @@ export class HousingListDto implements IHousingListDto {
         }
     }
 
-    static fromJS(data: any): HousingListDto {
+    static fromJS(data: any): HousingForListDto {
         data = typeof data === 'object' ? data : {};
-        let result = new HousingListDto();
+        let result = new HousingForListDto();
         result.init(data);
         return result;
     }
@@ -8797,15 +8797,15 @@ export class HousingListDto implements IHousingListDto {
         return data; 
     }
 
-    clone(): HousingListDto {
+    clone(): HousingForListDto {
         const json = this.toJSON();
-        let result = new HousingListDto();
+        let result = new HousingForListDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IHousingListDto {
+export interface IHousingForListDto {
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryName: string | undefined;
@@ -8821,11 +8821,11 @@ export interface IHousingListDto {
     id: string;
 }
 
-export class HousingListDtoPagedResultDto implements IHousingListDtoPagedResultDto {
+export class HousingForListDtoPagedResultDto implements IHousingForListDtoPagedResultDto {
     totalCount: number;
-    items: HousingListDto[] | undefined;
+    items: HousingForListDto[] | undefined;
 
-    constructor(data?: IHousingListDtoPagedResultDto) {
+    constructor(data?: IHousingForListDtoPagedResultDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -8840,14 +8840,14 @@ export class HousingListDtoPagedResultDto implements IHousingListDtoPagedResultD
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
-                    this.items.push(HousingListDto.fromJS(item));
+                    this.items.push(HousingForListDto.fromJS(item));
             }
         }
     }
 
-    static fromJS(data: any): HousingListDtoPagedResultDto {
+    static fromJS(data: any): HousingForListDtoPagedResultDto {
         data = typeof data === 'object' ? data : {};
-        let result = new HousingListDtoPagedResultDto();
+        let result = new HousingForListDtoPagedResultDto();
         result.init(data);
         return result;
     }
@@ -8863,17 +8863,17 @@ export class HousingListDtoPagedResultDto implements IHousingListDtoPagedResultD
         return data; 
     }
 
-    clone(): HousingListDtoPagedResultDto {
+    clone(): HousingForListDtoPagedResultDto {
         const json = this.toJSON();
-        let result = new HousingListDtoPagedResultDto();
+        let result = new HousingForListDtoPagedResultDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IHousingListDtoPagedResultDto {
+export interface IHousingForListDtoPagedResultDto {
     totalCount: number;
-    items: HousingListDto[] | undefined;
+    items: HousingForListDto[] | undefined;
 }
 
 export class CreateHousingPersonDto implements ICreateHousingPersonDto {

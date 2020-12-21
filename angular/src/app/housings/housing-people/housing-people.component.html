@@ -45,47 +45,36 @@
                 (onLazyLoad)="getData($event)"
                 [lazy]="true"
                 [loading]="isTableLoading"
+                [paginator]="true" 
+                [rows]="10" 
+                [totalRecords]="totalRecords"
               >
                 <ng-template pTemplate="header">
                   <tr>
-                    <th pSortableColumn="FirstName">
+                    <th pSortableColumn="person.firstName">
                       {{ "FirstName" | localize }}
-                      <p-sortIcon field="FirstName"></p-sortIcon>
+                      <p-sortIcon field="person.firstName"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="LastName">
+                    <th pSortableColumn="person.lastName">
                       {{ "LastName" | localize }}
-                      <p-sortIcon field="LastName"></p-sortIcon>
+                      <p-sortIcon field="person.lastName"></p-sortIcon>
                     </th>
                     <th pSortableColumn="IsTenant">
                       {{ "IsTenant" | localize }}
                       <p-sortIcon field="IsTenant"></p-sortIcon>
                     </th>                    
-                    <th pSortableColumn="Phone1">
+                    <th pSortableColumn="person.phone1">
                       {{ "Phone1" | localize }}
-                      <p-sortIcon field="Phone1"></p-sortIcon>
+                      <p-sortIcon field="person.phone1"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="Phone2">
+                    <th pSortableColumn="person.phone2">
                       {{ "Phone2" | localize }}
-                      <p-sortIcon field="Phone2"></p-sortIcon>
+                      <p-sortIcon field="person.phone2"></p-sortIcon>
                     </th>
                     <th>{{ "Actions" | localize }}</th>
                   </tr>
                 </ng-template>
-                <ng-template
-                  pTemplate="body"
-                  ngFor
-                  let-housingPerson
-                  [ngForOf]="
-                    housingPeople
-                      | paginate
-                        : {
-                            id: 'server',
-                            itemsPerPage: pageSize,
-                            currentPage: pageNumber,
-                            totalItems: totalItems
-                          }
-                  "
-                >
+                <ng-template pTemplate="body" let-housingPerson>
                   <tr>
                     <td>{{ housingPerson.person.firstName }}</td>
                     <td>{{ housingPerson.person.lastName }}</td>
@@ -97,7 +86,7 @@
                         type="button"
                         *ngIf="this.permissionHelper.deletePerson()"
                         class="btn btn-sm bg-danger mx-2"
-                        (click)="delete(housingPerson)"
+                        (click)="delete(housingPerson, $event)"
                       >
                         <i class="fas fa-trash"></i>
                         {{ "RemovePerson" | localize }}
@@ -105,30 +94,12 @@
                     </td>
                   </tr>
                 </ng-template>
+                <ng-template pTemplate="paginatorleft">
+                  <p class="mb-0 my-2">
+                    {{ "TotalRecordsCount" | localize: totalRecords }}
+                  </p>
+                </ng-template>
               </p-table>
-              </div>
-              <div class="card-footer bg-light border-top">
-                <div class="row">
-                  <div class="col-sm-4 col-12 text-sm-left text-center">
-                    <button class="btn btn-secondary" (click)="refresh()">
-                      <i class="fas fa-redo-alt"></i>
-                    </button>
-                  </div>
-                  <div class="col-sm-4 col-12 text-center">
-                    <p class="mb-0 my-2">
-                      {{ "TotalRecordsCount" | localize: totalItems }}
-                    </p>
-                  </div>
-                  <div class="col-sm-4 col-12">
-                    <div class="float-sm-right m-auto">
-                      <abp-pagination-controls
-                        id="server"
-                        (pageChange)="getDataPage($event)"
-                      >
-                      </abp-pagination-controls>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
