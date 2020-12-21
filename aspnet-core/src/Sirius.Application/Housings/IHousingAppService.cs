@@ -16,5 +16,6 @@ namespace Sirius.Housings
         Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId);
         Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input);
         Task<List<LookUpDto>> GetHousingsLookUpByPersonIdAsync(Guid personId);
+        Task<PagedResultDto<HousingListDto>> GetAllListAsync(PagedHousingResultRequestDto input);
     }
 }
