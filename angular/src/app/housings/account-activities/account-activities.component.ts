@@ -6,7 +6,6 @@ import {
   ViewChild,
   OnInit,
 } from '@angular/core';
-import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash';
 import {
@@ -19,7 +18,6 @@ import {
   PaymentPlanType
 } from '@shared/service-proxies/service-proxies';
 import {
-  PagedListingComponentBase,
   PagedRequestDto
 } from '@shared/paged-listing-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -41,6 +39,8 @@ export class AccountActivitiesDialogComponent extends AppComponentBase
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
+  skipCount: number;
+  maxResultCount: number;
   totalRecords: number;
   isTableLoading: boolean = false;
 
@@ -76,11 +76,16 @@ export class AccountActivitiesDialogComponent extends AppComponentBase
 
     this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
     
-    let skipCount = event.first;
-    let maxResultCount = event.first + event.rows;
+    if (event.first) {
+      this.skipCount = event.first;
+    }
+
+    if (event.first || event.rows) {
+      this.maxResultCount = event.first + event.rows;
+    }
 
     this._housingPaymentPlanService
-      .getAllByHousingId(this.id, this.sortingColumn, skipCount, maxResultCount)
+      .getAllByHousingId(this.id, this.sortingColumn, this.skipCount, this.maxResultCount)
       .subscribe((result: HousingPaymentPlanDtoPagedResultDto) => {
         this.housingPaymentPlans = result.items;
         this.totalRecords = result.totalCount;

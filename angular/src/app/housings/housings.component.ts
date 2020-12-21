@@ -11,12 +11,11 @@ import { EditHousingDialogComponent } from './edit-housing/edit-housing-dialog.c
 import {
   HousingDto,
   HousingServiceProxy,
-  HousingDtoPagedResultDto,
   HousingCategoryServiceProxy,
   LookUpDto,
   PersonServiceProxy,
-  HousingListDto,
-  HousingListDtoPagedResultDto,
+  HousingForListDto,
+  HousingForListDtoPagedResultDto,
 } from '@shared/service-proxies/service-proxies';
 import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
 import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
@@ -33,14 +32,14 @@ class PagedHousingsRequestDto extends PagedRequestDto {
   animations: [appModuleAnimation()],
 })
 export class HousingsComponent
-  extends PagedListingComponentBase<HousingDto>
+  extends PagedListingComponentBase<HousingForListDto>
   implements OnInit {
   @ViewChild('dataTable', { static: true }) dataTable: Table;
 
   sortingColumn: string;
   advancedFiltersVisible = false;
 
-  housings: HousingListDto[] = [];
+  housings: HousingForListDto[] = [];
 
   housingCategoriesFilter: SelectItem[] = [];
   selectedHousingCategoriesFilter: string[] = [];
@@ -118,13 +117,13 @@ export class HousingsComponent
           finishedCallback();
         })
       )
-      .subscribe((result: HousingListDtoPagedResultDto) => {
+      .subscribe((result: HousingForListDtoPagedResultDto) => {
         this.housings = result.items;
         this.showPaging(result, pageNumber);
       });
   }
 
-  protected delete(housing: HousingDto): void {
+  protected delete(housing: HousingForListDto): void {
     abp.message.confirm(
       this.l(
         'HousingDeleteWarningMessage',
@@ -142,7 +141,7 @@ export class HousingsComponent
     );
   }
 
-  protected getAccountActivities(housing: HousingDto): void {
+  protected getAccountActivities(housing: HousingForListDto): void {
     let accountActivitiesDialog: BsModalRef;
     accountActivitiesDialog = this._modalService.show(
       AccountActivitiesDialogComponent,
@@ -155,7 +154,7 @@ export class HousingsComponent
     );
   }
 
-  protected getPeople(housing: HousingDto): void {
+  protected getPeople(housing: HousingForListDto): void {
     let housingPeopleDialog: BsModalRef;
     housingPeopleDialog = this._modalService.show(
       HousingPeopleDialogComponent,
@@ -168,7 +167,7 @@ export class HousingsComponent
     );
   }
 
-  protected addPerson(housing: HousingDto): void {
+  protected addPerson(housing: HousingForListDto): void {
     let addPersonDialog: BsModalRef;
     addPersonDialog = this._modalService.show(AddPersonDialogComponent, {
       class: 'modal-lg,',
