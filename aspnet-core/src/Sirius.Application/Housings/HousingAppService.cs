@@ -142,7 +142,7 @@ namespace Sirius.Housings
             await _housingManager.DeleteAsync(housing);
         }
 
-        public override async Task<PagedResultDto<HousingDto>> GetAllAsync(PagedHousingResultRequestDto input)
+        public async Task<PagedResultDto<HousingListDto>> GetAllListAsync(PagedHousingResultRequestDto input)
         {
             CheckGetAllPermission();
             var query = (from housing in _housingRepository.GetAll().Include(p => p.HousingCategory)
@@ -158,15 +158,23 @@ namespace Sirius.Housings
                 .WhereIf(input.HousingCategoryIds.Count > 0,
                     p => input.HousingCategoryIds.Contains(p.housing.HousingCategoryId))
                 .WhereIf(input.PersonIds.Count > 0,
-                    p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty));
+                    p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty))
+                .GroupBy(p => new HousingListDto
+                {
+                    Apartment = p.housing.Apartment,
+                    Block = p.housing.Block.BlockName,
+                    HousingCategoryName = p.housing.HousingCategory.HousingCategoryName,
+                    TenantIsResiding = p.housing.TenantIsResiding,
+                    Balance = p.housing.Balance
+                })
+                .Select(p => p.Key);
 
-            var housings = await query.Select(p => p.housing)
+            var housings = await query
                 .OrderBy(input.Sorting ?? $"{nameof(HousingDto.Block)} ASC, {nameof(HousingDto.Apartment)}")
                 .PageBy(input)
                 .ToListAsync();
 
-            return new PagedResultDto<HousingDto>(query.Count(),
-                ObjectMapper.Map<List<HousingDto>>(housings));
+            return new PagedResultDto<HousingListDto>(query.Count(), housings);
         }
 
         public async Task<List<LookUpDto>> GetHousingLookUpAsync()

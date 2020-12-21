@@ -83,16 +83,24 @@ namespace Sirius.People
                 .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.PhoneNumber),
                     p => p.person.Phone1.Contains(input.PhoneNumber) ||
-                         p.person.Phone2.Contains(input.PhoneNumber));
+                         p.person.Phone2.Contains(input.PhoneNumber))
+                .GroupBy(p => new PersonDto
+                {
+                    FirstName = p.person.FirstName,
+                    LastName = p.person.LastName,
+                    Phone1 = p.person.Phone1,
+                    Phone2 = p.person.Phone2
+                }).Select(p => p.Key);
 
-            var people = await query.Select(p => p.person).OrderBy(input.Sorting ?? $"{nameof(PersonDto.FirstName)} ASC, {nameof(PersonDto.LastName)}")
+            var people = await query
+                .OrderBy(input.Sorting ?? $"{nameof(PersonDto.FirstName)} ASC, {nameof(PersonDto.LastName)}")
                 .PageBy(input)
                 .ToListAsync();
 
             return new PagedResultDto<PersonDto>(query.Count(),
                 ObjectMapper.Map<List<PersonDto>>(people));
         }
-        
+
         public async Task<List<LookUpDto>> GetPersonLookUpAsync()
         {
             CheckGetAllPermission();

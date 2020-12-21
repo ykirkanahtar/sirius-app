@@ -151,24 +151,24 @@
           >
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="block.blockName">
+                <th pSortableColumn="block">
                   {{ "Block" | localize }}
-                  <p-sortIcon field="block.blockName"></p-sortIcon>
+                  <p-sortIcon field="block"></p-sortIcon>
                 </th>
                 <th pSortableColumn="apartment">
                   {{ "Apartment" | localize }}
                   <p-sortIcon field="apartment"></p-sortIcon>
                 </th>
-                <th pSortableColumn="housingCategory.housingCategoryName">
+                <th pSortableColumn="housingCategoryName">
                   {{ "HousingCategory" | localize }}
                   <p-sortIcon
-                    field="housingCategory.housingCategoryName"
+                    field="housingCategoryName"
                   ></p-sortIcon>
                 </th>
-                <th pSortableColumn="housing.tenantIsResiding">
+                <th pSortableColumn="tenantIsResiding">
                   {{ "TenantIsResiding" | localize }}
                   <p-sortIcon
-                    field="housing.tenantIsResiding"
+                    field="tenantIsResiding"
                   ></p-sortIcon>
                 </th>
                 <th pSortableColumn="balance">
@@ -194,9 +194,9 @@
               "
             >
               <tr>
-                <td>{{ housing.block.blockName }}</td>
+                <td>{{ housing.block }}</td>
                 <td>{{ housing.apartment }}</td>
-                <td>{{ housing.housingCategory.housingCategoryName }}</td>
+                <td>{{ housing.housingCategoryName }}</td>
                 <td>{{ housing.tenantIsResiding.toString() | localize }}</td>
                 <td>{{ housing.balance | number: "1.2-2" }}</td>
                 <td>

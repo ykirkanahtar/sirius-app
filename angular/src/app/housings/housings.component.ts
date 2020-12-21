@@ -15,6 +15,8 @@ import {
   HousingCategoryServiceProxy,
   LookUpDto,
   PersonServiceProxy,
+  HousingListDto,
+  HousingListDtoPagedResultDto,
 } from '@shared/service-proxies/service-proxies';
 import { AddPersonDialogComponent } from './add-or-edit-person/add-person-dialog.component';
 import { AccountActivitiesDialogComponent } from './account-activities/account-activities.component';
@@ -38,7 +40,7 @@ export class HousingsComponent
   sortingColumn: string;
   advancedFiltersVisible = false;
 
-  housings: HousingDto[] = [];
+  housings: HousingListDto[] = [];
 
   housingCategoriesFilter: SelectItem[] = [];
   selectedHousingCategoriesFilter: string[] = [];
@@ -103,7 +105,7 @@ export class HousingsComponent
     finishedCallback: Function
   ): void {
     this._housingService
-      .getAll(
+      .getAllList(
         this.selectedHousingsFilters,
         this.selectedHousingCategoriesFilter,
         this.selectedPeopleFilters,
@@ -116,7 +118,7 @@ export class HousingsComponent
           finishedCallback();
         })
       )
-      .subscribe((result: HousingDtoPagedResultDto) => {
+      .subscribe((result: HousingListDtoPagedResultDto) => {
         this.housings = result.items;
         this.showPaging(result, pageNumber);
       });
