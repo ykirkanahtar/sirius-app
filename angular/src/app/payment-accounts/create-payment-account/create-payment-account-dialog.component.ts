@@ -28,7 +28,6 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
   saving = false;
   paymentAccount = new PaymentAccountDto();
   transferForPaymentAccount = new CreateTransferForPaymentAccountDto();
-  dateForDatepicker = moment();
 
   paymentAccountTypeEnum = PaymentAccountType;
 
