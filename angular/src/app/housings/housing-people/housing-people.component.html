@@ -71,6 +71,10 @@
                       {{ "Phone2" | localize }}
                       <p-sortIcon field="person.phone2"></p-sortIcon>
                     </th>
+                    <th pSortableColumn="Contact">
+                      {{ "ContactText" | localize }}
+                      <p-sortIcon field="Contact"></p-sortIcon>
+                    </th>  
                     <th>{{ "Actions" | localize }}</th>
                   </tr>
                 </ng-template>
@@ -81,6 +85,7 @@
                     <td>{{ housingPerson.isTenant.toString() | localize }}</td>
                     <td>{{ housingPerson.person.phone1 }}</td>
                     <td>{{ housingPerson.person.phone2 }}</td>
+                    <td>{{ housingPerson.contact.toString() | localize }}</td>
                     <td>
                       <button
                         type="button"
