@@ -42,9 +42,9 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_EditHousingCategory, L("EditHousingCategory"));
             context.CreatePermission(PermissionNames.Pages_DeleteHousingCategory, L("DeleteHousingCategory"));
             
-            context.CreatePermission(PermissionNames.Pages_CreateHousingPaymentPlanGroup, L("CreateHousingPaymentPlan"));
-            context.CreatePermission(PermissionNames.Pages_EditHousingPaymentPlanGroup, L("EditHousingPaymentPlan"));
-            context.CreatePermission(PermissionNames.Pages_DeleteHousingPaymentPlanGroup, L("DeleteHousingPaymentPlan"));
+            context.CreatePermission(PermissionNames.Pages_CreateHousingPaymentPlanGroup, L("CreateHousingPaymentPlanGroup"));
+            context.CreatePermission(PermissionNames.Pages_EditHousingPaymentPlanGroup, L("EditHousingPaymentPlanGroup"));
+            context.CreatePermission(PermissionNames.Pages_DeleteHousingPaymentPlanGroup, L("DeleteHousingPaymentPlanGroup"));
             
             context.CreatePermission(PermissionNames.Pages_CreateHousing, L("CreateHousing"));
             context.CreatePermission(PermissionNames.Pages_EditHousing, L("EditHousing"));
