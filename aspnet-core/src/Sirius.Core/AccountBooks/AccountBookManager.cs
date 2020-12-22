@@ -15,6 +15,7 @@ using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
+using Sirius.Shared.Enums;
 
 namespace Sirius.AccountBooks
 {
@@ -32,8 +33,8 @@ namespace Sirius.AccountBooks
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IHousingPaymentPlanManager housingPaymentPlanManager,
             IPaymentAccountManager paymentAccountManager,
-            IRepository<AccountBookFile, Guid> accountBookFileRepository, 
-            IPaymentCategoryManager paymentCategoryManager, 
+            IRepository<AccountBookFile, Guid> accountBookFileRepository,
+            IPaymentCategoryManager paymentCategoryManager,
             IHousingManager housingManager)
         {
             _accountBookRepository = accountBookRepository;
@@ -45,14 +46,15 @@ namespace Sirius.AccountBooks
             _housingManager = housingManager;
         }
 
-        public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount)
+        public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
+            PaymentAccount toPaymentAccount)
         {
             await _accountBookRepository.InsertAsync(accountBook);
 
             var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
 
             await _housingManager.DecreaseBalance(housing, accountBook.Amount);
-            
+
             await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                 SequentialGuidGenerator.Instance.Create()
                 , accountBook.TenantId
@@ -63,11 +65,51 @@ namespace Sirius.AccountBooks
                 , accountBook.Description
                 , accountBook
             ));
-            
+
             await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
         }
 
-        public async Task CreateAsync(AccountBook accountBook, [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
+        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
+        {
+            try
+            {
+                await _accountBookRepository.InsertAsync(accountBook);
+
+                var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
+
+                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+
+                await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
+                    SequentialGuidGenerator.Instance.Create()
+                    , accountBook.TenantId
+                    , housing
+                    , nettingPaymentCategory
+                    , accountBook.ProcessDateTime
+                    , accountBook.Amount
+                    , accountBook.Description
+                    , accountBook
+                ));
+
+                if (fromPaymentAccount != null)
+                {
+                    await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
+                }
+
+                if (toPaymentAccount != null)
+                {
+                    await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task CreateAsync(AccountBook accountBook, [CanBeNull] PaymentAccount fromPaymentAccount,
+            [CanBeNull] PaymentAccount toPaymentAccount)
         {
             await _accountBookRepository.InsertAsync(accountBook);
 
@@ -81,7 +123,7 @@ namespace Sirius.AccountBooks
                 await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
             }
         }
-        
+
         public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
         {
             await _accountBookRepository.InsertAsync(accountBook);

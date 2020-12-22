@@ -10,6 +10,7 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
+using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
 using Sirius.AppPaymentAccounts;
@@ -161,11 +162,28 @@ namespace Sirius.AccountBooks
                 , input.DocumentNumber
                 , accountBookFiles
                 , AbpSession.GetUserId());
-
-            await _accountBookManager.CreateAsync(accountBook,
-                input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
-
+    
+            if (input.EncachmentFromHousingDue && input.HousingIdForEncachment.HasValue)
+            {
+                if (input.FromPaymentAccountId.HasValue && fromPaymentAccount.TenantIsOwner)
+                {
+                    throw new UserFriendlyException("'Ödeme hesabından' seçeneği, siteye ait bir hesap olamaz.");
+                }
+                
+                var encashmentHousing = await _housingRepository.GetAsync(input.HousingIdForEncachment.Value);
+                
+                await _accountBookManager.CreateOtherPaymentWithEncachmentForHousingDueAsync(accountBook, 
+                    encashmentHousing,
+                    input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
+            }
+            else
+            {
+                await _accountBookManager.CreateAsync(accountBook,
+                    input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
+            }
+            
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
