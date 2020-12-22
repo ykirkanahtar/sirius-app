@@ -15,6 +15,7 @@ namespace Sirius.PaymentCategories
         Task DeleteAsync(PaymentCategory housing);
         Task<PaymentCategory> GetRegularHousingDueAsync();
         Task<PaymentCategory> GetTransferForRegularHousingDueAsync();
+        Task<PaymentCategory> GetNettingAsync();
         Task<PaymentCategory> GetTransferForPaymentAccountAsync();
     }
 }

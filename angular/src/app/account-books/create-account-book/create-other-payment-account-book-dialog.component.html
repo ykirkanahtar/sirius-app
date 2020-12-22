@@ -124,6 +124,30 @@
           </div>
         </div>
         <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="description">
+            {{ "UploadFile" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-fileUpload
+              #fileUpload
+              name="myFile[]"
+              maxFileSize="1000000000"
+              customUpload="true"
+              accept="image/*"
+              multiple="multiple"
+              auto="auto"
+              [chooseLabel]="l('ChooseFile')"
+              (uploadHandler)="uploadHandler($event)"
+            >
+              <ng-template pTemplate="content">
+                <ul *ngIf="uploadedFileUrls.length">
+                  <li *ngFor="let file of uploadedFileUrls">{{ file.name }}</li>
+                </ul>
+              </ng-template>
+            </p-fileUpload>
+          </div>
+        </div>
+        <div class="form-group row">
           <label class="col-md-3 col-form-label" for="documentDateTime">
             {{ "DocumentDateTime" | localize }}
           </label>
@@ -159,6 +183,69 @@
               [control]="documentNumberModel"
               [controlEl]="documentNumberEl"
             ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-md-3 col-form-label">
+            {{ "EncachmentFromHousingDue" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="encachmentFromHousingDue"
+                id="encachmentFromHousingDue"
+                [(ngModel)]="accountBook.encachmentFromHousingDue"
+              />
+              <label
+                class="custom-control-label mt-2"
+                for="encachmentFromHousingDue"
+              ></label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-md-12 col-form-label">
+            {{ "EncachmentFromHousingDueDescription" | localize }}
+          </label>
+        </div>
+        <div *ngIf="accountBook.encachmentFromHousingDue">
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="people">
+              {{ "Person" | localize }}
+            </label>
+            <div class="col-md-9">
+              <p-dropdown
+                id="people"
+                name="people"
+                [placeholder]="'PleaseSelect' | localize"
+                [options]="people"
+                (onChange)="onSelectedPersonChange($event)"
+                [filter]="true"
+                [style]="{ width: '100%' }"
+                [showClear]="true"
+              >
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="housings">
+              {{ "Housing" | localize }}
+            </label>
+            <div class="col-md-9">
+              <p-dropdown
+                id="housings"
+                name="housings"
+                [placeholder]="'PleaseSelect' | localize"
+                [options]="housings"
+                [(ngModel)]="accountBook.housingIdForEncachment"
+                [filter]="true"
+                [style]="{ width: '100%' }"
+                required
+              >
+              </p-dropdown>
+            </div>
           </div>
         </div>
       </tab>

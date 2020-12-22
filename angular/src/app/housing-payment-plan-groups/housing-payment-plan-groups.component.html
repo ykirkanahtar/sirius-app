@@ -202,7 +202,7 @@
               <tr>
                 <td>{{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}</td>
                 <td>{{ housingPaymentPlanGroup.housingCategory.housingCategoryName }}</td>
-                <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName }}</td>
+                <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName | localize }}</td>
                 <td>{{ housingPaymentPlanGroup.amountPerMonth | number: "1.2-2" }}</td>
                 <td>{{ housingPaymentPlanGroup.countOfMonth | number }}</td>
                 <td>{{ housingPaymentPlanGroup.paymentDayOfMonth | number }}</td>

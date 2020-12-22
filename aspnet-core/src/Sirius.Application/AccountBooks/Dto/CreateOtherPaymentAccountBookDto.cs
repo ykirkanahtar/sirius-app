@@ -21,6 +21,10 @@ namespace Sirius.AccountBooks.Dto
         public DateTime? DocumentDateTime { get; set; }
         public string DocumentNumber { get; set; }
         public List<string> AccountBookFileUrls { get; set; }
+        
+        public bool EncachmentFromHousingDue { get; set; }
+        
+        public Guid? HousingIdForEncachment { get; set; }
 
         public void Normalize()
         {

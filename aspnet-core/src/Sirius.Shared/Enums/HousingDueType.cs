@@ -4,8 +4,9 @@ namespace Sirius.Shared.Enums
     {
         RegularHousingDue = 1,
         TransferForRegularHousingDue = 2,
-        AdditionalHousingDueForResident = 3,
-        AdditionalHousingDueForOwner = 4,
-        TransferForAdditionalHousingDue = 5,
+        Netting = 3,
+        AdditionalHousingDueForResident = 4,
+        AdditionalHousingDueForOwner = 5,
+        TransferForAdditionalHousingDue = 6,
     }
 }

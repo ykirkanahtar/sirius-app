@@ -192,6 +192,8 @@
     <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>
     <text name="Employees">Çalışanlar</text>
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
+    <text name="EncachmentFromHousingDue">Mahsuplaşma</text>
+    <text name="EncachmentFromHousingDueDescription">Eğer ödeme, bir konut aidatından düşülecekse yukarıdaki seçeneği seçiniz.</text>
     <text name="EndDate">Bitiş Tarihi</text>
     <text name="false">Hayır</text>
     <text name="File(s)IsUploading">Dosya(lar) karşıya yükleniyor...</text>
@@ -228,6 +230,7 @@
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
+    <text name="Netting">Mahsuplaşma</text>
     <text name="OtherPayment">Diğer işlemler</text>
     <text name="OtherPayments">Diğer ödemeler</text>
     <text name="PaymentAccount">Ödeme hesabı</text>

@@ -6785,9 +6785,10 @@ export interface IAccountBookFileDto {
 export enum HousingDueType {
     RegularHousingDue = 1,
     TransferForRegularHousingDue = 2,
-    AdditionalHousingDueForResident = 3,
-    AdditionalHousingDueForOwner = 4,
-    TransferForAdditionalHousingDue = 5,
+    Netting = 3,
+    AdditionalHousingDueForResident = 4,
+    AdditionalHousingDueForOwner = 5,
+    TransferForAdditionalHousingDue = 6,
 }
 
 export class PaymentCategoryDto implements IPaymentCategoryDto {
@@ -7645,6 +7646,8 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
+    encachmentFromHousingDue: boolean;
+    housingIdForEncachment: string | undefined;
 
     constructor(data?: ICreateOtherPaymentAccountBookDto) {
         if (data) {
@@ -7670,6 +7673,8 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
                 for (let item of _data["accountBookFileUrls"])
                     this.accountBookFileUrls.push(item);
             }
+            this.encachmentFromHousingDue = _data["encachmentFromHousingDue"];
+            this.housingIdForEncachment = _data["housingIdForEncachment"];
         }
     }
 
@@ -7695,6 +7700,8 @@ export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAcco
             for (let item of this.accountBookFileUrls)
                 data["accountBookFileUrls"].push(item);
         }
+        data["encachmentFromHousingDue"] = this.encachmentFromHousingDue;
+        data["housingIdForEncachment"] = this.housingIdForEncachment;
         return data; 
     }
 
@@ -7716,6 +7723,8 @@ export interface ICreateOtherPaymentAccountBookDto {
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
+    encachmentFromHousingDue: boolean;
+    housingIdForEncachment: string | undefined;
 }
 
 export class UpdateAccountBookDto implements IUpdateAccountBookDto {
@@ -8731,6 +8740,7 @@ export interface IUpdateHousingDto {
 }
 
 export class HousingForListDto implements IHousingForListDto {
+    id: string;
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryName: string | undefined;
@@ -8743,7 +8753,6 @@ export class HousingForListDto implements IHousingForListDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: string;
 
     constructor(data?: IHousingForListDto) {
         if (data) {
@@ -8756,6 +8765,7 @@ export class HousingForListDto implements IHousingForListDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.block = _data["block"];
             this.apartment = _data["apartment"];
             this.housingCategoryName = _data["housingCategoryName"];
@@ -8768,7 +8778,6 @@ export class HousingForListDto implements IHousingForListDto {
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
         }
     }
 
@@ -8781,6 +8790,7 @@ export class HousingForListDto implements IHousingForListDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["block"] = this.block;
         data["apartment"] = this.apartment;
         data["housingCategoryName"] = this.housingCategoryName;
@@ -8793,7 +8803,6 @@ export class HousingForListDto implements IHousingForListDto {
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
         return data; 
     }
 
@@ -8806,6 +8815,7 @@ export class HousingForListDto implements IHousingForListDto {
 }
 
 export interface IHousingForListDto {
+    id: string;
     block: string | undefined;
     apartment: string | undefined;
     housingCategoryName: string | undefined;
@@ -8818,7 +8828,6 @@ export interface IHousingForListDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: string;
 }
 
 export class HousingForListDtoPagedResultDto implements IHousingForListDtoPagedResultDto {

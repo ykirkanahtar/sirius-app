@@ -75,6 +75,12 @@ namespace Sirius.PaymentCategories
                 p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
         }
         
+        public async Task<PaymentCategory> GetNettingAsync()
+        {
+            return await _paymentCategoryRepository.SingleAsync(p =>
+                p.HousingDueType == HousingDueType.Netting);
+        }
+        
         public async Task<PaymentCategory> GetTransferForPaymentAccountAsync()
         {
             return await _paymentCategoryRepository.SingleAsync(p =>

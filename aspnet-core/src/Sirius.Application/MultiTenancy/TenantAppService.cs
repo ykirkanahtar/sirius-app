@@ -110,6 +110,10 @@ namespace Sirius.MultiTenancy
                     tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(), HousingDueType.TransferForRegularHousingDue, true);
                 await _paymentCategoryManager.CreateAsync(transferForHousingDuePaymentCategory);
                 
+                var nettingPaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, HousingDueType.Netting.ToString(), HousingDueType.Netting, false);
+                await _paymentCategoryManager.CreateAsync(nettingPaymentCategory);
+                
                 var transferForPaymentAccountCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
                     tenant.Id, AppConstants.TransferForPaymentAccount, null, true, false);
                 await _paymentCategoryManager.CreateAsync(transferForPaymentAccountCategory);

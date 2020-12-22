@@ -10,6 +10,9 @@ namespace Sirius.AccountBooks
     public interface IAccountBookManager : IDomainService
     {
         Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount);
+
+        Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount);
         Task CreateAsync(AccountBook accountBook, [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount);
         Task CreateForPaymentAccountTransferAsync(AccountBook accountBook);
