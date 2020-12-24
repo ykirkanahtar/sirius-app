@@ -139,10 +139,14 @@ namespace Sirius.AccountBooks
             var accountBookFiles = new List<AccountBookFile>();
             foreach (var accountBookFileUrl in input.AccountBookFileUrls)
             {
+                var newFileUrl = await _blobService.MoveBetweenContainersAsync(accountBookFileUrl,
+                    AppConstants.TempContainerName,
+                    AppConstants.AccountBookContainerName);
+                
                 var entity = AccountBookFile.Create(
                     SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
-                    , accountBookFileUrl
+                    , newFileUrl
                     , accountBookGuid
                 );
                 accountBookFiles.Add(entity);
