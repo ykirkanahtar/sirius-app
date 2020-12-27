@@ -13,6 +13,6 @@ namespace Sirius.AccountBooks
 
         Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input);
 
-        Task<PagedResultDto<AccountBookGetAllOutput>> GetAllListAsync(PagedAccountBookResultRequestDto input);
+        Task<PagedAccountBookResultDto> GetAllListAsync(PagedAccountBookResultRequestDto input);
     }
 } 

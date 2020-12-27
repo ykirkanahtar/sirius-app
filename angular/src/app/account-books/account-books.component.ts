@@ -14,8 +14,8 @@ import {
   LookUpDto,
   PaymentCategoryServiceProxy,
   PaymentAccountServiceProxy,
-  AccountBookGetAllOutputPagedResultDto,
   AccountBookGetAllOutput,
+  PagedAccountBookResultDto,
 } from '@shared/service-proxies/service-proxies';
 import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
 import { CreateOtherPaymentAccountBookDialogComponent } from './create-account-book/create-other-payment-account-book-dialog.component';
@@ -41,6 +41,7 @@ export class AccountBooksComponent
 
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
+  lastAccountBookProcessDate: moment.Moment;
 
   paymentCategoriesFilter: SelectItem[] = [];
   selectedPaymentCategoriesFilter: string[] = [];
@@ -182,8 +183,9 @@ export class AccountBooksComponent
           finishedCallback();
         })
       )
-      .subscribe((result: AccountBookGetAllOutputPagedResultDto) => {
+      .subscribe((result: PagedAccountBookResultDto) => {
         this.accountBooks = result.items;
+        this.lastAccountBookProcessDate = result.lastAccountBookDate;
         this.showPaging(result, pageNumber);
       });
   }
@@ -215,6 +217,9 @@ export class AccountBooksComponent
           : CreateOtherPaymentAccountBookDialogComponent,
         {
           class: 'modal-lg',
+          initialState: {
+            lastAccountBookDate: this.lastAccountBookProcessDate,
+          },
         }
       );
     }

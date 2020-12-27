@@ -6,7 +6,8 @@ import {
   Output,
   Optional,
   Inject,
-  ViewChild
+  ViewChild,
+  Input
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalRef } from 'ngx-bootstrap/modal';
@@ -23,6 +24,8 @@ import {
   API_BASE_URL
 } from '@shared/service-proxies/service-proxies';
 import { HttpClient } from '@angular/common/http';
+import * as moment from 'moment';
+import { CommonFunctions } from '@shared/helpers/CommonFunctions';
 
 @Component({
   templateUrl: 'create-other-payment-account-book-dialog.component.html'
@@ -40,6 +43,10 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
 
   uploadedFileUrls: any[] = [];
   baseUrl: string;
+
+  processDate: Date;
+
+  @Input() lastAccountBookDate: moment.Moment;
 
   @Output() onSave = new EventEmitter<any>();
   @ViewChild("fileUpload") fileUpload: any;
@@ -79,6 +86,9 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
       .subscribe((result: LookUpDto[]) => {
         this.people = result;
       });
+
+      this.accountBook.processDateTime = this.lastAccountBookDate;
+      this.processDate = this.accountBook.processDateTime.toDate();
   }
 
   onSelectedPersonChange(event) {
@@ -140,6 +150,7 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
     this.saveLabel = this.l("Processing");
 
     this.accountBook.accountBookFileUrls = [];
+    this.accountBook.processDateTime = CommonFunctions.toMoment(this.processDate);
 
     for (const fileUrl of this.uploadedFileUrls) {
       this.accountBook.accountBookFileUrls.push(fileUrl);

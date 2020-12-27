@@ -10,14 +10,14 @@ namespace Sirius.Housings
     [Table("AppBlocks")]
     public class Block : FullAuditedEntity<Guid>, IMustHaveTenant
     {
-        protected Block()
-        {
-        }
+        // protected Block()
+        // {
+        // }
 
         public virtual int TenantId { get; set; }
 
-        [StringLength(50)] [Required] public string BlockName { get; set; }
-
+        [StringLength(50)] [Required] public string BlockName { get; private set; }
+        
         public static async Task<Block> CreateAsync(IBlockPolicy blockPolicy, Guid id, int tenantId, string blockName)
         {
             return await BindEntityAsync(blockPolicy, false, new Block(), id, tenantId, blockName);
