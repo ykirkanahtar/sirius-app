@@ -67,44 +67,38 @@ namespace Sirius.AccountBooks
             ));
 
             await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+            accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount.Balance);
         }
 
         public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
             [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
         {
-            try
+            await _accountBookRepository.InsertAsync(accountBook);
+
+            var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
+            await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+
+            await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
+                SequentialGuidGenerator.Instance.Create()
+                , accountBook.TenantId
+                , housing
+                , nettingPaymentCategory
+                , accountBook.ProcessDateTime
+                , accountBook.Amount
+                , accountBook.Description
+                , accountBook
+            ));
+
+            if (fromPaymentAccount != null)
             {
-                await _accountBookRepository.InsertAsync(accountBook);
-
-                var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
-
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
-
-                await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
-                    SequentialGuidGenerator.Instance.Create()
-                    , accountBook.TenantId
-                    , housing
-                    , nettingPaymentCategory
-                    , accountBook.ProcessDateTime
-                    , accountBook.Amount
-                    , accountBook.Description
-                    , accountBook
-                ));
-
-                if (fromPaymentAccount != null)
-                {
-                    await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
-                }
-
-                if (toPaymentAccount != null)
-                {
-                    await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
-                }
+                await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
+                accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount.Balance);
             }
-            catch (Exception e)
+
+            if (toPaymentAccount != null)
             {
-                Console.WriteLine(e);
-                throw;
+                await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+                accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount.Balance);
             }
         }
 
@@ -116,11 +110,13 @@ namespace Sirius.AccountBooks
             if (fromPaymentAccount != null)
             {
                 await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
+                accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount.Balance);
             }
 
             if (toPaymentAccount != null)
             {
                 await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+                accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount.Balance);
             }
         }
 

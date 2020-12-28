@@ -21,6 +21,8 @@ namespace Sirius.AccountBooks.Dto
         public string Description { get; set; }
         public DateTime? DocumentDateTime { get; set; }
         public string DocumentNumber { get; set; }
+        public decimal? FromPaymentAccountCurrentBalance { get; set; }
+        public decimal? ToPaymentAccountCurrentBalance { get;  set; }
        
         public virtual List<AccountBookFileDto> AccountBookFiles { get; set; }
         public virtual PaymentCategoryDto PaymentCategory { get; set; }

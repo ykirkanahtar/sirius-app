@@ -20,5 +20,7 @@ namespace Sirius.PaymentAccounts.Dto
         public string Iban { get; set; }
         public bool TenantIsOwner { get; set; }
         public bool IsDefault { get; set; }
+        public DateTime? FirstTransferDateTime { get; set; }
+        public decimal? TransferAmount { get; set; }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201227193346_AddCurrentBalancesToAccountBook")]
+    partial class AddCurrentBalancesToAccountBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1350,7 +1352,7 @@ namespace Sirius.Migrations
                     b.Property<string>("DocumentNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("FromPaymentAccountCurrentBalance")
+                    b.Property<decimal>("FromPaymentAccountCurrentBalance")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid?>("FromPaymentAccountId")
@@ -1377,7 +1379,7 @@ namespace Sirius.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("ToPaymentAccountCurrentBalance")
+                    b.Property<decimal>("ToPaymentAccountCurrentBalance")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid?>("ToPaymentAccountId")
@@ -1464,9 +1466,6 @@ namespace Sirius.Migrations
 
                     b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("FirstTransferDateTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Iban")
                         .HasColumnType("nvarchar(max)");

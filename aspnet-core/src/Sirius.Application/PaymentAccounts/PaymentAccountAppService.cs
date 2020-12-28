@@ -28,18 +28,21 @@ namespace Sirius.PaymentAccounts
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IAccountBookManager _accountBookManager;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IAccountBookPolicy _accountBookPolicy;
 
         public PaymentAccountAppService(
             IPaymentAccountManager paymentAccountManager,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
-            IPaymentCategoryManager paymentCategoryManager)
+            IPaymentCategoryManager paymentCategoryManager,
+            IAccountBookPolicy accountBookPolicy)
             : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
             _paymentAccountRepository = paymentAccountRepository;
             _accountBookManager = accountBookManager;
             _paymentCategoryManager = paymentCategoryManager;
+            _accountBookPolicy = accountBookPolicy;
             _accountBookManager = accountBookManager;
         }
 
@@ -58,11 +61,12 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
-                , input.CreateTransferForPaymentAccount.Amount
+                , input.TransferAmount
+                , input.FirstTransferDateTime
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
 
-            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
 
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
@@ -82,11 +86,12 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
-                , input.CreateTransferForPaymentAccount.Amount
+                , input.TransferAmount
+                , input.FirstTransferDateTime
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
 
-            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
 
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
@@ -105,11 +110,12 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
-                , input.CreateTransferForPaymentAccount.Amount
+                , input.TransferAmount
+                , input.FirstTransferDateTime
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
 
-            await CreateAccountBookAsync(input.CreateTransferForPaymentAccount, paymentAccount);
+            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
 
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
@@ -168,28 +174,26 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
 
-            var defaultPaymentAccount = await _paymentAccountRepository.GetAll().Where(p => p.IsDefault).SingleOrDefaultAsync();
+            var defaultPaymentAccount =
+                await _paymentAccountRepository.GetAll().Where(p => p.IsDefault).SingleOrDefaultAsync();
             return ObjectMapper.Map<PaymentAccountDto>(defaultPaymentAccount);
         }
 
-        private async Task CreateAccountBookAsync(CreateTransferForPaymentAccountDto input,
+        private async Task CreateAccountBookAsync(decimal? transferAmount, DateTime? transferProcessDateTime,
             PaymentAccount paymentAccount)
         {
-            if (input.Amount != 0)
+            if (transferAmount.HasValue && transferProcessDateTime.HasValue)
             {
                 var paymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
 
-                var accountBook = AccountBook.Create(
-                    SequentialGuidGenerator.Instance.Create()
+                var accountBook = await AccountBook.CreateForPaymentAccountTransferAsync(
+                    _accountBookPolicy
+                    , SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
-                    , input.ProcessDateTime
+                    , transferProcessDateTime.Value
                     , paymentCategory.Id
-                    , null
-                    , null
                     , paymentAccount.Id
-                    , input.Amount
-                    , string.Empty
-                    , null
+                    , transferAmount.Value
                     , string.Empty
                     , new List<AccountBookFile>()
                     , AbpSession.GetUserId()

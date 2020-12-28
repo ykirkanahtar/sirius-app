@@ -88,7 +88,11 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
       });
 
       this.accountBook.processDateTime = this.lastAccountBookDate;
-      this.processDate = this.accountBook.processDateTime.toDate();
+
+
+      if(this.accountBook.processDateTime) {
+        this.processDate = this.accountBook.processDateTime.toDate();
+      }
   }
 
   onSelectedPersonChange(event) {

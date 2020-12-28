@@ -35,11 +35,9 @@ namespace Sirius.AccountBooks
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
-        private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IHousingManager _housingManager;
-        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IBlobService _blobService;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly IAccountBookPolicy _accountBookPolicy;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -52,21 +50,20 @@ namespace Sirius.AccountBooks
             IHousingRepository housingRepository,
             IRepository<Block, Guid> blockRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
-            IBlobService blobService)
+            IBlobService blobService,
+            IAccountBookPolicy accountBookPolicy)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
             _accountBookRepository = accountBookRepository;
             _paymentCategoryManager = paymentCategoryManager;
-            _unitOfWorkManager = unitOfWorkManager;
             _housingManager = housingManager;
-            _paymentAccountManager = paymentAccountManager;
-            _housingPaymentPlanManager = housingPaymentPlanManager;
             _paymentCategoryRepository = paymentCategoryRepository;
             _housingRepository = housingRepository;
             _blockRepository = blockRepository;
             _paymentAccountRepository = paymentAccountRepository;
             _blobService = blobService;
+            _accountBookPolicy = accountBookPolicy;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -99,8 +96,9 @@ namespace Sirius.AccountBooks
                 accountBookFiles.Add(entity);
             }
 
-            var accountBook = AccountBook.CreateHousingDue(
-                accountBookGuid
+            var accountBook = await AccountBook.CreateHousingDueAsync(
+                _accountBookPolicy
+                , accountBookGuid
                 , AbpSession.GetTenantId()
                 , input.ProcessDateTime
                 , housingDuePaymentCategory.Id
@@ -152,8 +150,9 @@ namespace Sirius.AccountBooks
                 accountBookFiles.Add(entity);
             }
 
-            var accountBook = AccountBook.Create(
-                accountBookGuid
+            var accountBook = await AccountBook.CreateAsync(
+                _accountBookPolicy
+                , accountBookGuid
                 , AbpSession.GetTenantId()
                 , input.ProcessDateTime
                 , input.PaymentCategoryId
@@ -227,8 +226,15 @@ namespace Sirius.AccountBooks
             // var deletingAccountBookFiles = existingAccountBookFileUrls
             //     .Where(existingAccountBookFileUrl => !inputAccountBookFileUrls.Contains(existingAccountBookFileUrl)).ToList();
 
-            var accountBook = AccountBook.Update(existingAccountBook, input.Description, input.DocumentDateTime,
-                input.DocumentNumber, accountBookFiles, AbpSession.GetUserId());
+            var accountBook = await AccountBook.UpdateAsync(
+                _accountBookPolicy
+                , existingAccountBook
+                , input.Description,
+                input.DocumentDateTime,
+                input.DocumentNumber
+                , accountBookFiles
+                , AbpSession.GetUserId()
+            );
             await _accountBookManager.UpdateAsync(accountBook);
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -297,12 +303,8 @@ namespace Sirius.AccountBooks
                     ToPaymentAccountName = p.subToPaymentAccount != null
                         ? p.subToPaymentAccount.AccountName
                         : string.Empty,
-                    FromPaymentAccountBalance = p.subFromPaymentAccount != null
-                        ? (decimal?) p.subFromPaymentAccount.Balance
-                        : null,
-                    ToPaymentAccountBalance = p.subToPaymentAccount != null
-                        ? (decimal?) p.subToPaymentAccount.Balance
-                        : null,
+                    FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
+                    ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
                     AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
                 });
 
