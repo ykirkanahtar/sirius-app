@@ -29,6 +29,7 @@ namespace Sirius.PaymentCategories
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly ILocalizationSource _localizationSource;
+
         public PaymentCategoryAppService(
             IPaymentCategoryManager paymentCategoryManager,
             IRepository<PaymentCategory, Guid> paymentCategoryRepository
@@ -93,11 +94,12 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAllListAsync(p => p.ShowInLists);
+            var paymentAccounts = await _paymentCategoryRepository.GetAll().Where(p => p.ShowInLists).ToListAsync();
 
             return
-                (from l in paymentAccounts
-                    select new LookUpDto(l.Id.ToString(), _localizationSource.GetString(l.PaymentCategoryName))).ToList();
+                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(), _localizationSource.GetString(l.PaymentCategoryName)))
+                .ToList();
         }
 
         public async Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request)

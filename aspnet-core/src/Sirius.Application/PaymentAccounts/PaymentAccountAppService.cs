@@ -7,6 +7,7 @@ using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
+using Abp.EntityFrameworkCore;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks;
 using Sirius.AccountBooks.Dto;
 using Sirius.AppPaymentAccounts;
+using Sirius.EntityFrameworkCore;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Dtos;
@@ -29,13 +31,14 @@ namespace Sirius.PaymentAccounts
         private readonly IAccountBookManager _accountBookManager;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IAccountBookPolicy _accountBookPolicy;
+        private readonly IDbContextProvider<SiriusDbContext> _dbContextProvider;
 
         public PaymentAccountAppService(
             IPaymentAccountManager paymentAccountManager,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
             IPaymentCategoryManager paymentCategoryManager,
-            IAccountBookPolicy accountBookPolicy)
+            IAccountBookPolicy accountBookPolicy, IDbContextProvider<SiriusDbContext> dbContextProvider)
             : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
@@ -43,6 +46,7 @@ namespace Sirius.PaymentAccounts
             _accountBookManager = accountBookManager;
             _paymentCategoryManager = paymentCategoryManager;
             _accountBookPolicy = accountBookPolicy;
+            _dbContextProvider = dbContextProvider;
             _accountBookManager = accountBookManager;
         }
 
@@ -163,7 +167,7 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();
+            var paymentAccounts = await _paymentAccountRepository.GetAll().OrderBy(p => p.AccountName).ToListAsync();
 
             return
                 (from l in paymentAccounts
@@ -199,7 +203,8 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetUserId()
                 );
 
-                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook);
+                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook,
+                    _dbContextProvider.GetDbContext());
             }
         }
     }

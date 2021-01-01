@@ -114,6 +114,11 @@ namespace Sirius.AppPaymentAccounts
             }
 
             paymentAccount.Balance -= amount;
+
+            if (paymentAccount.PaymentAccountType == PaymentAccountType.BankAccount && paymentAccount.Balance < 0)
+            {
+                throw new UserFriendlyException("Bakiye sıfırdan küçük olamaz");
+            }
             return paymentAccount;
         }
 

@@ -18,6 +18,7 @@
     <PackageReference Include="Abp.AutoMapper" Version="6.0.0" />
     <PackageReference Include="Abp.ZeroCore.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.3.1" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="3.2.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sirius.Shared\Sirius.Shared.csproj" />

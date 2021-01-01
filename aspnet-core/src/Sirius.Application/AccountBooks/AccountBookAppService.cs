@@ -8,12 +8,14 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
 using Sirius.AppPaymentAccounts;
+using Sirius.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.FileServices;
 using Sirius.HousingPaymentPlans;
@@ -38,6 +40,7 @@ namespace Sirius.AccountBooks
         private readonly IHousingManager _housingManager;
         private readonly IBlobService _blobService;
         private readonly IAccountBookPolicy _accountBookPolicy;
+        private readonly IDbContextProvider<SiriusDbContext> _dbContextProvider;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -51,7 +54,7 @@ namespace Sirius.AccountBooks
             IRepository<Block, Guid> blockRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IBlobService blobService,
-            IAccountBookPolicy accountBookPolicy)
+            IAccountBookPolicy accountBookPolicy, IDbContextProvider<SiriusDbContext> dbContextProvider)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -64,6 +67,7 @@ namespace Sirius.AccountBooks
             _paymentAccountRepository = paymentAccountRepository;
             _blobService = blobService;
             _accountBookPolicy = accountBookPolicy;
+            _dbContextProvider = dbContextProvider;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -109,7 +113,7 @@ namespace Sirius.AccountBooks
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount);
+            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount, _dbContextProvider.GetDbContext());
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -178,13 +182,15 @@ namespace Sirius.AccountBooks
                 await _accountBookManager.CreateOtherPaymentWithEncachmentForHousingDueAsync(accountBook,
                     encashmentHousing,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null,
+                    _dbContextProvider.GetDbContext());
             }
             else
             {
-                await _accountBookManager.CreateAsync(accountBook,
+                await _accountBookManager.CreateAsync(accountBook, AccountBookCreateType.Other,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null,
+                    _dbContextProvider.GetDbContext());
             }
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
