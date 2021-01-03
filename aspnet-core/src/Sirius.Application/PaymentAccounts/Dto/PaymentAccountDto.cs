@@ -1,9 +1,6 @@
 ﻿using System;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Sirius.AppPaymentAccounts;
 using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentAccounts.Dto

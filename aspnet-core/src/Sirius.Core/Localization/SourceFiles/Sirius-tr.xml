@@ -200,6 +200,7 @@
     <text name="FinancialOperations">Finansal İşlemler</text>
     <text name="FinancialOperationsMenu">Finansal İşlemler (Menü)</text>
     <text name="FirstName">Ad</text>
+    <text name="From">Giden</text>
     <text name="FromPaymentAccount">Ödeme hesabından</text>
     <text name="FromPaymentAccountBalance">Ödeme Hesabından Bakiye</text>
     <text name="Hirer">Kiracı</text>
@@ -269,6 +270,7 @@
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
     <text name="TenantIsResiding">Kiracı oturuyor</text>
+    <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
     <text name="TransferBalance">Devir bakiyesi</text>

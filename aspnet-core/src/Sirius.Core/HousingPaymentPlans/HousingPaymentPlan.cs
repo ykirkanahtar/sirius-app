@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using JetBrains.Annotations;
-using Sirius.AccountBooks;
 using Sirius.Housings;
+using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Enums;
 

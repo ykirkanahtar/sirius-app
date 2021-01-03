@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Abp.Domain.Services;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AppPaymentAccounts;
 using Sirius.Housings;
 
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     public interface IAccountBookManager : IDomainService
     {

@@ -4,8 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using Abp.UI;
+using JetBrains.Annotations;
 
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     [Table("AppAccountBooks")]
     public class AccountBook : AggregateRoot<Guid>, IFullAudited, IMustHaveTenant
@@ -51,8 +53,8 @@ namespace Sirius.AccountBooks
             DateTime processDateTime,
             Guid paymentCategoryId,
             Guid? housingId,
-            Guid? fromPaymentAccountId,
-            Guid? toPaymentAccountId,
+            [CanBeNull] PaymentAccount fromPaymentAccount,
+            [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
             string description,
             DateTime? documentDateTime,
@@ -75,8 +77,8 @@ namespace Sirius.AccountBooks
             accountBook.DocumentNumber = documentNumber;
             accountBook.HousingId = housingId;
             accountBook.Amount = amount;
-            accountBook.FromPaymentAccountId = fromPaymentAccountId;
-            accountBook.ToPaymentAccountId = toPaymentAccountId;
+            accountBook.FromPaymentAccountId = fromPaymentAccount?.Id;
+            accountBook.ToPaymentAccountId = toPaymentAccount?.Id;
             accountBook.AccountBookFiles = accountBookFiles;
 
             if (creationTime.HasValue)
@@ -99,7 +101,12 @@ namespace Sirius.AccountBooks
                 accountBook.LastModifierUserId = modifierUserId.Value;
             }
 
-            await accountBookPolicy.CheckCreateOrUpdateAttemptAsync(accountBook, isUpdate, isTransferForPaymentAccount);
+            if (isTransferForPaymentAccount)
+            {
+                await accountBookPolicy.CheckForTransferForPaymentAccountAsync(accountBook, toPaymentAccount);
+            }
+
+            accountBookPolicy.CheckCreateOrUpdateAttempt(accountBook, fromPaymentAccount, toPaymentAccount, isUpdate);
 
             return accountBook;
         }
@@ -107,6 +114,8 @@ namespace Sirius.AccountBooks
         public static async Task<AccountBook> UpdateAsync(
             IAccountBookPolicy accountBookPolicy,
             AccountBook existingAccountBook,
+            [CanBeNull] PaymentAccount fromPaymentAccount,
+            [CanBeNull] PaymentAccount toPaymentAccount,
             string description,
             DateTime? documentDateTime,
             string documentNumber,
@@ -116,8 +125,10 @@ namespace Sirius.AccountBooks
             return await BindEntityAsync(accountBookPolicy, true, false, existingAccountBook, existingAccountBook.Id,
                 existingAccountBook.TenantId,
                 existingAccountBook.ProcessDateTime,
-                existingAccountBook.PaymentCategoryId, existingAccountBook.HousingId,
-                existingAccountBook.FromPaymentAccountId, existingAccountBook.ToPaymentAccountId,
+                existingAccountBook.PaymentCategoryId, 
+                existingAccountBook.HousingId,
+                fromPaymentAccount, 
+                toPaymentAccount,
                 existingAccountBook.Amount, description, documentDateTime, documentNumber, accountBookFiles, null, null,
                 DateTime.UtcNow, modifierUserId);
         }
@@ -129,7 +140,7 @@ namespace Sirius.AccountBooks
             DateTime processDateTime,
             Guid paymentCategoryId,
             Guid housingId,
-            Guid paymentAccountId,
+            PaymentAccount toPaymentAccountId,
             decimal amount,
             string description,
             ICollection<AccountBookFile> accountBookFiles,
@@ -138,7 +149,7 @@ namespace Sirius.AccountBooks
             return await BindEntityAsync(accountBookPolicy, false, false, new AccountBook(), id, tenantId,
                 processDateTime,
                 paymentCategoryId, housingId, null,
-                paymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
+                toPaymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
                 null, null);
         }
 
@@ -148,7 +159,7 @@ namespace Sirius.AccountBooks
             int tenantId,
             DateTime processDateTime,
             Guid paymentCategoryId,
-            Guid toPaymentAccountId,
+            PaymentAccount toPaymentAccount,
             decimal amount,
             string description,
             ICollection<AccountBookFile> accountBookFiles,
@@ -157,7 +168,7 @@ namespace Sirius.AccountBooks
             return await BindEntityAsync(accountBookPolicy, false, true, new AccountBook(), id, tenantId,
                 processDateTime,
                 paymentCategoryId, null, null,
-                toPaymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
+                toPaymentAccount, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
                 null, null);
         }
 
@@ -168,8 +179,8 @@ namespace Sirius.AccountBooks
             DateTime processDateTime,
             Guid paymentCategoryId,
             Guid? housingId,
-            Guid? fromPaymentAccountId,
-            Guid? toPaymentAccountId,
+            [CanBeNull] PaymentAccount fromPaymentAccount,
+            [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
             string description,
             DateTime? documentDateTime,
@@ -180,8 +191,8 @@ namespace Sirius.AccountBooks
             return await BindEntityAsync(accountBookPolicy, false, false, new AccountBook(), id, tenantId,
                 processDateTime,
                 paymentCategoryId, housingId,
-                fromPaymentAccountId,
-                toPaymentAccountId, amount, description, documentDateTime, documentNumber, accountBookFiles,
+                fromPaymentAccount,
+                toPaymentAccount, amount, description, documentDateTime, documentNumber, accountBookFiles,
                 DateTime.UtcNow, creatorUserId, null, null);
         }
 

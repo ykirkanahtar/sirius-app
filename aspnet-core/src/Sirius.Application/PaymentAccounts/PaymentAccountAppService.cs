@@ -12,9 +12,6 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AccountBooks;
-using Sirius.AccountBooks.Dto;
-using Sirius.AppPaymentAccounts;
 using Sirius.EntityFrameworkCore;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
@@ -196,7 +193,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetTenantId()
                     , transferProcessDateTime.Value
                     , paymentCategory.Id
-                    , paymentAccount.Id
+                    , paymentAccount
                     , transferAmount.Value
                     , string.Empty
                     , new List<AccountBookFile>()

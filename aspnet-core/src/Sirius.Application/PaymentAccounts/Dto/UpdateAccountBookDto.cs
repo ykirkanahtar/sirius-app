@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapTo(typeof(AccountBook))]
     public class UpdateAccountBookDto : FullAuditedEntityDto<Guid>

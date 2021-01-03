@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
-using Sirius.People;
 
 namespace Sirius.AccountBooks.Dto
 {

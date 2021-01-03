@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     public class AccountBookGetAllOutput: FullAuditedEntityDto<Guid>
     {

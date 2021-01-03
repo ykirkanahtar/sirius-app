@@ -1,7 +1,6 @@
 using System;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
-using Sirius.AppPaymentAccounts;
 
 namespace Sirius.PaymentAccounts.Dto
 {

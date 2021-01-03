@@ -1,4 +1,4 @@
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     public enum AccountBookCreateType
     {

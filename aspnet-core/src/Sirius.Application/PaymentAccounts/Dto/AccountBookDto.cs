@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Sirius.Housings.Dto;
-using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories.Dto;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapFrom(typeof(AccountBook))]
     public class AccountBookDto : FullAuditedEntityDto<Guid>

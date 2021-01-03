@@ -2,7 +2,7 @@ using System;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapFrom(typeof(AccountBookFile))]
     public class AccountBookFileDto : FullAuditedEntityDto<Guid>

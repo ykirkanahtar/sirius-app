@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Abp.Domain.Services;
-using Sirius.AppPaymentAccounts;
 
 namespace Sirius.PaymentAccounts
 {

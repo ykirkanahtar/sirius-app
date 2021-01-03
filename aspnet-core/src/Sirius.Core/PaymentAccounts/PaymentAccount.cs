@@ -1,14 +1,13 @@
-﻿using Abp;
-using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
-using Sirius.Shared.Enums;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Abp.Domain.Entities;
+using Abp.Domain.Entities.Auditing;
 using Abp.UI;
+using Sirius.Shared.Enums;
 
-namespace Sirius.AppPaymentAccounts
+namespace Sirius.PaymentAccounts
 {
     [Table("AppPaymentAccounts")]
     public class PaymentAccount : FullAuditedEntity<Guid>, IMustHaveTenant

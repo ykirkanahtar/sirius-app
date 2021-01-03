@@ -1,8 +1,5 @@
 ﻿using System;
 using Abp.AutoMapper;
-using JetBrains.Annotations;
-using Sirius.AccountBooks.Dto;
-using Sirius.AppPaymentAccounts;
 
 namespace Sirius.PaymentAccounts.Dto
 {

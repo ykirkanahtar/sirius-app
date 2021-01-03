@@ -14,17 +14,16 @@ using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
-using Sirius.AppPaymentAccounts;
 using Sirius.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.FileServices;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
-using Sirius.PaymentAccounts;
+using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Constants;
 
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     public class AccountBookAppService :
         AsyncCrudAppService<AccountBook, AccountBookDto, Guid, PagedAccountBookResultRequestDto, CreateAccountBookDto,
@@ -107,13 +106,14 @@ namespace Sirius.AccountBooks
                 , input.ProcessDateTime
                 , housingDuePaymentCategory.Id
                 , input.HousingId
-                , input.ToPaymentAccountId
+                , toPaymentAccount
                 , input.Amount
                 , input.Description
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount, _dbContextProvider.GetDbContext());
+            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount,
+                _dbContextProvider.GetDbContext());
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -161,8 +161,8 @@ namespace Sirius.AccountBooks
                 , input.ProcessDateTime
                 , input.PaymentCategoryId
                 , null
-                , input.FromPaymentAccountId
-                , input.ToPaymentAccountId
+                , fromPaymentAccount
+                , toPaymentAccount
                 , input.Amount
                 , input.Description
                 , input.DocumentDateTime
@@ -201,6 +201,14 @@ namespace Sirius.AccountBooks
             CheckUpdatePermission();
             var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
 
+            var fromPaymentAccount = existingAccountBook.FromPaymentAccountId.HasValue
+                ? await _paymentAccountRepository.GetAsync(existingAccountBook.FromPaymentAccountId.Value)
+                : null;
+            
+            var toPaymentAccount = existingAccountBook.ToPaymentAccountId.HasValue
+                ? await _paymentAccountRepository.GetAsync(existingAccountBook.ToPaymentAccountId.Value)
+                : null;
+
             var currentAccountBookFileUrls = existingAccountBook.AccountBookFiles.Select(p => p.FileUrl);
             var inputAccountBookFileUrls = input.AccountBookFiles;
 
@@ -235,6 +243,8 @@ namespace Sirius.AccountBooks
             var accountBook = await AccountBook.UpdateAsync(
                 _accountBookPolicy
                 , existingAccountBook
+                , fromPaymentAccount
+                , toPaymentAccount
                 , input.Description,
                 input.DocumentDateTime,
                 input.DocumentNumber

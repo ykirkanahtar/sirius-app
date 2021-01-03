@@ -3,17 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Domain.Repositories;
-using Abp.EntityFrameworkCore;
 using Abp.UI;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AppPaymentAccounts;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
-using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     public class AccountBookManager : IAccountBookManager
     {

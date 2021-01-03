@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AppPaymentAccounts;
 using Sirius.Housings;
+using Sirius.PaymentAccounts;
 
 namespace Sirius.People
 {

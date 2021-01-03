@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Abp.Application.Services;
-using Abp.Application.Services.Dto;
 using Sirius.AccountBooks.Dto;
+using Sirius.PaymentAccounts.Dto;
 
-namespace Sirius.AccountBooks
+namespace Sirius.PaymentAccounts
 {
     public interface IAccountBookAppService : IAsyncCrudAppService<AccountBookDto, Guid,
         PagedAccountBookResultRequestDto, CreateAccountBookDto, UpdateAccountBookDto>
