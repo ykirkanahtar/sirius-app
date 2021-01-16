@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
+using Abp.Localization;
 using Abp.Localization.Sources;
 using Abp.UI;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Sirius.Shared.Constants;
 
 namespace Sirius.PaymentAccounts
 {
@@ -16,10 +17,10 @@ namespace Sirius.PaymentAccounts
         private readonly ILocalizationSource _localizationSource;
 
         public AccountBookPolicy(IRepository<AccountBook, Guid> accountBookRepository,
-            ILocalizationSource localizationSource)
+            ILocalizationManager localizationManager)
         {
             _accountBookRepository = accountBookRepository;
-            _localizationSource = localizationSource;
+            _localizationSource =  localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
         public async Task CheckForTransferForPaymentAccountAsync(AccountBook accountBook,

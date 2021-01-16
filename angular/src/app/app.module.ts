@@ -59,6 +59,7 @@ import { PaymentAccountsComponent } from './payment-accounts/payment-accounts.co
 import { CreatePaymentAccountDialogComponent } from './payment-accounts/create-payment-account/create-payment-account-dialog.component';
 import { CreateHousingDueAccountBookDialogComponent } from './account-books/create-account-book/create-housing-due-account-book-dialog.component';
 import { CreateOtherPaymentAccountBookDialogComponent } from './account-books/create-account-book/create-other-payment-account-book-dialog.component';
+import { EditAccountBookDialogComponent } from './account-books/edit-account-book/edit-account-book-dialog.component';
 import { HousingsComponent } from './housings/housings.component';
 import { EditPaymentAccountDialogComponent } from './payment-accounts/edit-payment-account/edit-payment-account-dialog.component';
 // tslint:disable-next-line: max-line-length
@@ -144,7 +145,8 @@ import { trLocale } from 'ngx-bootstrap/locale';
     HousingPaymentPlanGroupsComponent,
     CreateHousingPaymentPlanGroupDialogComponent,
     EditHousingPaymentPlanGroupDialogComponent,
-    CreateOtherPaymentAccountBookDialogComponent
+    CreateOtherPaymentAccountBookDialogComponent,
+    EditAccountBookDialogComponent
   ],
   imports: [
     CommonModule,

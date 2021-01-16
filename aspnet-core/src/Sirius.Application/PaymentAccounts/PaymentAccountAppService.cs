@@ -28,14 +28,13 @@ namespace Sirius.PaymentAccounts
         private readonly IAccountBookManager _accountBookManager;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IAccountBookPolicy _accountBookPolicy;
-        private readonly IDbContextProvider<SiriusDbContext> _dbContextProvider;
 
         public PaymentAccountAppService(
             IPaymentAccountManager paymentAccountManager,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
             IPaymentCategoryManager paymentCategoryManager,
-            IAccountBookPolicy accountBookPolicy, IDbContextProvider<SiriusDbContext> dbContextProvider)
+            IAccountBookPolicy accountBookPolicy)
             : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
@@ -43,7 +42,6 @@ namespace Sirius.PaymentAccounts
             _accountBookManager = accountBookManager;
             _paymentCategoryManager = paymentCategoryManager;
             _accountBookPolicy = accountBookPolicy;
-            _dbContextProvider = dbContextProvider;
             _accountBookManager = accountBookManager;
         }
 
@@ -200,8 +198,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetUserId()
                 );
 
-                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook,
-                    _dbContextProvider.GetDbContext());
+                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook);
             }
         }
     }

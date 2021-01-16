@@ -9,20 +9,19 @@ namespace Sirius.PaymentAccounts
 {
     public interface IAccountBookManager : IDomainService
     {
-        Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount, DbContext dbContext);
+        Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount);
 
         Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, DbContext dbContext);
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount);
 
         Task CreateAsync(AccountBook accountBook,
-            AccountBookCreateType accountBookCreateType,
+            AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
-            [CanBeNull] Housing housing,
-            DbContext dbContext);
+            [CanBeNull] Housing housing);
         
-        Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, DbContext dbContext);
-        Task UpdateAsync(AccountBook accountBook);
+        Task CreateForPaymentAccountTransferAsync(AccountBook accountBook);
+        Task UpdateAsync(AccountBook existingAccountBook, AccountBook accountBook);
         Task DeleteAsync(AccountBook accountBook);
         Task<AccountBook> GetAsync(Guid id);
         Task<AccountBookFile> GetAccountBookFileByUrlAsync(string url);

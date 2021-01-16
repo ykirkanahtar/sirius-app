@@ -1,11 +1,11 @@
 <form
   class="form-horizontal"
   autocomplete="off"
-  #createOtherPaymentAccountBookForm="ngForm"
+  #editAccountBookForm="ngForm"
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'CreateNewOtherPaymentAccountBook' | localize"
+    [title]="'EditAccountBook' | localize"
     (onCloseClick)="bsModalRef.hide()"
   >
   </abp-modal-header>
@@ -171,69 +171,6 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div class="form-group row mb-0">
-              <div class="col-md-10">
-                <div class="custom-control custom-checkbox">
-                  <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    name="encachmentFromHousingDue"
-                    id="encachmentFromHousingDue"
-                    [(ngModel)]="accountBook.encachmentFromHousingDue"
-                  />
-                  <label
-                    class="custom-control-label mt-2"
-                    for="encachmentFromHousingDue"
-                  >
-                    {{ "EncachmentFromHousingDue" | localize }}
-                  </label>
-                  <label>
-                    <i>{{
-                      "EncachmentFromHousingDueDescription" | localize
-                    }}</i>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="accountBook.encachmentFromHousingDue">
-              <div class="form-group row">
-                <div class="col-md-10">
-                  <label for="people">
-                    {{ "Person" | localize }}
-                  </label>
-                  <p-dropdown
-                    id="people"
-                    name="people"
-                    [placeholder]="'PleaseSelect' | localize"
-                    [options]="people"
-                    (onChange)="onSelectedPersonChange($event)"
-                    [filter]="true"
-                    [style]="{ width: '100%' }"
-                    [showClear]="true"
-                  >
-                  </p-dropdown>
-                </div>
-              </div>
-              <div class="form-group row required">
-                <div class="col-md-10">
-                  <label for="housings">
-                    {{ "Housing" | localize }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <p-dropdown
-                    id="housings"
-                    name="housings"
-                    [placeholder]="'PleaseSelect' | localize"
-                    [options]="housings"
-                    [(ngModel)]="accountBook.housingIdForEncachment"
-                    [filter]="true"
-                    [style]="{ width: '100%' }"
-                    required
-                  >
-                  </p-dropdown>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <div class="row">
@@ -272,9 +209,9 @@
   <abp-modal-footer
     [cancelDisabled]="saving"
     [saveDisabled]="
-      !createOtherPaymentAccountBookForm.form.valid ||
+      !editAccountBookForm.form.valid ||
       saving ||
-      !this.permissionHelper.createAccountBook()
+      !this.permissionHelper.editAccountBook()
     "
     (onCancelClick)="bsModalRef.hide()"
     [saveLabel]="saveLabel"

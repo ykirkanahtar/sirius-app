@@ -1,11 +1,17 @@
-import { Component, HostListener, Injector, OnInit, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { appModuleAnimation } from '@shared/animations/routerTransition';
+import {
+  Component,
+  HostListener,
+  Injector,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { appModuleAnimation } from "@shared/animations/routerTransition";
 import {
   PagedListingComponentBase,
   PagedRequestDto,
-} from '@shared/paged-listing-component-base';
+} from "@shared/paged-listing-component-base";
 import {
   AccountBookDto,
   AccountBookServiceProxy,
@@ -16,25 +22,26 @@ import {
   PaymentAccountServiceProxy,
   AccountBookGetAllOutput,
   PagedAccountBookResultDto,
-} from '@shared/service-proxies/service-proxies';
-import { CreateHousingDueAccountBookDialogComponent } from './create-account-book/create-housing-due-account-book-dialog.component';
-import { CreateOtherPaymentAccountBookDialogComponent } from './create-account-book/create-other-payment-account-book-dialog.component';
-import { Table } from 'primeng/table';
-import { LazyLoadEvent, SelectItem } from 'primeng/api';
-import * as moment from 'moment';
+} from "@shared/service-proxies/service-proxies";
+import { CreateHousingDueAccountBookDialogComponent } from "./create-account-book/create-housing-due-account-book-dialog.component";
+import { CreateOtherPaymentAccountBookDialogComponent } from "./create-account-book/create-other-payment-account-book-dialog.component";
+import { Table } from "primeng/table";
+import { LazyLoadEvent, SelectItem } from "primeng/api";
+import * as moment from "moment";
+import { EditAccountBookDialogComponent } from "./edit-account-book/edit-account-book-dialog.component";
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
 }
 
 @Component({
-  templateUrl: './account-books.component.html',
+  templateUrl: "./account-books.component.html",
   animations: [appModuleAnimation()],
 })
 export class AccountBooksComponent
   extends PagedListingComponentBase<AccountBookDto>
   implements OnInit {
-  @ViewChild('dataTable', { static: true }) dataTable: Table;
+  @ViewChild("dataTable", { static: true }) dataTable: Table;
 
   sortingColumn: string;
   advancedFiltersVisible = false;
@@ -64,24 +71,24 @@ export class AccountBooksComponent
   display: boolean = false;
   closeDialog: boolean = false;
 
-  responsiveOptions2:any[] = [
+  responsiveOptions2: any[] = [
     {
-        breakpoint: '1500px',
-        numVisible: 5
+      breakpoint: "1500px",
+      numVisible: 5,
     },
     {
-        breakpoint: '1024px',
-        numVisible: 3
+      breakpoint: "1024px",
+      numVisible: 3,
     },
     {
-        breakpoint: '768px',
-        numVisible: 2
+      breakpoint: "768px",
+      numVisible: 2,
     },
     {
-        breakpoint: '560px',
-        numVisible: 1
-    }
- ];
+      breakpoint: "560px",
+      numVisible: 1,
+    },
+  ];
 
   constructor(
     injector: Injector,
@@ -96,7 +103,6 @@ export class AccountBooksComponent
   }
 
   ngOnInit(): void {
-
     this._paymentCategoryService
       .getPaymentCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
@@ -122,15 +128,20 @@ export class AccountBooksComponent
   }
 
   createAccountBook(): void {
-    this.showCreateOrEditAccountBookDialog(false);
+    this.showCreateAccountBookDialog(false);
   }
 
   createHousingDueAccountBook(): void {
-    this.showCreateOrEditAccountBookDialog(true);
+    this.showCreateAccountBookDialog(true);
   }
 
   createOtherPaymentAccountBook(): void {
-    this.showCreateOrEditAccountBookDialog(false);
+    this.showCreateAccountBookDialog(false);
+  }
+
+  editAccountBook(accountBook: AccountBookDto): void {
+    console.log(accountBook);
+    this.showEditAccountBookDialog(accountBook.id);
   }
 
   clearFilters(): void {
@@ -154,7 +165,9 @@ export class AccountBooksComponent
     this.accountBookFiles = accountBookFiles;
   }
 
-  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+  @HostListener("document:keydown.escape", ["$event"]) onKeydownHandler(
+    event: KeyboardEvent
+  ) {
     if (this.display) {
       this.display = !this.display;
     }
@@ -192,12 +205,12 @@ export class AccountBooksComponent
 
   protected delete(accountBook: AccountBookDto): void {
     abp.message.confirm(
-      this.l('AccountBookDeleteWarningMessage', accountBook.id),
+      this.l("AccountBookDeleteWarningMessage", accountBook.id),
       undefined,
       (result: boolean) => {
         if (result) {
           this._accountBooksService.delete(accountBook.id).subscribe(() => {
-            abp.notify.success(this.l('SuccessfullyDeleted'));
+            abp.notify.success(this.l("SuccessfullyDeleted"));
             this.refresh();
           });
         }
@@ -205,37 +218,39 @@ export class AccountBooksComponent
     );
   }
 
-  private showCreateOrEditAccountBookDialog(
-    isHousingDue: boolean,
-    id?: number
-  ): void {
-    let createOrEditAccountBookDialog: BsModalRef;
-    if (!id) {
-      createOrEditAccountBookDialog = this._modalService.show(
-        isHousingDue
-          ? CreateHousingDueAccountBookDialogComponent
-          : CreateOtherPaymentAccountBookDialogComponent,
-        {
-          class: 'modal-lg',
-          initialState: {
-            lastAccountBookDate: this.lastAccountBookProcessDate,
-          },
-        }
-      );
-    }
-    //else {
-    //   createOrEditAccountBookDialog = this._modalService.show(
-    //     EditAccountBookDialogComponent,
-    //     {
-    //       class: 'modal-lg',
-    //       initialState: {
-    //         id: id,
-    //       },
-    //     }
-    //   );
-    // }
+  private showCreateAccountBookDialog(isHousingDue: boolean): void {
+    let createAccountBookDialog: BsModalRef;
+    createAccountBookDialog = this._modalService.show(
+      isHousingDue
+        ? CreateHousingDueAccountBookDialogComponent
+        : CreateOtherPaymentAccountBookDialogComponent,
+      {
+        class: "modal-lg",
+        initialState: {
+          lastAccountBookDate: this.lastAccountBookProcessDate,
+        },
+      }
+    );
 
-    createOrEditAccountBookDialog.content.onSave.subscribe(() => {
+    createAccountBookDialog.content.onSave.subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  private showEditAccountBookDialog(id: string): void {
+    let editAccountBookDialog: BsModalRef;
+
+    editAccountBookDialog = this._modalService.show(
+      EditAccountBookDialogComponent,
+      {
+        class: "modal-lg",
+        initialState: {
+          id: id,
+        },
+      }
+    );
+
+    editAccountBookDialog.content.onSave.subscribe(() => {
       this.refresh();
     });
   }

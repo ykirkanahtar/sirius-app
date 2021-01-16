@@ -1,6 +1,6 @@
 namespace Sirius.PaymentAccounts
 {
-    public enum AccountBookCreateType
+    public enum AccountBookType
     {
         HousingDue = 1,
         OtherPaymentWithEncachmentForHousingDue = 2,

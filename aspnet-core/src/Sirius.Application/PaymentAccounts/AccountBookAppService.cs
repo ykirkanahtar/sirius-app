@@ -8,13 +8,12 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
-using Abp.EntityFrameworkCore;
+using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
-using Sirius.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.FileServices;
 using Sirius.HousingPaymentPlans;
@@ -35,11 +34,12 @@ namespace Sirius.PaymentAccounts
         private readonly IHousingRepository _housingRepository;
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
+        private readonly IRepository<AccountBookFile, Guid> _accountBookFileRepository;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingManager _housingManager;
         private readonly IBlobService _blobService;
         private readonly IAccountBookPolicy _accountBookPolicy;
-        private readonly IDbContextProvider<SiriusDbContext> _dbContextProvider;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -53,12 +53,13 @@ namespace Sirius.PaymentAccounts
             IRepository<Block, Guid> blockRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IBlobService blobService,
-            IAccountBookPolicy accountBookPolicy, IDbContextProvider<SiriusDbContext> dbContextProvider)
+            IAccountBookPolicy accountBookPolicy, IRepository<AccountBookFile, Guid> accountBookFileRepository)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
             _accountBookRepository = accountBookRepository;
             _paymentCategoryManager = paymentCategoryManager;
+            _unitOfWorkManager = unitOfWorkManager;
             _housingManager = housingManager;
             _paymentCategoryRepository = paymentCategoryRepository;
             _housingRepository = housingRepository;
@@ -66,7 +67,7 @@ namespace Sirius.PaymentAccounts
             _paymentAccountRepository = paymentAccountRepository;
             _blobService = blobService;
             _accountBookPolicy = accountBookPolicy;
-            _dbContextProvider = dbContextProvider;
+            _accountBookFileRepository = accountBookFileRepository;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -112,8 +113,7 @@ namespace Sirius.PaymentAccounts
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount,
-                _dbContextProvider.GetDbContext());
+            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount);
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
@@ -154,13 +154,20 @@ namespace Sirius.PaymentAccounts
                 accountBookFiles.Add(entity);
             }
 
+            var accountBookType = input.EncachmentFromHousingDue
+                ? AccountBookType.OtherPaymentWithEncachmentForHousingDue
+                : AccountBookType.Other;
+
             var accountBook = await AccountBook.CreateAsync(
                 _accountBookPolicy
                 , accountBookGuid
                 , AbpSession.GetTenantId()
+                , accountBookType
                 , input.ProcessDateTime
                 , input.PaymentCategoryId
                 , null
+                , input.EncachmentFromHousingDue
+                , input.HousingIdForEncachment
                 , fromPaymentAccount
                 , toPaymentAccount
                 , input.Amount
@@ -182,77 +189,179 @@ namespace Sirius.PaymentAccounts
                 await _accountBookManager.CreateOtherPaymentWithEncachmentForHousingDueAsync(accountBook,
                     encashmentHousing,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null,
-                    _dbContextProvider.GetDbContext());
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
             }
             else
             {
-                await _accountBookManager.CreateAsync(accountBook, AccountBookCreateType.Other,
+                await _accountBookManager.CreateAsync(accountBook, accountBookType,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null,
-                    _dbContextProvider.GetDbContext());
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null);
             }
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
+        private async Task<AccountBookDto> DeleteAndCreateAsync(UpdateAccountBookDto input,
+            AccountBook existingAccountBook)
+        {
+            var accountBookFileUrls =
+                existingAccountBook.AccountBookFiles.Select(p => p.FileUrl).ToList();
+
+            foreach (var newAccountBookFileUrl in input.NewAccountBookFileUrls)
+            {
+                accountBookFileUrls.Add(newAccountBookFileUrl);
+            }
+
+            foreach (var deletedAccountBookFileUrl in input.DeletedAccountBookFileUrls)
+            {
+                accountBookFileUrls.Remove(deletedAccountBookFileUrl);
+            }
+
+            // İşletme defteri silinip, tekrar oluşturulacak
+            //Yeniden oluşturma için gerekli bilgiler toplanıyor
+            var accountBookType = existingAccountBook.AccountBookType;
+
+            if (accountBookType == AccountBookType.HousingDue)
+            {
+                var createHousingDueAccountBookDto = new CreateHousingDueAccountBookDto
+                {
+                    ProcessDateTime = input.ProcessDateTime,
+                    HousingId = existingAccountBook.HousingId.Value,
+                    ToPaymentAccountId = input.ToPaymentAccountId.Value,
+                    Amount = input.Amount,
+                    Description = input.Description,
+                    AccountBookFileUrls = accountBookFileUrls
+                };
+
+                var retValue = await CreateHousingDueAsync(createHousingDueAccountBookDto);
+                await _accountBookManager.DeleteAsync(existingAccountBook);
+                return retValue;
+            }
+            else
+            {
+                var createOtherPaymentAccountBookDto = new CreateOtherPaymentAccountBookDto
+                {
+                    ProcessDateTime = input.ProcessDateTime,
+                    PaymentCategoryId = input.PaymentCategoryId,
+                    FromPaymentAccountId = input.FromPaymentAccountId.Value,
+                    ToPaymentAccountId = input.ToPaymentAccountId.Value,
+                    Amount = input.Amount,
+                    Description = input.Description,
+                    DocumentDateTime = input.DocumentDateTime,
+                    DocumentNumber = input.DocumentNumber,
+                    AccountBookFileUrls = accountBookFileUrls,
+                    EncachmentFromHousingDue = existingAccountBook.EncashmentHousing,
+                    HousingIdForEncachment = existingAccountBook.HousingIdForEncachment
+                };
+
+                await _accountBookManager.DeleteAsync(existingAccountBook);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
+                return await CreateOtherPaymentAsync(createOtherPaymentAccountBookDto);
+            }
+        }
+
+        [UnitOfWork]
         public override async Task<AccountBookDto> UpdateAsync(UpdateAccountBookDto input)
         {
-            CheckUpdatePermission();
-            var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
-
-            var fromPaymentAccount = existingAccountBook.FromPaymentAccountId.HasValue
-                ? await _paymentAccountRepository.GetAsync(existingAccountBook.FromPaymentAccountId.Value)
-                : null;
-            
-            var toPaymentAccount = existingAccountBook.ToPaymentAccountId.HasValue
-                ? await _paymentAccountRepository.GetAsync(existingAccountBook.ToPaymentAccountId.Value)
-                : null;
-
-            var currentAccountBookFileUrls = existingAccountBook.AccountBookFiles.Select(p => p.FileUrl);
-            var inputAccountBookFileUrls = input.AccountBookFiles;
-
-            var newAccountBookFileUrls = inputAccountBookFileUrls
-                .Where(accountBookFileUrl => !currentAccountBookFileUrls.Contains(accountBookFileUrl)).ToList();
-
-            var accountBookFiles = new List<AccountBookFile>();
-            foreach (var newAccountBookFileUrl in newAccountBookFileUrls)
+            try
             {
-                var entity = AccountBookFile.Create(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , newAccountBookFileUrl
-                    , existingAccountBook.Id
+                CheckUpdatePermission();
+                var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
+
+                var fromPaymentAccount = existingAccountBook.FromPaymentAccountId.HasValue
+                    ? await _paymentAccountRepository.GetAsync(existingAccountBook.FromPaymentAccountId.Value)
+                    : null;
+
+                var toPaymentAccount = existingAccountBook.ToPaymentAccountId.HasValue
+                    ? await _paymentAccountRepository.GetAsync(existingAccountBook.ToPaymentAccountId.Value)
+                    : null;
+
+                if (input.ProcessDateTime != existingAccountBook.ProcessDateTime)
+                {
+                    //eski tarih ile yeni tarih arasında ödeme hesaplarına ait işlem var mı
+                    var oldDate = input.ProcessDateTime < existingAccountBook.ProcessDateTime
+                        ? input.ProcessDateTime
+                        : existingAccountBook.ProcessDateTime;
+
+                    var newDate = oldDate == input.ProcessDateTime
+                        ? existingAccountBook.ProcessDateTime
+                        : input.ProcessDateTime;
+
+                    var accountBooksBetweenTwoDates = from p in _accountBookRepository.GetAll()
+                        where
+                            (
+                                (p.FromPaymentAccountId == existingAccountBook.FromPaymentAccountId
+                                 || p.ToPaymentAccountId == existingAccountBook.FromPaymentAccountId)
+                                ||
+                                (p.FromPaymentAccountId == existingAccountBook.ToPaymentAccountId
+                                 || p.ToPaymentAccountId == existingAccountBook.ToPaymentAccountId)
+                            ) &&
+                            p.ProcessDateTime > oldDate && p.ProcessDateTime < newDate
+                        select p;
+
+                    if (accountBooksBetweenTwoDates.Any())
+                    {
+                        return await DeleteAndCreateAsync(input, existingAccountBook);
+                    }
+                }
+
+                if (input.FromPaymentAccountId != existingAccountBook.FromPaymentAccountId ||
+                    input.ToPaymentAccountId != existingAccountBook.ToPaymentAccountId)
+                {
+                    return await DeleteAndCreateAsync(input, existingAccountBook);
+                }
+
+                if (input.PaymentCategoryId != existingAccountBook.PaymentCategoryId)
+                {
+                    //TODO eğer sabit kategorilerden biri değilse (aidat ödemesi, devir hareketi gibi), direk update çalıştırılabilir, silinip yeniden oluşturulmasına gerek yok
+                    return await DeleteAndCreateAsync(input, existingAccountBook);
+                }
+
+                var existingAccountBookFiles = existingAccountBook.AccountBookFiles;
+
+                foreach (var newAccountBookFileUrl in input.NewAccountBookFileUrls)
+                {
+                    var entity = AccountBookFile.Create(
+                        SequentialGuidGenerator.Instance.Create()
+                        , AbpSession.GetTenantId()
+                        , newAccountBookFileUrl
+                        , existingAccountBook.Id
+                    );
+                    existingAccountBookFiles.Add(entity);
+                }
+
+                foreach (var deletedAccountBookFileUrl in input.DeletedAccountBookFileUrls)
+                {
+                    var deletedAccountBookFile = await _accountBookFileRepository.GetAll()
+                        .Where(p => p.FileUrl == deletedAccountBookFileUrl).SingleAsync();
+
+                    await _accountBookFileRepository.DeleteAsync(deletedAccountBookFile);
+                    existingAccountBookFiles.Remove(deletedAccountBookFile);
+                }
+
+                var existingAccountBookForCheck = AccountBook.ShallowCopy(existingAccountBook);
+
+                var accountBook = await AccountBook.UpdateAsync(
+                    _accountBookPolicy
+                    , existingAccountBook
+                    , input.ProcessDateTime
+                    , fromPaymentAccount
+                    , toPaymentAccount
+                    , input.Amount
+                    , input.Description
+                    , input.DocumentDateTime
+                    , input.DocumentNumber
+                    , existingAccountBook.AccountBookFiles
+                    , AbpSession.GetUserId()
                 );
-                accountBookFiles.Add(entity);
+                await _accountBookManager.UpdateAsync(existingAccountBookForCheck, accountBook);
+                return ObjectMapper.Map<AccountBookDto>(accountBook);
             }
-
-            var existingAccountBookFileUrls = inputAccountBookFileUrls
-                .Where(accountBookFileUrl => currentAccountBookFileUrls.Contains(accountBookFileUrl)).ToList();
-            foreach (var existingAccountBookFileUrl in existingAccountBookFileUrls)
+            catch (Exception e)
             {
-                var existingAccountBookFile =
-                    await _accountBookManager.GetAccountBookFileByUrlAsync(existingAccountBookFileUrl);
-
-                accountBookFiles.Add(existingAccountBookFile);
+                Console.WriteLine(e);
+                throw;
             }
-
-            // var deletingAccountBookFiles = existingAccountBookFileUrls
-            //     .Where(existingAccountBookFileUrl => !inputAccountBookFileUrls.Contains(existingAccountBookFileUrl)).ToList();
-
-            var accountBook = await AccountBook.UpdateAsync(
-                _accountBookPolicy
-                , existingAccountBook
-                , fromPaymentAccount
-                , toPaymentAccount
-                , input.Description,
-                input.DocumentDateTime,
-                input.DocumentNumber
-                , accountBookFiles
-                , AbpSession.GetUserId()
-            );
-            await _accountBookManager.UpdateAsync(accountBook);
-            return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
         public override async Task DeleteAsync(EntityDto<Guid> input)
@@ -260,80 +369,96 @@ namespace Sirius.PaymentAccounts
             CheckDeletePermission();
             var accountBook = await _accountBookManager.GetAsync(input.Id);
             await _accountBookManager.DeleteAsync(accountBook);
+
+            //ToDo transaction commit olduktan sonra azure'dan silinen ilgili dosyaları sil. 
+            //Committen sonra silinmesi gerekeceği için bu katmanda sil.
         }
 
         public async Task<PagedAccountBookResultDto> GetAllListAsync(
             PagedAccountBookResultRequestDto input)
         {
-            CheckGetAllPermission();
-            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
+            try
+            {
+                CheckGetAllPermission();
+                var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
 
-            var query = (from accountBook in _accountBookRepository.GetAll()
-                    join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
-                        equals paymentCategory.Id
-                    join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
-                        housing
-                    from subHousing in housing.DefaultIfEmpty()
-                    join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
-                    from subBlock in block.DefaultIfEmpty()
-                    join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
-                        .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
-                    from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
-                    join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
-                            .ToPaymentAccountId
-                        equals toPaymentAccount.Id into toPaymentAccount
-                    from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
-                    select new
+                var query = (from accountBook in _accountBookRepository.GetAll()
+                        join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
+                            equals paymentCategory.Id
+                        join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
+                            housing
+                        from subHousing in housing.DefaultIfEmpty()
+                        join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
+                        from subBlock in block.DefaultIfEmpty()
+                        join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                            .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
+                        from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
+                        join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                                .ToPaymentAccountId
+                            equals toPaymentAccount.Id into toPaymentAccount
+                        from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
+                        select new
+                        {
+                            accountBook,
+                            paymentCategory,
+                            subHousing,
+                            subBlock,
+                            subFromPaymentAccount,
+                            subToPaymentAccount
+                        })
+                    .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
+                    .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
+                    .WhereIf(input.HousingIds.Count > 0,
+                        p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
+                    .WhereIf(input.PaymentCategoryIds.Count > 0,
+                        p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId))
+                    .WhereIf(housingIdsFromPersonFilter.Count > 0,
+                        p => housingIdsFromPersonFilter.Select(s => s.Id)
+                            .Contains(p.accountBook.HousingId ?? Guid.Empty))
+                    .WhereIf(input.FromPaymentAccountIds.Count > 0,
+                        p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
+                    .WhereIf(input.ToPaymentAccountIds.Count > 0,
+                        p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
+                    .Select(p => new AccountBookGetAllOutput
                     {
-                        accountBook,
-                        paymentCategory,
-                        subHousing,
-                        subBlock,
-                        subFromPaymentAccount,
-                        subToPaymentAccount
-                    })
-                .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
-                .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
-                .WhereIf(input.HousingIds.Count > 0,
-                    p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
-                .WhereIf(input.PaymentCategoryIds.Count > 0,
-                    p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId))
-                .WhereIf(housingIdsFromPersonFilter.Count > 0,
-                    p => housingIdsFromPersonFilter.Select(s => s.Id)
-                        .Contains(p.accountBook.HousingId ?? Guid.Empty))
-                .WhereIf(input.FromPaymentAccountIds.Count > 0,
-                    p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
-                .WhereIf(input.ToPaymentAccountIds.Count > 0,
-                    p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
-                .Select(p => new AccountBookGetAllOutput
-                {
-                    ProcessDateTime = p.accountBook.ProcessDateTime,
-                    PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
-                    HousingName = p.subHousing != null
-                        ? p.subBlock.BlockName + "-" + p.subHousing.Apartment
-                        : string.Empty,
-                    Amount = p.accountBook.Amount,
-                    FromPaymentAccountName = p.subFromPaymentAccount != null
-                        ? p.subFromPaymentAccount.AccountName
-                        : string.Empty,
-                    ToPaymentAccountName = p.subToPaymentAccount != null
-                        ? p.subToPaymentAccount.AccountName
-                        : string.Empty,
-                    FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
-                    ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
-                    AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
-                });
+                        Id = p.accountBook.Id,
+                        CreationTime = p.accountBook.CreationTime,
+                        CreatorUserId = p.accountBook.CreatorUserId,
+                        LastModificationTime = p.accountBook.LastModificationTime,
+                        LastModifierUserId = p.accountBook.LastModifierUserId,
+                        ProcessDateTime = p.accountBook.ProcessDateTime,
+                        PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
+                        HousingName = p.subHousing != null
+                            ? p.subBlock.BlockName + "-" + p.subHousing.Apartment
+                            : string.Empty,
+                        Amount = p.accountBook.Amount,
+                        FromPaymentAccountName = p.subFromPaymentAccount != null
+                            ? p.subFromPaymentAccount.AccountName
+                            : string.Empty,
+                        ToPaymentAccountName = p.subToPaymentAccount != null
+                            ? p.subToPaymentAccount.AccountName
+                            : string.Empty,
+                        FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
+                        ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
+                        AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
+                    });
 
-            var accountBooks = await query
-                .OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.ProcessDateTime)} DESC")
-                .PageBy(input)
-                .ToListAsync();
+                var accountBooks = await query
+                    .OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.ProcessDateTime)} DESC")
+                    .PageBy(input)
+                    .ToListAsync();
 
-            var lastAccountBookDate =
-                await _accountBookRepository.GetAll().OrderByDescending(p => p.ProcessDateTime).FirstOrDefaultAsync();
-
-            return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
-                lastAccountBookDate?.ProcessDateTime);
+                var lastAccountBookDate =
+                    await _accountBookRepository.GetAll().OrderByDescending(p => p.ProcessDateTime)
+                        .FirstOrDefaultAsync();
+                return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
+                    lastAccountBookDate?.ProcessDateTime);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

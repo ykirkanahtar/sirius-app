@@ -23,9 +23,5 @@ namespace Sirius.PaymentAccounts.Dto
         public decimal? ToPaymentAccountCurrentBalance { get;  set; }
        
         public virtual List<AccountBookFileDto> AccountBookFiles { get; set; }
-        public virtual PaymentCategoryDto PaymentCategory { get; set; }
-        public virtual HousingDto Housing { get; set; }
-        public virtual PaymentAccountDto FromPaymentAccount { get; set; }
-        public virtual PaymentAccountDto ToPaymentAccount { get; set; }
     }
 }
