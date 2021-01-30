@@ -190,7 +190,7 @@ namespace Sirius.PaymentAccounts
             accountBook.Id = id;
             accountBook.TenantId = tenantId;
             accountBook.AccountBookType = accountBookType;
-            accountBook.ProcessDateTime = processDateTime;
+            accountBook.ProcessDateTime = processDateTime.Date + new TimeSpan(0, 0, 0);
             accountBook.DocumentDateTime = documentDateTime;
             accountBook.PaymentCategoryId = paymentCategoryId;
             accountBook.Description = description;
