@@ -118,7 +118,7 @@
                       >
                         <ng-template let-paymentCategory pTemplate="item">
                           <div class="paymentCategory-item">
-                            <div>{{ paymentCategory.label | localize}}</div>
+                            <div>{{ paymentCategory.label | localize }}</div>
                           </div>
                         </ng-template>
                       </p-multiSelect>
@@ -265,9 +265,7 @@
                 </th>
                 <th pSortableColumn="PaymentCategoryName">
                   {{ "PaymentCategoryName" | localize }}
-                  <p-sortIcon
-                    field="PaymentCategoryName"
-                  ></p-sortIcon>
+                  <p-sortIcon field="PaymentCategoryName"></p-sortIcon>
                 </th>
                 <th pSortableColumn="HousingName">
                   {{ "Housing" | localize }}
@@ -284,14 +282,6 @@
                 <th pSortableColumn="ToPaymentAccountName">
                   {{ "ToPaymentAccount" | localize }}
                   <p-sortIcon field="ToPaymentAccountName"></p-sortIcon>
-                </th>
-                <th pSortableColumn="FromPaymentAccountBalance">
-                  {{ "FromPaymentAccountBalance" | localize }}
-                  <p-sortIcon field="FromPaymentAccountBalance"></p-sortIcon>
-                </th>
-                <th pSortableColumn="ToPaymentAccountBalance">
-                  {{ "ToPaymentAccountBalance" | localize }}
-                  <p-sortIcon field="ToPaymentAccountBalance"></p-sortIcon>
                 </th>
                 <th>
                   {{ "Images" | localize }}
@@ -316,21 +306,29 @@
             >
               <tr>
                 <td>{{ accountBook.processDateTime.format("DD-MM-YYYY") }}</td>
-                <td>{{ accountBook.paymentCategoryName | localize}}</td>
+                <td>{{ accountBook.paymentCategoryName | localize }}</td>
                 <td>{{ accountBook.housingName }}</td>
                 <td>{{ accountBook.amount | number: "1.2-2" }}</td>
-                <td>{{ accountBook.fromPaymentAccountName }}</td>
-                <td>{{ accountBook.toPaymentAccountName }}</td>
-                <td>{{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }}</td>
-                <td>{{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}</td>
+                <td>{{ accountBook.fromPaymentAccountName }} - {{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }} </td>
+                <td>{{ accountBook.toPaymentAccountName }} - {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}</td>
                 <td class="text-center">
-                  <i 
-                    class="far fa-file-image" 
-                    *ngIf="accountBook.accountBookFiles.length > 0" 
-                    (click)="showImages(accountBook.accountBookFiles)">
+                  <i
+                    class="far fa-file-image"
+                    *ngIf="accountBook.accountBookFiles.length > 0"
+                    (click)="showImages(accountBook.accountBookFiles)"
+                  >
                   </i>
                 </td>
                 <td>
+                  <button
+                    type="button"
+                    *ngIf="this.permissionHelper.editAccountBook()"
+                    class="btn btn-sm bg-secondary mx-2"
+                    (click)="editAccountBook(accountBook)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    {{ "Edit" | localize }}
+                  </button>
                   <button
                     type="button"
                     *ngIf="this.permissionHelper.deleteAccountBook()"
@@ -374,14 +372,30 @@
   </section>
 </div>
 
-<p-galleria [(value)]="accountBookFiles" [(visible)]="display" [responsiveOptions]="responsiveOptions2" [containerStyle]="{'max-width': '660px'}" [numVisible]="9"
-    [circular]="true" [fullScreen]="true" [showItemNavigators]="true" [baseZIndex]="100000"> 
-    <ng-template pTemplate="item" let-item>
-        <img [src]="item" style="width: 100%; display: block; max-width: 660px; max-height: 660px;"/>
-    </ng-template>
-    <ng-template pTemplate="thumbnail" let-item>
-        <div class="p-grid p-nogutter p-justify-center">
-            <img [src]="item" style="display: block;" style="max-width: 50px; max-height: 50px;"/>
-        </div>
-    </ng-template>
+<p-galleria
+  [(value)]="accountBookFiles"
+  [(visible)]="display"
+  [responsiveOptions]="responsiveOptions2"
+  [containerStyle]="{ 'max-width': '660px' }"
+  [numVisible]="9"
+  [circular]="true"
+  [fullScreen]="true"
+  [showItemNavigators]="true"
+  [baseZIndex]="100000"
+>
+  <ng-template pTemplate="item" let-item>
+    <img
+      [src]="item"
+      style="width: 100%; display: block; max-width: 660px; max-height: 660px"
+    />
+  </ng-template>
+  <ng-template pTemplate="thumbnail" let-item>
+    <div class="p-grid p-nogutter p-justify-center">
+      <img
+        [src]="item"
+        style="display: block"
+        style="max-width: 50px; max-height: 50px"
+      />
+    </div>
+  </ng-template>
 </p-galleria>

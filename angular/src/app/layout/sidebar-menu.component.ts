@@ -75,16 +75,16 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         'Pages.FinancialOperations',
         [
           new MenuItem(
-            this.l('PaymentAccounts'),
-            '/app/payment-accounts',
-            'fa fa-university',
-            'Pages.PaymentAccounts'
-          ),
-          new MenuItem(
             this.l('AccountBooks'),
             '/app/account-books',
             'fas fa-briefcase',
             'Pages.AccountBooks'
+          ),
+          new MenuItem(
+            this.l('PaymentAccounts'),
+            '/app/payment-accounts',
+            'fa fa-university',
+            'Pages.PaymentAccounts'
           ),
           new MenuItem(
             this.l('PaymentCategories'),

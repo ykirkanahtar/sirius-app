@@ -2,7 +2,7 @@
 using Abp.AutoMapper;
 using Abp.Runtime.Validation;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapTo(typeof(AccountBook))]
     public class CreateAccountBookDto : IShouldNormalize

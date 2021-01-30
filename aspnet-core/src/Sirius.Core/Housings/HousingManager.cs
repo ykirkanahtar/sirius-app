@@ -6,10 +6,9 @@ using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AccountBooks;
 using Sirius.HousingPaymentPlans;
+using Sirius.PaymentAccounts;
 using Sirius.People;
-using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {

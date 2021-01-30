@@ -1,36 +1,32 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Abp.Runtime.Validation;
+using Abp.Application.Services;
+using Abp.UI;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Sirius.FileServices;
 using Sirius.Shared.Constants;
 
-namespace Sirius.Controllers
+namespace Sirius.FileServices
 {
-    [DisableValidation]
-    public class UploadController : SiriusControllerBase
+    public class UploadAppService : ApplicationService, IUploadAppService
     {
         private readonly IBlobService _blobService;
-
-        public UploadController(IBlobService blobService)
+        public UploadAppService(IBlobService blobService)
         {
             _blobService = blobService;
         }
-
-        [HttpPost]
-        public async Task<ActionResult> UploadAsync(IFormFile file)
+        
+        public async Task<string> UploadFileAsync(IFormFile file)
         {
             if (file == null)
             {
-                return BadRequest();
+                throw new UserFriendlyException("Dosya seçilmedi");
             }
-
+            
             var extension = Path.GetExtension(file.FileName);
             if (string.IsNullOrWhiteSpace(extension))
             {
-                return BadRequest();
+                throw new UserFriendlyException("Geçersiz dosya");
             }
             
             var fileNameWithoutExtension = Guid.NewGuid();
@@ -40,10 +36,8 @@ namespace Sirius.Controllers
                 file.OpenReadStream(),
                 newFileName,
                 AppConstants.TempContainerName);
-
-            var toReturn = Path.Combine(result.AbsoluteUri, newFileName);
-
-            return new JsonResult(toReturn);
+            
+            return Path.Combine(result.AbsoluteUri, newFileName);
         }
     }
 }

@@ -2,7 +2,7 @@
 using Abp.UI;
 using System;
 using System.Threading.Tasks;
-using Sirius.AppPaymentAccounts;
+using Sirius.PaymentAccounts;
 
 namespace Sirius.Employees
 {

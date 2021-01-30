@@ -1,11 +1,11 @@
 <form
   class="form-horizontal"
   autocomplete="off"
-  #createOtherPaymentAccountBookForm="ngForm"
+  #editAccountBookForm="ngForm"
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'CreateNewOtherPaymentAccountBook' | localize"
+    [title]="'EditAccountBook' | localize"
     (onCloseClick)="bsModalRef.hide()"
   >
   </abp-modal-header>
@@ -171,95 +171,96 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div class="form-group row mb-0">
-              <div class="col-md-10">
-                <div class="custom-control custom-checkbox">
-                  <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    name="encachmentFromHousingDue"
-                    id="encachmentFromHousingDue"
-                    [(ngModel)]="accountBook.encachmentFromHousingDue"
-                  />
-                  <label
-                    class="custom-control-label mt-2"
-                    for="encachmentFromHousingDue"
-                  >
-                    {{ "EncachmentFromHousingDue" | localize }}
-                  </label>
-                  <label>
-                    <i>{{
-                      "EncachmentFromHousingDueDescription" | localize
-                    }}</i>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="accountBook.encachmentFromHousingDue">
-              <div class="form-group row">
-                <div class="col-md-10">
-                  <label for="people">
-                    {{ "Person" | localize }}
-                  </label>
-                  <p-dropdown
-                    id="people"
-                    name="people"
-                    [placeholder]="'PleaseSelect' | localize"
-                    [options]="people"
-                    (onChange)="onSelectedPersonChange($event)"
-                    [filter]="true"
-                    [style]="{ width: '100%' }"
-                    [showClear]="true"
-                  >
-                  </p-dropdown>
-                </div>
-              </div>
-              <div class="form-group row required">
-                <div class="col-md-10">
-                  <label for="housings">
-                    {{ "Housing" | localize }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <p-dropdown
-                    id="housings"
-                    name="housings"
-                    [placeholder]="'PleaseSelect' | localize"
-                    [options]="housings"
-                    [(ngModel)]="accountBook.housingIdForEncachment"
-                    [filter]="true"
-                    [style]="{ width: '100%' }"
-                    required
-                  >
-                  </p-dropdown>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </tab>
       <tab [heading]="'Images' | localize" class="pt-3 px-2">
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label" for="description">
-            {{ "UploadFile" | localize }}
-          </label>
-          <div class="col-md-9">
-            <p-fileUpload
-              #fileUpload
-              name="myFile[]"
-              maxFileSize="1000000000"
-              customUpload="true"
-              accept="image/*"
-              multiple="multiple"
-              auto="auto"
-              [chooseLabel]="l('ChooseFile')"
-              (uploadHandler)="uploadHandler($event)"
-            >
-              <ng-template pTemplate="content">
-                <ul *ngIf="uploadedFileUrls.length">
-                  <li *ngFor="let file of uploadedFileUrls">{{ file.name }}</li>
-                </ul>
-              </ng-template>
-            </p-fileUpload>
+        <div class="row">
+          <div class="col-md-6" style="border-right: 1px dashed #333">
+            <div class="form-group row mb-0">
+              <div class="col-md-12">
+                <div class="row">
+                  <label for="fileUpload">
+                    {{ "UploadNewFile" | localize }}
+                  </label>
+                </div>
+                <div class="row">
+                  <p>
+                    <em>{{ "UploadFileWarning" | localize }}</em>
+                  </p>
+                </div>
+                <p-fileUpload
+                  #fileUpload
+                  name="fileUpload"
+                  maxFileSize="1000000000"
+                  customUpload="true"
+                  accept="image/*"
+                  multiple="multiple"
+                  auto="false"
+                  [chooseLabel]="l('ChooseFile')"
+                  (uploadHandler)="uploadHandler($event)"
+                >
+                  <ng-template pTemplate="content">
+                    <ul *ngIf="newUploadedFileUrls.length">
+                      <li
+                        *ngFor="let file of newUploadedFileUrls; let i = index"
+                      >
+                        <div class="form-group row">
+                          <div class="col-md-12">
+                            <img
+                              [id]="'img_' + i"
+                              [src]="file"
+                              [height]="75"
+                              (click)="showImages(file)"
+                            />
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </ng-template>
+                </p-fileUpload>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group row mb-0">
+              <div class="col-md-12">
+                <label for="fileUpload">
+                  {{ "ExistingFiles" | localize }}
+                </label>
+              </div>
+            </div>
+            <div class="form-group row mb-0">
+              <div class="col-md-12">
+                <ng-container
+                  *ngFor="
+                    let accountBookFile of accountBook.accountBookFiles;
+                    let i = index
+                  "
+                >
+                  <div class="form-group row" style="align-items: center">
+                    <div class="col-md-6">
+                      <img
+                        [id]="'img_' + i"
+                        [src]="accountBookFile.fileUrl"
+                        [height]="75"
+                        (click)="showImages(accountBookFile.fileUrl)"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <button
+                        type="button"
+                        class="btn btn-sm bg-danger mx-2"
+                        (click)="delete(accountBookFile)"
+                      >
+                        <i class="fas fa-trash"></i>
+                        {{ "DeleteImage" | localize }}
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
           </div>
         </div>
       </tab>
@@ -268,11 +269,39 @@
   <abp-modal-footer
     [cancelDisabled]="saving"
     [saveDisabled]="
-      !createOtherPaymentAccountBookForm.form.valid ||
+      !editAccountBookForm.form.valid ||
       saving ||
-      !this.permissionHelper.createAccountBook()
+      !this.permissionHelper.editAccountBook()
     "
     (onCancelClick)="bsModalRef.hide()"
     [saveLabel]="saveLabel"
   ></abp-modal-footer>
 </form>
+
+<p-galleria
+  [(value)]="clickedImages"
+  [(visible)]="display"
+  [responsiveOptions]="responsiveOptions2"
+  [containerStyle]="{ 'max-width': '660px' }"
+  [numVisible]="9"
+  [circular]="false"
+  [fullScreen]="true"
+  [showItemNavigators]="false"
+  [baseZIndex]="100000"
+>
+  <ng-template pTemplate="item" let-item>
+    <img
+      [src]="item"
+      style="width: 100%; display: block; max-width: 660px; max-height: 660px"
+    />
+  </ng-template>
+  <ng-template pTemplate="thumbnail" let-item>
+    <div class="p-grid p-nogutter p-justify-center">
+      <img
+        [src]="item"
+        style="display: block"
+        style="max-width: 50px; max-height: 50px"
+      />
+    </div>
+  </ng-template>
+</p-galleria>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Abp.UI;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -26,7 +27,8 @@ namespace Sirius.FileServices
             return containerClient;
         }
 
-        public async Task<string> MoveBetweenContainersAsync(string fileUri, string sourceContainerName, string targetContainerName)
+        public async Task<string> MoveBetweenContainersAsync(string fileUri, string sourceContainerName,
+            string targetContainerName)
         {
             var sourceContainerClient = GetContainerClient(sourceContainerName);
             var targetContainerClient = GetContainerClient(targetContainerName);
@@ -35,23 +37,23 @@ namespace Sirius.FileServices
             var targetFileUri = $"{targetContainerName}/{fileName}";
 
             var sourceBlobClient = sourceContainerClient.GetBlobClient(fileName);
-            var targetBlobClient = targetContainerClient.GetBlockBlobClient(fileName); 
+            var targetBlobClient = targetContainerClient.GetBlockBlobClient(fileName);
 
             var blobUri = new Uri(fileUri);
             await targetBlobClient.StartCopyFromUriAsync(blobUri);
-            
+
             await sourceBlobClient.DeleteAsync();
 
             return targetBlobClient.Uri.ToString();
         }
-        
+
         public async Task<Uri> UploadAsnyc(Stream fileStream, string name, string containerName)
         {
             try
             {
                 var outputStream = new MemoryStream();
                 _imageService.ResizeImage(fileStream, outputStream);
-            
+
                 var blobContainerClient = GetContainerClient(containerName);
                 //Container yoksa oluşturacak.
                 await blobContainerClient.CreateIfNotExistsAsync();
@@ -65,8 +67,12 @@ namespace Sirius.FileServices
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                if (e is UserFriendlyException)
+                {
+                    throw new UserFriendlyException(e.Message);
+                }
+
+                throw new Exception(e.Message);
             }
         }
 
@@ -78,7 +84,7 @@ namespace Sirius.FileServices
             //response.Value -> Tüm bilgileri getirecektir.
             return response.Value.Content;
         }
-        
+
         public async Task DeleteAsync(string fileName, string containerName)
         {
             var blobContainerClient = GetContainerClient(containerName);
@@ -89,7 +95,7 @@ namespace Sirius.FileServices
         public async Task<List<string>> GetLogAsync(string fileName)
         {
             var logs = new List<string>();
-            var blobContainerClient = GetContainerClient("logs");//Log olacağı için ismi sabit.
+            var blobContainerClient = GetContainerClient("logs"); //Log olacağı için ismi sabit.
 
             var appendBlobClient =
                 blobContainerClient
@@ -112,7 +118,7 @@ namespace Sirius.FileServices
 
         public async Task SetLogAsync(string text, string fileName)
         {
-            var blobContainerClient = GetContainerClient("logs");//Log olacağı için ismi sabit.
+            var blobContainerClient = GetContainerClient("logs"); //Log olacağı için ismi sabit.
             await blobContainerClient.CreateIfNotExistsAsync();
             var appendBlobClient = blobContainerClient.GetAppendBlobClient(fileName);
             await appendBlobClient.CreateIfNotExistsAsync();

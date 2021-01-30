@@ -103,7 +103,8 @@
     <text name="ConfirmNewPassword">Yeni şifreyi doğrula</text>
 
     <text name="AccountActivities">Hesap Hareketleri</text>
-    <text name="AccountBookDeleteWarningMessage">İşletme Defteri kaydınız silmek istediğinize emin misiniz?</text>
+    <text name="AccountBookDeleteWarningMessage">İşletme Defteri kaydını silmek istediğinize emin misiniz?</text>
+    <text name="AccountBookFileDeleteWarningMessage">İşletme Defteri görselini silmek istediğinize emin misiniz?</text>
     <text name="AccountBookProcessType">İşlem tipi</text>
     <text name="AccountBooks">İşletme Defteri</text>
     <text name="AccountBooksMenu">İşletme Defteri (Menü)</text>
@@ -169,6 +170,7 @@
     <text name="DeleteHousingCategory">Konut grubu sil</text>
     <text name="DeleteHousingPaymentPlanGroup">Aidat ödeme planı sil</text>
     <text name="DeleteHousing">Konut sil</text>
+    <text name="DeleteImage">Görseli Sil</text>
     <text name="DeletePaymentAccount">Ödeme hesabı sil</text>
     <text name="DeletePaymentCategory">Ödeme türü sil</text>
     <text name="DeletePerson">Kişi sil</text>
@@ -195,11 +197,13 @@
     <text name="EncachmentFromHousingDue">Mahsuplaşma</text>
     <text name="EncachmentFromHousingDueDescription">Eğer ödeme, bir konut aidatından düşülecekse yukarıdaki seçeneği seçiniz.</text>
     <text name="EndDate">Bitiş Tarihi</text>
+    <text name="ExistingFiles">Varolan Dosyalar</text>
     <text name="false">Hayır</text>
     <text name="File(s)IsUploading">Dosya(lar) karşıya yükleniyor...</text>
     <text name="FinancialOperations">Finansal İşlemler</text>
     <text name="FinancialOperationsMenu">Finansal İşlemler (Menü)</text>
     <text name="FirstName">Ad</text>
+    <text name="From">Giden</text>
     <text name="FromPaymentAccount">Ödeme hesabından</text>
     <text name="FromPaymentAccountBalance">Ödeme Hesabından Bakiye</text>
     <text name="Hirer">Kiracı</text>
@@ -269,6 +273,7 @@
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
     <text name="TenantIsResiding">Kiracı oturuyor</text>
+    <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
     <text name="TransferBalance">Devir bakiyesi</text>
@@ -281,6 +286,8 @@
     <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>
     <text name="UploadFile">Dosya yükle</text>
+    <text name="UploadFileWarning">Kaydet butonuna basana kadar yaptığınız işlemler kaydedilmeyecektir.</text>
+    <text name="UploadNewFile">Yeni dosya yükle</text>
     <text name="UsersActivation">Kullanıcı aktivasyonu</text>
     <text name="WorkerWarmingFee">Görevli ısınma ödemesi</text>
   </texts>

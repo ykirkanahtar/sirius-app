@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 
-namespace Sirius.AccountBooks.Dto
+namespace Sirius.PaymentAccounts.Dto
 {
     public class AccountBookGetAllOutput: FullAuditedEntityDto<Guid>
     {
@@ -14,7 +14,7 @@ namespace Sirius.AccountBooks.Dto
         public string ToPaymentAccountName { get; set; }
         public decimal? FromPaymentAccountBalance { get; set; }
         public decimal? ToPaymentAccountBalance { get; set; }
-        
+        public int SameDayIndex { get; set; }
         public List<string> AccountBookFiles { get; set; }
     }
 }

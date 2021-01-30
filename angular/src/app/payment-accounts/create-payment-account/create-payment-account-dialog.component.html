@@ -141,11 +141,11 @@
               id="amount"
               minlength="0"
               maxlength="10"
-              [(ngModel)]="transferForPaymentAccount.amount"
+              [(ngModel)]="paymentAccount.transferAmount"
             />
           </div>
         </div>
-        <div *ngIf="transferForPaymentAccount.amount > 0">
+        <div *ngIf="paymentAccount.transferAmount > 0">
           <div class="form-group row required">
             <label class="col-md-3 col-form-label" for="date">
               {{ "TransferDate" | localize }}
@@ -156,7 +156,7 @@
                 class="form-control m-input"
                 type="datetime"
                 bsDatepicker
-                [(ngModel)]="transferForPaymentAccount.processDateTime"
+                [(ngModel)]="paymentAccount.firstTransferDateTime"
                 id="date"
                 name="date"
               />

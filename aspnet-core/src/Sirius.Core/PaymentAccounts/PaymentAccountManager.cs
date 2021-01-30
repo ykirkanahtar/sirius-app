@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AccountBooks;
-using Sirius.AppPaymentAccounts;
 using Sirius.PaymentCategories;
 
 namespace Sirius.PaymentAccounts

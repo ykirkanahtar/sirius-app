@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
-using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
-using Sirius.AccountBooks;
 using Sirius.HousingPaymentPlans;
+using Sirius.PaymentAccounts;
 using Sirius.Shared.Constants;
 using Sirius.Shared.Enums;
 
@@ -74,17 +71,17 @@ namespace Sirius.PaymentCategories
             return await _paymentCategoryRepository.SingleAsync(p =>
                 p.HousingDueType == HousingDueType.TransferForRegularHousingDue);
         }
-        
+
         public async Task<PaymentCategory> GetNettingAsync()
         {
             return await _paymentCategoryRepository.SingleAsync(p =>
                 p.HousingDueType == HousingDueType.Netting);
         }
-        
+
         public async Task<PaymentCategory> GetTransferForPaymentAccountAsync()
         {
-            return await _paymentCategoryRepository.SingleAsync(p =>
-                p.PaymentCategoryName == AppConstants.TransferForPaymentAccount);
+            return await _paymentCategoryRepository.GetAll().Where(p =>
+                p.PaymentCategoryName == AppConstants.TransferForPaymentAccount).SingleOrDefaultAsync();
         }
 
         public async Task<PaymentCategory> GetAsync(Guid id)

@@ -1,14 +1,13 @@
-﻿using Abp;
-using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
-using Sirius.Shared.Enums;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Abp.Domain.Entities;
+using Abp.Domain.Entities.Auditing;
 using Abp.UI;
+using Sirius.Shared.Enums;
 
-namespace Sirius.AppPaymentAccounts
+namespace Sirius.PaymentAccounts
 {
     [Table("AppPaymentAccounts")]
     public class PaymentAccount : FullAuditedEntity<Guid>, IMustHaveTenant
@@ -25,6 +24,8 @@ namespace Sirius.AppPaymentAccounts
         [DefaultValue(0)] public decimal Balance { get; private set; }
         public string Description { get; private set; }
 
+        public DateTime? FirstTransferDateTime { get; private set; } //ilk devir hareketi
+
         public Guid? PersonId { get; private set; }
         public Guid? EmployeeId { get; private set; }
 
@@ -34,41 +35,45 @@ namespace Sirius.AppPaymentAccounts
         public bool IsDefault { get; private set; }
 
         public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description,
-            Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
+            Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.Cash, accountName, description,
                 personId, employeeId,
-                tenantIsOwner, isDefault, null, balance);
+                tenantIsOwner, isDefault, null, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance);
+                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null)
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance);
+                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
             string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
-            decimal balance, string iban = null)
+            decimal balance, string iban = null, DateTime? firstTransferDateTime = null)
         {
             return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
                 existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance);
+                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
         }
 
         private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId,
             PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId,
-            Guid? employeeId, bool tenantIsOwner, bool isDefault, string iban = null, decimal? balance = null)
+            Guid? employeeId, bool tenantIsOwner, bool isDefault, string iban = null, decimal? balance = null,
+            DateTime? firstTransferDateTime = null)
         {
             paymentAccount ??= new PaymentAccount();
 
@@ -84,6 +89,7 @@ namespace Sirius.AppPaymentAccounts
             paymentAccount.TenantIsOwner = tenantIsOwner;
             paymentAccount.IsDefault = isDefault;
             paymentAccount.Balance = balance ?? 0;
+            paymentAccount.FirstTransferDateTime = firstTransferDateTime;
 
             return paymentAccount;
         }
@@ -107,6 +113,11 @@ namespace Sirius.AppPaymentAccounts
             }
 
             paymentAccount.Balance -= amount;
+
+            if (paymentAccount.PaymentAccountType == PaymentAccountType.BankAccount && paymentAccount.Balance < 0)
+            {
+                throw new UserFriendlyException("Bakiye sıfırdan küçük olamaz");
+            }
             return paymentAccount;
         }
 
