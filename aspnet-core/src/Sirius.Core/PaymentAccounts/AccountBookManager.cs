@@ -58,13 +58,15 @@ namespace Sirius.PaymentAccounts
         {
             await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null);
         }
-
+        
         public async Task CreateAsync(AccountBook accountBook,
             AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing)
         {
+            await accountBook.SetSameDayIndexAsync(_accountBookRepository);
+
             await _accountBookRepository.InsertAsync(accountBook);
 
             if (accountBookType == AccountBookType.ForPaymentAccount)
@@ -126,108 +128,103 @@ namespace Sirius.PaymentAccounts
             PaymentAccountDirection paymentAccountDirection, CudType cudType,
             [CanBeNull] AccountBook oldAccountBook = null)
         {
-            try
+            var amount = accountBook.Amount;
+            if (cudType == CudType.Update)
             {
-                var amount = accountBook.Amount;
-                if (cudType == CudType.Update)
+                if (oldAccountBook == null)
                 {
-                    if (oldAccountBook == null)
-                    {
-                        throw new Exception("Güncelleme işlemi için eski işletme defteri değeri boş olamaz.");
-                    }
-
-                    amount = accountBook.Amount - oldAccountBook.Amount;
-                }
-                else if (cudType == CudType.Delete)
-                {
-                    amount *= -1;
+                    throw new Exception("Güncelleme işlemi için eski işletme defteri değeri boş olamaz.");
                 }
 
-                //Eğer ödeme hesabına ait son hareket değilse, ondan sonra kaydedilen hesapların bakiye bilgisi güncellenmeli
+                amount = accountBook.Amount - oldAccountBook.Amount;
+            }
+            else if (cudType == CudType.Delete)
+            {
+                amount *= -1;
+            }
 
-                //Giden hesabın son hesap hareketi mi 
-                var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
-                        p.ProcessDateTime > accountBook.ProcessDateTime &&
-                        p.FromPaymentAccountId == paymentAccount.Id)
-                    .OrderBy(p => p.ProcessDateTime)
-                    .ToListAsync();
+            //Eğer ödeme hesabına ait son hareket değilse, ondan sonra kaydedilen hesapların bakiye bilgisi güncellenmeli
 
-                if (nextAccountBooksForFromPaymentAccount.Count > 0)
+            //Giden hesabın son hesap hareketi mi 
+            var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
+                    p.ProcessDateTime > accountBook.ProcessDateTime &&
+                    p.FromPaymentAccountId == paymentAccount.Id)
+                .OrderBy(p => p.ProcessDateTime)
+                .ThenBy(p => p.SameDayIndex)
+                .ToListAsync();
+
+            if (nextAccountBooksForFromPaymentAccount.Count > 0)
+            {
+                foreach (var t in nextAccountBooksForFromPaymentAccount)
                 {
-                    foreach (var t in nextAccountBooksForFromPaymentAccount)
-                    {
-                        var existingAccountBook = t;
-                        var newBalance = paymentAccountDirection == PaymentAccountDirection.From
-                            ? (t.FromPaymentAccountCurrentBalance ?? 0) - amount
-                            : (t.FromPaymentAccountCurrentBalance ?? 0) + amount;
-                        t.SetFromPaymentAccountCurrentBalance(newBalance);
+                    var existingAccountBook = t;
+                    var newBalance = paymentAccountDirection == PaymentAccountDirection.From
+                        ? (t.FromPaymentAccountCurrentBalance ?? 0) - amount
+                        : (t.FromPaymentAccountCurrentBalance ?? 0) + amount;
+                    t.SetFromPaymentAccountCurrentBalance(newBalance);
 
-                        await UpdateAsync(existingAccountBook, t);
-                    }
-                }
-
-                //Gelen hesabın son hesap hareketi mi 
-                var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
-                        p.ProcessDateTime > accountBook.ProcessDateTime &&
-                        p.ToPaymentAccountId == paymentAccount.Id)
-                    .OrderBy(p => p.ProcessDateTime)
-                    .ToListAsync();
-
-                if (nextAccountBooksForToPaymentAccount.Count > 0)
-                {
-                    foreach (var p in nextAccountBooksForToPaymentAccount)
-                    {
-                        var existingAccountBook = p;
-                        var newBalance = paymentAccountDirection == PaymentAccountDirection.From
-                            ? (p.ToPaymentAccountCurrentBalance ?? 0) - amount
-                            : (p.ToPaymentAccountCurrentBalance ?? 0) + amount;
-                        p.SetToPaymentAccountCurrentBalance(newBalance);
-
-                        await UpdateAsync(existingAccountBook, p);
-                    }
-                }
-
-                //Eğer kaydedilen ödeme hesap hareketi son hesap hareketi ise, o zaman ödeme hesabının bakiyesi kaydediliyor
-                if (nextAccountBooksForFromPaymentAccount.Count == 0 && nextAccountBooksForToPaymentAccount.Count == 0)
-                {
-                    if (paymentAccountDirection == PaymentAccountDirection.From)
-                    {
-                        accountBook.SetFromPaymentAccountCurrentBalance(paymentAccount.Balance);
-                    }
-                    else
-                    {
-                        accountBook.SetToPaymentAccountCurrentBalance(paymentAccount.Balance);
-                    }
-                }
-                else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
-                {
-                    var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
-                            p.ProcessDateTime < accountBook.ProcessDateTime &&
-                            (p.FromPaymentAccountId == paymentAccount.Id ||
-                             p.ToPaymentAccountId == paymentAccount.Id))
-                        .OrderByDescending(p => p.ProcessDateTime)
-                        .FirstAsync();
-
-                    if (paymentAccountDirection == PaymentAccountDirection.From)
-                    {
-                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
-                        accountBook.SetFromPaymentAccountCurrentBalance(newBalance);
-                    }
-                    else
-                    {
-                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
-                        accountBook.SetToPaymentAccountCurrentBalance(newBalance);
-                    }
+                    await UpdateAsync(existingAccountBook, t);
                 }
             }
-            catch (Exception e)
+
+            //Gelen hesabın son hesap hareketi mi 
+            var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
+                    p.ProcessDateTime > accountBook.ProcessDateTime &&
+                    p.ToPaymentAccountId == paymentAccount.Id)
+                .OrderBy(p => p.ProcessDateTime)
+                .ThenBy(p => p.SameDayIndex)
+                .ToListAsync();
+
+            if (nextAccountBooksForToPaymentAccount.Count > 0)
             {
-                Console.WriteLine(e);
-                throw;
+                foreach (var p in nextAccountBooksForToPaymentAccount)
+                {
+                    var existingAccountBook = p;
+                    var newBalance = paymentAccountDirection == PaymentAccountDirection.From
+                        ? (p.ToPaymentAccountCurrentBalance ?? 0) - amount
+                        : (p.ToPaymentAccountCurrentBalance ?? 0) + amount;
+                    p.SetToPaymentAccountCurrentBalance(newBalance);
+
+                    await UpdateAsync(existingAccountBook, p);
+                }
+            }
+
+            //Eğer kaydedilen ödeme hesap hareketi son hesap hareketi ise, o zaman ödeme hesabının bakiyesi kaydediliyor
+            if (nextAccountBooksForFromPaymentAccount.Count == 0 && nextAccountBooksForToPaymentAccount.Count == 0)
+            {
+                if (paymentAccountDirection == PaymentAccountDirection.From)
+                {
+                    accountBook.SetFromPaymentAccountCurrentBalance(paymentAccount.Balance);
+                }
+                else
+                {
+                    accountBook.SetToPaymentAccountCurrentBalance(paymentAccount.Balance);
+                }
+            }
+            else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
+            {
+                var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
+                        p.ProcessDateTime < accountBook.ProcessDateTime &&
+                        (p.FromPaymentAccountId == paymentAccount.Id ||
+                         p.ToPaymentAccountId == paymentAccount.Id))
+                    .OrderByDescending(p => p.ProcessDateTime)
+                    .ThenByDescending(p => p.SameDayIndex)
+                    .FirstAsync();
+
+                if (paymentAccountDirection == PaymentAccountDirection.From)
+                {
+                    var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+                        ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
+                        : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
+                    accountBook.SetFromPaymentAccountCurrentBalance(newBalance);
+                }
+                else
+                {
+                    var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+                        ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
+                        : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
+                    accountBook.SetToPaymentAccountCurrentBalance(newBalance);
+                }
             }
         }
 

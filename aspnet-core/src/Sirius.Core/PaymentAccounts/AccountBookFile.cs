@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using Abp.Timing;
 
 namespace Sirius.PaymentAccounts
 {
@@ -29,15 +30,17 @@ namespace Sirius.PaymentAccounts
         public long? DeleterUserId { get; set; }
 
         public static AccountBookFile Create(Guid id, int tenantId, string fileUrl,
-            Guid accountBookGuid)
+            Guid accountBookGuid, long creatorUserId)
         {
-            var accountBookFile = new AccountBookFile();
-            accountBookFile.Id = id;
-            accountBookFile.TenantId = tenantId;
-            accountBookFile.FileUrl = fileUrl;
-            accountBookFile.AccountBookId = accountBookGuid;
-
-            return accountBookFile;
+            return new()
+            {
+                Id = id,
+                TenantId = tenantId,
+                FileUrl = fileUrl,
+                AccountBookId = accountBookGuid,
+                CreationTime = Clock.Now,
+                CreatorUserId = creatorUserId
+            };
         }
     }
 }

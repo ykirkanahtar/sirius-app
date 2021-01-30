@@ -96,6 +96,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetTenantId()
                     , newFileUrl
                     , accountBookGuid
+                    , AbpSession.UserId.Value
                 );
                 accountBookFiles.Add(entity);
             }
@@ -150,6 +151,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetTenantId()
                     , newFileUrl
                     , accountBookGuid
+                    , AbpSession.UserId.Value
                 );
                 accountBookFiles.Add(entity);
             }
@@ -260,12 +262,14 @@ namespace Sirius.PaymentAccounts
             }
         }
 
-        [UnitOfWork]
         public override async Task<AccountBookDto> UpdateAsync(UpdateAccountBookDto input)
         {
             try
             {
                 CheckUpdatePermission();
+                // var existingAccountBook = await _accountBookRepository.GetAll().Where(p => p.Id == input.Id)
+                //     .AsNoTracking().SingleAsync();
+
                 var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
 
                 var fromPaymentAccount = existingAccountBook.FromPaymentAccountId.HasValue
@@ -317,29 +321,26 @@ namespace Sirius.PaymentAccounts
                     return await DeleteAndCreateAsync(input, existingAccountBook);
                 }
 
-                var existingAccountBookFiles = existingAccountBook.AccountBookFiles;
+                var existingAccountBookForCheck = AccountBook.ShallowCopy(existingAccountBook);
 
-                foreach (var newAccountBookFileUrl in input.NewAccountBookFileUrls)
+                var newAccountBookFiles = new List<AccountBookFile>();
+                input.NewAccountBookFileUrls.ForEach(async newAccountBookFileUrl =>
                 {
-                    var entity = AccountBookFile.Create(
-                        SequentialGuidGenerator.Instance.Create()
-                        , AbpSession.GetTenantId()
-                        , newAccountBookFileUrl
-                        , existingAccountBook.Id
-                    );
-                    existingAccountBookFiles.Add(entity);
-                }
+                    var accountBookFile = AccountBookFile.Create(SequentialGuidGenerator.Instance.Create(),
+                        AbpSession.GetTenantId(),
+                        newAccountBookFileUrl, existingAccountBook.Id, AbpSession.UserId.Value);
+                    await _accountBookFileRepository.InsertAsync(accountBookFile);
+                });
 
+                var deletedAccountBookFiles = new List<AccountBookFile>();
                 foreach (var deletedAccountBookFileUrl in input.DeletedAccountBookFileUrls)
                 {
                     var deletedAccountBookFile = await _accountBookFileRepository.GetAll()
                         .Where(p => p.FileUrl == deletedAccountBookFileUrl).SingleAsync();
 
                     await _accountBookFileRepository.DeleteAsync(deletedAccountBookFile);
-                    existingAccountBookFiles.Remove(deletedAccountBookFile);
+                    deletedAccountBookFiles.Add(deletedAccountBookFile);
                 }
-
-                var existingAccountBookForCheck = AccountBook.ShallowCopy(existingAccountBook);
 
                 var accountBook = await AccountBook.UpdateAsync(
                     _accountBookPolicy
@@ -351,7 +352,8 @@ namespace Sirius.PaymentAccounts
                     , input.Description
                     , input.DocumentDateTime
                     , input.DocumentNumber
-                    , existingAccountBook.AccountBookFiles
+                    , newAccountBookFiles
+                    , deletedAccountBookFiles
                     , AbpSession.GetUserId()
                 );
                 await _accountBookManager.UpdateAsync(existingAccountBookForCheck, accountBook);
@@ -372,6 +374,16 @@ namespace Sirius.PaymentAccounts
 
             //ToDo transaction commit olduktan sonra azure'dan silinen ilgili dosyaları sil. 
             //Committen sonra silinmesi gerekeceği için bu katmanda sil.
+        }
+
+        public override async Task<AccountBookDto> GetAsync(EntityDto<Guid> input)
+        {
+            CheckGetPermission();
+            var accountBook = await _accountBookRepository.GetAll().Where(p => p.Id == input.Id)
+                .Include(p => p.AccountBookFiles)
+                .SingleAsync();
+
+            return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
         public async Task<PagedAccountBookResultDto> GetAllListAsync(
@@ -440,11 +452,13 @@ namespace Sirius.PaymentAccounts
                             : string.Empty,
                         FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
                         ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
+                        SameDayIndex = p.accountBook.SameDayIndex,
                         AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
                     });
 
                 var accountBooks = await query
-                    .OrderBy(input.Sorting ?? $"{nameof(AccountBookDto.ProcessDateTime)} DESC")
+                    .OrderBy(input.Sorting ??
+                             $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC")
                     .PageBy(input)
                     .ToListAsync();
 

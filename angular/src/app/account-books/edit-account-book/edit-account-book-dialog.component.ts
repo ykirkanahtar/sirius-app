@@ -15,7 +15,6 @@ import * as _ from "lodash";
 import { AppComponentBase } from "@shared/app-component-base";
 import {
   AccountBookServiceProxy,
-  HousingServiceProxy,
   PaymentAccountServiceProxy,
   LookUpDto,
   PaymentCategoryServiceProxy,
@@ -23,13 +22,15 @@ import {
   API_BASE_URL,
   UpdateAccountBookDto,
   AccountBookDto,
-  PaymentAccountDto,
   HousingDto,
+  AccountBookFileDto,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import { update } from "lodash";
+import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
+import { Observable } from "rxjs";
 
 @Component({
   templateUrl: "edit-account-book-dialog.component.html",
@@ -48,10 +49,11 @@ export class EditAccountBookDialogComponent
   paymentCategories: LookUpDto[];
   people: LookUpDto[];
 
-  uploadedFileUrls: any[] = [];
   newUploadedFileUrls: any[] = [];
+  deletedUploadedFileUrls: any[] = [];
   deletedFileUrls: any[] = [];
-  baseUrl: string;
+  display: boolean = false;
+  clickedImages: string[] = [];
 
   processDate: Date;
 
@@ -60,18 +62,37 @@ export class EditAccountBookDialogComponent
   @Output() onSave = new EventEmitter<any>();
   @ViewChild("fileUpload") fileUpload: any;
 
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: "1500px",
+      numVisible: 5,
+    },
+    {
+      breakpoint: "1024px",
+      numVisible: 3,
+    },
+    {
+      breakpoint: "768px",
+      numVisible: 2,
+    },
+    {
+      breakpoint: "560px",
+      numVisible: 1,
+    },
+  ];
+
   constructor(
     injector: Injector,
     private _accountBookServiceProxy: AccountBookServiceProxy,
     private _paymentAccountServiceProxy: PaymentAccountServiceProxy,
     private _paymentCategoryServiceProxy: PaymentCategoryServiceProxy,
     private _personServiceProxy: PersonServiceProxy,
+    private _uploadServiceProxy: CustomUploadServiceProxy,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
   ) {
     super(injector);
-    this.baseUrl = baseUrl ? baseUrl : "";
   }
 
   ngOnInit(): void {
@@ -113,20 +134,37 @@ export class EditAccountBookDialogComponent
     for (const file of event.files) {
       const input = new FormData();
       input.append("file", file);
-      this.http.post(this.baseUrl + "/Upload/Upload", input).subscribe(
-        (data) => {
-          this.uploadedFileUrls.push(data["result"]);
-          this.saving = false;
-          this.saveLabel = this.l("Save");
-        },
-        (err) => {
-          abp.message.error(err.statusText);
-          this.fileUpload.clear();
-          this.saving = false;
-          this.saveLabel = this.l("Save");
-        }
-      );
+
+      this._uploadServiceProxy.uploadFile(input).subscribe((result) => {
+        this.newUploadedFileUrls.push(result);
+        this.fileUpload.clear();
+        this.saving = false;
+        this.saveLabel = this.l("Save");
+      });
     }
+  }
+
+  showImages(clickedImages: string) {
+    this.display = true;
+    this.clickedImages.push(clickedImages);
+  }
+
+  delete(accountBookFile: AccountBookFileDto) {
+    abp.message.confirm(
+      this.l("AccountBookFileDeleteWarningMessage"),
+      undefined,
+      (result: boolean) => {
+        if (result) {
+          const index: number = this.accountBook.accountBookFiles.indexOf(
+            accountBookFile
+          );
+          if (index !== -1) {
+            this.accountBook.accountBookFiles.splice(index, 1);
+            this.deletedFileUrls.push(accountBookFile.fileUrl);
+          }
+        }
+      }
+    );
   }
 
   save(): void {
@@ -144,6 +182,12 @@ export class EditAccountBookDialogComponent
 
     for (const fileUrl of this.newUploadedFileUrls) {
       updateAccountBookDto.newAccountBookFileUrls.push(fileUrl);
+    }
+
+    updateAccountBookDto.deletedAccountBookFileUrls = [];
+
+    for (const fileUrl of this.deletedFileUrls) {
+      updateAccountBookDto.deletedAccountBookFileUrls.push(fileUrl);
     }
 
     this._accountBookServiceProxy

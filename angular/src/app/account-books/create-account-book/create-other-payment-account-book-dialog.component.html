@@ -236,34 +236,30 @@
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="form-group row">
-              <div class="col-md-12">
-                <label for="fileUpload">
-                  {{ "UploadFile" | localize }}
-                </label>
-                <p-fileUpload
-                  #fileUpload
-                  name="fileUpload"
-                  maxFileSize="1000000000"
-                  customUpload="true"
-                  accept="image/*"
-                  multiple="multiple"
-                  auto="auto"
-                  [chooseLabel]="l('ChooseFile')"
-                  (uploadHandler)="uploadHandler($event)"
-                >
-                  <ng-template pTemplate="content">
-                    <ul *ngIf="uploadedFileUrls.length">
-                      <li *ngFor="let file of uploadedFileUrls">
-                        {{ file.name }}
-                      </li>
-                    </ul>
-                  </ng-template>
-                </p-fileUpload>
-              </div>
-            </div>
+      </tab>
+      <tab [heading]="'Images' | localize" class="pt-3 px-2">
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="description">
+            {{ "UploadFile" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-fileUpload
+              #fileUpload
+              name="myFile[]"
+              maxFileSize="1000000000"
+              customUpload="true"
+              accept="image/*"
+              multiple="multiple"
+              auto="auto"
+              [chooseLabel]="l('ChooseFile')"
+              (uploadHandler)="uploadHandler($event)"
+            >
+              <ng-template pTemplate="content">
+                <ul *ngIf="uploadedFileUrls.length">
+                  <li *ngFor="let file of uploadedFileUrls">{{ file.name }}</li>
+                </ul>
+              </ng-template>
+            </p-fileUpload>
           </div>
         </div>
       </tab>

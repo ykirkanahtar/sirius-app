@@ -21,11 +21,12 @@ import {
   PaymentCategoryServiceProxy,
   CreateOtherPaymentAccountBookDto,
   PersonServiceProxy,
-  API_BASE_URL
+  API_BASE_URL,
 } from '@shared/service-proxies/service-proxies';
 import { HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
 import { CommonFunctions } from '@shared/helpers/CommonFunctions';
+import { CustomUploadServiceProxy } from '@shared/service-proxies/custom-service-proxies';
 
 @Component({
   templateUrl: 'create-other-payment-account-book-dialog.component.html'
@@ -58,6 +59,7 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
     private _paymentAccountServiceProxy: PaymentAccountServiceProxy,
     private _paymentCategoryServiceProxy: PaymentCategoryServiceProxy,
     private _personServiceProxy: PersonServiceProxy,
+    private _uploadServiceProxy: CustomUploadServiceProxy,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
@@ -133,19 +135,17 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
     for (const file of event.files) {
       const input = new FormData();
       input.append("file", file);
-      this.http.post(this.baseUrl + "/Upload/Upload", input).subscribe(
-        (data) => {
-          this.uploadedFileUrls.push(data["result"]);
-          this.saving = false;
-          this.saveLabel = this.l("Save");
-        },
-        (err) => {
-          abp.message.error(err.statusText);
-          this.fileUpload.clear();
-          this.saving = false;
-          this.saveLabel = this.l("Save");
-        }
-      );
+
+      this._uploadServiceProxy
+        .uploadFile(input)
+        .subscribe(
+          (result) => {
+            this.uploadedFileUrls.push(result);
+            this.fileUpload.clear();
+            this.saving = false;
+            this.saveLabel = this.l("Save");
+          }
+        );
     }
   }
 

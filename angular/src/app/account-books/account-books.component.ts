@@ -140,7 +140,6 @@ export class AccountBooksComponent
   }
 
   editAccountBook(accountBook: AccountBookDto): void {
-    console.log(accountBook);
     this.showEditAccountBookDialog(accountBook.id);
   }
 

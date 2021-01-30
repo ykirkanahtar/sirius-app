@@ -17,6 +17,7 @@ using Abp.AspNetCore.SignalR.Hubs;
 using Abp.Dependency;
 using Abp.Json;
 using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Sirius.FileServices;
@@ -45,10 +46,7 @@ namespace Sirius.Web.Host.Startup
 
             //MVC
             services.AddControllersWithViews(
-                options =>
-                {
-                    options.Filters.Add(new AbpAutoValidateAntiforgeryTokenAttribute());
-                }
+                options => { options.Filters.Add(new AbpAutoValidateAntiforgeryTokenAttribute()); }
             ).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new AbpMvcContractResolver(IocManager.Instance)
@@ -56,7 +54,7 @@ namespace Sirius.Web.Host.Startup
                     NamingStrategy = new CamelCaseNamingStrategy()
                 };
             });
-            
+
             IdentityRegistrar.Register(services);
             AuthConfigurer.Configure(services, _appConfiguration);
 
@@ -83,6 +81,9 @@ namespace Sirius.Web.Host.Startup
             // Swagger - Enable this line and the related lines in Configure method to enable swagger UI
             services.AddSwaggerGen(options =>
             {
+                options.SchemaGeneratorOptions.CustomTypeMappings.Add(typeof(IFormFile),
+                    () => new OpenApiSchema() {Type = "file", Format = "binary"});
+
                 options.SwaggerDoc(_apiVersion, new OpenApiInfo
                 {
                     Version = _apiVersion,
@@ -106,13 +107,13 @@ namespace Sirius.Web.Host.Startup
                 // Define the BearerAuth scheme that's in use
                 options.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme()
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description =
+                        "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
                 });
                 options.SchemaFilter<EnumSchemaFilter>();
-
             });
 
             // Configure Abp and Dependency Injection
@@ -124,7 +125,7 @@ namespace Sirius.Web.Host.Startup
             );
         }
 
-        public void Configure(IApplicationBuilder app,  ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             app.UseAbp(options => { options.UseAbpRequestLocalization = false; }); // Initializes ABP framework.
 
@@ -138,7 +139,7 @@ namespace Sirius.Web.Host.Startup
 
             app.UseAbpRequestLocalization();
 
-          
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<AbpCommonHub>("/signalr");
