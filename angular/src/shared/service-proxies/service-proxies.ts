@@ -569,6 +569,66 @@ export class AccountBookServiceProxy {
     }
 
     /**
+     * @param accountBookId (optional) 
+     * @return Success
+     */
+    getPaymentCategoryLookUpForEditAccountBook(accountBookId: string | undefined): Observable<PaymentCategoryLookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AccountBook/GetPaymentCategoryLookUpForEditAccountBook?";
+        if (accountBookId === null)
+            throw new Error("The parameter 'accountBookId' cannot be null.");
+        else if (accountBookId !== undefined)
+            url_ += "accountBookId=" + encodeURIComponent("" + accountBookId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentCategoryLookUpForEditAccountBook(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentCategoryLookUpForEditAccountBook(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryLookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryLookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentCategoryLookUpForEditAccountBook(response: HttpResponseBase): Observable<PaymentCategoryLookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(PaymentCategoryLookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryLookUpDto[]>(<any>null);
+    }
+
+    /**
      * @param startDate (optional) 
      * @param endDate (optional) 
      * @param paymentCategoryIds (optional) 
@@ -7462,6 +7522,57 @@ export interface IPagedAccountBookResultDto {
     lastAccountBookDate: moment.Moment | undefined;
     totalCount: number;
     items: AccountBookGetAllOutput[] | undefined;
+}
+
+export class PaymentCategoryLookUpDto implements IPaymentCategoryLookUpDto {
+    readonly editInAccountBook: boolean;
+    readonly value: string | undefined;
+    readonly label: string | undefined;
+
+    constructor(data?: IPaymentCategoryLookUpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).editInAccountBook = _data["editInAccountBook"];
+            (<any>this).value = _data["value"];
+            (<any>this).label = _data["label"];
+        }
+    }
+
+    static fromJS(data: any): PaymentCategoryLookUpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentCategoryLookUpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["editInAccountBook"] = this.editInAccountBook;
+        data["value"] = this.value;
+        data["label"] = this.label;
+        return data; 
+    }
+
+    clone(): PaymentCategoryLookUpDto {
+        const json = this.toJSON();
+        let result = new PaymentCategoryLookUpDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentCategoryLookUpDto {
+    editInAccountBook: boolean;
+    value: string | undefined;
+    label: string | undefined;
 }
 
 export class AccountBookDtoPagedResultDto implements IAccountBookDtoPagedResultDto {

@@ -94,11 +94,14 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAll().Where(p => p.ShowInLists).ToListAsync();
+            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.ShowInLists)
+                .ToListAsync();
 
             return
                 (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
-                    select new LookUpDto(l.Id.ToString(), _localizationSource.GetString(l.PaymentCategoryName)))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
                 .ToList();
         }
 

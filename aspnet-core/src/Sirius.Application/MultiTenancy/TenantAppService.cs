@@ -27,7 +27,9 @@ using Sirius.Shared.Enums;
 namespace Sirius.MultiTenancy
 {
     [AbpAuthorize(PermissionNames.Pages_Tenants)]
-    public class TenantAppService : AsyncCrudAppService<Tenant, TenantDto, int, PagedTenantResultRequestDto, CreateTenantDto, TenantDto>, ITenantAppService
+    public class TenantAppService :
+        AsyncCrudAppService<Tenant, TenantDto, int, PagedTenantResultRequestDto, CreateTenantDto, TenantDto>,
+        ITenantAppService
     {
         private readonly TenantManager _tenantManager;
         private readonly EditionManager _editionManager;
@@ -42,7 +44,7 @@ namespace Sirius.MultiTenancy
             EditionManager editionManager,
             UserManager userManager,
             RoleManager roleManager,
-            IAbpZeroDbMigrator abpZeroDbMigrator, 
+            IAbpZeroDbMigrator abpZeroDbMigrator,
             IPaymentCategoryManager paymentCategoryManager)
             : base(repository)
         {
@@ -71,9 +73,9 @@ namespace Sirius.MultiTenancy
             }
 
             await _tenantManager.CreateAsync(tenant);
-            
+
             await CurrentUnitOfWork.SaveChangesAsync(); // To get new tenant's id.
-            
+
             // Create tenant database
             _abpZeroDbMigrator.CreateOrMigrateForTenant(tenant);
 
@@ -84,7 +86,7 @@ namespace Sirius.MultiTenancy
                 CheckErrors(await _roleManager.CreateStaticRoles(tenant.Id));
 
                 await CurrentUnitOfWork.SaveChangesAsync(); // To get static role ids
-                
+
                 // Grant all permissions to admin role
                 var adminRole = _roleManager.Roles.Single(r => r.Name == StaticRoleNames.Tenants.Admin);
                 await _roleManager.GrantAllPermissionsAsync(adminRole);
@@ -98,24 +100,28 @@ namespace Sirius.MultiTenancy
                 // Assign admin user to role!
                 CheckErrors(await _userManager.AddToRoleAsync(adminUser, adminRole.Name));
                 await CurrentUnitOfWork.SaveChangesAsync();
-                
+
                 StaticPermissionsBuilderForTenant.Build(CurrentUnitOfWork.GetDbContext<SiriusDbContext>(), tenant.Id);
-                
+
                 //Custom changes
                 var housingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.RegularHousingDue.ToString(), HousingDueType.RegularHousingDue, true);
+                    tenant.Id, HousingDueType.RegularHousingDue.ToString(), HousingDueType.RegularHousingDue, true,
+                    false);
                 await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
-                
-                var transferForHousingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(), HousingDueType.TransferForRegularHousingDue, true);
+
+                var transferForHousingDuePaymentCategory = PaymentCategory.Create(
+                    SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(),
+                    HousingDueType.TransferForRegularHousingDue, true, false);
                 await _paymentCategoryManager.CreateAsync(transferForHousingDuePaymentCategory);
-                
+
                 var nettingPaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.Netting.ToString(), HousingDueType.Netting, false);
+                    tenant.Id, HousingDueType.Netting.ToString(), HousingDueType.Netting, false, false);
                 await _paymentCategoryManager.CreateAsync(nettingPaymentCategory);
-                
-                var transferForPaymentAccountCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, AppConstants.TransferForPaymentAccount, null, true, false);
+
+                var transferForPaymentAccountCategory = PaymentCategory.Create(
+                    SequentialGuidGenerator.Instance.Create(),
+                    tenant.Id, AppConstants.TransferForPaymentAccount, null, true, false, false);
                 await _paymentCategoryManager.CreateAsync(transferForPaymentAccountCategory);
             }
 
@@ -125,7 +131,8 @@ namespace Sirius.MultiTenancy
         protected override IQueryable<Tenant> CreateFilteredQuery(PagedTenantResultRequestDto input)
         {
             return Repository.GetAll()
-                .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), x => x.TenancyName.Contains(input.Keyword) || x.Name.Contains(input.Keyword))
+                .WhereIf(!input.Keyword.IsNullOrWhiteSpace(),
+                    x => x.TenancyName.Contains(input.Keyword) || x.Name.Contains(input.Keyword))
                 .WhereIf(input.IsActive.HasValue, x => x.IsActive == input.IsActive);
         }
 
@@ -151,4 +158,3 @@ namespace Sirius.MultiTenancy
         }
     }
 }
-

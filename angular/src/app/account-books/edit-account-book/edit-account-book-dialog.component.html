@@ -44,6 +44,7 @@
                   [placeholder]="'PleaseSelect' | localize"
                   [options]="paymentCategories"
                   [(ngModel)]="accountBook.paymentCategoryId"
+                  [disabled]="!canEditPaymentCategory(accountBook.paymentCategoryId)"
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
