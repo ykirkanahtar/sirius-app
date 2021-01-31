@@ -6862,6 +6862,9 @@ export class AccountBookDto implements IAccountBookDto {
     documentNumber: string | undefined;
     fromPaymentAccountCurrentBalance: number | undefined;
     toPaymentAccountCurrentBalance: number | undefined;
+    encashmentHousing: boolean;
+    housingIdForEncachment: string | undefined;
+    sameDayIndex: number;
     accountBookFiles: AccountBookFileDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -6894,6 +6897,9 @@ export class AccountBookDto implements IAccountBookDto {
             this.documentNumber = _data["documentNumber"];
             this.fromPaymentAccountCurrentBalance = _data["fromPaymentAccountCurrentBalance"];
             this.toPaymentAccountCurrentBalance = _data["toPaymentAccountCurrentBalance"];
+            this.encashmentHousing = _data["encashmentHousing"];
+            this.housingIdForEncachment = _data["housingIdForEncachment"];
+            this.sameDayIndex = _data["sameDayIndex"];
             if (Array.isArray(_data["accountBookFiles"])) {
                 this.accountBookFiles = [] as any;
                 for (let item of _data["accountBookFiles"])
@@ -6930,6 +6936,9 @@ export class AccountBookDto implements IAccountBookDto {
         data["documentNumber"] = this.documentNumber;
         data["fromPaymentAccountCurrentBalance"] = this.fromPaymentAccountCurrentBalance;
         data["toPaymentAccountCurrentBalance"] = this.toPaymentAccountCurrentBalance;
+        data["encashmentHousing"] = this.encashmentHousing;
+        data["housingIdForEncachment"] = this.housingIdForEncachment;
+        data["sameDayIndex"] = this.sameDayIndex;
         if (Array.isArray(this.accountBookFiles)) {
             data["accountBookFiles"] = [];
             for (let item of this.accountBookFiles)
@@ -6966,6 +6975,9 @@ export interface IAccountBookDto {
     documentNumber: string | undefined;
     fromPaymentAccountCurrentBalance: number | undefined;
     toPaymentAccountCurrentBalance: number | undefined;
+    encashmentHousing: boolean;
+    housingIdForEncachment: string | undefined;
+    sameDayIndex: number;
     accountBookFiles: AccountBookFileDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -7275,6 +7287,9 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     toPaymentAccountName: string | undefined;
     fromPaymentAccountBalance: number | undefined;
     toPaymentAccountBalance: number | undefined;
+    encashmentHousing: boolean;
+    encashmentHousingBlockApartment: string | undefined;
+    sameDayIndex: number;
     accountBookFiles: string[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -7304,6 +7319,9 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
             this.toPaymentAccountName = _data["toPaymentAccountName"];
             this.fromPaymentAccountBalance = _data["fromPaymentAccountBalance"];
             this.toPaymentAccountBalance = _data["toPaymentAccountBalance"];
+            this.encashmentHousing = _data["encashmentHousing"];
+            this.encashmentHousingBlockApartment = _data["encashmentHousingBlockApartment"];
+            this.sameDayIndex = _data["sameDayIndex"];
             if (Array.isArray(_data["accountBookFiles"])) {
                 this.accountBookFiles = [] as any;
                 for (let item of _data["accountBookFiles"])
@@ -7337,6 +7355,9 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
         data["toPaymentAccountName"] = this.toPaymentAccountName;
         data["fromPaymentAccountBalance"] = this.fromPaymentAccountBalance;
         data["toPaymentAccountBalance"] = this.toPaymentAccountBalance;
+        data["encashmentHousing"] = this.encashmentHousing;
+        data["encashmentHousingBlockApartment"] = this.encashmentHousingBlockApartment;
+        data["sameDayIndex"] = this.sameDayIndex;
         if (Array.isArray(this.accountBookFiles)) {
             data["accountBookFiles"] = [];
             for (let item of this.accountBookFiles)
@@ -7370,6 +7391,9 @@ export interface IAccountBookGetAllOutput {
     toPaymentAccountName: string | undefined;
     fromPaymentAccountBalance: number | undefined;
     toPaymentAccountBalance: number | undefined;
+    encashmentHousing: boolean;
+    encashmentHousingBlockApartment: string | undefined;
+    sameDayIndex: number;
     accountBookFiles: string[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;

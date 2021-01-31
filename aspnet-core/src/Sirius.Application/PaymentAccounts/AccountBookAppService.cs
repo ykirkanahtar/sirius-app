@@ -39,27 +39,27 @@ namespace Sirius.PaymentAccounts
         private readonly IHousingManager _housingManager;
         private readonly IBlobService _blobService;
         private readonly IAccountBookPolicy _accountBookPolicy;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymetPlanRepository;
+        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
             IPaymentCategoryManager paymentCategoryManager,
-            IUnitOfWorkManager unitOfWorkManager,
             IHousingManager housingManager,
-            IPaymentAccountManager paymentAccountManager,
-            IHousingPaymentPlanManager housingPaymentPlanManager,
             IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IHousingRepository housingRepository,
             IRepository<Block, Guid> blockRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IBlobService blobService,
-            IAccountBookPolicy accountBookPolicy, IRepository<AccountBookFile, Guid> accountBookFileRepository)
+            IAccountBookPolicy accountBookPolicy,
+            IRepository<AccountBookFile, Guid> accountBookFileRepository,
+            IRepository<HousingPaymentPlan, Guid> housingPaymetPlanRepository,
+            IHousingPaymentPlanManager housingPaymentPlanManager)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
             _accountBookRepository = accountBookRepository;
             _paymentCategoryManager = paymentCategoryManager;
-            _unitOfWorkManager = unitOfWorkManager;
             _housingManager = housingManager;
             _paymentCategoryRepository = paymentCategoryRepository;
             _housingRepository = housingRepository;
@@ -68,6 +68,8 @@ namespace Sirius.PaymentAccounts
             _blobService = blobService;
             _accountBookPolicy = accountBookPolicy;
             _accountBookFileRepository = accountBookFileRepository;
+            _housingPaymetPlanRepository = housingPaymetPlanRepository;
+            _housingPaymentPlanManager = housingPaymentPlanManager;
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -321,6 +323,18 @@ namespace Sirius.PaymentAccounts
                     return await DeleteAndCreateAsync(input, existingAccountBook);
                 }
 
+                var existingHousingPaymentPlan = await _housingPaymetPlanRepository.GetAll()
+                    .Where(p => p.AccountBookId == existingAccountBook.Id).SingleOrDefaultAsync();
+                if (existingHousingPaymentPlan != null)
+                {
+                    if (input.ProcessDateTime != existingAccountBook.ProcessDateTime
+                        || input.Amount != existingAccountBook.Amount)
+                    {
+                        await _housingPaymentPlanManager.UpdateAsync(existingHousingPaymentPlan.Id,
+                            input.ProcessDateTime, input.Amount, existingHousingPaymentPlan.Description);
+                    }
+                }
+
                 var existingAccountBookForCheck = AccountBook.ShallowCopy(existingAccountBook);
 
                 var newAccountBookFiles = new List<AccountBookFile>();
@@ -357,6 +371,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetUserId()
                 );
                 await _accountBookManager.UpdateAsync(existingAccountBookForCheck, accountBook);
+
                 return ObjectMapper.Map<AccountBookDto>(accountBook);
             }
             catch (Exception e)
@@ -409,6 +424,11 @@ namespace Sirius.PaymentAccounts
                                 .ToPaymentAccountId
                             equals toPaymentAccount.Id into toPaymentAccount
                         from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
+                        join encashmentHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
+                                .HousingIdForEncachment
+                            equals encashmentHousing.Id into
+                            encashmentHousing
+                        from subEncashmentHousing in encashmentHousing.DefaultIfEmpty()
                         select new
                         {
                             accountBook,
@@ -416,7 +436,8 @@ namespace Sirius.PaymentAccounts
                             subHousing,
                             subBlock,
                             subFromPaymentAccount,
-                            subToPaymentAccount
+                            subToPaymentAccount,
+                            subEncashmentHousing
                         })
                     .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
                     .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
@@ -452,6 +473,10 @@ namespace Sirius.PaymentAccounts
                             : string.Empty,
                         FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
                         ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
+                        EncashmentHousing = p.accountBook.EncashmentHousing,
+                        EncashmentHousingBlockApartment = p.subEncashmentHousing != null
+                            ? p.subEncashmentHousing.Block.BlockName + ' ' + p.subEncashmentHousing.Apartment
+                            : string.Empty,
                         SameDayIndex = p.accountBook.SameDayIndex,
                         AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
                     });

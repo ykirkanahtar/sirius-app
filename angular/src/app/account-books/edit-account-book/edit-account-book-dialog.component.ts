@@ -24,6 +24,7 @@ import {
   AccountBookDto,
   HousingDto,
   AccountBookFileDto,
+  HousingServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
@@ -56,6 +57,7 @@ export class EditAccountBookDialogComponent
   clickedImages: string[] = [];
 
   processDate: Date;
+  encashmentHousingText: string;
 
   @Input() lastAccountBookDate: moment.Moment;
 
@@ -88,6 +90,7 @@ export class EditAccountBookDialogComponent
     private _paymentCategoryServiceProxy: PaymentCategoryServiceProxy,
     private _personServiceProxy: PersonServiceProxy,
     private _uploadServiceProxy: CustomUploadServiceProxy,
+    private _housingServiceProxy: HousingServiceProxy,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
@@ -101,6 +104,14 @@ export class EditAccountBookDialogComponent
       .subscribe((result: AccountBookDto) => {
         this.accountBook = result;
         this.processDate = this.accountBook.processDateTime.toDate();
+
+        if (this.accountBook.encashmentHousing) {
+          this._housingServiceProxy
+            .get(this.accountBook.housingIdForEncachment)
+            .subscribe((result: HousingDto) => {
+              this.encashmentHousingText = result.block.blockName + " " + result.apartment;
+            });
+        }
       });
 
     this._paymentAccountServiceProxy

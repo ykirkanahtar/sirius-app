@@ -196,6 +196,8 @@
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
     <text name="EncachmentFromHousingDue">Mahsuplaşma</text>
     <text name="EncachmentFromHousingDueDescription">Eğer ödeme, bir konut aidatından düşülecekse yukarıdaki seçeneği seçiniz.</text>
+    <text name="EncashmentHousingText">Mahsuplaşmanın yapıldığı konut: </text>
+    <text name="EncashmentShort">Mahs.: </text>
     <text name="EndDate">Bitiş Tarihi</text>
     <text name="ExistingFiles">Varolan Dosyalar</text>
     <text name="false">Hayır</text>

@@ -14,6 +14,8 @@ namespace Sirius.PaymentAccounts.Dto
         public string ToPaymentAccountName { get; set; }
         public decimal? FromPaymentAccountBalance { get; set; }
         public decimal? ToPaymentAccountBalance { get; set; }
+        public bool EncashmentHousing { get;  set; }
+        public string EncashmentHousingBlockApartment { get;  set; }
         public int SameDayIndex { get; set; }
         public List<string> AccountBookFiles { get; set; }
     }
