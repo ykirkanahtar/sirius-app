@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore.Repositories;
@@ -12,12 +13,15 @@ namespace Sirius.HousingPaymentPlans
     public class HousingPaymentPlanManager : IHousingPaymentPlanManager
     {
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
+        private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IHousingManager _housingManager;
 
-        public HousingPaymentPlanManager(IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository, IHousingManager housingManager)
+        public HousingPaymentPlanManager(IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
+            IHousingManager housingManager, IRepository<Housing, Guid> housingRepository)
         {
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingManager = housingManager;
+            _housingRepository = housingRepository;
         }
 
         public async Task CreateAsync(HousingPaymentPlan housingPaymentPlan)
@@ -29,17 +33,47 @@ namespace Sirius.HousingPaymentPlans
         {
             await _housingPaymentPlanRepository.GetDbContext().AddRangeAsync(housingPaymentPlans);
         }
-        
-        public async Task UpdateAsync(HousingPaymentPlan housingPaymentPlan)
+
+        public async Task<HousingPaymentPlan> UpdateAsync(Guid housingPaymentPlanId, DateTime date,
+            decimal amount, string description)
         {
-            await _housingPaymentPlanRepository.UpdateAsync(housingPaymentPlan);
+            var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(housingPaymentPlanId);
+
+            var amountDiff = existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Credit
+                ? Math.Abs(existingHousingPaymentPlan.Amount) - Math.Abs(amount)
+                : Math.Abs(amount) - Math.Abs(existingHousingPaymentPlan.Amount);
+
+            var updatedHousingPaymentPlan = HousingPaymentPlan.Update(existingHousingPaymentPlan, date, amount,
+                existingHousingPaymentPlan.Description);
+
+            if (amountDiff != 0)
+            {
+                var housing = await _housingRepository.GetAsync(existingHousingPaymentPlan.HousingId);
+                if (existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
+                {
+                    if (amountDiff > 0)
+                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff));
+                    else
+                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff));
+                }
+                else
+                {
+                    if (amountDiff > 0)
+                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff));
+                    else
+                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff));
+                }
+            }
+
+            return updatedHousingPaymentPlan;
         }
 
         public async Task DeleteAsync(HousingPaymentPlan housingPaymentPlan, bool fromAccountBook = false)
         {
             if (!fromAccountBook && housingPaymentPlan.AccountBookId.HasValue)
             {
-                throw new UserFriendlyException("Bu kayıt işletme defterine girilen kayıt sonrası otomatik oluşmuştur. İşletme defterindeki kaydı siliniz.");
+                throw new UserFriendlyException(
+                    "Bu kayıt işletme defterine girilen kayıt sonrası otomatik oluşmuştur. İşletme defterindeki kaydı siliniz.");
             }
 
             var housing = await _housingManager.GetAsync(housingPaymentPlan.HousingId);
@@ -63,6 +97,7 @@ namespace Sirius.HousingPaymentPlans
             {
                 throw new UserFriendlyException("Ödeme planı bulunamadı");
             }
+
             return housingPaymentPlan;
         }
     }

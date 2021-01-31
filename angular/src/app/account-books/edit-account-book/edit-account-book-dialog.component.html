@@ -171,6 +171,16 @@
                 ></abp-validation-summary>
               </div>
             </div>
+            <div *ngIf="accountBook.encashmentHousing">
+              <div class="form-group row">
+                <div class="col-md-10">
+                  <label>
+                    {{ "EncashmentHousingText" | localize }} 
+                  </label>
+                  <span>{{' ' + encashmentHousingText }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </tab>

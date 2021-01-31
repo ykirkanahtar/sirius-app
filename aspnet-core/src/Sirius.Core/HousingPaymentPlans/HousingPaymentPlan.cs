@@ -30,7 +30,7 @@ namespace Sirius.HousingPaymentPlans
 
         [ForeignKey(nameof(PaymentCategoryId))]
         public virtual PaymentCategory PaymentCategory { get; protected set; }
-        
+
 
         public static HousingPaymentPlan CreateDebt(Guid id, int tenantId,
             [CanBeNull] HousingPaymentPlanGroup housingPaymentPlanGroup, Housing housing,
@@ -49,14 +49,14 @@ namespace Sirius.HousingPaymentPlans
                 paymentCategory.Id, date, amount, description, accountBook?.Id);
         }
 
-        public static HousingPaymentPlan Update(HousingPaymentPlan existingHousingPaymentPlan, DateTime date,
+        internal static HousingPaymentPlan Update(HousingPaymentPlan existingHousingPaymentPlan, DateTime date,
             decimal amount, string description)
         {
             return BindEntity(existingHousingPaymentPlan, existingHousingPaymentPlan.Id,
                 existingHousingPaymentPlan.TenantId, existingHousingPaymentPlan.HousingPaymentPlanGroupId,
                 existingHousingPaymentPlan.PaymentPlanType, existingHousingPaymentPlan.HousingId,
                 existingHousingPaymentPlan.PaymentCategoryId, date, amount,
-                description, null);
+                description, existingHousingPaymentPlan.AccountBookId);
         }
 
         private static HousingPaymentPlan BindEntity(HousingPaymentPlan housingPaymentPlan, Guid id, int tenantId,
@@ -71,7 +71,7 @@ namespace Sirius.HousingPaymentPlans
             housingPaymentPlan.HousingId = housingId;
             housingPaymentPlan.PaymentCategoryId = paymentCategoryId;
             housingPaymentPlan.PaymentPlanType = paymentPlanType;
-            housingPaymentPlan.Date = date;
+            housingPaymentPlan.Date = date.Date + new TimeSpan(0, 0, 0);
             housingPaymentPlan.Amount =
                 paymentPlanType == PaymentPlanType.Debt ? Math.Abs(amount) : Math.Abs(amount) * -1;
             housingPaymentPlan.Description = description;

@@ -150,11 +150,14 @@ namespace Sirius.HousingPaymentPlans
         public override async Task<HousingPaymentPlanDto> UpdateAsync(UpdateHousingPaymentPlanDto input)
         {
             CheckUpdatePermission();
+
             var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(input.Id);
-            var housingPaymentPlan = HousingPaymentPlan.Update(existingHousingPaymentPlan, input.Date,
-                input.Amount, input.Description);
-            await _housingPaymentPlanManager.UpdateAsync(housingPaymentPlan);
-            return ObjectMapper.Map<HousingPaymentPlanDto>(housingPaymentPlan);
+
+            var updatedHousingPaymentPlan = await _housingPaymentPlanManager.UpdateAsync(existingHousingPaymentPlan.Id,
+                input.Date, input.Amount,
+                input.Description);
+            
+            return ObjectMapper.Map<HousingPaymentPlanDto>(updatedHousingPaymentPlan);
         }
 
         public override async Task DeleteAsync(EntityDto<Guid> input)

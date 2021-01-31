@@ -9,7 +9,7 @@ namespace Sirius.HousingPaymentPlans
     {
         Task BulkCreateAsync(IEnumerable<HousingPaymentPlan> housingPaymentPlans);
         Task CreateAsync(HousingPaymentPlan housingPaymentPlan);
-        Task UpdateAsync(HousingPaymentPlan housingPaymentPlan);
+        Task<HousingPaymentPlan>  UpdateAsync(Guid housingPaymentPlanId, DateTime date, decimal amount, string description);
         Task DeleteAsync(HousingPaymentPlan housingPaymentPlan, bool fromAccountBook = false);
         Task<HousingPaymentPlan> GetAsync(Guid id);
     }

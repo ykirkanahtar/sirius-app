@@ -58,7 +58,7 @@ namespace Sirius.PaymentAccounts
         {
             await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null);
         }
-        
+
         public async Task CreateAsync(AccountBook accountBook,
             AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,

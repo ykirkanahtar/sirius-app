@@ -306,11 +306,24 @@
             >
               <tr>
                 <td>{{ accountBook.processDateTime.format("DD-MM-YYYY") }}</td>
-                <td>{{ accountBook.paymentCategoryName | localize }}</td>
+                <td>
+                  {{ accountBook.paymentCategoryName | localize }}
+                  <span
+                    *ngIf="accountBook.encashmentHousing"
+                    class="font-italic font-weight-light"
+                    >{{ "EncashmentShort" | localize }}{{ ' ' + accountBook.encashmentHousingBlockApartment }}</span
+                  >
+                </td>
                 <td>{{ accountBook.housingName }}</td>
                 <td>{{ accountBook.amount | number: "1.2-2" }}</td>
-                <td>{{ accountBook.fromPaymentAccountName }} - {{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }} </td>
-                <td>{{ accountBook.toPaymentAccountName }} - {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}</td>
+                <td>
+                  {{ accountBook.fromPaymentAccountName }} -
+                  {{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }}
+                </td>
+                <td>
+                  {{ accountBook.toPaymentAccountName }} -
+                  {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}
+                </td>
                 <td class="text-center">
                   <i
                     class="far fa-file-image"
