@@ -25,6 +25,7 @@ import {
   HousingDto,
   AccountBookFileDto,
   HousingServiceProxy,
+  PaymentCategoryLookUpDto,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
@@ -47,7 +48,7 @@ export class EditAccountBookDialogComponent
 
   housing = new HousingDto();
   paymentAccounts: LookUpDto[];
-  paymentCategories: LookUpDto[];
+  paymentCategories: PaymentCategoryLookUpDto[] = [];
   people: LookUpDto[];
 
   newUploadedFileUrls: any[] = [];
@@ -55,6 +56,7 @@ export class EditAccountBookDialogComponent
   deletedFileUrls: any[] = [];
   display: boolean = false;
   clickedImages: string[] = [];
+  showPaymentCategory = false;
 
   processDate: Date;
   encashmentHousingText: string;
@@ -109,7 +111,8 @@ export class EditAccountBookDialogComponent
           this._housingServiceProxy
             .get(this.accountBook.housingIdForEncachment)
             .subscribe((result: HousingDto) => {
-              this.encashmentHousingText = result.block.blockName + " " + result.apartment;
+              this.encashmentHousingText =
+                result.block.blockName + " " + result.apartment;
             });
         }
       });
@@ -120,9 +123,9 @@ export class EditAccountBookDialogComponent
         this.paymentAccounts = result;
       });
 
-    this._paymentCategoryServiceProxy
-      .getPaymentCategoryLookUp()
-      .subscribe((result: LookUpDto[]) => {
+    this._accountBookServiceProxy
+      .getPaymentCategoryLookUpForEditAccountBook(this.id)
+      .subscribe((result: PaymentCategoryLookUpDto[]) => {
         this.paymentCategories = result;
       });
 
@@ -153,6 +156,22 @@ export class EditAccountBookDialogComponent
         this.saveLabel = this.l("Save");
       });
     }
+  }
+
+  canEditPaymentCategory(paymentCategoryId: string): boolean {
+    if (paymentCategoryId) {
+      //sayfa yüklenene kadar paymentCategoryId undefined geldiği için bu kontrol eklendi, o zamana kadar da component disabled yapılıyor
+
+      let editInAccountBooks = this.paymentCategories
+        .filter(
+          (paymentCategory) => paymentCategory.value === paymentCategoryId
+        )
+        .map((p) => p.editInAccountBook);
+
+      return editInAccountBooks[0];
+    }
+
+    return false;
   }
 
   showImages(clickedImages: string) {

@@ -10,6 +10,8 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Abp.Localization;
+using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,7 @@ using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
+using Sirius.PaymentCategories.Dto;
 using Sirius.Shared.Constants;
 
 namespace Sirius.PaymentAccounts
@@ -41,6 +44,7 @@ namespace Sirius.PaymentAccounts
         private readonly IAccountBookPolicy _accountBookPolicy;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymetPlanRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
+        private readonly ILocalizationSource _localizationSource;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -54,7 +58,8 @@ namespace Sirius.PaymentAccounts
             IAccountBookPolicy accountBookPolicy,
             IRepository<AccountBookFile, Guid> accountBookFileRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymetPlanRepository,
-            IHousingPaymentPlanManager housingPaymentPlanManager)
+            IHousingPaymentPlanManager housingPaymentPlanManager, 
+            ILocalizationManager localizationManager)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -70,6 +75,7 @@ namespace Sirius.PaymentAccounts
             _accountBookFileRepository = accountBookFileRepository;
             _housingPaymetPlanRepository = housingPaymetPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
+            _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
         public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
@@ -498,6 +504,36 @@ namespace Sirius.PaymentAccounts
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public async Task<List<PaymentCategoryLookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(
+            Guid accountBookId)
+        {
+            CheckGetAllPermission();
+
+            var accountBook = await _accountBookRepository.GetAll().Where(p => p.Id == accountBookId).AsNoTracking()
+                .SingleAsync();
+
+            var paymentCategory = await _paymentCategoryRepository.GetAsync(accountBook.PaymentCategoryId);
+            if (!paymentCategory.EditInAccountBook) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
+            {
+                return new List<PaymentCategoryLookUpDto>
+                {
+                    new(paymentCategory.Id.ToString(),
+                        _localizationSource.GetString(paymentCategory.PaymentCategoryName),
+                        paymentCategory.EditInAccountBook)
+                };
+            }
+
+            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.ShowInLists && p.EditInAccountBook)
+                .ToListAsync();
+
+            return
+                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new PaymentCategoryLookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName), l.EditInAccountBook))
+                .ToList();
         }
     }
 }
