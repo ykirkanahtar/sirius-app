@@ -311,18 +311,27 @@
                   <span
                     *ngIf="accountBook.encashmentHousing"
                     class="font-italic font-weight-light"
-                    >{{ "EncashmentShort" | localize }}{{ ' ' + accountBook.encashmentHousingBlockApartment }}</span
+                    >{{ "EncashmentShort" | localize
+                    }}{{
+                      " " + accountBook.encashmentHousingBlockApartment
+                    }}</span
                   >
                 </td>
                 <td>{{ accountBook.housingName }}</td>
                 <td>{{ accountBook.amount | number: "1.2-2" }}</td>
                 <td>
-                  {{ accountBook.fromPaymentAccountName }} -
-                  {{ accountBook.fromPaymentAccountBalance | number: "1.2-2" }}
+                  <span *ngIf="accountBook.fromPaymentAccountName.length > 0" >
+                    {{ accountBook.fromPaymentAccountName }} /
+                    {{
+                      accountBook.fromPaymentAccountBalance | number: "1.2-2"
+                    }}
+                  </span>
                 </td>
                 <td>
-                  {{ accountBook.toPaymentAccountName }} -
-                  {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}
+                  <span *ngIf="accountBook.toPaymentAccountName.length > 0" >
+                    {{ accountBook.toPaymentAccountName }} /
+                    {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}
+                  </span>
                 </td>
                 <td class="text-center">
                   <i

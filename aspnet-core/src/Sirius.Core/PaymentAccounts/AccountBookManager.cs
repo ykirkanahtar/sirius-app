@@ -204,7 +204,7 @@ namespace Sirius.PaymentAccounts
             else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
-                        p.ProcessDateTime < accountBook.ProcessDateTime &&
+                        p.ProcessDateTime <= accountBook.ProcessDateTime &&
                         (p.FromPaymentAccountId == paymentAccount.Id ||
                          p.ToPaymentAccountId == paymentAccount.Id))
                     .OrderByDescending(p => p.ProcessDateTime)

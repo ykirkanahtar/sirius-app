@@ -260,6 +260,7 @@
     <text name="PersonOptions">Kişi Seçenekleri</text>
     <text name="Phone1">Telefon numarası(1)</text>
     <text name="Phone2">Telefon numarası(2)</text>
+    <text name="PhoneNumber">Telefon numarası</text>
     <text name="PleaseSelect">Lütfen Seçiniz</text>
     <text name="ProcessDateTime">İşlem tarihi</text>
     <text name="Processing">İşlem sürüyor...</text>

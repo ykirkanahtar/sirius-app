@@ -86,6 +86,7 @@ namespace Sirius.People
                          p.person.Phone2.Contains(input.PhoneNumber))
                 .GroupBy(p => new PersonDto
                 {
+                    Id = p.person.Id,
                     FirstName = p.person.FirstName,
                     LastName = p.person.LastName,
                     Phone1 = p.person.Phone1,

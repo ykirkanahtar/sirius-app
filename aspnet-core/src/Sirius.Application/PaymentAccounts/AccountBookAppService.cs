@@ -58,7 +58,7 @@ namespace Sirius.PaymentAccounts
             IAccountBookPolicy accountBookPolicy,
             IRepository<AccountBookFile, Guid> accountBookFileRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymetPlanRepository,
-            IHousingPaymentPlanManager housingPaymentPlanManager, 
+            IHousingPaymentPlanManager housingPaymentPlanManager,
             ILocalizationManager localizationManager)
             : base(accountBookRepository)
         {
@@ -86,6 +86,8 @@ namespace Sirius.PaymentAccounts
         public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
         {
             CheckCreatePermission();
+            input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
+
             var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
             var housing = await _housingManager.GetAsync(input.HousingId);
             var toPaymentAccount = await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId);
@@ -130,6 +132,8 @@ namespace Sirius.PaymentAccounts
         public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
         {
             CheckCreatePermission();
+            input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
+
             PaymentAccount fromPaymentAccount = null;
             PaymentAccount toPaymentAccount = null;
 
@@ -253,8 +257,8 @@ namespace Sirius.PaymentAccounts
                 {
                     ProcessDateTime = input.ProcessDateTime,
                     PaymentCategoryId = input.PaymentCategoryId,
-                    FromPaymentAccountId = input.FromPaymentAccountId.Value,
-                    ToPaymentAccountId = input.ToPaymentAccountId.Value,
+                    FromPaymentAccountId = input.FromPaymentAccountId.HasValue ? input.FromPaymentAccountId.Value : null,
+                    ToPaymentAccountId = input.ToPaymentAccountId.HasValue ? input.ToPaymentAccountId.Value : null,
                     Amount = input.Amount,
                     Description = input.Description,
                     DocumentDateTime = input.DocumentDateTime,
@@ -275,8 +279,7 @@ namespace Sirius.PaymentAccounts
             try
             {
                 CheckUpdatePermission();
-                // var existingAccountBook = await _accountBookRepository.GetAll().Where(p => p.Id == input.Id)
-                //     .AsNoTracking().SingleAsync();
+                input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
 
                 var existingAccountBook = await _accountBookRepository.GetAsync(input.Id);
 
@@ -515,7 +518,8 @@ namespace Sirius.PaymentAccounts
                 .SingleAsync();
 
             var paymentCategory = await _paymentCategoryRepository.GetAsync(accountBook.PaymentCategoryId);
-            if (!paymentCategory.EditInAccountBook) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
+            if (!paymentCategory.EditInAccountBook
+            ) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
             {
                 return new List<PaymentCategoryLookUpDto>
                 {
