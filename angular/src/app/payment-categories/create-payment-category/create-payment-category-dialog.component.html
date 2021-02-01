@@ -53,6 +53,56 @@
             </div>
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="fromPaymentAccountId">
+            {{ "DefaultFromPaymentAccount" | localize }}
+          </label>
+          <div class="col-md-6 pr-4">
+            <p-dropdown
+              id="fromPaymentAccounts"
+              name="fromPaymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="paymentCategory.defaultFromPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
+            </p-dropdown>
+          </div>
+          <div class="col-md-3">
+            <span class="btn btn-danger">
+              <i
+                class="fas fa-trash-alt"
+                (click)="paymentCategory.defaultFromPaymentAccountId = null"
+              ></i>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="toPaymentAccountId">
+            {{ "DefaultToPaymentAccount" | localize }}
+          </label>
+          <div class="col-md-6 pr-4">
+            <p-dropdown
+              id="toPaymentAccounts"
+              name="toPaymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="paymentCategory.defaultToPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+            >
+            </p-dropdown>
+          </div>
+          <div class="col-md-3">
+            <span class="btn btn-danger">
+              <i
+                class="fas fa-trash-alt"
+                (click)="paymentCategory.defaultToPaymentAccountId = null"
+              ></i>
+            </span>
+          </div>
+        </div>
       </tab>
     </tabset>
   </div>

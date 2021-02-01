@@ -11,5 +11,7 @@ namespace Sirius.PaymentCategories.Dto
         public string PaymentCategoryName { get; set; }
         
         public bool IsValidForAllPeriods { get; set; }
+        public Guid? DefaultFromPaymentAccountId { get; set; }
+        public Guid? DefaultToPaymentAccountId { get; set; }
     }
 }

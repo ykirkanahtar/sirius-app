@@ -22,6 +22,7 @@ import {
   CreateOtherPaymentAccountBookDto,
   PersonServiceProxy,
   API_BASE_URL,
+  PaymentCategoryDto,
 } from '@shared/service-proxies/service-proxies';
 import { HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
@@ -97,19 +98,15 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
       }
   }
 
-  onSelectedPersonChange(event) {
-    var selectedPerson = event.value;
+  onSelectedPaymentCategoryChange(event) {
+    var selectedPaymentCategory = event.value;
 
-    if (!selectedPerson) {
-      this.getHousings();
-    } else {
-      this._housingServiceProxy
-      .getHousingsLookUpByPersonId(selectedPerson)
-      .subscribe((result: LookUpDto[]) => {
-        this.housings = result;
-        if (this.housings.length === 1) {
-          this.accountBook.housingIdForEncachment = this.housings[0].value;
-        }
+    if (selectedPaymentCategory) {
+      this._paymentCategoryServiceProxy
+      .get(selectedPaymentCategory)
+      .subscribe((result: PaymentCategoryDto) => {
+        this.accountBook.fromPaymentAccountId = result.defaultFromPaymentAccountId;
+        this.accountBook.toPaymentAccountId = result.defaultToPaymentAccountId;
       });
     }
   }

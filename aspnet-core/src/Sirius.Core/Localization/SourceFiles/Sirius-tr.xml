@@ -162,6 +162,8 @@
     <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
     <text name="Date">Tarih</text>
     <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
+    <text name="DefaultFromPaymentAccount">Varsayılan Giden Hesap</text>
+    <text name="DefaultToPaymentAccount">Varsayılan Gelen Hesap</text>
     <text name="Definitions">Tanımlar</text>
     <text name="DefinitionsMenu">Tanımlar (Menü)</text>
     <text name="DeleteAccountBook">İşletme defteri sil</text>

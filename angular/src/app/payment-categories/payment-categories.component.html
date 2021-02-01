@@ -101,6 +101,14 @@
                 <th>
                   {{ "IsValidForAllPeriods" | localize }}
                 </th>
+                <th pSortableColumn="DefaultFromPaymentAccount">
+                  {{ "DefaultFromPaymentAccount" | localize }}
+                  <p-sortIcon field="DefaultFromPaymentAccount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="DefaultToPaymentAccount">
+                  {{ "DefaultToPaymentAccount" | localize }}
+                  <p-sortIcon field="DefaultToPaymentAccount"></p-sortIcon>
+                </th>
                 <th>{{ "Actions" | localize }}</th>
               </tr>
             </ng-template>
@@ -124,10 +132,12 @@
                 <td>
                   {{ paymentCategory.isValidForAllPeriods ? "Evet" : "Hayır" }}
                 </td>
+                <td>{{ paymentCategory.defaultFromPaymentAccountName | localize}}</td>
+                <td>{{ paymentCategory.defaultToPaymentAccountName | localize}}</td>
                 <td>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.editPaymentCategory() && paymentCategory.tenanId > 0"
+                    *ngIf="this.permissionHelper.editPaymentCategory() && paymentCategory.editInAccountBook"
                     class="btn btn-sm bg-secondary"
                     (click)="editPaymentCategory(paymentCategory)"
                   >
@@ -136,7 +146,7 @@
                   </button>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.deletePaymentCategory() && paymentCategory.tenanId > 0"
+                    *ngIf="this.permissionHelper.deletePaymentCategory() && paymentCategory.editInAccountBook"
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(paymentCategory)"
                   >

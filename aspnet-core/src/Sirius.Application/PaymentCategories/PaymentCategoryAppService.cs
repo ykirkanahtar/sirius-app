@@ -14,6 +14,7 @@ using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories.Dto;
 using Sirius.People.Dto;
 using Sirius.Shared.Constants;
@@ -28,16 +29,19 @@ namespace Sirius.PaymentCategories
     {
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
+        private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly ILocalizationSource _localizationSource;
 
         public PaymentCategoryAppService(
             IPaymentCategoryManager paymentCategoryManager,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository
-            , ILocalizationManager localizationManager)
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository,
+            ILocalizationManager localizationManager,
+            IRepository<PaymentAccount, Guid> paymentAccountRepository)
             : base(paymentCategoryRepository)
         {
             _paymentCategoryManager = paymentCategoryManager;
             _paymentCategoryRepository = paymentCategoryRepository;
+            _paymentAccountRepository = paymentAccountRepository;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -50,7 +54,8 @@ namespace Sirius.PaymentCategories
             }
 
             var paymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                AbpSession.GetTenantId(), input.PaymentCategoryName, input.HousingDueType, input.IsValidForAllPeriods);
+                AbpSession.GetTenantId(), input.PaymentCategoryName, input.HousingDueType, input.IsValidForAllPeriods,
+                input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
             await _paymentCategoryManager.CreateAsync(paymentCategory);
             return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
         }
@@ -59,7 +64,8 @@ namespace Sirius.PaymentCategories
         {
             CheckUpdatePermission();
             var existingPaymentCategory = await _paymentCategoryManager.GetAsync(input.Id);
-            var paymentCategory = PaymentCategory.Update(existingPaymentCategory, input.PaymentCategoryName);
+            var paymentCategory = PaymentCategory.Update(existingPaymentCategory, input.PaymentCategoryName,
+                input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
             await _paymentCategoryManager.UpdateAsync(paymentCategory);
             return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
         }
@@ -76,8 +82,26 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            var query = _paymentCategoryRepository
-                .GetAll()
+            var query = from pc in _paymentCategoryRepository.GetAll()
+                join fpa in _paymentAccountRepository.GetAll() on pc.DefaultFromPaymentAccountId equals fpa.Id into fpa
+                from subFpa in fpa.DefaultIfEmpty()
+                join tpa in _paymentAccountRepository.GetAll() on pc.DefaultToPaymentAccountId equals tpa.Id into tpa
+                from subTpa in tpa.DefaultIfEmpty()
+                select new PaymentCategoryDto
+                {
+                    Id = pc.Id,
+                    PaymentCategoryName = pc.PaymentCategoryName,
+                    HousingDueType = pc.HousingDueType,
+                    ShowInLists = pc.ShowInLists,
+                    EditInAccountBook = pc.EditInAccountBook,
+                    IsValidForAllPeriods = pc.IsValidForAllPeriods,
+                    DefaultFromPaymentAccountId = pc.DefaultFromPaymentAccountId,
+                    DefaultToPaymentAccountId = pc.DefaultToPaymentAccountId,
+                    DefaultFromPaymentAccountName = subFpa != null ? subFpa.AccountName : string.Empty,
+                    DefaultToPaymentAccountName = subTpa != null ? subTpa.AccountName : string.Empty
+                };
+
+            query = query
                 .WhereIf(!string.IsNullOrWhiteSpace(input.PaymentCategoryName),
                     p => p.PaymentCategoryName.Contains(input.PaymentCategoryName));
 
@@ -86,8 +110,7 @@ namespace Sirius.PaymentCategories
                 .PageBy(input)
                 .ToListAsync();
 
-            return new PagedResultDto<PaymentCategoryDto>(query.Count(),
-                ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories));
+            return new PagedResultDto<PaymentCategoryDto>(query.Count(), paymentCategories);
         }
 
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
