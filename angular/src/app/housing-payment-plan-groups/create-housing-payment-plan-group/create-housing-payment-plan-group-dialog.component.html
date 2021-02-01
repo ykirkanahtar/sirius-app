@@ -73,22 +73,16 @@
             {{ "AmountPerMonth" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
-              class="form-control"
+            <p-inputNumber
+              [(ngModel)]="input.amountPerMonth"
               name="amountPerMonth"
               id="amountPerMonth"
-              minlength="0"
-              maxlength="10"
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
               required
-              [(ngModel)]="input.amountPerMonth"
-              #amountPerMonthModel="ngModel"
-              #amountPerMonthEl
-            />
-            <abp-validation-summary
-              [control]="amountPerMonthModel"
-              [controlEl]="amountPerMonthEl"
-            ></abp-validation-summary>
+            >
+            </p-inputNumber>
           </div>
         </div>
         <div class="form-group row required">
@@ -96,22 +90,13 @@
             {{ "CountOfMonth" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="number"
-              class="form-control"
+            <p-inputNumber
+              [(ngModel)]="input.countOfMonth"
               name="countOfMonth"
               id="countOfMonth"
-              min="1"
-              max="36"
               required
-              [(ngModel)]="input.countOfMonth"
-              #countOfMonthModel="ngModel"
-              #countOfMonthEl
-            />
-            <abp-validation-summary
-              [control]="countOfMonthModel"
-              [controlEl]="countOfMonthEl"
-            ></abp-validation-summary>
+            >
+            </p-inputNumber>
           </div>
         </div>
         <div class="form-group row required">
@@ -119,22 +104,15 @@
             {{ "PaymentDayOfMonth" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="number"
-              class="form-control"
+            <p-inputNumber
+              [(ngModel)]="input.paymentDayOfMonth"
               name="paymentDayOfMonth"
               id="paymentDayOfMonth"
               min="1"
               max="31"
               required
-              [(ngModel)]="input.paymentDayOfMonth"
-              #paymentDayOfMonthModel="ngModel"
-              #paymentDayOfMonthEl
-            />
-            <abp-validation-summary
-              [control]="paymentDayOfMonthModel"
-              [controlEl]="paymentDayOfMonthEl"
-            ></abp-validation-summary>
+            >
+            </p-inputNumber>
           </div>
         </div>
         <div class="form-group row">
