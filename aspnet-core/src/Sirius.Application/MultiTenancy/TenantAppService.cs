@@ -104,24 +104,49 @@ namespace Sirius.MultiTenancy
                 StaticPermissionsBuilderForTenant.Build(CurrentUnitOfWork.GetDbContext<SiriusDbContext>(), tenant.Id);
 
                 //Custom changes
-                var housingDuePaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.RegularHousingDue.ToString(), HousingDueType.RegularHousingDue, true,
-                    false);
+                var housingDuePaymentCategory = PaymentCategory.Create(
+                    id: SequentialGuidGenerator.Instance.Create(),
+                    tenantId: tenant.Id,
+                    paymentCategoryName: HousingDueType.RegularHousingDue.ToString(),
+                    housingDueType: HousingDueType.RegularHousingDue,
+                    isValidForAllPeriods: true,
+                    defaultFromPaymentAccountId: null,
+                    defaultToPaymentAccountId: null,
+                    showInLists: false);
                 await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
 
                 var transferForHousingDuePaymentCategory = PaymentCategory.Create(
-                    SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.TransferForRegularHousingDue.ToString(),
-                    HousingDueType.TransferForRegularHousingDue, true, false);
+                    id: SequentialGuidGenerator.Instance.Create(),
+                    tenantId: tenant.Id,
+                    paymentCategoryName: HousingDueType.TransferForRegularHousingDue.ToString(),
+                    housingDueType: HousingDueType.TransferForRegularHousingDue,
+                    isValidForAllPeriods: true,
+                    defaultFromPaymentAccountId: null,
+                    defaultToPaymentAccountId: null,
+                    showInLists: false);
                 await _paymentCategoryManager.CreateAsync(transferForHousingDuePaymentCategory);
 
-                var nettingPaymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, HousingDueType.Netting.ToString(), HousingDueType.Netting, false, false);
+                var nettingPaymentCategory = PaymentCategory.Create(
+                    id: SequentialGuidGenerator.Instance.Create(),
+                    tenantId: tenant.Id,
+                    paymentCategoryName: HousingDueType.Netting.ToString(),
+                    housingDueType: HousingDueType.Netting,
+                    isValidForAllPeriods: false,
+                    defaultFromPaymentAccountId: null,
+                    defaultToPaymentAccountId: null,
+                    showInLists: false);
                 await _paymentCategoryManager.CreateAsync(nettingPaymentCategory);
 
                 var transferForPaymentAccountCategory = PaymentCategory.Create(
-                    SequentialGuidGenerator.Instance.Create(),
-                    tenant.Id, AppConstants.TransferForPaymentAccount, null, true, false, false);
+                    id: SequentialGuidGenerator.Instance.Create(),
+                    tenantId: tenant.Id, 
+                    paymentCategoryName: AppConstants.TransferForPaymentAccount,
+                    housingDueType: null, 
+                    isValidForAllPeriods: true,
+                    defaultFromPaymentAccountId: null,
+                    defaultToPaymentAccountId: null,
+                    showInLists: false, 
+                    editInAccountBook: false);
                 await _paymentCategoryManager.CreateAsync(transferForPaymentAccountCategory);
             }
 

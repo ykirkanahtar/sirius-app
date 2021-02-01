@@ -65,6 +65,14 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing)
         {
+            if (fromPaymentAccount  == null
+                && toPaymentAccount == null
+                && accountBook.EncashmentHousing == false)
+            {
+                throw new UserFriendlyException(
+                    "Gelen hesap, giden hesap ya da mahsuplaşmadan en az biri seçilmelidir.");
+            }
+            
             await accountBook.SetSameDayIndexAsync(_accountBookRepository);
 
             await _accountBookRepository.InsertAsync(accountBook);

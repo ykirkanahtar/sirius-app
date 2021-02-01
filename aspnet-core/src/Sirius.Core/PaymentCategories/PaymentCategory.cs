@@ -24,30 +24,42 @@ namespace Sirius.PaymentCategories
         public bool IsValidForAllPeriods { get; private set; }
         public bool ShowInLists { get; private set; }
         public bool EditInAccountBook { get; private set; }
-
+        public Guid? DefaultFromPaymentAccountId { get; private set; }
+        public Guid? DefaultToPaymentAccountId { get; private set; }
+        
         public static PaymentCategory Create(Guid id, int tenantId, string paymentCategoryName,
-            HousingDueType? housingDueType, bool isValidForAllPeriods, bool showInLists = true,
+            HousingDueType? housingDueType, bool isValidForAllPeriods, Guid? defaultFromPaymentAccountId,
+            Guid? defaultToPaymentAccountId, bool showInLists = true,
             bool editInAccountBook = true)
         {
             return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, housingDueType,
-                isValidForAllPeriods, showInLists, editInAccountBook);
+                isValidForAllPeriods, defaultFromPaymentAccountId, defaultToPaymentAccountId, showInLists,
+                editInAccountBook);
         }
 
         public static PaymentCategory Update(PaymentCategory existingPaymentCategory, string paymentCategoryName,
-            bool showInLists = true)
+            Guid? defaultFromPaymentAccountId, Guid? defaultToPaymentAccountId, bool showInLists = true)
         {
             return BindEntity(existingPaymentCategory, existingPaymentCategory.Id, existingPaymentCategory.TenantId,
                 paymentCategoryName, existingPaymentCategory.HousingDueType,
-                existingPaymentCategory.IsValidForAllPeriods, showInLists, existingPaymentCategory.EditInAccountBook);
+                existingPaymentCategory.IsValidForAllPeriods, defaultFromPaymentAccountId, defaultToPaymentAccountId,
+                showInLists, existingPaymentCategory.EditInAccountBook);
         }
 
         private static PaymentCategory BindEntity(PaymentCategory paymentCategory, Guid id, int tenantId,
-            string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods, bool showInLists,
+            string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods, Guid?
+                defaultFromPaymentAccountId, Guid? defaultToPaymentAccountId, bool showInLists,
             bool editInAccountBook)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
             {
                 throw new UserFriendlyException("Kategori ismi dolu olmalıdır.");
+            }
+
+            if ((defaultFromPaymentAccountId.HasValue && defaultToPaymentAccountId.HasValue) &&
+                (defaultFromPaymentAccountId.Value == defaultToPaymentAccountId.Value))
+            {
+                throw new UserFriendlyException("Varsayılan gelen hesap ile giden hesap aynı olamaz.");
             }
 
             paymentCategory ??= new PaymentCategory();
@@ -59,7 +71,9 @@ namespace Sirius.PaymentCategories
             paymentCategory.IsValidForAllPeriods = isValidForAllPeriods;
             paymentCategory.ShowInLists = showInLists;
             paymentCategory.EditInAccountBook = editInAccountBook;
-            
+            paymentCategory.DefaultFromPaymentAccountId = defaultFromPaymentAccountId;
+            paymentCategory.DefaultToPaymentAccountId = defaultToPaymentAccountId;
+
             return paymentCategory;
         }
     }

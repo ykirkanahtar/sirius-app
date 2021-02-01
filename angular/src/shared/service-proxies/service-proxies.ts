@@ -9301,7 +9301,13 @@ export enum HousingDueType {
 export class PaymentCategoryDto implements IPaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
+    showInLists: boolean;
+    editInAccountBook: boolean;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
+    defaultFromPaymentAccountName: string | undefined;
+    defaultToPaymentAccountName: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -9324,7 +9330,13 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
         if (_data) {
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.housingDueType = _data["housingDueType"];
+            this.showInLists = _data["showInLists"];
+            this.editInAccountBook = _data["editInAccountBook"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
+            this.defaultFromPaymentAccountName = _data["defaultFromPaymentAccountName"];
+            this.defaultToPaymentAccountName = _data["defaultToPaymentAccountName"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -9347,7 +9359,13 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
         data = typeof data === 'object' ? data : {};
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["housingDueType"] = this.housingDueType;
+        data["showInLists"] = this.showInLists;
+        data["editInAccountBook"] = this.editInAccountBook;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
+        data["defaultFromPaymentAccountName"] = this.defaultFromPaymentAccountName;
+        data["defaultToPaymentAccountName"] = this.defaultToPaymentAccountName;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -9370,7 +9388,13 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
 export interface IPaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
+    showInLists: boolean;
+    editInAccountBook: boolean;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
+    defaultFromPaymentAccountName: string | undefined;
+    defaultToPaymentAccountName: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10426,6 +10450,8 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
 
     constructor(data?: ICreatePaymentCategoryDto) {
         if (data) {
@@ -10441,6 +10467,8 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.housingDueType = _data["housingDueType"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
         }
     }
 
@@ -10456,6 +10484,8 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["housingDueType"] = this.housingDueType;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         return data; 
     }
 
@@ -10471,12 +10501,16 @@ export interface ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
 }
 
 export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
     id: string;
     paymentCategoryName: string | undefined;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
 
     constructor(data?: IUpdatePaymentCategoryDto) {
         if (data) {
@@ -10492,6 +10526,8 @@ export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
             this.id = _data["id"];
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
         }
     }
 
@@ -10507,6 +10543,8 @@ export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
         data["id"] = this.id;
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         return data; 
     }
 
@@ -10522,6 +10560,8 @@ export interface IUpdatePaymentCategoryDto {
     id: string;
     paymentCategoryName: string | undefined;
     isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
 }
 
 export class PaymentCategoryDtoPagedResultDto implements IPaymentCategoryDtoPagedResultDto {
