@@ -70,7 +70,7 @@
               ></label>
             </div>
           </div>
-        </div>        
+        </div>
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="apartment">
             {{ "HousingCategory" | localize }}
@@ -95,15 +95,15 @@
             {{ "TransferBalance" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
-              class="form-control"
+            <p-inputNumber
+              [(ngModel)]="housing.createTransferForHousingDue.amount"
               name="amount"
               id="amount"
-              minlength="0"
-              maxlength="10"
-              [(ngModel)]="housing.createTransferForHousingDue.amount"
-            />
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+            >
+            </p-inputNumber>
           </div>
         </div>
         <div *ngIf="housing.createTransferForHousingDue.amount > 0">

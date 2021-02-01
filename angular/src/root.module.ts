@@ -9,6 +9,8 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
+import { InputNumberModule } from 'primeng/inputnumber';
+
 import * as _ from 'lodash';
 
 import { AbpHttpInterceptor } from 'abp-ng2-module';
@@ -48,6 +50,7 @@ export function getCurrentLanguage(): string {
     BsDatepickerModule.forRoot(),
     MultiSelectModule,
     TableModule,
+    InputNumberModule,
   ],
   declarations: [RootComponent],
   providers: [

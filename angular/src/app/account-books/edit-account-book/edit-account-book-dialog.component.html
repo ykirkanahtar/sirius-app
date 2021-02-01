@@ -44,7 +44,9 @@
                   [placeholder]="'PleaseSelect' | localize"
                   [options]="paymentCategories"
                   [(ngModel)]="accountBook.paymentCategoryId"
-                  [disabled]="!canEditPaymentCategory(accountBook.paymentCategoryId)"
+                  [disabled]="
+                    !canEditPaymentCategory(accountBook.paymentCategoryId)
+                  "
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
@@ -92,22 +94,16 @@
                   {{ "Amount" | localize }}
                   <span class="text-danger">*</span>
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
+                <p-inputNumber
+                  [(ngModel)]="accountBook.amount"
                   name="amount"
                   id="amount"
-                  minlength="0"
-                  maxlength="10"
                   required
-                  [(ngModel)]="accountBook.amount"
-                  #amountModel="ngModel"
-                  #amountEl
-                />
-                <abp-validation-summary
-                  [control]="amountModel"
-                  [controlEl]="amountEl"
-                ></abp-validation-summary>
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                >
+                </p-inputNumber>
               </div>
             </div>
           </div>
@@ -176,9 +172,9 @@
               <div class="form-group row">
                 <div class="col-md-10">
                   <label>
-                    {{ "EncashmentHousingText" | localize }} 
+                    {{ "EncashmentHousingText" | localize }}
                   </label>
-                  <span>{{' ' + encashmentHousingText }}</span>
+                  <span>{{ " " + encashmentHousingText }}</span>
                 </div>
               </div>
             </div>

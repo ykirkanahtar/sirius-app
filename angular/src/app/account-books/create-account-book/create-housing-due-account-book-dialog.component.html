@@ -87,22 +87,16 @@
             {{ "Amount" | localize }}
           </label>
           <div class="col-md-9">
-            <input
-              type="text"
-              class="form-control"
+            <p-inputNumber
+              [(ngModel)]="accountBook.amount"
               name="amount"
               id="amount"
-              minlength="0"
-              maxlength="10"
               required
-              [(ngModel)]="accountBook.amount"
-              #amountModel="ngModel"
-              #amountEl
-            />
-            <abp-validation-summary
-              [control]="amountModel"
-              [controlEl]="amountEl"
-            ></abp-validation-summary>
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+            >
+            </p-inputNumber>
           </div>
         </div>
         <div class="form-group row">
