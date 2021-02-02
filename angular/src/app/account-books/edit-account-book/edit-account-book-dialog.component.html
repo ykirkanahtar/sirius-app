@@ -55,10 +55,13 @@
               </div>
             </div>
             <div class="form-group row">
-              <div class="col-md-10">
-                <label for="fromPaymentAccountId">
-                  {{ "FromPaymentAccount" | localize }}
-                </label>
+              <label
+                class="col-md-12 col-form-label"
+                for="fromPaymentAccountId"
+              >
+                {{ "FromPaymentAccount" | localize }}
+              </label>
+              <div class="col-md-9 pr-4">
                 <p-dropdown
                   id="fromPaymentAccounts"
                   name="fromPaymentAccounts"
@@ -70,12 +73,20 @@
                 >
                 </p-dropdown>
               </div>
+              <div class="col-md-3">
+                <span class="btn btn-danger">
+                  <i
+                    class="fas fa-trash-alt"
+                    (click)="accountBook.fromPaymentAccountId = null"
+                  ></i>
+                </span>
+              </div>
             </div>
             <div class="form-group row">
-              <div class="col-md-10">
-                <label for="toPaymentAccountId">
-                  {{ "ToPaymentAccount" | localize }}
-                </label>
+              <label class="col-md-12 col-form-label" for="toPaymentAccountId">
+                {{ "ToPaymentAccount" | localize }}
+              </label>
+              <div class="col-md-9 pr-4">
                 <p-dropdown
                   id="toPaymentAccounts"
                   name="toPaymentAccounts"
@@ -86,6 +97,14 @@
                   [style]="{ width: '100%' }"
                 >
                 </p-dropdown>
+              </div>
+              <div class="col-md-3">
+                <span class="btn btn-danger">
+                  <i
+                    class="fas fa-trash-alt"
+                    (click)="accountBook.toPaymentAccountId = null"
+                  ></i>
+                </span>
               </div>
             </div>
             <div class="form-group row required">
@@ -102,6 +121,7 @@
                   mode="decimal"
                   [minFractionDigits]="2"
                   [maxFractionDigits]="2"
+                  [style]="{ width: '100%' }"
                 >
                 </p-inputNumber>
               </div>

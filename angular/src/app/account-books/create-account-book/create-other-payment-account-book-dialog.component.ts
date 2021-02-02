@@ -98,6 +98,20 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
       }
   }
 
+  onSelectedPersonChange(event) {
+    var selectedPerson = event.value;
+
+    if (!selectedPerson) {
+      this.getHousings();
+    } else {
+      this._housingServiceProxy
+      .getHousingsLookUpByPersonId(selectedPerson)
+      .subscribe((result: LookUpDto[]) => {
+        this.housings = result;
+      });
+    }
+  }
+
   onSelectedPaymentCategoryChange(event) {
     var selectedPaymentCategory = event.value;
 
