@@ -117,6 +117,7 @@
     <text name="AdministrationMenu">Yönetim (Menü)</text>
     <text name="AdvanceAccount">Avans Hesabı</text>
     <text name="AdvancedFilters">Detaylı Arama</text>
+    <text name="AllowNegativeBalance">Eksi bakiyeye izin verilsin mi?</text>
     <text name="Amount">Tutar</text>
     <text name="AmountPerMonth">Tutar/Ay</text>
     <text name="Apartment">Daire</text>

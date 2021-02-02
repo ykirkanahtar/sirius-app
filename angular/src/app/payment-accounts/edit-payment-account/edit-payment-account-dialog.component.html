@@ -101,6 +101,26 @@
             </div>
           </div>
         </div>
+        <div class="form-group row mb-0">
+          <label class="col-md-3 col-form-label">
+            {{ "AllowNegativeBalance" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="allowNegativeBalance"
+                id="allowNegativeBalance"
+                [(ngModel)]="paymentAccount.allowNegativeBalance"
+              />
+              <label
+                class="custom-control-label mt-2"
+                for="allowNegativeBalance"
+              ></label>
+            </div>
+          </div>
+        </div>
       </tab>
     </tabset>
   </div>

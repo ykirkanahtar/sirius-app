@@ -44,6 +44,12 @@ namespace Sirius.PaymentAccounts
         public bool IsDeleted { get; set; }
         public DateTime? DeletionTime { get; set; }
         public long? DeleterUserId { get; set; }
+        
+        [ForeignKey(nameof(FromPaymentAccountId))]
+        public virtual PaymentAccount FromPaymentAccount { get; protected set; }
+        
+        [ForeignKey(nameof(ToPaymentAccountId))]
+        public virtual PaymentAccount ToPaymentAccount { get; protected set; }
 
         public virtual ICollection<AccountBookFile> AccountBookFiles { get; private set; }
 
@@ -233,9 +239,10 @@ namespace Sirius.PaymentAccounts
             return accountBook;
         }
 
-        public void SetToPaymentAccountCurrentBalance(decimal balance)
+        public void SetToPaymentAccountCurrentBalance(PaymentAccount paymentAccount, decimal balance)
         {
-            if (balance < 0)
+            var allowNegativeBalance = paymentAccount?.AllowNegativeBalance ?? false;
+            if (allowNegativeBalance == false && balance < 0)
             {
                 throw new UserFriendlyException("Bakiye eksiye düşemez");
             }
@@ -243,9 +250,10 @@ namespace Sirius.PaymentAccounts
             ToPaymentAccountCurrentBalance = balance;
         }
 
-        public void SetFromPaymentAccountCurrentBalance(decimal balance)
+        public void SetFromPaymentAccountCurrentBalance(PaymentAccount paymentAccount, decimal balance)
         {
-            if (balance < 0)
+            var allowNegativeBalance = paymentAccount?.AllowNegativeBalance ?? false;
+            if (allowNegativeBalance == false && balance < 0)
             {
                 throw new UserFriendlyException("Bakiye eksiye düşemez");
             }

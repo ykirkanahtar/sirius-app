@@ -10035,6 +10035,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
 
     constructor(data?: ICreateBankOrAdvanceAccountDto) {
         if (data) {
@@ -10056,6 +10057,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
             this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
+            this.allowNegativeBalance = _data["allowNegativeBalance"];
         }
     }
 
@@ -10077,6 +10079,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
+        data["allowNegativeBalance"] = this.allowNegativeBalance;
         return data; 
     }
 
@@ -10098,6 +10101,7 @@ export interface ICreateBankOrAdvanceAccountDto {
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
 }
 
 export enum PaymentAccountType {
@@ -10118,6 +10122,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10149,6 +10154,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
             this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
+            this.allowNegativeBalance = _data["allowNegativeBalance"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -10180,6 +10186,7 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
+        data["allowNegativeBalance"] = this.allowNegativeBalance;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -10211,6 +10218,7 @@ export interface IPaymentAccountDto {
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10230,6 +10238,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
 
     constructor(data?: ICreateCashAccountDto) {
         if (data) {
@@ -10250,6 +10259,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
+            this.allowNegativeBalance = _data["allowNegativeBalance"];
         }
     }
 
@@ -10270,6 +10280,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
+        data["allowNegativeBalance"] = this.allowNegativeBalance;
         return data; 
     }
 
@@ -10290,6 +10301,7 @@ export interface ICreateCashAccountDto {
     isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
+    allowNegativeBalance: boolean;
 }
 
 export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
@@ -10300,6 +10312,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDefault: boolean;
+    allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10327,6 +10340,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
             this.isDefault = _data["isDefault"];
+            this.allowNegativeBalance = _data["allowNegativeBalance"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -10354,6 +10368,7 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
         data["isDefault"] = this.isDefault;
+        data["allowNegativeBalance"] = this.allowNegativeBalance;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -10381,6 +10396,7 @@ export interface IUpdatePaymentAccountDto {
     iban: string | undefined;
     tenantIsOwner: boolean;
     isDefault: boolean;
+    allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

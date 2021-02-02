@@ -26,7 +26,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Sirius.Core\Sirius.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations" />
-  </ItemGroup>
 </Project>

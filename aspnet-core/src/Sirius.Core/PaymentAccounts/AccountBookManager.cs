@@ -65,14 +65,14 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing)
         {
-            if (fromPaymentAccount  == null
+            if (fromPaymentAccount == null
                 && toPaymentAccount == null
                 && accountBook.EncashmentHousing == false)
             {
                 throw new UserFriendlyException(
                     "Gelen hesap, giden hesap ya da mahsuplaşmadan en az biri seçilmelidir.");
             }
-            
+
             await accountBook.SetSameDayIndexAsync(_accountBookRepository);
 
             await _accountBookRepository.InsertAsync(accountBook);
@@ -137,6 +137,15 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] AccountBook oldAccountBook = null)
         {
             var amount = accountBook.Amount;
+
+            var fromPaymentAccount = accountBook.FromPaymentAccountId.HasValue
+                ? await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value)
+                : null;
+            var toPaymentAccount = accountBook.ToPaymentAccountId.HasValue
+                ? await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value)
+                : null;
+
+
             if (cudType == CudType.Update)
             {
                 if (oldAccountBook == null)
@@ -154,7 +163,8 @@ namespace Sirius.PaymentAccounts
             //Eğer ödeme hesabına ait son hareket değilse, ondan sonra kaydedilen hesapların bakiye bilgisi güncellenmeli
 
             //Giden hesabın son hesap hareketi mi 
-            var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
+            var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll()
+                .Include(p => p.FromPaymentAccount).Where(p =>
                     p.ProcessDateTime > accountBook.ProcessDateTime &&
                     p.FromPaymentAccountId == paymentAccount.Id)
                 .OrderBy(p => p.ProcessDateTime)
@@ -169,14 +179,15 @@ namespace Sirius.PaymentAccounts
                     var newBalance = paymentAccountDirection == PaymentAccountDirection.From
                         ? (t.FromPaymentAccountCurrentBalance ?? 0) - amount
                         : (t.FromPaymentAccountCurrentBalance ?? 0) + amount;
-                    t.SetFromPaymentAccountCurrentBalance(newBalance);
+                    t.SetFromPaymentAccountCurrentBalance(t.FromPaymentAccount, newBalance);
 
                     await UpdateAsync(existingAccountBook, t);
                 }
             }
 
             //Gelen hesabın son hesap hareketi mi 
-            var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll().Where(p =>
+            var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll()
+                .Include(p => p.ToPaymentAccount).Where(p =>
                     p.ProcessDateTime > accountBook.ProcessDateTime &&
                     p.ToPaymentAccountId == paymentAccount.Id)
                 .OrderBy(p => p.ProcessDateTime)
@@ -191,7 +202,7 @@ namespace Sirius.PaymentAccounts
                     var newBalance = paymentAccountDirection == PaymentAccountDirection.From
                         ? (p.ToPaymentAccountCurrentBalance ?? 0) - amount
                         : (p.ToPaymentAccountCurrentBalance ?? 0) + amount;
-                    p.SetToPaymentAccountCurrentBalance(newBalance);
+                    p.SetToPaymentAccountCurrentBalance(p.ToPaymentAccount, newBalance);
 
                     await UpdateAsync(existingAccountBook, p);
                 }
@@ -202,11 +213,11 @@ namespace Sirius.PaymentAccounts
             {
                 if (paymentAccountDirection == PaymentAccountDirection.From)
                 {
-                    accountBook.SetFromPaymentAccountCurrentBalance(paymentAccount.Balance);
+                    accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, paymentAccount.Balance);
                 }
                 else
                 {
-                    accountBook.SetToPaymentAccountCurrentBalance(paymentAccount.Balance);
+                    accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, paymentAccount.Balance);
                 }
             }
             else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
@@ -224,14 +235,14 @@ namespace Sirius.PaymentAccounts
                     var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
                         ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
                         : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
-                    accountBook.SetFromPaymentAccountCurrentBalance(newBalance);
+                    accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
                 }
                 else
                 {
                     var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
                         ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
                         : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
-                    accountBook.SetToPaymentAccountCurrentBalance(newBalance);
+                    accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
                 }
             }
         }
