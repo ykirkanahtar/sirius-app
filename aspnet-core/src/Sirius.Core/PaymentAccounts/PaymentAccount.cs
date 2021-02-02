@@ -33,46 +33,51 @@ namespace Sirius.PaymentAccounts
         public string Iban { get; private set; }
         public bool TenantIsOwner { get; private set; }
         public bool IsDefault { get; private set; }
+        public bool AllowNegativeBalance { get; private set; }
 
         public static PaymentAccount CreateCashAccount(Guid id, int tenantId, string accountName, string description,
-            Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, bool allowNegativeBalance,
+            decimal? balance = null,
             DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.Cash, accountName, description,
                 personId, employeeId,
-                tenantIsOwner, isDefault, null, balance, firstTransferDateTime);
+                tenantIsOwner, isDefault, allowNegativeBalance, null, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount CreateBankAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
+            bool allowNegativeBalance, decimal? balance = null,
             DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.BankAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
+                tenantIsOwner, isDefault, allowNegativeBalance, iban, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault, decimal? balance = null,
+            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
+            bool allowNegativeBalance, decimal? balance = null,
             DateTime? firstTransferDateTime = null)
         {
             return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName,
                 description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
+                tenantIsOwner, isDefault, allowNegativeBalance, iban, balance, firstTransferDateTime);
         }
 
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
             string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
-            decimal balance, string iban = null, DateTime? firstTransferDateTime = null)
+            decimal balance, bool allowNegativeBalance, string iban = null, DateTime? firstTransferDateTime = null)
         {
             return BindEntity(existingPaymentAccount, existingPaymentAccount.Id, existingPaymentAccount.TenantId,
                 existingPaymentAccount.PaymentAccountType, accountName, description, personId, employeeId,
-                tenantIsOwner, isDefault, iban, balance, firstTransferDateTime);
+                tenantIsOwner, isDefault, allowNegativeBalance, iban, balance, firstTransferDateTime);
         }
 
         private static PaymentAccount BindEntity(PaymentAccount paymentAccount, Guid id, int tenantId,
             PaymentAccountType paymentAccountType, string accountName, string description, Guid? personId,
-            Guid? employeeId, bool tenantIsOwner, bool isDefault, string iban = null, decimal? balance = null,
+            Guid? employeeId, bool tenantIsOwner, bool isDefault, bool allowNegativeBalance, string iban = null,
+            decimal? balance = null,
             DateTime? firstTransferDateTime = null)
         {
             paymentAccount ??= new PaymentAccount();
@@ -89,7 +94,10 @@ namespace Sirius.PaymentAccounts
             paymentAccount.TenantIsOwner = tenantIsOwner;
             paymentAccount.IsDefault = isDefault;
             paymentAccount.Balance = balance ?? 0;
-            paymentAccount.FirstTransferDateTime = firstTransferDateTime;
+            paymentAccount.FirstTransferDateTime = firstTransferDateTime.HasValue
+                ? firstTransferDateTime.Value.Date + new TimeSpan(0, 0, 0)
+                : null;
+            paymentAccount.AllowNegativeBalance = allowNegativeBalance;
 
             return paymentAccount;
         }
@@ -118,6 +126,7 @@ namespace Sirius.PaymentAccounts
             {
                 throw new UserFriendlyException("Bakiye sıfırdan küçük olamaz");
             }
+
             return paymentAccount;
         }
 

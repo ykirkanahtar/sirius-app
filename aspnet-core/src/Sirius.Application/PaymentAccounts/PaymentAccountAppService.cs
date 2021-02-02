@@ -60,6 +60,7 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
+                , input.AllowNegativeBalance
                 , input.TransferAmount
                 , input.FirstTransferDateTime
             );
@@ -85,6 +86,7 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
+                , input.AllowNegativeBalance
                 , input.TransferAmount
                 , input.FirstTransferDateTime
             );
@@ -109,6 +111,7 @@ namespace Sirius.PaymentAccounts
                 , input.EmployeeId
                 , input.TenantIsOwner
                 , input.IsDefault
+                , input.AllowNegativeBalance
                 , input.TransferAmount
                 , input.FirstTransferDateTime
             );
@@ -131,7 +134,7 @@ namespace Sirius.PaymentAccounts
             var existingPaymentAccount = await _paymentAccountRepository.GetAsync(input.Id);
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
                 input.PersonId, input.EmployeeId, input.TenantIsOwner, input.IsDefault, existingPaymentAccount.Balance,
-                input.Iban);
+                input.AllowNegativeBalance, input.Iban);
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
