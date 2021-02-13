@@ -5,43 +5,21 @@
         <div class="col-6">
           <h1>{{ "PaymentAccounts" | localize }}</h1>
         </div>
+        
+        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+
         <div
           class="col-6 text-right"
           *ngIf="this.permissionHelper.createPaymentAccount()"
         >
-          <div class="btn-group dropdown" dropdown>
-            <button dropdownToggle class="dropdown-toggle btn bg-blue">
-              <i class="fa fa-plus-square"></i>
-              {{ "Create" | localize }}
-            </button>
-            <ul class="dropdown-menu" *dropdownMenu>
-              <li>
-                <a
-                  href="javascript:;"
-                  (click)="createPaymentAccount(paymentAccountTypeEnum.Cash)"
-                  >{{ "CashAccount" | localize }}</a
-                >
-              </li>
-              <li>
-                <a
-                  href="javascript:;"
-                  (click)="
-                    createPaymentAccount(paymentAccountTypeEnum.BankAccount)
-                  "
-                  >{{ "BankAccount" | localize }}</a
-                >
-              </li>
-              <li>
-                <a
-                  href="javascript:;"
-                  (click)="
-                    createPaymentAccount(paymentAccountTypeEnum.AdvanceAccount)
-                  "
-                  >{{ "AdvanceAccount" | localize }}</a
-                >
-              </li>
-            </ul>
-          </div>
+          <button
+            type="button"
+            class="btn bg-blue"
+            pButton
+            icon="fa fa-arrow-down"
+            [label]="'Create' | localize"
+            (click)="menu.toggle($event)"
+          ></button>
         </div>
       </div>
     </div>
