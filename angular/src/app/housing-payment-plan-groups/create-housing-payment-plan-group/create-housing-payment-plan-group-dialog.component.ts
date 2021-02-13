@@ -4,30 +4,32 @@ import {
   OnInit,
   EventEmitter,
   Output,
-} from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import * as _ from 'lodash';
-import { AppComponentBase } from '@shared/app-component-base';
+} from "@angular/core";
+import { finalize } from "rxjs/operators";
+import * as _ from "lodash";
+import { AppComponentBase } from "@shared/app-component-base";
 
 import {
   CreateHousingPaymentPlanGroupDto,
   HousingCategoryServiceProxy,
   LookUpDto,
   HousingPaymentPlanGroupServiceProxy,
-} from '@shared/service-proxies/service-proxies';
-import * as moment from 'moment';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+  PaymentCategoryServiceProxy,
+  PaymentCategoryDto,
+} from "@shared/service-proxies/service-proxies";
+import * as moment from "moment";
+import { BsModalRef } from "ngx-bootstrap/modal";
 
 @Component({
-  templateUrl: './create-housing-payment-plan-group-dialog.component.html',
+  templateUrl: "./create-housing-payment-plan-group-dialog.component.html",
 })
-
 export class CreateHousingPaymentPlanGroupDialogComponent
   extends AppComponentBase
   implements OnInit {
   saving = false;
   input = new CreateHousingPaymentPlanGroupDto();
   housingCategories: LookUpDto[];
+  paymentCategories: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -35,6 +37,7 @@ export class CreateHousingPaymentPlanGroupDialogComponent
     injector: Injector,
     private _housingPaymentPlanGroupService: HousingPaymentPlanGroupServiceProxy,
     private _housingCategoryService: HousingCategoryServiceProxy,
+    private _paymentCategoryService: PaymentCategoryServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
@@ -45,6 +48,18 @@ export class CreateHousingPaymentPlanGroupDialogComponent
       .getHousingCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.housingCategories = result;
+      });
+
+    this._paymentCategoryService
+      .getHousingDuePaymentCategoryLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.paymentCategories = result;
+      });
+
+    this._paymentCategoryService
+      .getRegularHousingDue()
+      .subscribe((result: PaymentCategoryDto) => {
+        this.input.paymentCategoryId = result.id;
       });
   }
 
@@ -59,7 +74,7 @@ export class CreateHousingPaymentPlanGroupDialogComponent
         })
       )
       .subscribe(() => {
-        this.notify.info(this.l('SavedSuccessfully'));
+        this.notify.info(this.l("SavedSuccessfully"));
         this.bsModalRef.hide();
         this.onSave.emit();
       });

@@ -113,12 +113,37 @@ namespace Sirius.PaymentCategories
             return new PagedResultDto<PaymentCategoryDto>(query.Count(), paymentCategories);
         }
 
+        public async Task<PaymentCategoryDto> GetRegularHousingDueAsync()
+        {
+            CheckGetAllPermission();
+
+            var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+            return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
+        }
+        
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
         {
             CheckGetAllPermission();
 
             var paymentAccounts = await _paymentCategoryRepository.GetAll()
                 .Where(p => p.ShowInLists)
+                .ToListAsync();
+
+            return
+                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
+                .ToList();
+        }
+
+        public async Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync()
+        {
+            CheckGetAllPermission();
+
+            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.HousingDueType == HousingDueType.RegularHousingDue ||
+                            p.HousingDueType == HousingDueType.AdditionalHousingDueForOwner ||
+                            p.HousingDueType == HousingDueType.AdditionalHousingDueForResident)
                 .ToListAsync();
 
             return

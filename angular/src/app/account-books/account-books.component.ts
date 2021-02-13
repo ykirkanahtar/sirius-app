@@ -29,6 +29,7 @@ import { Table } from "primeng/table";
 import { LazyLoadEvent, SelectItem } from "primeng/api";
 import * as moment from "moment";
 import { EditAccountBookDialogComponent } from "./edit-account-book/edit-account-book-dialog.component";
+import { MenuItem as PrimeNgMenuItem } from "primeng/api";
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
@@ -45,6 +46,8 @@ export class AccountBooksComponent
 
   sortingColumn: string;
   advancedFiltersVisible = false;
+
+  items: PrimeNgMenuItem[];
 
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
@@ -103,6 +106,23 @@ export class AccountBooksComponent
   }
 
   ngOnInit(): void {
+    this.items = [
+          {
+            label: this.l("HousingDue"),
+            icon: "pi pi-home",
+            command: () => {
+              this.createHousingDueAccountBook();
+            },
+          },
+          {
+            label: this.l("OtherPayments"),
+            icon: "pi pi-money-bill",
+            command: () => {
+              this.createOtherPaymentAccountBook();
+            },
+      },
+    ];
+
     this._paymentCategoryService
       .getPaymentCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {

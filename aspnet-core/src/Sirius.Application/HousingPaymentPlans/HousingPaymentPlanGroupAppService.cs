@@ -15,7 +15,9 @@ using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
 using System.Linq.Dynamic.Core;
+using Abp.UI;
 using Sirius.People;
+using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans
 {
@@ -69,7 +71,16 @@ namespace Sirius.HousingPaymentPlans
             CheckCreatePermission();
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
-            var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+            var paymentCategory = await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
+            
+            if (paymentCategory.HousingDueType != HousingDueType.RegularHousingDue ||
+                paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForOwner ||
+                paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForResident)
+            {
+                throw new UserFriendlyException("Aidat dışı bir ödeme kategorisi ile işlem yapılamaz.");
+            }
+
+            // var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
 
             var startDate = input.StartDate > Clock.Now ? input.StartDate : Clock.Now;
 

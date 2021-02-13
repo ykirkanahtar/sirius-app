@@ -10,6 +10,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { MenuModule } from "primeng/menu";
 
 import * as _ from 'lodash';
 
@@ -51,6 +52,7 @@ export function getCurrentLanguage(): string {
     MultiSelectModule,
     TableModule,
     InputNumberModule,
+    MenuModule,
   ],
   declarations: [RootComponent],
   providers: [

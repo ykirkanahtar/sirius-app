@@ -16,6 +16,7 @@ import {
 import { LazyLoadEvent } from "primeng/api";
 import { Table } from "primeng/table";
 import { EditPaymentAccountDialogComponent } from "./edit-payment-account/edit-payment-account-dialog.component";
+import { MenuItem as PrimeNgMenuItem } from "primeng/api";
 
 class PagedPaymentAccountRequestDto extends PagedRequestDto {
   keyword: string;
@@ -31,6 +32,8 @@ export class PaymentAccountsComponent
   @ViewChild("dataTable", { static: true }) dataTable: Table;
 
   sortingColumn: string;
+  items: PrimeNgMenuItem[];
+
   paymentAccounts: PaymentAccountDto[] = [];
 
   paymentAccountTypeEnum = PaymentAccountType;
@@ -44,6 +47,30 @@ export class PaymentAccountsComponent
   }
 
   ngOnInit(): void {
+    this.items = [
+      {
+        label: this.l("CashAccount"),
+        icon: "pi pi-money-bill",
+        command: () => {
+          this.createPaymentAccount(this.paymentAccountTypeEnum.Cash);
+        },
+      },
+      {
+        label: this.l("BankAccount"),
+        icon: "pi pi-home",
+        command: () => {
+          this.createPaymentAccount(this.paymentAccountTypeEnum.BankAccount);
+        },
+      },
+      {
+        label: this.l("AdvanceAccount"),
+        icon: "pi pi-forward",
+        command: () => {
+          this.createPaymentAccount(this.paymentAccountTypeEnum.AdvanceAccount);
+        },
+      },
+    ];
+
     this.getDataPage(1);
   }
 
@@ -128,7 +155,8 @@ export class PaymentAccountsComponent
       }
     );
 
-    createOrEditPaymentAccountDialog.content.paymentAccountType = paymentAccount.paymentAccountType;
+    createOrEditPaymentAccountDialog.content.paymentAccountType =
+      paymentAccount.paymentAccountType;
 
     createOrEditPaymentAccountDialog.content.onSave.subscribe(() => {
       this.refresh();
