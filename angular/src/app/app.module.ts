@@ -75,6 +75,7 @@ import { FileUploadModule } from "primeng/fileupload";
 import { GalleriaModule } from "primeng/galleria";
 import { DialogModule } from "primeng/dialog";
 import { InputNumberModule } from "primeng/inputnumber";
+import { MenuModule } from "primeng/menu";
 
 // tslint:disable-next-line: max-line-length
 import { CreateHousingCategoryDialogComponent } from "./housing-categories/create-housing-category/create-housing-category-dialog.component";
@@ -172,6 +173,7 @@ import { trLocale } from "ngx-bootstrap/locale";
     FileUploadModule,
     GalleriaModule,
     DialogModule,
+    MenuModule,
   ],
   providers: [],
   entryComponents: [

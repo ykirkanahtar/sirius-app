@@ -5,40 +5,20 @@
         <div class="col-6">
           <h1>{{ "AccountBooks" | localize }}</h1>
         </div>
+        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+
         <div
           class="col-6 text-right"
           *ngIf="this.permissionHelper.createAccountBook()"
         >
-          <div class="btn-group dropdown" dropdown>
-            <button dropdownToggle class="dropdown-toggle btn bg-blue">
-              <i class="fa fa-plus-square"></i>
-              {{ "Create" | localize }}
-            </button>
-            <ul
-              class="dropdown-menu"
-              *dropdownMenu
-              style="background-color: #007bff !important"
-            >
-              <li>
-                <a
-                  class="dropdown-item"
-                  href="javascript:;"
-                  style="color: black"
-                  (click)="createHousingDueAccountBook()"
-                  >{{ "HousingDue" | localize }}</a
-                >
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  href="javascript:;"
-                  style="color: black"
-                  (click)="createOtherPaymentAccountBook()"
-                  >{{ "OtherPayments" | localize }}</a
-                >
-              </li>
-            </ul>
-          </div>
+          <button
+            type="button"
+            class="btn bg-blue"
+            pButton
+            icon="fa fa-arrow-down"
+            [label]="'Create' | localize"
+            (click)="menu.toggle($event)"
+          ></button>
         </div>
       </div>
     </div>
@@ -320,7 +300,7 @@
                 <td>{{ accountBook.housingName }}</td>
                 <td>{{ accountBook.amount | number: "1.2-2" }}</td>
                 <td>
-                  <span *ngIf="accountBook.fromPaymentAccountName.length > 0" >
+                  <span *ngIf="accountBook.fromPaymentAccountName.length > 0">
                     {{ accountBook.fromPaymentAccountName }} /
                     {{
                       accountBook.fromPaymentAccountBalance | number: "1.2-2"
@@ -328,7 +308,7 @@
                   </span>
                 </td>
                 <td>
-                  <span *ngIf="accountBook.toPaymentAccountName.length > 0" >
+                  <span *ngIf="accountBook.toPaymentAccountName.length > 0">
                     {{ accountBook.toPaymentAccountName }} /
                     {{ accountBook.toPaymentAccountBalance | number: "1.2-2" }}
                   </span>

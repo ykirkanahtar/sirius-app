@@ -4289,6 +4289,57 @@ export class PaymentCategoryServiceProxy {
     /**
      * @return Success
      */
+    getRegularHousingDue(): Observable<PaymentCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetRegularHousingDue";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRegularHousingDue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRegularHousingDue(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetRegularHousingDue(response: HttpResponseBase): Observable<PaymentCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaymentCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
     getPaymentCategoryLookUp(): Observable<LookUpDto[]> {
         let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp";
         url_ = url_.replace(/[?&]$/, "");
@@ -4316,6 +4367,61 @@ export class PaymentCategoryServiceProxy {
     }
 
     protected processGetPaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getHousingDuePaymentCategoryLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetHousingDuePaymentCategoryLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingDuePaymentCategoryLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingDuePaymentCategoryLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingDuePaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -9713,6 +9819,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
+    paymentCategoryId: string;
 
     constructor(data?: ICreateHousingPaymentPlanGroupDto) {
         if (data) {
@@ -9732,6 +9839,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
             this.paymentDayOfMonth = _data["paymentDayOfMonth"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.description = _data["description"];
+            this.paymentCategoryId = _data["paymentCategoryId"];
         }
     }
 
@@ -9751,6 +9859,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
         data["paymentDayOfMonth"] = this.paymentDayOfMonth;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["description"] = this.description;
+        data["paymentCategoryId"] = this.paymentCategoryId;
         return data; 
     }
 
@@ -9770,6 +9879,7 @@ export interface ICreateHousingPaymentPlanGroupDto {
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
+    paymentCategoryId: string;
 }
 
 export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {

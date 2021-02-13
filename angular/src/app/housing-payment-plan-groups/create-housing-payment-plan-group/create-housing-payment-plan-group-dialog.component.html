@@ -34,6 +34,24 @@
           </div>
         </div>
         <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="housingCategoryId">
+            {{ "PaymentCategory" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-dropdown
+              id="paymentCategories"
+              name="paymentCategories"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentCategories"
+              [(ngModel)]="input.paymentCategoryId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
+          </div>
+        </div>
+        <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="startDate">
             {{ "StartDate" | localize }}
           </label>
