@@ -9,6 +9,7 @@ using Sirius.Housings;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.People;
+using Sirius.Periods;
 
 namespace Sirius.EntityFrameworkCore
 {
@@ -27,6 +28,7 @@ namespace Sirius.EntityFrameworkCore
         public virtual DbSet<HousingCategory> HousingCategories { get; set; }
         public virtual DbSet<HousingPerson> HousingPeople { get; set; }
         public virtual DbSet<Block> Blocks { get; set; }
+        public virtual DbSet<Period> Periods { get; set; }
 
         public SiriusDbContext(DbContextOptions<SiriusDbContext> options)
             : base(options)
