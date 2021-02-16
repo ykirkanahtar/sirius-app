@@ -4563,6 +4563,480 @@ export class PaymentCategoryServiceProxy {
 }
 
 @Injectable()
+export class PeriodServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createForSite(body: CreatePeriodForSiteDto | undefined): Observable<PeriodDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/CreateForSite";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateForSite(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateForSite(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateForSite(response: HttpResponseBase): Observable<PeriodDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createForBlock(body: CreatePeriodForBlockDto | undefined): Observable<PeriodDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/CreateForBlock";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateForBlock(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateForBlock(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateForBlock(response: HttpResponseBase): Observable<PeriodDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    create(body: CreatePeriodForSiteDto | undefined): Observable<PeriodDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<PeriodDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: UpdatePeriodDto | undefined): Observable<PeriodDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<PeriodDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Period/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @param name (optional) 
+     * @param periodFor (optional) 
+     * @param blockId (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(name: string | null | undefined, periodFor: PeriodFor | undefined, blockId: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PeriodDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/GetAll?";
+        if (name !== undefined)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (periodFor === null)
+            throw new Error("The parameter 'periodFor' cannot be null.");
+        else if (periodFor !== undefined)
+            url_ += "PeriodFor=" + encodeURIComponent("" + periodFor) + "&";
+        if (blockId !== undefined)
+            url_ += "BlockId=" + encodeURIComponent("" + blockId) + "&";
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDtoPagedResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDtoPagedResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PeriodDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getPeriodLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Period/GetPeriodLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPeriodLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPeriodLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPeriodLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: string | undefined): Observable<PeriodDto> {
+        let url_ = this.baseUrl + "/api/services/app/Period/Get?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<PeriodDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class PersonServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -10743,6 +11217,306 @@ export class PaymentCategoryDtoPagedResultDto implements IPaymentCategoryDtoPage
 export interface IPaymentCategoryDtoPagedResultDto {
     totalCount: number;
     items: PaymentCategoryDto[] | undefined;
+}
+
+export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+
+    constructor(data?: ICreatePeriodForSiteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CreatePeriodForSiteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePeriodForSiteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        return data; 
+    }
+
+    clone(): CreatePeriodForSiteDto {
+        const json = this.toJSON();
+        let result = new CreatePeriodForSiteDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreatePeriodForSiteDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+}
+
+export enum PeriodFor {
+    Site = 1,
+    Block = 2,
+}
+
+export class PeriodDto implements IPeriodDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+    isActive: boolean;
+    endDate: moment.Moment | undefined;
+    periodFor: PeriodFor;
+    blockId: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IPeriodDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.isActive = _data["isActive"];
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.periodFor = _data["periodFor"];
+            this.blockId = _data["blockId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PeriodDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PeriodDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["isActive"] = this.isActive;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["periodFor"] = this.periodFor;
+        data["blockId"] = this.blockId;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): PeriodDto {
+        const json = this.toJSON();
+        let result = new PeriodDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPeriodDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+    isActive: boolean;
+    endDate: moment.Moment | undefined;
+    periodFor: PeriodFor;
+    blockId: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+    blockId: string;
+
+    constructor(data?: ICreatePeriodForBlockDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.blockId = _data["blockId"];
+        }
+    }
+
+    static fromJS(data: any): CreatePeriodForBlockDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePeriodForBlockDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["blockId"] = this.blockId;
+        return data; 
+    }
+
+    clone(): CreatePeriodForBlockDto {
+        const json = this.toJSON();
+        let result = new CreatePeriodForBlockDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreatePeriodForBlockDto {
+    name: string | undefined;
+    startDate: moment.Moment;
+    blockId: string;
+}
+
+export class UpdatePeriodDto implements IUpdatePeriodDto {
+    id: string;
+    name: string | undefined;
+
+    constructor(data?: IUpdatePeriodDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePeriodDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePeriodDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data; 
+    }
+
+    clone(): UpdatePeriodDto {
+        const json = this.toJSON();
+        let result = new UpdatePeriodDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdatePeriodDto {
+    id: string;
+    name: string | undefined;
+}
+
+export class PeriodDtoPagedResultDto implements IPeriodDtoPagedResultDto {
+    totalCount: number;
+    items: PeriodDto[] | undefined;
+
+    constructor(data?: IPeriodDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(PeriodDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PeriodDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PeriodDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): PeriodDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new PeriodDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPeriodDtoPagedResultDto {
+    totalCount: number;
+    items: PeriodDto[] | undefined;
 }
 
 export class CreatePersonDto implements ICreatePersonDto {

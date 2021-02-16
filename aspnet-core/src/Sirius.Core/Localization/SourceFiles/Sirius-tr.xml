@@ -147,6 +147,10 @@
     <text name="CreateHousing">Konut oluştur</text>
     <text name="CreatePaymentAccount">Ödeme hesabı oluştur</text>
     <text name="CreatePaymentCategory">Ödeme türü oluştur</text>
+    <text name="CreatePeriodForBlock">Dönem oluştur (Blok/Apt. için)</text>
+    <text name="CreatePeriodForBlockMenu">Blok/Apt. için</text>
+    <text name="CreatePeriodForSite">Dönem oluştur (Site için)</text>
+    <text name="CreatePeriodForSiteMenu">Site için</text>
     <text name="CreatePerson">Kişi oluştur</text>
     <text name="CreateNewAdvanceAccount">Avans hesabı ekle</text>
     <text name="CreateNewBankAccount">Banka hesabı ekle</text>
@@ -159,6 +163,7 @@
     <text name="CreateNewHousingDueAccountBook">Aidat ödemesi ekle</text>
     <text name="CreateNewOtherPaymentAccountBook">Ödeme ekle</text>
     <text name="CreateNewPaymentCategory">Ödeme Kategorisi Ekle</text>
+    <text name="CreateNewPeriod">Dönem ekle</text>
     <text name="CreateNewPerson">Kişi ekle</text>
     <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
     <text name="Date">Tarih</text>
@@ -176,6 +181,7 @@
     <text name="DeleteImage">Görseli Sil</text>
     <text name="DeletePaymentAccount">Ödeme hesabı sil</text>
     <text name="DeletePaymentCategory">Ödeme türü sil</text>
+    <text name="DeletePeriod">Dönem sil</text>
     <text name="DeletePerson">Kişi sil</text>
     <text name="Description">Açıklama</text>
     <text name="Details">Detaylar</text>
@@ -192,6 +198,7 @@
     <text name="EditHousing">Konut düzenle</text>
     <text name="EditPaymentAccount">Ödeme hesabı düzenle</text>
     <text name="EditPaymentCategory">Ödeme türü düzenle</text>
+    <text name="EditPeriod">Dönem düzenle</text>
     <text name="EditPerson">Kişi düzenle</text>
     <text name="EftFee">Eft masrafı</text>  
     <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>
@@ -258,6 +265,9 @@
     <text name="PaymentPlanType">Borç / Alacak</text>
     <text name="People">Kişiler</text>
     <text name="PeopleMenu">Kişiler (Menü)</text>
+    <text name="PeriodsForSiteMenu">Dönemler (Site)</text>
+    <text name="PeriodsForBlockMenu">Dönemler (Blok/Apt.)</text>
+    <text name="Periods">Dönemler</text>
     <text name="Person">Kişi</text>
     <text name="PersonDeleteWarningMessage">Kişiyi silmek istediğinize emin misiniz?</text>        
     <text name="PersonOptions">Kişi Seçenekleri</text>

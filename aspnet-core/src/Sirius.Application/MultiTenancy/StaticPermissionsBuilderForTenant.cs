@@ -119,6 +119,13 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_CreatePerson),
                 new Permission(PermissionNames.Pages_EditPerson),
                 new Permission(PermissionNames.Pages_DeletePerson),
+                
+                new Permission(PermissionNames.Pages_PeriodsForSite),
+                new Permission(PermissionNames.Pages_PeriodsForBlock),
+                new Permission(PermissionNames.Pages_CreatePeriodForBlock),
+                new Permission(PermissionNames.Pages_CreatePeriodForSite),
+                new Permission(PermissionNames.Pages_EditPeriod),
+                new Permission(PermissionNames.Pages_DeletePeriod),
             };
 
 
@@ -186,6 +193,11 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_CreatePerson),
                 new Permission(PermissionNames.Pages_EditPerson),
                 new Permission(PermissionNames.Pages_DeletePerson),
+                
+                new Permission(PermissionNames.Pages_PeriodsForSite),
+                new Permission(PermissionNames.Pages_CreatePeriodForSite),
+                new Permission(PermissionNames.Pages_EditPeriod),
+                new Permission(PermissionNames.Pages_DeletePeriod),
             };
 
             if (siteManagementPermissions.Any())
@@ -212,6 +224,8 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_PaymentCategories),
                 new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
                 new Permission(PermissionNames.Pages_FinancialOperations),
+                new Permission(PermissionNames.Pages_PeriodsForBlock),
+                new Permission(PermissionNames.Pages_CreatePeriodForBlock),
             };
 
             if (blockManagementPermissions.Any())

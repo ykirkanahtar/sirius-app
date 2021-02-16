@@ -6,6 +6,8 @@ using Abp;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.Timing;
+using Sirius.Housings;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Periods
 {
@@ -14,29 +16,37 @@ namespace Sirius.Periods
     {
         protected Period()
         {
-            
         }
-        public int TenantId { get; set; }
-        
-        [Required]
-        [StringLength(50)]
-        public string Name { get; private set; }
-        
-        [Required] public DateTime StartDate { get; private set; }
-        public bool IsActive { get;  set; }
-        public DateTime? EndDate { get; private set; }
 
-        public static Period Create(Guid id, int tenantId, [NotNull] string name, DateTime startDate)
+        public int TenantId { get; set; }
+
+        [Required] [StringLength(50)] public string Name { get; private set; }
+
+        [Required] public DateTime StartDate { get; private set; }
+        public bool IsActive { get; set; }
+        public DateTime? EndDate { get; private set; }
+        public PeriodFor PeriodFor { get; set; }
+        public Guid? BlockId { get; set; }
+
+        public static Period CreateForSite(Guid id, int tenantId, [NotNull] string name, DateTime startDate)
         {
-            return BindEntity(new Period(), id, tenantId, name, startDate, true);
+            return BindEntity(new Period(), id, tenantId, name, startDate, true, PeriodFor.Site, null);
+        }
+        
+        public static Period CreateForBlock(Guid id, int tenantId, [NotNull] string name, DateTime startDate, Block block)
+        {
+            return BindEntity(new Period(), id, tenantId, name, startDate, true, PeriodFor.Block, block.Id);
         }
 
         public static Period Update(Period existingPeriod, [NotNull] string name)
         {
             return BindEntity(existingPeriod, existingPeriod.Id, existingPeriod.TenantId, name,
-                existingPeriod.StartDate, existingPeriod.IsActive, existingPeriod.EndDate);
+                existingPeriod.StartDate, existingPeriod.IsActive, existingPeriod.PeriodFor, existingPeriod.BlockId,
+                existingPeriod.EndDate);
         }
-        private static Period BindEntity(Period period, Guid id, int tenantId, string name, DateTime startDate, bool isActive,
+
+        private static Period BindEntity(Period period, Guid id, int tenantId, string name, DateTime startDate,
+            bool isActive, PeriodFor periodFor, Guid? blockId,
             DateTime? endDate = null)
         {
             Check.NotNull(name, nameof(name));
@@ -50,6 +60,8 @@ namespace Sirius.Periods
             period.StartDate = startDate;
             period.IsActive = isActive;
             period.EndDate = endDate;
+            period.PeriodFor = periodFor;
+            period.BlockId = blockId;
 
             return period;
         }

@@ -17,6 +17,8 @@ import { PaymentAccountsComponent } from './payment-accounts/payment-accounts.co
 import { PaymentCategoriesComponent } from './payment-categories/payment-categories.component';
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
 import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
+import { PeriodsComponent } from './periods/periods.component';
+
 @NgModule({
   imports: [
     RouterModule.forChild([
@@ -83,6 +85,18 @@ import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups
             data: { permission: 'Pages.HousingPaymentPlanGroups' },
             canActivate: [AppRouteGuard],
           },
+          {
+            path: 'site-periods',
+            component: PeriodsComponent,
+            data: { permission: 'Pages.PeriodsForSite' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'block-periods',
+            component: PeriodsComponent,
+            data: { permission: 'Pages.PeriodsForBlock' },
+            canActivate: [AppRouteGuard],
+          },          
           {
             path: 'users',
             component: UsersComponent,

@@ -117,6 +117,18 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             'fa fa-columns',
             'Pages.Blocks'
           ),
+          new MenuItem(
+            this.l('PeriodsForSiteMenu'),
+            '/app/site-periods',
+            'far fa-clock',
+            'Pages.PeriodsForSite'
+          ),
+          new MenuItem(
+            this.l('PeriodsForBlockMenu'),
+            '/app/block-periods',
+            'far fa-clock',
+            'Pages.PeriodsForBlock'
+          ),
         ]),
       new MenuItem(
         this.l('Administration'),
