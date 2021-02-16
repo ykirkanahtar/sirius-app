@@ -124,7 +124,7 @@ export class AccountBooksComponent
     ];
 
     this._paymentCategoryService
-      .getPaymentCategoryLookUp()
+      .getPaymentCategoryLookUp(false)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategoriesFilter = result;
       });

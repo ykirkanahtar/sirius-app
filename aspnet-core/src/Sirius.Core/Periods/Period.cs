@@ -66,10 +66,10 @@ namespace Sirius.Periods
             return period;
         }
 
-        public void ClosePeriod(Period period, DateTime endDate)
+        public void ClosePeriod(DateTime endDate)
         {
-            period.EndDate = endDate;
-            period.IsActive = false;
+            EndDate = endDate;
+            IsActive = false;
         }
     }
 }

@@ -4338,10 +4338,15 @@ export class PaymentCategoryServiceProxy {
     }
 
     /**
+     * @param onlyActives (optional) 
      * @return Success
      */
-    getPaymentCategoryLookUp(): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp";
+    getPaymentCategoryLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp?";
+        if (onlyActives === null)
+            throw new Error("The parameter 'onlyActives' cannot be null.");
+        else if (onlyActives !== undefined)
+            url_ += "onlyActives=" + encodeURIComponent("" + onlyActives) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -4395,8 +4400,68 @@ export class PaymentCategoryServiceProxy {
     /**
      * @return Success
      */
-    getHousingDuePaymentCategoryLookUp(): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetHousingDuePaymentCategoryLookUp";
+    getPaymentCategoryForTransferLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryForTransferLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentCategoryForTransferLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentCategoryForTransferLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentCategoryForTransferLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param onlyActives (optional) 
+     * @return Success
+     */
+    getHousingDuePaymentCategoryLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetHousingDuePaymentCategoryLookUp?";
+        if (onlyActives === null)
+            throw new Error("The parameter 'onlyActives' cannot be null.");
+        else if (onlyActives !== undefined)
+            url_ += "onlyActives=" + encodeURIComponent("" + onlyActives) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -11222,6 +11287,7 @@ export interface IPaymentCategoryDtoPagedResultDto {
 export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
+    paymentCategories: string[] | undefined;
 
     constructor(data?: ICreatePeriodForSiteDto) {
         if (data) {
@@ -11236,6 +11302,11 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         if (_data) {
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            if (Array.isArray(_data["paymentCategories"])) {
+                this.paymentCategories = [] as any;
+                for (let item of _data["paymentCategories"])
+                    this.paymentCategories.push(item);
+            }
         }
     }
 
@@ -11250,6 +11321,11 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        if (Array.isArray(this.paymentCategories)) {
+            data["paymentCategories"] = [];
+            for (let item of this.paymentCategories)
+                data["paymentCategories"].push(item);
+        }
         return data; 
     }
 
@@ -11264,6 +11340,7 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
 export interface ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
+    paymentCategories: string[] | undefined;
 }
 
 export enum PeriodFor {
@@ -11367,9 +11444,10 @@ export interface IPeriodDto {
 }
 
 export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
+    blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
-    blockId: string;
+    paymentCategories: string[] | undefined;
 
     constructor(data?: ICreatePeriodForBlockDto) {
         if (data) {
@@ -11382,9 +11460,14 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
 
     init(_data?: any) {
         if (_data) {
+            this.blockId = _data["blockId"];
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.blockId = _data["blockId"];
+            if (Array.isArray(_data["paymentCategories"])) {
+                this.paymentCategories = [] as any;
+                for (let item of _data["paymentCategories"])
+                    this.paymentCategories.push(item);
+            }
         }
     }
 
@@ -11397,9 +11480,14 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["blockId"] = this.blockId;
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["blockId"] = this.blockId;
+        if (Array.isArray(this.paymentCategories)) {
+            data["paymentCategories"] = [];
+            for (let item of this.paymentCategories)
+                data["paymentCategories"].push(item);
+        }
         return data; 
     }
 
@@ -11412,9 +11500,10 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
 }
 
 export interface ICreatePeriodForBlockDto {
+    blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
-    blockId: string;
+    paymentCategories: string[] | undefined;
 }
 
 export class UpdatePeriodDto implements IUpdatePeriodDto {

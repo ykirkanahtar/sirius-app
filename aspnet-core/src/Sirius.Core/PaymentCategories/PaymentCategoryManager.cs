@@ -81,7 +81,9 @@ namespace Sirius.PaymentCategories
         public async Task<PaymentCategory> GetTransferForPaymentAccountAsync()
         {
             return await _paymentCategoryRepository.GetAll().Where(p =>
-                p.PaymentCategoryName == AppConstants.TransferForPaymentAccount).SingleOrDefaultAsync();
+                    p.PaymentCategoryName ==
+                    AppConstants.TransferForPaymentAccount)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<PaymentCategory> GetAsync(Guid id)

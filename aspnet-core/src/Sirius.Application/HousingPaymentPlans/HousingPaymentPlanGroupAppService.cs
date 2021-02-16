@@ -16,6 +16,7 @@ using Sirius.Housings;
 using Sirius.PaymentCategories;
 using System.Linq.Dynamic.Core;
 using Abp.UI;
+using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.People;
 using Sirius.Shared.Enums;
 
@@ -79,9 +80,7 @@ namespace Sirius.HousingPaymentPlans
             {
                 throw new UserFriendlyException("Aidat dışı bir ödeme kategorisi ile işlem yapılamaz.");
             }
-
-            // var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
-
+            
             var startDate = input.StartDate > Clock.Now ? input.StartDate : Clock.Now;
 
             if (startDate.Day > input.PaymentDayOfMonth)
