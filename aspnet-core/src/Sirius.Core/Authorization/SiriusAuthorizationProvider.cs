@@ -25,7 +25,9 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_Administration, L("AdministrationMenu"));
             context.CreatePermission(PermissionNames.Pages_Definitions, L("DefinitionsMenu"));
             context.CreatePermission(PermissionNames.Pages_FinancialOperations, L("FinancialOperationsMenu"));
-            
+            context.CreatePermission(PermissionNames.Pages_PeriodsForSite, L("PeriodsForSiteMenu"));
+            context.CreatePermission(PermissionNames.Pages_PeriodsForBlock, L("PeriodsForBlockMenu"));
+
             context.CreatePermission(PermissionNames.Pages_CreateAccountBook, L("CreateAccountBook"));
             context.CreatePermission(PermissionNames.Pages_EditAccountBook, L("EditAccountBook"));
             context.CreatePermission(PermissionNames.Pages_DeleteAccountBook, L("DeleteAccountBook"));
@@ -62,6 +64,11 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_CreatePerson, L("CreatePerson"));
             context.CreatePermission(PermissionNames.Pages_EditPerson, L("EditPerson"));
             context.CreatePermission(PermissionNames.Pages_DeletePerson, L("DeletePerson"));
+            
+            context.CreatePermission(PermissionNames.Pages_CreatePeriodForBlock, L("CreatePeriodForBlock"));
+            context.CreatePermission(PermissionNames.Pages_CreatePeriodForSite, L("CreatePeriodForSite"));
+            context.CreatePermission(PermissionNames.Pages_EditPeriod, L("EditPeriod"));
+            context.CreatePermission(PermissionNames.Pages_DeletePeriod, L("DeletePeriod"));
         }
 
         private static ILocalizableString L(string name)

@@ -57,5 +57,12 @@
         public const string Pages_CreatePerson = "Pages.CreatePerson";
         public const string Pages_EditPerson = "Pages.EditPerson";
         public const string Pages_DeletePerson = "Pages.DeletePerson";
+        
+        public const string Pages_PeriodsForSite = "Pages.PeriodsForSite";
+        public const string Pages_PeriodsForBlock = "Pages.PeriodsForBlock";
+        public const string Pages_CreatePeriodForSite = "Pages.CreatePeriodForSite";
+        public const string Pages_CreatePeriodForBlock = "Pages.CreatePeriodForBlock";
+        public const string Pages_EditPeriod = "Pages.EditPeriod";
+        public const string Pages_DeletePeriod = "Pages.DeletePeriod";
     }
 }

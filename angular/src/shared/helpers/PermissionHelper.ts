@@ -121,5 +121,21 @@ export class PermissionHelper {
     deletePerson(): boolean {
         return this._permissionCheckerService.isGranted('Pages.DeletePerson');
     }
+
+    createPeriodForSite(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.CreatePeriodForSite');
+    }
+
+    createPeriodForBlock(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.CreatePeriodForBlock');
+    }
+
+    editPeriod(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.EditPeriod');
+    }
+
+    deletePeriod(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.DeletePeriod');
+    }
 }
 
