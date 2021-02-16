@@ -1,0 +1,89 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #createPeriodForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'CreateNewPeriod' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <tabset>
+      <tab [heading]="'Details' | localize" class="pt-3 px-2">
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="name">
+            {{ "Name" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="name"
+              required
+              minlength="0"
+              maxlength="50"
+              [(ngModel)]="period.name"
+              #nameModel="ngModel"
+              #nameEl
+            />
+            <abp-validation-summary
+              [control]="nameModel"
+              [controlEl]="nameEl"
+            ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="startDate">
+            {{ "StartDate" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              id="startDate"
+              name="startDate"
+              class="form-control"
+              [placeholder]="'SelectDate' | localize"
+              bsDatepicker
+              [(ngModel)]="period.startDate"
+              required
+            />
+          </div>
+        </div>
+        <div
+          class="form-group row required"
+          *ngIf="periodFor === periodForEnum.Block"
+        >
+          <label class="col-md-3 col-form-label" for="block">
+            {{ "Block" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-dropdown
+              id="block"
+              name="block"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="blockItems"
+              [(ngModel)]="period.blockId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+              [showClear]="true"
+              required
+            >
+            </p-dropdown>
+          </div>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="
+      !createPeriodForm.form.valid ||
+      saving ||
+      (!this.permissionHelper.createPeriodForSite() &&
+        !this.permissionHelper.createPeriodForBlock())
+    "
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>

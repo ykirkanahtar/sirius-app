@@ -1,0 +1,181 @@
+<div [@routerTransition]>
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-6">
+          <h1>{{ "Periods" | localize }}</h1>
+        </div>
+        <div
+          class="col-6 text-right"
+          *ngIf="periodType === PeriodTypeEnum.Site ? this.permissionHelper.createPeriodForSite() : this.permissionHelper.createPeriodForBlock()"
+        >
+          <a href="javascript:;" class="btn bg-blue" (click)="periodType === PeriodTypeEnum.Site ? createPeriodForSite() : createPeriodForBlock()">
+            <i class="fa fa-plus-square"></i>
+            {{ "Create" | localize }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="content px-2">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header">
+          <div class="input-group">
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="advancedFiltersVisible = !advancedFiltersVisible"
+              >
+                {{ "AdvancedFilters" | localize }}
+                <i
+                  class="fas"
+                  [class.fa-angle-up]="advancedFiltersVisible"
+                  [class.fa-angle-down]="!advancedFiltersVisible"
+                ></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+            <div class="card-body">
+              <form class="form-horizontal">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-label">
+                        {{ "Block" | localize }}
+                      </label>
+                      <p-dropdown
+                        id="blockFilter"
+                        name="blockFilter"
+                        [placeholder]="'PleaseSelect' | localize"
+                        [options]="blockItems"
+                        [(ngModel)]="blockIdFilter"
+                        [filter]="true"
+                        [style]="{ width: '100%' }"
+                        [showClear]="true"
+                      >
+                      </p-dropdown>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn bg-blue"
+                (click)="getDataPage(1)"
+              >
+                {{ "Search" | localize }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-default float-right"
+                (click)="clearFilters()"
+              >
+                {{ "Clear" | localize }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body table-responsive p-0">
+          <p-table
+            #dataTable
+            class="table table-hover text-nowrap"
+            [value]="periods"
+            [resizableColumns]="true"
+            [autoLayout]="true"
+            [busy]="isTableLoading"
+            (onLazyLoad)="getData($event)"
+            [lazy]="true"
+            [loading]="isTableLoading"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="Name">
+                  {{ "Name" | localize }}
+                  <p-sortIcon field="Name"></p-sortIcon>
+                </th>               
+                <th pSortableColumn="StartDate">
+                  {{ "StartDate" | localize }}
+                  <p-sortIcon field="StartDate"></p-sortIcon>
+                </th>
+                <th pSortableColumn="EndDate">
+                  {{ "EndDate" | localize }}
+                  <p-sortIcon field="EndDate"></p-sortIcon>
+                </th>
+                <th pSortableColumn="IsActive">
+                  {{ "IsActive" | localize }}
+                  <p-sortIcon field="IsActive"></p-sortIcon>
+                </th>
+                <th>{{ "Actions" | localize }}</th>
+              </tr>
+            </ng-template>
+            <ng-template
+              pTemplate="body"
+              ngFor
+              let-period
+              [ngForOf]="
+                periods
+                  | paginate
+                    : {
+                        id: 'server',
+                        itemsPerPage: pageSize,
+                        currentPage: pageNumber,
+                        totalItems: totalItems
+                      }
+              "
+            >
+              <tr>
+                <td>{{ period.name }}</td>
+                <td>{{ period.startDate.format("DD-MM-YYYY") }}</td>
+                <td>
+                  <span *ngIf="period.endDate">{{
+                    period.endDate.format("DD-MM-YYYY")
+                  }}</span>
+                </td>
+                <td>{{ period.isActive.toString() | localize }}</td>
+                <td>
+                  <button
+                    type="button"
+                    *ngIf="this.permissionHelper.editPerson()"
+                    class="btn btn-sm bg-secondary"
+                    (click)="editPeriod(period)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                    {{ "Edit" | localize }}
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="card-footer bg-light border-top">
+          <div class="row">
+            <div class="col-sm-4 col-12 text-sm-left text-center">
+              <button class="btn btn-secondary" (click)="refresh()">
+                <i class="fas fa-redo-alt"></i>
+              </button>
+            </div>
+            <div class="col-sm-4 col-12 text-center">
+              <p class="mb-0 my-2">
+                {{ "TotalRecordsCount" | localize: totalItems }}
+              </p>
+            </div>
+            <div class="col-sm-4 col-12">
+              <div class="float-sm-right m-auto">
+                <abp-pagination-controls
+                  id="server"
+                  (pageChange)="getDataPage($event)"
+                >
+                </abp-pagination-controls>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
