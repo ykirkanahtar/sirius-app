@@ -10,7 +10,9 @@ using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
+using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.Housings;
+using Sirius.PaymentCategories;
 using Sirius.Periods.Dto;
 using Sirius.Shared.Dtos;
 
@@ -24,14 +26,16 @@ namespace Sirius.Periods
         private readonly IRepository<Period, Guid> _periodRepository;
         private readonly IPeriodManager _periodManager;
         private readonly IBlockManager _blockManager;
+        private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
 
         public PeriodAppService(IRepository<Period, Guid> periodRepository, IPeriodManager periodManager,
-            IBlockManager blockManager) : base(
+            IBlockManager blockManager, IRepository<PaymentCategory, Guid> paymentCategoryRepository) : base(
             periodRepository)
         {
             _periodRepository = periodRepository;
             _periodManager = periodManager;
             _blockManager = blockManager;
+            _paymentCategoryRepository = paymentCategoryRepository;
         }
 
         public async Task<PeriodDto> CreateForSiteAsync(CreatePeriodForSiteDto input)
@@ -45,6 +49,9 @@ namespace Sirius.Periods
                 , input.StartDate
             );
             await _periodManager.CreateAsync(period);
+
+            await SetPassivePaymentCategoriesAsync(input.PaymentCategories);
+
             return ObjectMapper.Map<PeriodDto>(period);
         }
 
@@ -62,7 +69,22 @@ namespace Sirius.Periods
                 , block
             );
             await _periodManager.CreateAsync(period);
+
+            await SetPassivePaymentCategoriesAsync(input.PaymentCategories);
+
             return ObjectMapper.Map<PeriodDto>(period);
+        }
+
+        private async Task SetPassivePaymentCategoriesAsync(List<Guid> activePaymentCategories)
+        {
+            var allPaymentCategories = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.IsActive && p.IsValidForAllPeriods == false &&
+                            activePaymentCategories.Contains(p.Id) == false).ToListAsync();
+
+            foreach (var paymentCategory in allPaymentCategories)
+            {
+                paymentCategory.SetPassive();
+            }
         }
 
         public override Task<PeriodDto> CreateAsync(CreatePeriodForSiteDto input)

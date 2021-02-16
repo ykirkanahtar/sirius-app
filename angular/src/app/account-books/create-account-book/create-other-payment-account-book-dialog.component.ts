@@ -79,7 +79,7 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
       });
 
     this._paymentCategoryServiceProxy
-      .getPaymentCategoryLookUp()
+      .getPaymentCategoryLookUp(true)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategories = result;
       });

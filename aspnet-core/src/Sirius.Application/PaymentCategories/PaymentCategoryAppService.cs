@@ -87,6 +87,7 @@ namespace Sirius.PaymentCategories
                 from subFpa in fpa.DefaultIfEmpty()
                 join tpa in _paymentAccountRepository.GetAll() on pc.DefaultToPaymentAccountId equals tpa.Id into tpa
                 from subTpa in tpa.DefaultIfEmpty()
+                where pc.IsActive
                 select new PaymentCategoryDto
                 {
                     Id = pc.Id,
@@ -120,13 +121,14 @@ namespace Sirius.PaymentCategories
             var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
             return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
         }
-        
-        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync()
+
+        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives)
         {
             CheckGetAllPermission();
 
             var paymentAccounts = await _paymentCategoryRepository.GetAll()
                 .Where(p => p.ShowInLists)
+                .WhereIf(onlyActives, p => p.IsActive)
                 .ToListAsync();
 
             return
@@ -136,7 +138,23 @@ namespace Sirius.PaymentCategories
                 .ToList();
         }
 
-        public async Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync()
+        //Önceki dönemden devredilecek ödeme kategorileri çekiliyor
+        public async Task<List<LookUpDto>> GetPaymentCategoryForTransferLookUpAsync()
+        {
+            CheckGetAllPermission();
+
+            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.ShowInLists && p.IsActive && p.IsValidForAllPeriods == false)
+                .ToListAsync();
+
+            return
+                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
+                .ToList();
+        }
+
+        public async Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives)
         {
             CheckGetAllPermission();
 
@@ -144,6 +162,7 @@ namespace Sirius.PaymentCategories
                 .Where(p => p.HousingDueType == HousingDueType.RegularHousingDue ||
                             p.HousingDueType == HousingDueType.AdditionalHousingDueForOwner ||
                             p.HousingDueType == HousingDueType.AdditionalHousingDueForResident)
+                .WhereIf(onlyActives, p => p.IsActive)
                 .ToListAsync();
 
             return
