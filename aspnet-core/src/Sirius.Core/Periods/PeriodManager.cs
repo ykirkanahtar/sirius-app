@@ -31,14 +31,24 @@ namespace Sirius.Periods
 
         public async Task CreateAsync(Period period)
         {
+            //Yeni başlayacak dönemden daha yeni dönem varsa hata fırlatılıyor
+            var newerPeriods = await _periodRepository.GetAll()
+                .Where(p => p.PeriodFor == period.PeriodFor && p.StartDate >= period.StartDate).ToListAsync();
+
+            if (newerPeriods.Any())
+            {
+                throw new UserFriendlyException("Sistemde daha yeni tarihli dönem bulunmaktadır.");
+            }
+
             //Active olan dönem bulunuyor ve kayıtlarda varsa kapatılıyor
-            var activePeriod = await _periodRepository.GetAll().Where(p => p.IsActive)
+            var activePeriod = await _periodRepository.GetAll()
+                .Where(p => p.IsActive)
                 .WhereIf(period.PeriodFor == PeriodFor.Block,
                     p => p.PeriodFor == PeriodFor.Block && p.BlockId == period.BlockId)
                 .WhereIf(period.PeriodFor == PeriodFor.Site, p => p.PeriodFor == PeriodFor.Site)
                 .SingleOrDefaultAsync();
 
-            activePeriod?.ClosePeriod(activePeriod, period.StartDate);
+            activePeriod?.ClosePeriod(period.StartDate);
 
             await _periodRepository.InsertAsync(period);
         }

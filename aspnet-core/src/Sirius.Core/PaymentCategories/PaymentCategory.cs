@@ -10,7 +10,7 @@ using Sirius.Shared.Enums;
 namespace Sirius.PaymentCategories
 {
     [Table("AppPaymentCategories")]
-    public class PaymentCategory : FullAuditedEntity<Guid>, IMustHaveTenant
+    public class PaymentCategory : FullAuditedEntity<Guid>, IMustHaveTenant, IPassivable
     {
         protected PaymentCategory()
         {
@@ -27,6 +27,13 @@ namespace Sirius.PaymentCategories
         public Guid? DefaultFromPaymentAccountId { get; private set; }
         public Guid? DefaultToPaymentAccountId { get; private set; }
         
+        public bool IsActive { get; set; }
+
+        public void SetPassive()
+        {
+            IsActive = false;
+        }
+        
         public static PaymentCategory Create(Guid id, int tenantId, string paymentCategoryName,
             HousingDueType? housingDueType, bool isValidForAllPeriods, Guid? defaultFromPaymentAccountId,
             Guid? defaultToPaymentAccountId, bool showInLists = true,
@@ -34,7 +41,7 @@ namespace Sirius.PaymentCategories
         {
             return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, housingDueType,
                 isValidForAllPeriods, defaultFromPaymentAccountId, defaultToPaymentAccountId, showInLists,
-                editInAccountBook);
+                editInAccountBook, true);
         }
 
         public static PaymentCategory Update(PaymentCategory existingPaymentCategory, string paymentCategoryName,
@@ -43,13 +50,13 @@ namespace Sirius.PaymentCategories
             return BindEntity(existingPaymentCategory, existingPaymentCategory.Id, existingPaymentCategory.TenantId,
                 paymentCategoryName, existingPaymentCategory.HousingDueType,
                 existingPaymentCategory.IsValidForAllPeriods, defaultFromPaymentAccountId, defaultToPaymentAccountId,
-                showInLists, existingPaymentCategory.EditInAccountBook);
+                showInLists, existingPaymentCategory.EditInAccountBook, true);
         }
 
         private static PaymentCategory BindEntity(PaymentCategory paymentCategory, Guid id, int tenantId,
             string paymentCategoryName, HousingDueType? housingDueType, bool isValidForAllPeriods, Guid?
                 defaultFromPaymentAccountId, Guid? defaultToPaymentAccountId, bool showInLists,
-            bool editInAccountBook)
+            bool editInAccountBook, bool isActive)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
             {
@@ -73,8 +80,10 @@ namespace Sirius.PaymentCategories
             paymentCategory.EditInAccountBook = editInAccountBook;
             paymentCategory.DefaultFromPaymentAccountId = defaultFromPaymentAccountId;
             paymentCategory.DefaultToPaymentAccountId = defaultToPaymentAccountId;
+            paymentCategory.IsActive = isActive;
 
             return paymentCategory;
         }
+
     }
 }

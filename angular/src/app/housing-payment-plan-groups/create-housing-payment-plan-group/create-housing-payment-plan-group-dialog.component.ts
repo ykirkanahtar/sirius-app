@@ -51,7 +51,7 @@ export class CreateHousingPaymentPlanGroupDialogComponent
       });
 
     this._paymentCategoryService
-      .getHousingDuePaymentCategoryLookUp()
+      .getHousingDuePaymentCategoryLookUp(true)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategories = result;
       });

@@ -257,7 +257,8 @@ namespace Sirius.PaymentAccounts
                 {
                     ProcessDateTime = input.ProcessDateTime,
                     PaymentCategoryId = input.PaymentCategoryId,
-                    FromPaymentAccountId = input.FromPaymentAccountId.HasValue ? input.FromPaymentAccountId.Value : null,
+                    FromPaymentAccountId =
+                        input.FromPaymentAccountId.HasValue ? input.FromPaymentAccountId.Value : null,
                     ToPaymentAccountId = input.ToPaymentAccountId.HasValue ? input.ToPaymentAccountId.Value : null,
                     Amount = input.Amount,
                     Description = input.Description,

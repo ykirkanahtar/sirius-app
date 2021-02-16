@@ -73,6 +73,31 @@
             </p-dropdown>
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="paymentCategoriesFilter">
+            {{ "PaymentCategoriesForTransfer" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-multiSelect
+              name="paymentCategoriesFilter"
+              [options]="paymentCategoriesFilter"
+              [showToggleAll]="false"
+              [(ngModel)]="selectedPaymentCategoriesFilter"
+              [virtualScroll]="true"
+              [filter]="true"
+              [itemSize]="34"
+              [defaultLabel]="l('PaymentCategory')"
+              class="multiselect-custom-virtual-scroll"
+              [style]="{ minWidth: '100%' }"
+            >
+              <ng-template let-paymentCategory pTemplate="item">
+                <div class="paymentCategory-item">
+                  <div>{{ paymentCategory.label }}</div>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </div>
+        </div>
       </tab>
     </tabset>
   </div>
