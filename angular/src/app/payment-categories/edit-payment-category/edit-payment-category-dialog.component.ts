@@ -10,10 +10,12 @@ import { BsModalRef } from "ngx-bootstrap/modal";
 import * as _ from "lodash";
 import { AppComponentBase } from "@shared/app-component-base";
 import {
+  HousingDueType,
   LookUpDto,
   PaymentAccountServiceProxy,
   PaymentCategoryDto,
   PaymentCategoryServiceProxy,
+  PaymentCategoryType,
 } from "@shared/service-proxies/service-proxies";
 
 @Component({
@@ -26,6 +28,8 @@ export class EditPaymentCategoryDialogComponent
   id: string;
   paymentCategory = new PaymentCategoryDto();
   paymentAccounts: LookUpDto[];
+  PaymentCategoryTypeEnum = PaymentCategoryType;
+  HousingDueTypeEnum = HousingDueType;
 
   @Output() onSave = new EventEmitter<any>();
 

@@ -11,10 +11,14 @@ using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore.Repositories;
+using Sirius.HousingPaymentPlans;
+using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
+using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.Periods.Dto;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Periods
 {
@@ -27,15 +31,25 @@ namespace Sirius.Periods
         private readonly IPeriodManager _periodManager;
         private readonly IBlockManager _blockManager;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
-
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IPaymentAccountManager _paymentAccountManager;
+        private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
+        private readonly IRepository<Housing, Guid> _housingRepository;
+        private readonly IHousingPaymentPlanGroupManager _housingPaymentPlanGroupManager;
         public PeriodAppService(IRepository<Period, Guid> periodRepository, IPeriodManager periodManager,
-            IBlockManager blockManager, IRepository<PaymentCategory, Guid> paymentCategoryRepository) : base(
+            IBlockManager blockManager, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
+            IPaymentCategoryManager paymentCategoryManager, IPaymentAccountManager paymentAccountManager, IRepository<HousingCategory, Guid> housingCategoryRepository, IRepository<Housing, Guid> housingRepository, IHousingPaymentPlanGroupManager housingPaymentPlanGroupManager) : base(
             periodRepository)
         {
             _periodRepository = periodRepository;
             _periodManager = periodManager;
             _blockManager = blockManager;
             _paymentCategoryRepository = paymentCategoryRepository;
+            _paymentCategoryManager = paymentCategoryManager;
+            _paymentAccountManager = paymentAccountManager;
+            _housingCategoryRepository = housingCategoryRepository;
+            _housingRepository = housingRepository;
+            _housingPaymentPlanGroupManager = housingPaymentPlanGroupManager;
         }
 
         public async Task<PeriodDto> CreateForSiteAsync(CreatePeriodForSiteDto input)
@@ -48,9 +62,9 @@ namespace Sirius.Periods
                 , input.Name
                 , input.StartDate
             );
-            await _periodManager.CreateAsync(period);
 
-            await SetPassivePaymentCategoriesAsync(input.PaymentCategories);
+            await CreateAsync(period, input.DefaultPaymentAccountIdForRegularHousingDue, input.RegularHousingDueName,
+                input.PaymentCategories, input.HousingPaymentPlanGroups);
 
             return ObjectMapper.Map<PeriodDto>(period);
         }
@@ -68,11 +82,53 @@ namespace Sirius.Periods
                 , input.StartDate
                 , block
             );
-            await _periodManager.CreateAsync(period);
 
-            await SetPassivePaymentCategoriesAsync(input.PaymentCategories);
+            await CreateAsync(period, input.DefaultPaymentAccountIdForRegularHousingDue, input.RegularHousingDueName,
+                input.PaymentCategories, input.HousingPaymentPlanGroups);
 
             return ObjectMapper.Map<PeriodDto>(period);
+        }
+
+        private async Task CreateAsync(Period period, Guid defaultPaymentAccountIdForRegularHousingDue,
+            string regularHousingDueName, List<Guid> paymentCategories, List<CreateHousingPaymentPlanGroupDto> housingPaymentPlanGroups)
+        {
+            await _periodManager.CreateAsync(period);
+            
+            /*Yeni dönem için olağan aidat ödemesi için ödeme kategorisi oluşturuluyor*/
+            var defaultPaymentAccountForRegularHousingDue =
+                await _paymentAccountManager.GetAsync(defaultPaymentAccountIdForRegularHousingDue);
+
+            var housingDuePaymentCategory = PaymentCategory.Create(
+                id: SequentialGuidGenerator.Instance.Create(),
+                tenantId: AbpSession.GetTenantId(),
+                paymentCategoryName: regularHousingDueName,
+                housingDueType: HousingDueType.RegularHousingDue,
+                isValidForAllPeriods: false,
+                defaultFromPaymentAccountId: null,
+                defaultToPaymentAccountId: defaultPaymentAccountForRegularHousingDue.Id,
+                showInLists: false);
+            await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
+            /******************************************************************/
+
+            /*Yeni dönem için konut ödeme planları oluşturuluyor ve olağan aidat ödemesi için geçmiş dönemden devirler yapılıyor*/
+            foreach (var input in housingPaymentPlanGroups)  
+            {
+                var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
+                var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
+
+                var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(SequentialGuidGenerator.Instance.Create(),
+                    AbpSession.GetTenantId(),
+                    input.HousingPaymentPlanGroupName, housingCategory, housingDuePaymentCategory, input.AmountPerMonth,
+                    input.CountOfMonth, input.PaymentDayOfMonth
+                    , input.StartDate, input.Description);
+                
+                await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
+                    housingDuePaymentCategory, true, period.StartDate);
+            }
+            /*******************************************************************************************************/
+
+            
+            await SetPassivePaymentCategoriesAsync(paymentCategories);
         }
 
         private async Task SetPassivePaymentCategoriesAsync(List<Guid> activePaymentCategories)

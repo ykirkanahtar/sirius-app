@@ -104,16 +104,16 @@ namespace Sirius.MultiTenancy
                 StaticPermissionsBuilderForTenant.Build(CurrentUnitOfWork.GetDbContext<SiriusDbContext>(), tenant.Id);
 
                 //Custom changes
-                var housingDuePaymentCategory = PaymentCategory.Create(
-                    id: SequentialGuidGenerator.Instance.Create(),
-                    tenantId: tenant.Id,
-                    paymentCategoryName: HousingDueType.RegularHousingDue.ToString(),
-                    housingDueType: HousingDueType.RegularHousingDue,
-                    isValidForAllPeriods: true,
-                    defaultFromPaymentAccountId: null,
-                    defaultToPaymentAccountId: null,
-                    showInLists: false);
-                await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
+                // var housingDuePaymentCategory = PaymentCategory.Create(
+                //     id: SequentialGuidGenerator.Instance.Create(),
+                //     tenantId: tenant.Id,
+                //     paymentCategoryName: HousingDueType.RegularHousingDue.ToString(),
+                //     housingDueType: HousingDueType.RegularHousingDue,
+                //     isValidForAllPeriods: true,
+                //     defaultFromPaymentAccountId: null,
+                //     defaultToPaymentAccountId: null,
+                //     showInLists: false);
+                // await _paymentCategoryManager.CreateAsync(housingDuePaymentCategory);
 
                 var transferForHousingDuePaymentCategory = PaymentCategory.Create(
                     id: SequentialGuidGenerator.Instance.Create(),

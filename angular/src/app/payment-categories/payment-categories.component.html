@@ -5,18 +5,20 @@
         <div class="col-6">
           <h1>{{ "PaymentCategories" | localize }}</h1>
         </div>
+        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+
         <div
           class="col-6 text-right"
           *ngIf="this.permissionHelper.createPaymentCategory()"
         >
-          <a
-            href="javascript:;"
+          <button
+            type="button"
             class="btn bg-blue"
-            (click)="createPaymentCategory()"
-          >
-            <i class="fa fa-plus-square"></i>
-            {{ "Create" | localize }}
-          </a>
+            pButton
+            icon="fa fa-arrow-down"
+            [label]="'Create' | localize"
+            (click)="menu.toggle($event)"
+          ></button>
         </div>
       </div>
     </div>
@@ -128,16 +130,26 @@
               "
             >
               <tr>
-                <td>{{ paymentCategory.paymentCategoryName | localize}}</td>
+                <td>{{ paymentCategory.paymentCategoryName | localize }}</td>
                 <td>
                   {{ paymentCategory.isValidForAllPeriods ? "Evet" : "Hayır" }}
                 </td>
-                <td>{{ paymentCategory.defaultFromPaymentAccountName | localize}}</td>
-                <td>{{ paymentCategory.defaultToPaymentAccountName | localize}}</td>
+                <td>
+                  {{ paymentCategory.defaultFromPaymentAccountName | localize }}
+                </td>
+                <td>
+                  {{ paymentCategory.defaultToPaymentAccountName | localize }}
+                </td>
                 <td>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.editPaymentCategory() && paymentCategory.editInAccountBook"
+                    *ngIf="
+                      this.permissionHelper.editPaymentCategory() &&
+                      paymentCategory.housingDueType !=
+                        HousingDueTypeEnum.RegularHousingDue &&
+                      paymentCategory.housingDueType !=
+                        HousingDueTypeEnum.Netting
+                    "
                     class="btn btn-sm bg-secondary"
                     (click)="editPaymentCategory(paymentCategory)"
                   >
@@ -146,7 +158,12 @@
                   </button>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.deletePaymentCategory() && paymentCategory.editInAccountBook"
+                    *ngIf="
+                      this.permissionHelper.deletePaymentCategory() &&
+                      paymentCategory.housingDueType !=
+                        HousingDueTypeEnum.RegularHousingDue &&
+                      paymentCategory.editInAccountBook
+                    "
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(paymentCategory)"
                   >

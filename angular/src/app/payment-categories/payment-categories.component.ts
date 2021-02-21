@@ -1,33 +1,38 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { Component, Injector, OnInit, ViewChild } from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { appModuleAnimation } from "@shared/animations/routerTransition";
 import {
   PagedListingComponentBase,
   PagedRequestDto,
-} from '@shared/paged-listing-component-base';
-import { CreatePaymentCategoryDialogComponent } from './create-payment-category/create-payment-category-dialog.component';
-import { EditPaymentCategoryDialogComponent } from './edit-payment-category/edit-payment-category-dialog.component';
+} from "@shared/paged-listing-component-base";
+import { CreatePaymentCategoryDialogComponent } from "./create-payment-category/create-payment-category-dialog.component";
+import { EditPaymentCategoryDialogComponent } from "./edit-payment-category/edit-payment-category-dialog.component";
 import {
   PaymentCategoryDto,
   PaymentCategoryServiceProxy,
   PaymentCategoryDtoPagedResultDto,
-} from '@shared/service-proxies/service-proxies';
-import { Table } from 'primeng/table';
-import { LazyLoadEvent } from 'primeng/api';
+  PaymentCategoryType,
+  HousingDueType,
+} from "@shared/service-proxies/service-proxies";
+import { Table } from "primeng/table";
+import { LazyLoadEvent } from "primeng/api";
+import { MenuItem as PrimeNgMenuItem } from "primeng/api";
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
 }
 
 @Component({
-  templateUrl: './payment-categories.component.html',
+  templateUrl: "./payment-categories.component.html",
   animations: [appModuleAnimation()],
 })
 export class PaymentCategoriesComponent
   extends PagedListingComponentBase<PaymentCategoryDto>
   implements OnInit {
-  @ViewChild('dataTable', { static: true }) dataTable: Table;
+  @ViewChild("dataTable", { static: true }) dataTable: Table;
+
+  items: PrimeNgMenuItem[];
 
   sortingColumn: string;
   advancedFiltersVisible = false;
@@ -36,6 +41,7 @@ export class PaymentCategoriesComponent
 
   paymentCategoriesFilter: string[] = [];
   selectedPaymentCategoryFilter: string;
+  HousingDueTypeEnum = HousingDueType;
 
   constructor(
     injector: Injector,
@@ -46,6 +52,39 @@ export class PaymentCategoriesComponent
   }
 
   ngOnInit(): void {
+    this.items = [
+      {
+        label: this.l("ExpensePaymentCategory"),
+        icon: "pi pi-arrow-right",
+        command: () => {
+          this.createPaymentCategory(PaymentCategoryType.Expense, false);
+        },
+      },
+      {
+        label: this.l("AdditionalHousingDue"),
+        icon: "pi pi-arrow-left",
+        command: () => {
+          this.createPaymentCategory(PaymentCategoryType.Income, true);
+        },
+      },
+      {
+        label: this.l("IncomePaymentCategory"),
+        icon: "pi pi-arrow-left",
+        command: () => {
+          this.createPaymentCategory(PaymentCategoryType.Income, false);
+        },
+      },
+      {
+        label: this.l("TransferBetweenAccounts"),
+        icon: "pi pi-sort-alt",
+        command: () => {
+          this.createPaymentCategory(
+            PaymentCategoryType.TransferBetweenAccounts, false
+          );
+        },
+      },
+    ];
+
     this.getDataPage(1);
   }
 
@@ -57,17 +96,21 @@ export class PaymentCategoriesComponent
       });
   }
 
-  createPaymentCategory(): void {
-    this.showCreateOrEditPaymentCategoryDialog();
+  createPaymentCategory(paymentCategoryType: PaymentCategoryType, housingDue: boolean): void {
+    this.showCreateOrEditPaymentCategoryDialog(paymentCategoryType, housingDue);
   }
 
   editPaymentCategory(paymentCategory: PaymentCategoryDto): void {
-    this.showCreateOrEditPaymentCategoryDialog(paymentCategory.id);
+    this.showCreateOrEditPaymentCategoryDialog(
+      paymentCategory.paymentCategoryType,
+      null,
+      paymentCategory.id
+    );
   }
 
   clearFilters(): void {
     this.paymentCategoriesFilter = [];
-    this.selectedPaymentCategoryFilter = '';
+    this.selectedPaymentCategoryFilter = "";
     this.getDataPage(1);
   }
 
@@ -102,7 +145,7 @@ export class PaymentCategoriesComponent
   protected delete(paymentCategory: PaymentCategoryDto): void {
     abp.message.confirm(
       this.l(
-        'PaymentCategoryDeleteWarningMessage',
+        "PaymentCategoryDeleteWarningMessage",
         paymentCategory.paymentCategoryName
       ),
       undefined,
@@ -111,7 +154,7 @@ export class PaymentCategoriesComponent
           this._paymentCategoryService
             .delete(paymentCategory.id)
             .subscribe(() => {
-              abp.notify.success(this.l('SuccessfullyDeleted'));
+              abp.notify.success(this.l("SuccessfullyDeleted"));
               this.refresh();
             });
         }
@@ -119,20 +162,28 @@ export class PaymentCategoriesComponent
     );
   }
 
-  private showCreateOrEditPaymentCategoryDialog(id?: string): void {
+  private showCreateOrEditPaymentCategoryDialog(
+    paymentCategoryType?: PaymentCategoryType,
+    housingDue?: boolean,
+    id?: string
+  ): void {
     let createOrEditPaymentCategoryDialog: BsModalRef;
     if (!id) {
       createOrEditPaymentCategoryDialog = this._modalService.show(
         CreatePaymentCategoryDialogComponent,
         {
-          class: 'modal-lg',
+          class: "modal-lg",
+          initialState: {
+            paymentCategoryType: paymentCategoryType,
+            housingDue: housingDue,
+          },
         }
       );
     } else {
       createOrEditPaymentCategoryDialog = this._modalService.show(
         EditPaymentCategoryDialogComponent,
         {
-          class: 'modal-lg',
+          class: "modal-lg",
           initialState: {
             id: id,
           },

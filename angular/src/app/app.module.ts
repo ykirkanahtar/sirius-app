@@ -68,6 +68,7 @@ import { PaymentCategoriesComponent } from "./payment-categories/payment-categor
 import { EditPaymentCategoryDialogComponent } from "./payment-categories/edit-payment-category/edit-payment-category-dialog.component";
 import { BsDatepickerModule, BsLocaleService } from "ngx-bootstrap/datepicker";
 import { DropdownModule } from "primeng/dropdown";
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { TableModule } from "primeng/table";
 import { MultiSelectModule } from "primeng/multiselect";
 import { AutoCompleteModule } from "primeng/autocomplete";
@@ -172,6 +173,7 @@ import { trLocale } from "ngx-bootstrap/locale";
     NgxPaginationModule,
     BsDatepickerModule.forRoot(),
     DropdownModule,
+    RadioButtonModule,
     TableModule,
     MultiSelectModule,
     InputNumberModule,

@@ -5,13 +5,13 @@
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'CreateNewPaymentCategory' | localize"
+    [title]="title"
     (onCloseClick)="bsModalRef.hide()"
   ></abp-modal-header>
   <div class="modal-body">
     <tabset>
       <tab [heading]="'Details' | localize" class="pt-3 px-2">
-        <div class="form-group row">
+        <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="paymentCategoryName">
             {{ "PaymentCategoryName" | localize }}
           </label>
@@ -24,6 +24,7 @@
               minlength="0"
               maxlength="50"
               [(ngModel)]="paymentCategory.paymentCategoryName"
+              required
               #paymentCategoryNameModel="ngModel"
               #paymentCategoryNameEl
             />
@@ -31,6 +32,37 @@
               [control]="paymentCategoryNameModel"
               [controlEl]="paymentCategoryNameEl"
             ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="form-group row required" *ngIf="housingDue">
+          <label class="col-md-3 col-form-label" for="paymentCategoryName">
+            {{ "AdditionalHousingDueType" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="p-field-radiobutton mb-1">
+              <p-radioButton
+                name="housingDueType"
+                [value]="HousingDueTypeEnum.AdditionalHousingDueForResident"
+                [(ngModel)]="paymentCategory.housingDueType"
+                inputId="housingDueForResident"
+                required
+              ></p-radioButton>
+              <label class="mb-0 ml-3" for="housingDueTypeForResident">{{
+                "AdditionalHousingDueForResident" | localize
+              }}</label>
+            </div>
+            <div class="p-field-radiobutton">
+              <p-radioButton
+                name="housingDueType"
+                [value]="HousingDueTypeEnum.AdditionalHousingDueForOwner"
+                [(ngModel)]="paymentCategory.housingDueType"
+                inputId="housingDueTypeForOwner"
+                required
+              ></p-radioButton>
+              <label class="mb-0 ml-3" for="housingDueTypeForOwner">{{
+                "AdditionalHousingDueForOwner" | localize
+              }}</label>
+            </div>
           </div>
         </div>
         <div class="form-group row mb-0">
@@ -53,7 +85,14 @@
             </div>
           </div>
         </div>
-        <div class="form-group row">
+        <div
+          class="form-group row required"
+          *ngIf="
+            paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
+            paymentCategoryType ===
+              PaymentCategoryTypeEnum.TransferBetweenAccounts
+          "
+        >
           <label class="col-md-3 col-form-label" for="fromPaymentAccountId">
             {{ "DefaultFromPaymentAccount" | localize }}
           </label>
@@ -66,6 +105,7 @@
               [(ngModel)]="paymentCategory.defaultFromPaymentAccountId"
               [filter]="true"
               [style]="{ width: '100%' }"
+              required
             >
             </p-dropdown>
           </div>
@@ -78,7 +118,14 @@
             </span>
           </div>
         </div>
-        <div class="form-group row">
+        <div
+          class="form-group row required"
+          *ngIf="
+            paymentCategoryType === PaymentCategoryTypeEnum.Income ||
+            paymentCategoryType ===
+              PaymentCategoryTypeEnum.TransferBetweenAccounts
+          "
+        >
           <label class="col-md-3 col-form-label" for="toPaymentAccountId">
             {{ "DefaultToPaymentAccount" | localize }}
           </label>
@@ -91,6 +138,7 @@
               [(ngModel)]="paymentCategory.defaultToPaymentAccountId"
               [filter]="true"
               [style]="{ width: '100%' }"
+              required
             >
             </p-dropdown>
           </div>
