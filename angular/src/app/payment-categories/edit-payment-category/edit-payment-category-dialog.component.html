@@ -33,8 +33,47 @@
             ></abp-validation-summary>
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label" for="fromPaymentAccountId">
+        <div class="form-group row required" *ngIf="paymentCategory.housingDueType">
+          <label class="col-md-3 col-form-label" for="paymentCategoryName">
+            {{ "AdditionalHousingDueType" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="p-field-radiobutton mb-1">
+              <p-radioButton
+                name="housingDueType"
+                [value]="HousingDueTypeEnum.AdditionalHousingDueForResident"
+                [(ngModel)]="paymentCategory.housingDueType"
+                inputId="housingDueForResident"
+                required
+                disabled
+              ></p-radioButton>
+              <label class="mb-0 ml-3" for="housingDueTypeForResident">{{
+                "AdditionalHousingDueForResident" | localize
+              }}</label>
+            </div>
+            <div class="p-field-radiobutton">
+              <p-radioButton
+                name="housingDueType"
+                [value]="HousingDueTypeEnum.AdditionalHousingDueForOwner"
+                [(ngModel)]="paymentCategory.housingDueType"
+                inputId="housingDueTypeForOwner"
+                required
+                disabled
+              ></p-radioButton>
+              <label class="mb-0 ml-3" for="housingDueTypeForOwner">{{
+                "AdditionalHousingDueForOwner" | localize
+              }}</label>
+            </div>
+          </div>
+        </div>        
+        <div
+          class="form-group row required"
+          *ngIf="
+          paymentCategory.paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
+          paymentCategory.paymentCategoryType ===
+              PaymentCategoryTypeEnum.TransferBetweenAccounts
+          "
+        >          <label class="col-md-3 col-form-label" for="fromPaymentAccountId">
             {{ "DefaultFromPaymentAccount" | localize }}
           </label>
           <div class="col-md-6 pr-4">
@@ -58,8 +97,14 @@
             </span>
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label" for="toPaymentAccountId">
+        <div
+          class="form-group row required"
+          *ngIf="
+            paymentCategory.paymentCategoryType === PaymentCategoryTypeEnum.Income ||
+            paymentCategory.paymentCategoryType ===
+              PaymentCategoryTypeEnum.TransferBetweenAccounts
+          "
+        >          <label class="col-md-3 col-form-label" for="toPaymentAccountId">
             {{ "DefaultToPaymentAccount" | localize }}
           </label>
           <div class="col-md-6 pr-4">

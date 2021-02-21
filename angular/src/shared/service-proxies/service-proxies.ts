@@ -4059,6 +4059,174 @@ export class PaymentCategoryServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createIncome(body: CreateIncomePaymentCategoryDto | undefined): Observable<PaymentCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/CreateIncome";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateIncome(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateIncome(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateIncome(response: HttpResponseBase): Observable<PaymentCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaymentCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createExpense(body: CreateExpensePaymentCategoryDto | undefined): Observable<PaymentCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/CreateExpense";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateExpense(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateExpense(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateExpense(response: HttpResponseBase): Observable<PaymentCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaymentCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createTransfer(body: CreateTransferPaymentCategoryDto | undefined): Observable<PaymentCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/CreateTransfer";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateTransfer(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateTransfer(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateTransfer(response: HttpResponseBase): Observable<PaymentCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaymentCategoryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryDto>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     create(body: CreatePaymentCategoryDto | undefined): Observable<PaymentCategoryDto> {
         let url_ = this.baseUrl + "/api/services/app/PaymentCategory/Create";
         url_ = url_.replace(/[?&]$/, "");
@@ -4335,6 +4503,61 @@ export class PaymentCategoryServiceProxy {
             }));
         }
         return _observableOf<PaymentCategoryDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getPaymentCategoryForMenu(): Observable<PaymentCategoryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryForMenu";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaymentCategoryForMenu(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaymentCategoryForMenu(<any>response_);
+                } catch (e) {
+                    return <Observable<PaymentCategoryDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PaymentCategoryDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPaymentCategoryForMenu(response: HttpResponseBase): Observable<PaymentCategoryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(PaymentCategoryDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PaymentCategoryDto[]>(<any>null);
     }
 
     /**
@@ -9943,6 +10166,12 @@ export enum HousingDueType {
     TransferForAdditionalHousingDue = 6,
 }
 
+export enum PaymentCategoryType {
+    Income = 1,
+    Expense = 2,
+    TransferBetweenAccounts = 3,
+}
+
 export class PaymentCategoryDto implements IPaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
@@ -9951,6 +10180,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
     defaultFromPaymentAccountName: string | undefined;
     defaultToPaymentAccountName: string | undefined;
     isDeleted: boolean;
@@ -9980,6 +10210,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
             this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
+            this.paymentCategoryType = _data["paymentCategoryType"];
             this.defaultFromPaymentAccountName = _data["defaultFromPaymentAccountName"];
             this.defaultToPaymentAccountName = _data["defaultToPaymentAccountName"];
             this.isDeleted = _data["isDeleted"];
@@ -10009,6 +10240,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
         data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
+        data["paymentCategoryType"] = this.paymentCategoryType;
         data["defaultFromPaymentAccountName"] = this.defaultFromPaymentAccountName;
         data["defaultToPaymentAccountName"] = this.defaultToPaymentAccountName;
         data["isDeleted"] = this.isDeleted;
@@ -10038,6 +10270,7 @@ export interface IPaymentCategoryDto {
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
     defaultFromPaymentAccountName: string | undefined;
     defaultToPaymentAccountName: string | undefined;
     isDeleted: boolean;
@@ -11111,6 +11344,167 @@ export interface IPaymentAccountDtoPagedResultDto {
     items: PaymentAccountDto[] | undefined;
 }
 
+export class CreateIncomePaymentCategoryDto implements ICreateIncomePaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    housingDueType: HousingDueType;
+    isValidForAllPeriods: boolean;
+    defaultToPaymentAccountId: string;
+
+    constructor(data?: ICreateIncomePaymentCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.housingDueType = _data["housingDueType"];
+            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
+        }
+    }
+
+    static fromJS(data: any): CreateIncomePaymentCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateIncomePaymentCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["housingDueType"] = this.housingDueType;
+        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
+        return data; 
+    }
+
+    clone(): CreateIncomePaymentCategoryDto {
+        const json = this.toJSON();
+        let result = new CreateIncomePaymentCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateIncomePaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    housingDueType: HousingDueType;
+    isValidForAllPeriods: boolean;
+    defaultToPaymentAccountId: string;
+}
+
+export class CreateExpensePaymentCategoryDto implements ICreateExpensePaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string;
+
+    constructor(data?: ICreateExpensePaymentCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+        }
+    }
+
+    static fromJS(data: any): CreateExpensePaymentCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateExpensePaymentCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        return data; 
+    }
+
+    clone(): CreateExpensePaymentCategoryDto {
+        const json = this.toJSON();
+        let result = new CreateExpensePaymentCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateExpensePaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string;
+}
+
+export class CreateTransferPaymentCategoryDto implements ICreateTransferPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string;
+    defaultToPaymentAccountId: string;
+
+    constructor(data?: ICreateTransferPaymentCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
+        }
+    }
+
+    static fromJS(data: any): CreateTransferPaymentCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTransferPaymentCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
+        return data; 
+    }
+
+    clone(): CreateTransferPaymentCategoryDto {
+        const json = this.toJSON();
+        let result = new CreateTransferPaymentCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateTransferPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string;
+    defaultToPaymentAccountId: string;
+}
+
 export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
     housingDueType: HousingDueType;
@@ -11287,7 +11681,10 @@ export interface IPaymentCategoryDtoPagedResultDto {
 export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
+    regularHousingDueName: string | undefined;
+    defaultPaymentAccountIdForRegularHousingDue: string;
     paymentCategories: string[] | undefined;
+    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 
     constructor(data?: ICreatePeriodForSiteDto) {
         if (data) {
@@ -11302,10 +11699,17 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         if (_data) {
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.regularHousingDueName = _data["regularHousingDueName"];
+            this.defaultPaymentAccountIdForRegularHousingDue = _data["defaultPaymentAccountIdForRegularHousingDue"];
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
                     this.paymentCategories.push(item);
+            }
+            if (Array.isArray(_data["housingPaymentPlanGroups"])) {
+                this.housingPaymentPlanGroups = [] as any;
+                for (let item of _data["housingPaymentPlanGroups"])
+                    this.housingPaymentPlanGroups.push(CreateHousingPaymentPlanGroupDto.fromJS(item));
             }
         }
     }
@@ -11321,10 +11725,17 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["regularHousingDueName"] = this.regularHousingDueName;
+        data["defaultPaymentAccountIdForRegularHousingDue"] = this.defaultPaymentAccountIdForRegularHousingDue;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
                 data["paymentCategories"].push(item);
+        }
+        if (Array.isArray(this.housingPaymentPlanGroups)) {
+            data["housingPaymentPlanGroups"] = [];
+            for (let item of this.housingPaymentPlanGroups)
+                data["housingPaymentPlanGroups"].push(item.toJSON());
         }
         return data; 
     }
@@ -11340,7 +11751,10 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
 export interface ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
+    regularHousingDueName: string | undefined;
+    defaultPaymentAccountIdForRegularHousingDue: string;
     paymentCategories: string[] | undefined;
+    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 }
 
 export enum PeriodFor {
@@ -11447,7 +11861,10 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
+    regularHousingDueName: string | undefined;
+    defaultPaymentAccountIdForRegularHousingDue: string;
     paymentCategories: string[] | undefined;
+    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 
     constructor(data?: ICreatePeriodForBlockDto) {
         if (data) {
@@ -11463,10 +11880,17 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
             this.blockId = _data["blockId"];
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.regularHousingDueName = _data["regularHousingDueName"];
+            this.defaultPaymentAccountIdForRegularHousingDue = _data["defaultPaymentAccountIdForRegularHousingDue"];
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
                     this.paymentCategories.push(item);
+            }
+            if (Array.isArray(_data["housingPaymentPlanGroups"])) {
+                this.housingPaymentPlanGroups = [] as any;
+                for (let item of _data["housingPaymentPlanGroups"])
+                    this.housingPaymentPlanGroups.push(CreateHousingPaymentPlanGroupDto.fromJS(item));
             }
         }
     }
@@ -11483,10 +11907,17 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
         data["blockId"] = this.blockId;
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["regularHousingDueName"] = this.regularHousingDueName;
+        data["defaultPaymentAccountIdForRegularHousingDue"] = this.defaultPaymentAccountIdForRegularHousingDue;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
                 data["paymentCategories"].push(item);
+        }
+        if (Array.isArray(this.housingPaymentPlanGroups)) {
+            data["housingPaymentPlanGroups"] = [];
+            for (let item of this.housingPaymentPlanGroups)
+                data["housingPaymentPlanGroups"].push(item.toJSON());
         }
         return data; 
     }
@@ -11503,7 +11934,10 @@ export interface ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
+    regularHousingDueName: string | undefined;
+    defaultPaymentAccountIdForRegularHousingDue: string;
     paymentCategories: string[] | undefined;
+    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 }
 
 export class UpdatePeriodDto implements IUpdatePeriodDto {

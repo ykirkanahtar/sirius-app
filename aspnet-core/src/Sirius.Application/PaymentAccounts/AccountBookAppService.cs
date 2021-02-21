@@ -531,7 +531,8 @@ namespace Sirius.PaymentAccounts
             }
 
             var paymentAccounts = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.ShowInLists && p.EditInAccountBook)
+                .Where(p => p.ShowInLists && p.EditInAccountBook &&
+                            p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .ToListAsync();
 
             return

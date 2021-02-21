@@ -9,6 +9,10 @@ namespace Sirius.PaymentCategories
 {
     public interface IPaymentCategoryAppService : IAsyncCrudAppService<PaymentCategoryDto, Guid, PagedPaymentCategoryResultRequestDto, CreatePaymentCategoryDto, UpdatePaymentCategoryDto>
     {
+        Task<PaymentCategoryDto> CreateIncomeAsync(CreateIncomePaymentCategoryDto input);
+        Task<PaymentCategoryDto> CreateExpenseAsync(CreateExpensePaymentCategoryDto input);
+        Task<PaymentCategoryDto> CreateTransferAsync(CreateTransferPaymentCategoryDto input);
+        Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync();
         Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives);
         Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives);
         Task<List<LookUpDto>> GetPaymentCategoryForTransferLookUpAsync();

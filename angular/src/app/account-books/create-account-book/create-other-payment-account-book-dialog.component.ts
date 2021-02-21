@@ -23,6 +23,7 @@ import {
   PersonServiceProxy,
   API_BASE_URL,
   PaymentCategoryDto,
+  PaymentCategoryType,
 } from '@shared/service-proxies/service-proxies';
 import { HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
@@ -42,6 +43,11 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
   paymentAccounts: LookUpDto[];
   paymentCategories: LookUpDto[];
   people: LookUpDto[];
+
+  paymentCategoryType: PaymentCategoryType;
+  PaymentCategoryTypeEnum = PaymentCategoryType;
+  checkForPaymentCategoryType: boolean = false;
+  paymentCategoryId: string;
 
   uploadedFileUrls: any[] = [];
   baseUrl: string;
@@ -70,6 +76,12 @@ export class CreateOtherPaymentAccountBookDialogComponent extends AppComponentBa
   }
 
   ngOnInit(): void {
+
+    if(this.paymentCategoryType) {
+      this.checkForPaymentCategoryType = true;
+      this.accountBook.paymentCategoryId = this.paymentCategoryId;
+    }
+
     this.getHousings();
 
     this._paymentAccountServiceProxy

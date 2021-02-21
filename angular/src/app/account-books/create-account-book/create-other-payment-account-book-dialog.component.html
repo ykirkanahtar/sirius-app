@@ -48,11 +48,27 @@
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
+                  [disabled]="checkForPaymentCategoryType"
                 >
                 </p-dropdown>
               </div>
             </div>
-            <div class="form-group row">
+            <div
+              class="form-group row"
+              [ngClass]="
+                (paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
+                  paymentCategoryType ===
+                    PaymentCategoryTypeEnum.TransferBetweenAccounts) === true
+                  ? 'required'
+                  : ''
+              "
+              *ngIf="
+                !checkForPaymentCategoryType ||
+                paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
+                paymentCategoryType ===
+                  PaymentCategoryTypeEnum.TransferBetweenAccounts
+              "
+            >
               <label
                 class="col-md-12 col-form-label"
                 for="fromPaymentAccountId"
@@ -68,6 +84,11 @@
                   [(ngModel)]="accountBook.fromPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
+                  [required]="
+                    paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
+                    paymentCategoryType ===
+                      PaymentCategoryTypeEnum.TransferBetweenAccounts
+                  "
                 >
                 </p-dropdown>
               </div>
@@ -80,7 +101,22 @@
                 </span>
               </div>
             </div>
-            <div class="form-group row">
+            <div
+              class="form-group row"
+              [ngClass]="
+                (paymentCategoryType === PaymentCategoryTypeEnum.Income ||
+                  paymentCategoryType ===
+                    PaymentCategoryTypeEnum.TransferBetweenAccounts) === true
+                  ? 'required'
+                  : ''
+              "
+              *ngIf="
+                !checkForPaymentCategoryType ||
+                paymentCategoryType === PaymentCategoryTypeEnum.Income ||
+                paymentCategoryType ===
+                  PaymentCategoryTypeEnum.TransferBetweenAccounts
+              "
+            >
               <label class="col-md-12 col-form-label" for="toPaymentAccountId">
                 {{ "ToPaymentAccount" | localize }}
               </label>
@@ -93,6 +129,11 @@
                   [(ngModel)]="accountBook.toPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
+                  [required]="
+                    paymentCategoryType === PaymentCategoryTypeEnum.Income ||
+                    paymentCategoryType ===
+                      PaymentCategoryTypeEnum.TransferBetweenAccounts
+                  "
                 >
                 </p-dropdown>
               </div>
@@ -119,7 +160,7 @@
                   mode="decimal"
                   [minFractionDigits]="2"
                   [maxFractionDigits]="2"
-                  [style]="{'width':'100%'}"
+                  [style]="{ width: '100%' }"
                 >
                 </p-inputNumber>
               </div>
@@ -148,7 +189,13 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div class="form-group row">
+            <div
+              class="form-group row"
+              *ngIf="
+                !checkForPaymentCategoryType ||
+                paymentCategoryType === PaymentCategoryTypeEnum.Expense
+              "
+            >
               <div class="col-md-10">
                 <label for="documentDateTime">
                   {{ "DocumentDateTime" | localize }}
@@ -164,7 +211,13 @@
                 />
               </div>
             </div>
-            <div class="form-group row">
+            <div
+              class="form-group row"
+              *ngIf="
+                !checkForPaymentCategoryType ||
+                paymentCategoryType === PaymentCategoryTypeEnum.Expense
+              "
+            >
               <div class="col-md-10">
                 <label for="documentNumber">
                   {{ "DocumentNumber" | localize }}
@@ -186,7 +239,13 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div class="form-group row mb-0">
+            <div
+              class="form-group row mb-0"
+              *ngIf="
+                !checkForPaymentCategoryType ||
+                paymentCategoryType === PaymentCategoryTypeEnum.Expense
+              "
+            >
               <div class="col-md-10">
                 <div class="custom-control custom-checkbox">
                   <input

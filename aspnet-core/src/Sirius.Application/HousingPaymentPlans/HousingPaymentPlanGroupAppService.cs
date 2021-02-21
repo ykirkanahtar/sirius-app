@@ -73,22 +73,12 @@ namespace Sirius.HousingPaymentPlans
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
             var paymentCategory = await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
-            
+
             if (paymentCategory.HousingDueType != HousingDueType.RegularHousingDue ||
                 paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForOwner ||
                 paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForResident)
             {
                 throw new UserFriendlyException("Aidat dışı bir ödeme kategorisi ile işlem yapılamaz.");
-            }
-            
-            var startDate = input.StartDate > Clock.Now ? input.StartDate : Clock.Now;
-
-            if (startDate.Day > input.PaymentDayOfMonth)
-            {
-                var year = startDate.Year;
-                var month = startDate.Month == 12 ? 1 : startDate.Month + 1;
-                year = month == 1 ? year + 1 : year;
-                startDate = new DateTime(year, month, input.PaymentDayOfMonth);
             }
 
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(SequentialGuidGenerator.Instance.Create(),
@@ -97,40 +87,8 @@ namespace Sirius.HousingPaymentPlans
                 input.CountOfMonth, input.PaymentDayOfMonth
                 , input.StartDate, input.Description);
 
-            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup);
-
-            var housingPaymentPlans = new List<HousingPaymentPlan>();
-
-            foreach (var housing in housings)
-            {
-                var date = startDate;
-                for (var i = 0; i < input.CountOfMonth; i++)
-                {
-                    if (i > 0)
-                    {
-                        var day = input.PaymentDayOfMonth;
-                        var month = date.Month == 12 ? 1 : date.Month + 1;
-                        var year = month == 1 ? date.Year + 1 : date.Year;
-                        date = new DateTime(year, month, day);
-                    }
-
-                    var housingPaymentPlan = HousingPaymentPlan.CreateDebt(
-                        SequentialGuidGenerator.Instance.Create()
-                        , AbpSession.GetTenantId()
-                        , housingPaymentPlanGroup
-                        , housing
-                        , paymentCategory
-                        , date
-                        , input.AmountPerMonth
-                        , input.Description
-                    );
-
-                    housingPaymentPlans.Add(housingPaymentPlan);
-                }
-            }
-
-            await _housingPaymentPlanManager.BulkCreateAsync(housingPaymentPlans);
-            _housingManager.BulkIncreaseBalance(housings, input.AmountPerMonth * input.CountOfMonth);
+            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
+                paymentCategory, false, null);
 
             return ObjectMapper.Map<HousingPaymentPlanGroupDto>(housingPaymentPlanGroup);
         }

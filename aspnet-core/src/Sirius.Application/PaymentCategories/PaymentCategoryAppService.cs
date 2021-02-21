@@ -7,16 +7,13 @@ using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
-using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.Localization;
 using Abp.Localization.Sources;
 using Abp.Runtime.Session;
-using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories.Dto;
-using Sirius.People.Dto;
 using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
@@ -45,19 +42,56 @@ namespace Sirius.PaymentCategories
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
-        public override async Task<PaymentCategoryDto> CreateAsync(CreatePaymentCategoryDto input)
+        public async Task<PaymentCategoryDto> CreateIncomeAsync(CreateIncomePaymentCategoryDto input)
         {
             CheckCreatePermission();
-            if (input.HousingDueType == HousingDueType.RegularHousingDue)
-            {
-                throw new UserFriendlyException("Geçersiz aidat ödemesi tipi");
-            }
 
-            var paymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+            var paymentCategory = PaymentCategory.CreateIncome(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.PaymentCategoryName, input.HousingDueType, input.IsValidForAllPeriods,
-                input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
+                input.DefaultToPaymentAccountId);
+
             await _paymentCategoryManager.CreateAsync(paymentCategory);
             return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
+        }
+
+        public async Task<PaymentCategoryDto> CreateExpenseAsync(CreateExpensePaymentCategoryDto input)
+        {
+            CheckCreatePermission();
+
+            var paymentCategory = PaymentCategory.CreateExpense(SequentialGuidGenerator.Instance.Create(),
+                AbpSession.GetTenantId(), input.PaymentCategoryName, input.IsValidForAllPeriods,
+                input.DefaultFromPaymentAccountId);
+
+            await _paymentCategoryManager.CreateAsync(paymentCategory);
+            return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
+        }
+
+        public async Task<PaymentCategoryDto> CreateTransferAsync(CreateTransferPaymentCategoryDto input)
+        {
+            CheckCreatePermission();
+
+            var paymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+                AbpSession.GetTenantId(), input.PaymentCategoryName, null, input.IsValidForAllPeriods,
+                input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
+
+            await _paymentCategoryManager.CreateAsync(paymentCategory);
+            return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
+        }
+
+        public override async Task<PaymentCategoryDto> CreateAsync(CreatePaymentCategoryDto input)
+        {
+            throw new NotSupportedException();
+            // CheckCreatePermission();
+            // if (input.HousingDueType == HousingDueType.RegularHousingDue)
+            // {
+            //     throw new UserFriendlyException("Geçersiz aidat ödemesi tipi");
+            // }
+            //
+            // var paymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
+            //     AbpSession.GetTenantId(), input.PaymentCategoryName, input.HousingDueType, input.IsValidForAllPeriods,
+            //     input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
+            // await _paymentCategoryManager.CreateAsync(paymentCategory);
+            // return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
         }
 
         public override async Task<PaymentCategoryDto> UpdateAsync(UpdatePaymentCategoryDto input)
@@ -122,17 +156,29 @@ namespace Sirius.PaymentCategories
             return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
         }
 
+        public async Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync()
+        {
+            CheckGetAllPermission();
+
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.IsActive && p.ShowInLists)
+                .OrderBy(p => p.PaymentCategoryType)
+                .ToListAsync();
+
+            return ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories);
+        }
+
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives)
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
                 .Where(p => p.ShowInLists)
                 .WhereIf(onlyActives, p => p.IsActive)
                 .ToListAsync();
 
             return
-                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
                     select new LookUpDto(l.Id.ToString(),
                         _localizationSource.GetString(l.PaymentCategoryName)))
                 .ToList();
@@ -143,12 +189,12 @@ namespace Sirius.PaymentCategories
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAll()
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
                 .Where(p => p.ShowInLists && p.IsActive && p.IsValidForAllPeriods == false)
                 .ToListAsync();
 
             return
-                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
                     select new LookUpDto(l.Id.ToString(),
                         _localizationSource.GetString(l.PaymentCategoryName)))
                 .ToList();

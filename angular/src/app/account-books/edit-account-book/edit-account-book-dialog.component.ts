@@ -26,6 +26,8 @@ import {
   AccountBookFileDto,
   HousingServiceProxy,
   PaymentCategoryLookUpDto,
+  PaymentCategoryDto,
+  PaymentCategoryType,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
@@ -45,6 +47,8 @@ export class EditAccountBookDialogComponent
   id: string;
 
   accountBook = new AccountBookDto();
+  paymentCategory = new PaymentCategoryDto();
+  PaymentCategoryTypeEnum = PaymentCategoryType;
 
   housing = new HousingDto();
   paymentAccounts: LookUpDto[];
@@ -106,6 +110,12 @@ export class EditAccountBookDialogComponent
       .subscribe((result: AccountBookDto) => {
         this.accountBook = result;
         this.processDate = this.accountBook.processDateTime.toDate();
+
+        this._paymentCategoryServiceProxy
+        .get(this.accountBook.paymentCategoryId)
+        .subscribe((paymentCategory: PaymentCategoryDto) => {
+          this.paymentCategory = paymentCategory;
+        })
 
         if (this.accountBook.encashmentHousing) {
           this._housingServiceProxy

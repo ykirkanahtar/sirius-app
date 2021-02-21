@@ -18,6 +18,8 @@ namespace Sirius.PaymentCategories.Dto
         public Guid? DefaultFromPaymentAccountId { get; set; }
         public Guid? DefaultToPaymentAccountId { get; set; }
         
+        public PaymentCategoryType PaymentCategoryType { get; set; }
+        
         public string DefaultFromPaymentAccountName { get; set; }
         public string DefaultToPaymentAccountName { get; set; }
     }
