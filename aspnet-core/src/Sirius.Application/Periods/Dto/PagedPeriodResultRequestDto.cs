@@ -7,7 +7,7 @@ namespace Sirius.Periods.Dto
     public class PagedPeriodResultRequestDto : PagedAndSortedResultRequestDto
     {
         public string Name { get; set; }
-        public PeriodFor PeriodFor { get; set; }
+        public SiteOrBlock SiteOrBlock { get; set; }
         public Guid? BlockId { get; set; }
     }
 }

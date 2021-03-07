@@ -33,7 +33,7 @@ namespace Sirius.Periods
         {
             //Yeni başlayacak dönemden daha yeni dönem varsa hata fırlatılıyor
             var newerPeriods = await _periodRepository.GetAll()
-                .Where(p => p.PeriodFor == period.PeriodFor && p.StartDate >= period.StartDate).ToListAsync();
+                .Where(p => p.SiteOrBlock == period.SiteOrBlock && p.StartDate >= period.StartDate).ToListAsync();
 
             if (newerPeriods.Any())
             {
@@ -43,9 +43,9 @@ namespace Sirius.Periods
             //Active olan dönem bulunuyor ve kayıtlarda varsa kapatılıyor
             var activePeriod = await _periodRepository.GetAll()
                 .Where(p => p.IsActive)
-                .WhereIf(period.PeriodFor == PeriodFor.Block,
-                    p => p.PeriodFor == PeriodFor.Block && p.BlockId == period.BlockId)
-                .WhereIf(period.PeriodFor == PeriodFor.Site, p => p.PeriodFor == PeriodFor.Site)
+                .WhereIf(period.SiteOrBlock == SiteOrBlock.Block,
+                    p => p.SiteOrBlock == SiteOrBlock.Block && p.BlockId == period.BlockId)
+                .WhereIf(period.SiteOrBlock == SiteOrBlock.Site, p => p.SiteOrBlock == SiteOrBlock.Site)
                 .SingleOrDefaultAsync();
 
             activePeriod?.ClosePeriod(period.StartDate);

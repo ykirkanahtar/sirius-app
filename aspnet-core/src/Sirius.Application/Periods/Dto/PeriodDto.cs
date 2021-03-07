@@ -12,7 +12,7 @@ namespace Sirius.Periods.Dto
         public DateTime StartDate { get; set; }
         public bool IsActive { get;  set; }
         public DateTime? EndDate { get; set; }
-        public PeriodFor PeriodFor { get; set; }
+        public SiteOrBlock SiteOrBlock { get; set; }
         public Guid? BlockId { get; set; }
     }
 }

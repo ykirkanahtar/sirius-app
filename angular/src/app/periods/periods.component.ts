@@ -13,7 +13,7 @@ import {
   PeriodServiceProxy,
   PeriodDtoPagedResultDto,
   LookUpDto,
-  PeriodFor,
+  SiteOrBlock,
   BlockServiceProxy,
 } from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
@@ -47,8 +47,8 @@ export class PeriodsComponent
   periods: PeriodDto[] = [];
 
   nameFilter: string;
-  periodForItems = [];
-  periodForFilter: number;
+  siteOrBlockItems = [];
+  siteOrBlockFilter: number;
   blockItems = [];
   blockIdFilter: string;
   periodType: PeriodType;
@@ -58,7 +58,7 @@ export class PeriodsComponent
     injector: Injector,
     private _periodService: PeriodServiceProxy,
     private _blockService: BlockServiceProxy,
-    private router: Router,
+    private _router: Router,
     private _modalService: BsModalService
   ) {
     super(injector);
@@ -66,11 +66,11 @@ export class PeriodsComponent
 
   ngOnInit(): void {
 
-    var url = this.router.routerState.snapshot.url;
+    var url = this._router.routerState.snapshot.url;
     this.periodType = url.includes('site') ? PeriodType.Site : PeriodType.Block;
  
-    this.periodForItems = Object.keys(PeriodFor).map(k => ({name: k, value: PeriodFor[k as any]}));
-    this.periodForFilter = PeriodFor.Site;
+    this.siteOrBlockItems = Object.keys(SiteOrBlock).map(k => ({name: k, value: SiteOrBlock[k as any]}));
+    this.siteOrBlockFilter = SiteOrBlock.Site;
     
     this._blockService
     .getBlockLookUp()
@@ -82,11 +82,11 @@ export class PeriodsComponent
   }
 
   createPeriodForSite(): void {
-    this.showCreateOrEditPeriodDialog(PeriodFor.Site);
+    this.showCreateOrEditPeriodDialog(SiteOrBlock.Site);
   }
 
   createPeriodForBlock(): void {
-    this.showCreateOrEditPeriodDialog(PeriodFor.Block);
+    this.showCreateOrEditPeriodDialog(SiteOrBlock.Block);
   }
 
   editPeriod(period: PeriodDto): void {
@@ -110,7 +110,7 @@ export class PeriodsComponent
     this._periodService
       .getAll(
         this.nameFilter,
-        this.periodForFilter,
+        this.siteOrBlockFilter,
         this.blockIdFilter,
         this.sortingColumn,
         request.skipCount,
@@ -145,7 +145,7 @@ export class PeriodsComponent
     );
   }
 
-  private showCreateOrEditPeriodDialog(periodFor?: PeriodFor, id?: string): void {
+  private showCreateOrEditPeriodDialog(siteOrBlock?: SiteOrBlock, id?: string): void {
     let createOrEditPeriodDialog: BsModalRef;
     if (!id) {
       createOrEditPeriodDialog = this._modalService.show(
@@ -153,7 +153,7 @@ export class PeriodsComponent
         {
           class: 'modal-lg',
           initialState: {
-            periodFor: periodFor,
+            siteOrBlock: siteOrBlock,
           },
         }
       );

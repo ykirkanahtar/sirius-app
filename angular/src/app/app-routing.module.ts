@@ -91,12 +91,18 @@ import { PeriodsComponent } from './periods/periods.component';
             data: { permission: 'Pages.PeriodsForSite' },
             canActivate: [AppRouteGuard],
           },
-          {
-            path: 'block-periods',
-            component: PeriodsComponent,
-            data: { permission: 'Pages.PeriodsForBlock' },
-            canActivate: [AppRouteGuard],
-          },          
+          // {
+          //   path: 'create-period',
+          //   component: CreatePeriodComponent,
+          //   data: { permission: 'Pages.CreatePeriodForSite' },
+          //   canActivate: [AppRouteGuard],
+          // },
+          // {
+          //   path: 'block-periods',
+          //   component: PeriodsComponent,
+          //   data: { permission: 'Pages.PeriodsForBlock' },
+          //   canActivate: [AppRouteGuard],
+          // },          
           {
             path: 'users',
             component: UsersComponent,
