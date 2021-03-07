@@ -58,7 +58,7 @@ export class PeriodsComponent
     injector: Injector,
     private _periodService: PeriodServiceProxy,
     private _blockService: BlockServiceProxy,
-    private router: Router,
+    private _router: Router,
     private _modalService: BsModalService
   ) {
     super(injector);
@@ -66,7 +66,7 @@ export class PeriodsComponent
 
   ngOnInit(): void {
 
-    var url = this.router.routerState.snapshot.url;
+    var url = this._router.routerState.snapshot.url;
     this.periodType = url.includes('site') ? PeriodType.Site : PeriodType.Block;
  
     this.periodForItems = Object.keys(PeriodFor).map(k => ({name: k, value: PeriodFor[k as any]}));
@@ -82,7 +82,7 @@ export class PeriodsComponent
   }
 
   createPeriodForSite(): void {
-    this.showCreateOrEditPeriodDialog(PeriodFor.Site);
+    this._router.navigate(['/app/create-period']);
   }
 
   createPeriodForBlock(): void {

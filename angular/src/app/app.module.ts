@@ -86,7 +86,9 @@ import { HousingPaymentPlanGroupsComponent } from "./housing-payment-plan-groups
 import { CreateHousingPaymentPlanGroupDialogComponent } from "./housing-payment-plan-groups/create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component";
 import { EditHousingPaymentPlanGroupDialogComponent } from "./housing-payment-plan-groups/edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component";
 import { PeriodsComponent } from "./periods/periods.component";
+import { CreatePeriodComponent } from "./periods/create-period/create-period.component";
 import { CreatePeriodDialogComponent } from "./periods/create-period/create-period-dialog.component";
+import { CreateHousingPaymentPlanGroupForPeriodDialogComponent } from "./periods/create-period/create-housing-payment-plan-group-for-period-dialog.component";
 import { EditPeriodDialogComponent } from "./periods/edit-period/edit-period-dialog.component";
 import { defineLocale } from "ngx-bootstrap/chronos";
 import { trLocale } from "ngx-bootstrap/locale";
@@ -155,6 +157,8 @@ import { trLocale } from "ngx-bootstrap/locale";
     EditAccountBookDialogComponent,
     PeriodsComponent,
     CreatePeriodDialogComponent,
+    CreateHousingPaymentPlanGroupForPeriodDialogComponent,
+    CreatePeriodComponent,
     EditPeriodDialogComponent,
   ],
   imports: [

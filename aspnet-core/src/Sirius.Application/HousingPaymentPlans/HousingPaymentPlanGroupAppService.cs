@@ -29,8 +29,6 @@ namespace Sirius.HousingPaymentPlans
     {
         private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IHousingPaymentPlanGroupManager _housingPaymentPlanGroupManager;
-        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
-        private readonly IHousingManager _housingManager;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
@@ -38,24 +36,20 @@ namespace Sirius.HousingPaymentPlans
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public HousingPaymentPlanGroupAppService(
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
             IHousingPaymentPlanGroupManager housingPaymentPlanGroupManager,
-            IHousingPaymentPlanManager housingPaymentPlanManager, IHousingManager housingManager,
             IRepository<Housing, Guid> housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository,
             IPaymentCategoryManager paymentCategoryManager, IRepository<Person, Guid> personRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<HousingPerson, Guid> housingPersonRepository,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository, IUnitOfWorkManager unitOfWorkManager)
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository)
             : base(housingPaymentPlanGroupRepository)
         {
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _housingPaymentPlanGroupManager = housingPaymentPlanGroupManager;
-            _housingPaymentPlanManager = housingPaymentPlanManager;
-            _housingManager = housingManager;
             _housingRepository = housingRepository;
             _housingCategoryRepository = housingCategoryRepository;
             _paymentCategoryManager = paymentCategoryManager;
@@ -63,7 +57,6 @@ namespace Sirius.HousingPaymentPlans
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingPersonRepository = housingPersonRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
-            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public override async Task<HousingPaymentPlanGroupDto> CreateAsync(

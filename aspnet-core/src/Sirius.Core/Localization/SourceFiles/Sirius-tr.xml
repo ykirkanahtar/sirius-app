@@ -109,6 +109,7 @@
     <text name="AccountBooks">İşletme Defteri</text>
     <text name="AccountBooksMenu">İşletme Defteri (Menü)</text>
     <text name="AccountName">Hesap adı</text>
+    <text name="AddedSuccessfully">Başarıyla eklendi</text>
     <text name="AdditionalHousingDue">Ek Aidat</text>
     <text name="AdditionalHousingDueForOwner">Konut sahipleri için ek aidat ödemesi</text>
     <text name="AdditionalHousingDueForResident">İkamet edenler için ek aidat ödemesi</text>
@@ -189,6 +190,7 @@
     <text name="DeletePaymentCategory">Ödeme türü sil</text>
     <text name="DeletePeriod">Dönem sil</text>
     <text name="DeletePerson">Kişi sil</text>
+    <text name="DeleteWarningMessage">Bu kaydı silmek istediğinize emin misiniz?</text>
     <text name="Description">Açıklama</text>
     <text name="Details">Detaylar</text>
     <text name="DocumentDateTime">Belge Tarihi</text>
@@ -243,6 +245,7 @@
     <text name="HousingPaymentPlanGroupNameShort">Ödeme Planı</text>
     <text name="HousingPaymentPlanGroupsMenu">Aidat Ödeme Planları (Menü)</text>
     <text name="HousingPaymentPlanGroups">Aidat Ödeme Planları</text>
+    <text name="HousingPaymentPlanGroupStartDateCanNotBeSmallThanPeriodStartDate">Aidat Ödeme Planı başlangıç tarihi, dönem başlangıç tarihinden önce olamaz.</text>
     <text name="HousingPersonDeleteWarningMessage">Kişi tanımını kaldırmak istediğinize emin misiniz?</text>
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
@@ -257,6 +260,7 @@
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
     <text name="Netting">Mahsuplaşma</text>
+    <text name="NoDataFound">Veri bulunamadı</text>
     <text name="OtherPayment">Diğer işlemler</text>
     <text name="OtherPayments">Diğer ödemeler</text>
     <text name="PaymentAccount">Ödeme hesabı</text>
@@ -294,6 +298,7 @@
     <text name="RemovePerson">Kişi tanımını kaldır</text>
     <text name="SalaryPayment">Maaş ödemesi</text>
     <text name="SelectDate">Tarih Seçiniz</text>
+    <text name="SelectHousingPaymentPlans">Konut ödeme planı gir</text>
     <text name="SiteManagement">Site Yönetimi</text>
     <text name="StartDate">Başlangıç Tarihi</text>
     <text name="StartDateShort">Baş. Tarihi</text>
