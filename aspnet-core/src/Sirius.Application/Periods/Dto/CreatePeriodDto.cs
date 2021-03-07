@@ -10,12 +10,12 @@ namespace Sirius.Periods.Dto
         public CreatePeriodDto()
         {
             PaymentCategories = new List<Guid>();
-            HousingPaymentPlanGroups = new List<CreateHousingPaymentPlanGroupDto>();
         }
+        
         public string Name { get; set; }
         public DateTime StartDate { get; set; }
-        public Guid DefaultPaymentAccountIdForRegularHousingDue { get; set; }
+        public DateTime? EndDate { get; set; }
+        
         public List<Guid> PaymentCategories { get; set; }
-        public List<CreateHousingPaymentPlanGroupDto> HousingPaymentPlanGroups { get; set; }
     }
 }

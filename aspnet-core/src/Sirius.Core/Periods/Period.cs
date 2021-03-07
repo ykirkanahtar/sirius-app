@@ -25,28 +25,28 @@ namespace Sirius.Periods
         [Required] public DateTime StartDate { get; private set; }
         public bool IsActive { get; set; }
         public DateTime? EndDate { get; private set; }
-        public PeriodFor PeriodFor { get; set; }
+        public SiteOrBlock SiteOrBlock { get; set; }
         public Guid? BlockId { get; set; }
 
-        public static Period CreateForSite(Guid id, int tenantId, [NotNull] string name, DateTime startDate)
+        public static Period CreateForSite(Guid id, int tenantId, [NotNull] string name, DateTime startDate, DateTime? endDate)
         {
-            return BindEntity(new Period(), id, tenantId, name, startDate, true, PeriodFor.Site, null);
+            return BindEntity(new Period(), id, tenantId, name, startDate, true, SiteOrBlock.Site, null, endDate);
         }
         
-        public static Period CreateForBlock(Guid id, int tenantId, [NotNull] string name, DateTime startDate, Block block)
+        public static Period CreateForBlock(Guid id, int tenantId, [NotNull] string name, DateTime startDate, DateTime? endDate, Block block)
         {
-            return BindEntity(new Period(), id, tenantId, name, startDate, true, PeriodFor.Block, block.Id);
+            return BindEntity(new Period(), id, tenantId, name, startDate, true, SiteOrBlock.Block, block.Id, endDate);
         }
 
-        public static Period Update(Period existingPeriod, [NotNull] string name)
+        public static Period Update(Period existingPeriod, [NotNull] string name, DateTime startDate, DateTime? endDate)
         {
             return BindEntity(existingPeriod, existingPeriod.Id, existingPeriod.TenantId, name,
-                existingPeriod.StartDate, existingPeriod.IsActive, existingPeriod.PeriodFor, existingPeriod.BlockId,
-                existingPeriod.EndDate);
+                startDate, existingPeriod.IsActive, existingPeriod.SiteOrBlock, existingPeriod.BlockId,
+                endDate);
         }
 
         private static Period BindEntity(Period period, Guid id, int tenantId, string name, DateTime startDate,
-            bool isActive, PeriodFor periodFor, Guid? blockId,
+            bool isActive, SiteOrBlock siteOrBlock, Guid? blockId,
             DateTime? endDate = null)
         {
             Check.NotNull(name, nameof(name));
@@ -60,7 +60,7 @@ namespace Sirius.Periods
             period.StartDate = startDate;
             period.IsActive = isActive;
             period.EndDate = endDate;
-            period.PeriodFor = periodFor;
+            period.SiteOrBlock = siteOrBlock;
             period.BlockId = blockId;
 
             return period;

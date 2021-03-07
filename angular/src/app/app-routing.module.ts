@@ -18,7 +18,6 @@ import { PaymentCategoriesComponent } from './payment-categories/payment-categor
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
 import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
 import { PeriodsComponent } from './periods/periods.component';
-import { CreatePeriodComponent } from './periods/create-period/create-period.component';
 
 @NgModule({
   imports: [
@@ -92,18 +91,18 @@ import { CreatePeriodComponent } from './periods/create-period/create-period.com
             data: { permission: 'Pages.PeriodsForSite' },
             canActivate: [AppRouteGuard],
           },
-          {
-            path: 'create-period',
-            component: CreatePeriodComponent,
-            data: { permission: 'Pages.CreatePeriodForSite' },
-            canActivate: [AppRouteGuard],
-          },
-          {
-            path: 'block-periods',
-            component: PeriodsComponent,
-            data: { permission: 'Pages.PeriodsForBlock' },
-            canActivate: [AppRouteGuard],
-          },          
+          // {
+          //   path: 'create-period',
+          //   component: CreatePeriodComponent,
+          //   data: { permission: 'Pages.CreatePeriodForSite' },
+          //   canActivate: [AppRouteGuard],
+          // },
+          // {
+          //   path: 'block-periods',
+          //   component: PeriodsComponent,
+          //   data: { permission: 'Pages.PeriodsForBlock' },
+          //   canActivate: [AppRouteGuard],
+          // },          
           {
             path: 'users',
             component: UsersComponent,
