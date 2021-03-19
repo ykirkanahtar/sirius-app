@@ -5,6 +5,7 @@ using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using JetBrains.Annotations;
 using Sirius.Housings;
+using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 
 namespace Sirius.HousingPaymentPlans
@@ -14,7 +15,6 @@ namespace Sirius.HousingPaymentPlans
     {
         protected HousingPaymentPlanGroup()
         {
-            
         }
 
         public int TenantId { get; set; }
@@ -26,14 +26,14 @@ namespace Sirius.HousingPaymentPlans
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
         public string Description { get; private set; }
-        
+
         [ForeignKey(nameof(HousingCategoryId))]
         public virtual HousingCategory HousingCategory { get; protected set; }
-        
+
         [ForeignKey(nameof(PaymentCategoryId))]
         public virtual PaymentCategory PaymentCategory { get; protected set; }
-        
-        [ForeignKey(nameof(HousingPaymentPlan.HousingPaymentPlanGroupId))] 
+
+        [ForeignKey(nameof(HousingPaymentPlan.HousingPaymentPlanGroupId))]
         public virtual ICollection<HousingPaymentPlan> HousingPaymentPlans { get; set; }
 
         public static HousingPaymentPlanGroup Create(Guid id,
@@ -41,7 +41,8 @@ namespace Sirius.HousingPaymentPlans
             PaymentCategory paymentCategory, decimal amountPerMonth, int countOfMonth, int paymentDayOfMonth,
             DateTime startDate, string description)
         {
-            return BindEntity(new HousingPaymentPlanGroup(), id, tenantId, housingPaymentPlanGroupName,
+            return BindEntity(new HousingPaymentPlanGroup(), id, tenantId,
+                housingPaymentPlanGroupName,
                 housingCategory.Id, paymentCategory.Id, amountPerMonth, countOfMonth, paymentDayOfMonth, startDate,
                 description);
         }
@@ -49,15 +50,15 @@ namespace Sirius.HousingPaymentPlans
         public static HousingPaymentPlanGroup Update(HousingPaymentPlanGroup existingHousingPaymentPlanGroup,
             [NotNull] string housingPaymentPlanGroupName)
         {
-            return BindEntity(existingHousingPaymentPlanGroup, 
-                existingHousingPaymentPlanGroup.Id, 
-                existingHousingPaymentPlanGroup.TenantId, 
+            return BindEntity(existingHousingPaymentPlanGroup,
+                existingHousingPaymentPlanGroup.Id,
+                existingHousingPaymentPlanGroup.TenantId,
                 housingPaymentPlanGroupName,
-                existingHousingPaymentPlanGroup.HousingCategoryId, 
-                existingHousingPaymentPlanGroup.PaymentCategoryId, 
-                existingHousingPaymentPlanGroup.AmountPerMonth, 
-                existingHousingPaymentPlanGroup.CountOfMonth, 
-                existingHousingPaymentPlanGroup.PaymentDayOfMonth, 
+                existingHousingPaymentPlanGroup.HousingCategoryId,
+                existingHousingPaymentPlanGroup.PaymentCategoryId,
+                existingHousingPaymentPlanGroup.AmountPerMonth,
+                existingHousingPaymentPlanGroup.CountOfMonth,
+                existingHousingPaymentPlanGroup.PaymentDayOfMonth,
                 existingHousingPaymentPlanGroup.StartDate,
                 existingHousingPaymentPlanGroup.Description);
         }

@@ -11,11 +11,10 @@ namespace Sirius.HousingPaymentPlans.Dto
         public Guid HousingCategoryId { get; set; }
         public decimal AmountPerMonth { get; set; }
         public int CountOfMonth { get; set; }
-        
+        public Guid DefaultToPaymentAccountId { get; set; }
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
         public string Description { get; set; }
-        public Guid PaymentCategoryId { get; set; }
         
         public void Normalize()
         {

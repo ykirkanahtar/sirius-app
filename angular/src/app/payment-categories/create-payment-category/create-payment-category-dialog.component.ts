@@ -18,7 +18,6 @@ import {
   CreateIncomePaymentCategoryDto,
   CreateExpensePaymentCategoryDto,
   CreateTransferPaymentCategoryDto,
-  HousingDueType,
 } from "@shared/service-proxies/service-proxies";
 
 @Component({
@@ -32,7 +31,6 @@ export class CreatePaymentCategoryDialogComponent
   paymentAccounts: LookUpDto[];
   paymentCategoryType: PaymentCategoryType;
   PaymentCategoryTypeEnum = PaymentCategoryType;
-  HousingDueTypeEnum = HousingDueType;
   title: string;
   housingDue: boolean;
 

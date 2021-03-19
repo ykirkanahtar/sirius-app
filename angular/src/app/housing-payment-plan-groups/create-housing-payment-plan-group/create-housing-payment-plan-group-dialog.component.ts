@@ -14,8 +14,7 @@ import {
   HousingCategoryServiceProxy,
   LookUpDto,
   HousingPaymentPlanGroupServiceProxy,
-  PaymentCategoryServiceProxy,
-  PaymentCategoryDto,
+  PaymentAccountServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
 import { BsModalRef } from "ngx-bootstrap/modal";
@@ -29,7 +28,7 @@ export class CreateHousingPaymentPlanGroupDialogComponent
   saving = false;
   input = new CreateHousingPaymentPlanGroupDto();
   housingCategories: LookUpDto[];
-  paymentCategories: LookUpDto[];
+  paymentAccounts: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -37,7 +36,7 @@ export class CreateHousingPaymentPlanGroupDialogComponent
     injector: Injector,
     private _housingPaymentPlanGroupService: HousingPaymentPlanGroupServiceProxy,
     private _housingCategoryService: HousingCategoryServiceProxy,
-    private _paymentCategoryService: PaymentCategoryServiceProxy,
+    private _paymentAccountService: PaymentAccountServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
@@ -50,16 +49,10 @@ export class CreateHousingPaymentPlanGroupDialogComponent
         this.housingCategories = result;
       });
 
-    this._paymentCategoryService
-      .getHousingDuePaymentCategoryLookUp(true)
+    this._paymentAccountService
+      .getPaymentAccountLookUp()
       .subscribe((result: LookUpDto[]) => {
-        this.paymentCategories = result;
-      });
-
-    this._paymentCategoryService
-      .getRegularHousingDue()
-      .subscribe((result: PaymentCategoryDto) => {
-        this.input.paymentCategoryId = result.id;
+        this.paymentAccounts = result;
       });
   }
 

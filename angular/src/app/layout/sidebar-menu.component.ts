@@ -123,12 +123,12 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             'far fa-clock',
             'Pages.PeriodsForSite'
           ),
-          new MenuItem(
-            this.l('PeriodsForBlockMenu'),
-            '/app/block-periods',
-            'far fa-clock',
-            'Pages.PeriodsForBlock'
-          ),
+          // new MenuItem(
+          //   this.l('PeriodsForBlockMenu'),
+          //   '/app/block-periods',
+          //   'far fa-clock',
+          //   'Pages.PeriodsForBlock'
+          // ),
         ]),
       new MenuItem(
         this.l('Administration'),

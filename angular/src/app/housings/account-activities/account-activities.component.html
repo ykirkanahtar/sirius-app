@@ -45,14 +45,18 @@
                         {{ "Date" | localize }}
                         <p-sortIcon field="date"></p-sortIcon>
                       </th>
-                      <th pSortableColumn="paymentPlanType">
-                        {{ "PaymentPlanType" | localize }}
-                        <p-sortIcon field="paymentPlanType"></p-sortIcon>
+                      <th pSortableColumn="creditOrDebt">
+                        {{ "CreditOrDebt" | localize }}
+                        <p-sortIcon field="creditOrDebt"></p-sortIcon>
                       </th>
                       <th pSortableColumn="paymentCategory.paymentCategoryName">
                         {{ "PaymentCategory" | localize }}
                         <p-sortIcon field="paymentCategory.paymentCategoryName"></p-sortIcon>
                       </th>
+                      <th pSortableColumn="housingPaymentPlanType">
+                        {{ "HousingPaymentPlanType" | localize }}
+                        <p-sortIcon field="housingPaymentPlanType"></p-sortIcon>
+                      </th>                      
                       <th pSortableColumn="amount">
                         {{ "Amount" | localize }}
                         <p-sortIcon field="amount"></p-sortIcon>
@@ -64,20 +68,13 @@
                       <td>
                         {{ housingPaymentPlan.date.format("DD-MM-YYYY") }}
                       </td>
+                      <td>{{ creditOrDebtEnum[housingPaymentPlan.creditOrDebt] | localize}}</td>
                       <td>
                         {{
-                          (housingPaymentPlan.paymentPlanType ==
-                          paymentPlanTypeEnum.Debt
-                            ? "DebtTextForHousingPaymentPlan"
-                            : "CreditTextForHousingPaymentPlan"
-                          ) | localize
+                          housingPaymentPlan.paymentCategory ? (housingPaymentPlan.paymentCategory.paymentCategoryName | localize) : ''
                         }}
                       </td>
-                      <td>
-                        {{
-                          housingPaymentPlan.paymentCategory.paymentCategoryName | localize
-                        }}
-                      </td>
+                      <td>{{ housingPaymentPlanTypeEnum[housingPaymentPlan.housingPaymentPlanType] | localize}}</td>
                       <td>{{ housingPaymentPlan.amount | number: "1.2-2" }}</td>
                     </tr>
                   </ng-template>

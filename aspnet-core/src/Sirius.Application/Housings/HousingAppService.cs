@@ -20,6 +20,7 @@ using Sirius.PaymentCategories;
 using Sirius.People;
 using Sirius.People.Dto;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {
@@ -60,53 +61,66 @@ namespace Sirius.Housings
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
         {
-            CheckCreatePermission();
-            var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
-            var block = await _blockRepository.GetAsync(input.BlockId);
-
-            var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
-                AbpSession.GetTenantId(),
-                block, input.Apartment, housingCategory, input.TenantIsResiding);
-
-            if (input.CreateTransferForHousingDue.Amount != 0)
+            try
             {
-                housing = input.CreateTransferForHousingDue.IsDebt
-                    ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount)
-                    : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount);
+                CheckCreatePermission();
+                var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
+                var block = await _blockRepository.GetAsync(input.BlockId);
+
+                var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
+                    AbpSession.GetTenantId(),
+                    block, input.Apartment, housingCategory, input.TenantIsResiding);
+
+                if (input.CreateTransferForHousingDue.Amount != 0)
+                {
+                    housing = input.CreateTransferForHousingDue.IsDebt
+                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount)
+                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount);
+                }
+
+                await _housingManager.CreateAsync(housing);
+
+                if (input.CreateTransferForHousingDue.Amount != 0)
+                {
+                    // var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
+                    // var paymentCategory = await _paymentCategoryManager.GetAsync(input.CreateTransferForHousingDue.PaymentCategoryId);
+
+                    var housingPaymentPlan = input.CreateTransferForHousingDue.IsDebt
+                        ? HousingPaymentPlan.CreateDebt(
+                            SequentialGuidGenerator.Instance.Create()
+                            , AbpSession.GetTenantId()
+                            , null
+                            , housing
+                            , null
+                            , input.CreateTransferForHousingDue.Date
+                            , input.CreateTransferForHousingDue.Amount
+                            , input.CreateTransferForHousingDue.Description
+                            , HousingPaymentPlanType.Transfer
+                            , null
+                        )
+                        : HousingPaymentPlan.CreateCredit(
+                            SequentialGuidGenerator.Instance.Create()
+                            , AbpSession.GetTenantId()
+                            , housing
+                            , null
+                            , input.CreateTransferForHousingDue.Date
+                            , input.CreateTransferForHousingDue.Amount
+                            , input.CreateTransferForHousingDue.Description
+                            , null
+                            , HousingPaymentPlanType.Transfer
+                            , null
+                        );
+
+                    await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
+                }
+
+                return ObjectMapper.Map<HousingDto>(housing);
             }
-
-            await _housingManager.CreateAsync(housing);
-
-            if (input.CreateTransferForHousingDue.Amount != 0)
+            catch (Exception e)
             {
-                var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
-
-                var housingPaymentPlan = input.CreateTransferForHousingDue.IsDebt
-                    ? HousingPaymentPlan.CreateDebt(
-                        SequentialGuidGenerator.Instance.Create()
-                        , AbpSession.GetTenantId()
-                        , null
-                        , housing
-                        , paymentCategory
-                        , input.CreateTransferForHousingDue.Date
-                        , input.CreateTransferForHousingDue.Amount
-                        , input.CreateTransferForHousingDue.Description
-                    )
-                    : HousingPaymentPlan.CreateCredit(
-                        SequentialGuidGenerator.Instance.Create()
-                        , AbpSession.GetTenantId()
-                        , housing
-                        , paymentCategory
-                        , input.CreateTransferForHousingDue.Date
-                        , input.CreateTransferForHousingDue.Amount
-                        , input.CreateTransferForHousingDue.Description
-                        , null
-                    );
-
-                await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
+                Console.WriteLine(e);
+                throw;
             }
-
-            return ObjectMapper.Map<HousingDto>(housing);
         }
 
         public override async Task<HousingDto> UpdateAsync(UpdateHousingDto input)

@@ -14,12 +14,14 @@ import {
   PeriodServiceProxy,
   CreatePeriodForSiteDto,
   CreatePeriodForBlockDto,
-  PeriodFor,
+  SiteOrBlock,
   BlockServiceProxy,
   LookUpDto,
   PaymentCategoryServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { SelectItem } from "primeng/api";
+import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "create-period-dialog.component.html",
@@ -29,10 +31,11 @@ export class CreatePeriodDialogComponent
   implements OnInit {
   saving = false;
   period = new PeriodDto();
-  periodFor: PeriodFor;
-  periodForEnum = PeriodFor;
+  siteOrBlock: SiteOrBlock;
+  siteOrBlockEnum = SiteOrBlock;
   blockItems = [];
   selectedBlock: string;
+  startDate: Date;
 
   paymentCategoriesFilter: SelectItem[] = [];
   selectedPaymentCategoriesFilter: string[] = [];
@@ -59,15 +62,19 @@ export class CreatePeriodDialogComponent
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategoriesFilter = result;
       });
+
+    this.startDate = abp.clock.now();
   }
 
   save(): void {
     this.saving = true;
 
-    if (this.periodFor === PeriodFor.Site) {
+    if (this.siteOrBlock === SiteOrBlock.Site) {
       const period = new CreatePeriodForSiteDto();
       period.init(this.period);
       period.paymentCategories = this.selectedPaymentCategoriesFilter;
+
+      period.startDate = CommonFunctions.toMoment(this.startDate);
 
       this._periodService
         .createForSite(period)

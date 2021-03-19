@@ -7,6 +7,7 @@ using Abp.Timing;
 using Abp.UI;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
+using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans
 {
@@ -46,7 +47,7 @@ namespace Sirius.HousingPaymentPlans
                 {
                     if (housing.Balance != 0)
                     {
-                        var paymentCategoryForHousingDueTransfer = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
+                        // var paymentCategoryForHousingDueTransfer = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
 
                         var housingPaymentPlanForHousingDueTransfer = housing.Balance > 0 //Site alacaklı ise
                             ? HousingPaymentPlan.CreateDebt(
@@ -54,19 +55,23 @@ namespace Sirius.HousingPaymentPlans
                                 , housingPaymentPlanGroup.TenantId
                                 , null
                                 , housing
-                                , paymentCategoryForHousingDueTransfer
+                                , paymentCategory
                                 , periodStartDate.Value
                                 , housing.Balance
                                 , string.Empty //Description
+                                , HousingPaymentPlanType.Transfer
+                                , null
                             )
                             : HousingPaymentPlan.CreateCredit(
                                 SequentialGuidGenerator.Instance.Create()
                                 , housingPaymentPlanGroup.TenantId
                                 , housing
-                                , paymentCategoryForHousingDueTransfer
+                                , paymentCategory
                                 , periodStartDate.Value
                                 , housing.Balance
                                 , string.Empty //Description
+                                , null
+                                , HousingPaymentPlanType.Transfer
                                 , null
                             );
                         
@@ -94,6 +99,8 @@ namespace Sirius.HousingPaymentPlans
                         , date
                         , housingPaymentPlanGroup.AmountPerMonth
                         , housingPaymentPlanGroup.Description
+                        , HousingPaymentPlanType.HousingDueDefinition
+                        , null
                     );
 
                     housingPaymentPlans.Add(housingPaymentPlan);

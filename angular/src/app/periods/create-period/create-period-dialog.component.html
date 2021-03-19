@@ -46,14 +46,30 @@
               class="form-control"
               [placeholder]="'SelectDate' | localize"
               bsDatepicker
-              [(ngModel)]="period.startDate"
+              [(ngModel)]="startDate"
               required
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="endDate">
+            {{ "EndDate" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              id="endDate"
+              name="endDate"
+              class="form-control"
+              [placeholder]="'SelectDate' | localize"
+              bsDatepicker
+              [(ngModel)]="period.endDate"
             />
           </div>
         </div>
         <div
           class="form-group row required"
-          *ngIf="periodFor === periodForEnum.Block"
+          *ngIf="siteOrBlock === siteOrBlockEnum.Block"
         >
           <label class="col-md-3 col-form-label" for="block">
             {{ "Block" | localize }}

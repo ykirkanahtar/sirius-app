@@ -25,7 +25,6 @@ import {
   HousingDto,
   AccountBookFileDto,
   HousingServiceProxy,
-  PaymentCategoryLookUpDto,
   PaymentCategoryDto,
   PaymentCategoryType,
 } from "@shared/service-proxies/service-proxies";
@@ -52,7 +51,7 @@ export class EditAccountBookDialogComponent
 
   housing = new HousingDto();
   paymentAccounts: LookUpDto[];
-  paymentCategories: PaymentCategoryLookUpDto[] = [];
+  paymentCategories: LookUpDto[] = [];
   people: LookUpDto[];
 
   newUploadedFileUrls: any[] = [];
@@ -112,10 +111,16 @@ export class EditAccountBookDialogComponent
         this.processDate = this.accountBook.processDateTime.toDate();
 
         this._paymentCategoryServiceProxy
-        .get(this.accountBook.paymentCategoryId)
-        .subscribe((paymentCategory: PaymentCategoryDto) => {
-          this.paymentCategory = paymentCategory;
-        })
+          .get(this.accountBook.paymentCategoryId)
+          .subscribe((paymentCategory: PaymentCategoryDto) => {
+            this.paymentCategory = paymentCategory;
+
+            this._accountBookServiceProxy
+              .getPaymentCategoryLookUpForEditAccountBook(this.id)
+              .subscribe((result: LookUpDto[]) => {
+                this.paymentCategories = result;
+              });
+          });
 
         if (this.accountBook.encashmentHousing) {
           this._housingServiceProxy
@@ -131,12 +136,6 @@ export class EditAccountBookDialogComponent
       .getPaymentAccountLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.paymentAccounts = result;
-      });
-
-    this._accountBookServiceProxy
-      .getPaymentCategoryLookUpForEditAccountBook(this.id)
-      .subscribe((result: PaymentCategoryLookUpDto[]) => {
-        this.paymentCategories = result;
       });
 
     this._personServiceProxy
@@ -168,21 +167,21 @@ export class EditAccountBookDialogComponent
     }
   }
 
-  canEditPaymentCategory(paymentCategoryId: string): boolean {
-    if (paymentCategoryId) {
-      //sayfa yüklenene kadar paymentCategoryId undefined geldiği için bu kontrol eklendi, o zamana kadar da component disabled yapılıyor
+  // canEditPaymentCategory(paymentCategoryId: string): boolean {
+  //   if (paymentCategoryId) {
+  //     //sayfa yüklenene kadar paymentCategoryId undefined geldiği için bu kontrol eklendi, o zamana kadar da component disabled yapılıyor
 
-      let editInAccountBooks = this.paymentCategories
-        .filter(
-          (paymentCategory) => paymentCategory.value === paymentCategoryId
-        )
-        .map((p) => p.editInAccountBook);
+  //     let editInAccountBooks = this.paymentCategories
+  //       .filter(
+  //         (paymentCategory) => paymentCategory.value === paymentCategoryId
+  //       )
+  //       .map((p) => p.editInAccountBook);
 
-      return editInAccountBooks[0];
-    }
+  //     return editInAccountBooks[0];
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   showImages(clickedImages: string) {
     this.display = true;

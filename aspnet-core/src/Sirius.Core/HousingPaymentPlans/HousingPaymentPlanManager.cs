@@ -38,7 +38,7 @@ namespace Sirius.HousingPaymentPlans
         {
             var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(housingPaymentPlanId);
 
-            var amountDiff = existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Credit
+            var amountDiff = existingHousingPaymentPlan.CreditOrDebt == CreditOrDebt.Credit
                 ? Math.Abs(existingHousingPaymentPlan.Amount) - Math.Abs(amount)
                 : Math.Abs(amount) - Math.Abs(existingHousingPaymentPlan.Amount);
 
@@ -48,7 +48,7 @@ namespace Sirius.HousingPaymentPlans
             if (amountDiff != 0)
             {
                 var housing = await _housingRepository.GetAsync(existingHousingPaymentPlan.HousingId);
-                if (existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
+                if (existingHousingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
                 {
                     if (amountDiff > 0)
                         await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff));
@@ -77,7 +77,7 @@ namespace Sirius.HousingPaymentPlans
 
             var housing = await _housingManager.GetAsync(housingPaymentPlan.HousingId);
 
-            if (housingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
+            if (housingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
             {
                 await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount));
             }

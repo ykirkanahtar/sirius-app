@@ -7,8 +7,6 @@ using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
-using Abp.Domain.Uow;
-using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.Localization;
 using Abp.Localization.Sources;
@@ -24,6 +22,8 @@ using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
 using Sirius.PaymentCategories.Dto;
 using Sirius.Shared.Constants;
+using Sirius.Shared.Dtos;
+using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentAccounts
 {
@@ -78,19 +78,28 @@ namespace Sirius.PaymentAccounts
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
-        public override Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
+        public override async Task<AccountBookDto> CreateAsync(CreateAccountBookDto input)
         {
-            throw new NotImplementedException();
+            CheckCreatePermission();
+            if (input.IsHousingDue)
+            {
+                return await CreateHousingDueAsync(input);
+            }
+
+            return await CreateOtherPaymentAsync(input);
         }
 
-        public async Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input)
+        private async Task<AccountBookDto> CreateHousingDueAsync(CreateAccountBookDto input)
         {
             CheckCreatePermission();
             input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
 
-            var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+            // var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+            var housingDuePaymentCategory = await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
+
             var housing = await _housingManager.GetAsync(input.HousingId);
-            var toPaymentAccount = await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId);
+            var toPaymentAccount =
+                await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId.GetValueOrDefault());
 
             var accountBookGuid = SequentialGuidGenerator.Instance.Create();
 
@@ -129,7 +138,7 @@ namespace Sirius.PaymentAccounts
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
-        public async Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input)
+        private async Task<AccountBookDto> CreateOtherPaymentAsync(CreateAccountBookDto input)
         {
             CheckCreatePermission();
             input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
@@ -168,7 +177,7 @@ namespace Sirius.PaymentAccounts
                 accountBookFiles.Add(entity);
             }
 
-            var accountBookType = input.EncachmentFromHousingDue
+            var accountBookType = input.EncachmentFromHousingDue //Mahsuplaşma var mı kontrolü yapılıyor
                 ? AccountBookType.OtherPaymentWithEncachmentForHousingDue
                 : AccountBookType.Other;
 
@@ -189,9 +198,11 @@ namespace Sirius.PaymentAccounts
                 , input.DocumentDateTime
                 , input.DocumentNumber
                 , accountBookFiles
-                , AbpSession.GetUserId());
+                , AbpSession.GetUserId()
+                , false);
 
-            if (input.EncachmentFromHousingDue && input.HousingIdForEncachment.HasValue)
+            if (input.EncachmentFromHousingDue && input.HousingIdForEncachment.HasValue
+            ) //Mahsuplaşma kaydı gerçekleştiriyor
             {
                 if (input.FromPaymentAccountId.HasValue && fromPaymentAccount.TenantIsOwner)
                 {
@@ -237,13 +248,14 @@ namespace Sirius.PaymentAccounts
 
             if (accountBookType == AccountBookType.HousingDue)
             {
-                var createHousingDueAccountBookDto = new CreateHousingDueAccountBookDto
+                var createHousingDueAccountBookDto = new CreateAccountBookDto
                 {
                     ProcessDateTime = input.ProcessDateTime,
                     HousingId = existingAccountBook.HousingId.Value,
                     ToPaymentAccountId = input.ToPaymentAccountId.Value,
                     Amount = input.Amount,
                     Description = input.Description,
+                    PaymentCategoryId = input.PaymentCategoryId,
                     AccountBookFileUrls = accountBookFileUrls
                 };
 
@@ -253,7 +265,7 @@ namespace Sirius.PaymentAccounts
             }
             else
             {
-                var createOtherPaymentAccountBookDto = new CreateOtherPaymentAccountBookDto
+                var createOtherPaymentAccountBookDto = new CreateAccountBookDto
                 {
                     ProcessDateTime = input.ProcessDateTime,
                     PaymentCategoryId = input.PaymentCategoryId,
@@ -327,10 +339,26 @@ namespace Sirius.PaymentAccounts
                     return await DeleteAndCreateAsync(input, existingAccountBook);
                 }
 
+                var paymentCategory =
+                    await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
+                
                 if (input.PaymentCategoryId != existingAccountBook.PaymentCategoryId)
                 {
-                    //TODO eğer sabit kategorilerden biri değilse (aidat ödemesi, devir hareketi gibi), direk update çalıştırılabilir, silinip yeniden oluşturulmasına gerek yok
-                    return await DeleteAndCreateAsync(input, existingAccountBook);
+                    var oldPaymentCategory =
+                        await _paymentCategoryRepository.GetAsync(existingAccountBook.PaymentCategoryId
+                            .GetValueOrDefault());
+
+                    if (oldPaymentCategory.PaymentCategoryType != paymentCategory.PaymentCategoryType ||
+                        oldPaymentCategory.IsHousingDue != paymentCategory.IsHousingDue)
+                    {
+                        throw new UserFriendlyException(
+                            "Ödeme kategorisi, aynı tipte bir ödeme kategorisi ile değiştirilebilir. (Örn. gelir vs gelir ya da gider vs gider)");
+                    }
+
+                    if (oldPaymentCategory.IsHousingDue)
+                    {
+                        return await DeleteAndCreateAsync(input, existingAccountBook);
+                    }
                 }
 
                 var existingHousingPaymentPlan = await _housingPaymetPlanRepository.GetAll()
@@ -370,6 +398,7 @@ namespace Sirius.PaymentAccounts
                     _accountBookPolicy
                     , existingAccountBook
                     , input.ProcessDateTime
+                    , paymentCategory
                     , fromPaymentAccount
                     , toPaymentAccount
                     , input.Amount
@@ -414,103 +443,95 @@ namespace Sirius.PaymentAccounts
         public async Task<PagedAccountBookResultDto> GetAllListAsync(
             PagedAccountBookResultRequestDto input)
         {
-            try
-            {
-                CheckGetAllPermission();
-                var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
+            CheckGetAllPermission();
+            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
 
-                var query = (from accountBook in _accountBookRepository.GetAll()
-                        join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
-                            equals paymentCategory.Id
-                        join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
-                            housing
-                        from subHousing in housing.DefaultIfEmpty()
-                        join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
-                        from subBlock in block.DefaultIfEmpty()
-                        join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
-                            .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
-                        from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
-                        join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
-                                .ToPaymentAccountId
-                            equals toPaymentAccount.Id into toPaymentAccount
-                        from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
-                        join encashmentHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
-                                .HousingIdForEncachment
-                            equals encashmentHousing.Id into
-                            encashmentHousing
-                        from subEncashmentHousing in encashmentHousing.DefaultIfEmpty()
-                        select new
-                        {
-                            accountBook,
-                            paymentCategory,
-                            subHousing,
-                            subBlock,
-                            subFromPaymentAccount,
-                            subToPaymentAccount,
-                            subEncashmentHousing
-                        })
-                    .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
-                    .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
-                    .WhereIf(input.HousingIds.Count > 0,
-                        p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
-                    .WhereIf(input.PaymentCategoryIds.Count > 0,
-                        p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId))
-                    .WhereIf(housingIdsFromPersonFilter.Count > 0,
-                        p => housingIdsFromPersonFilter.Select(s => s.Id)
-                            .Contains(p.accountBook.HousingId ?? Guid.Empty))
-                    .WhereIf(input.FromPaymentAccountIds.Count > 0,
-                        p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
-                    .WhereIf(input.ToPaymentAccountIds.Count > 0,
-                        p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
-                    .Select(p => new AccountBookGetAllOutput
+            var query = (from accountBook in _accountBookRepository.GetAll()
+                    join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
+                        equals paymentCategory.Id
+                    join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
+                        housing
+                    from subHousing in housing.DefaultIfEmpty()
+                    join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
+                    from subBlock in block.DefaultIfEmpty()
+                    join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                        .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
+                    from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
+                    join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
+                            .ToPaymentAccountId
+                        equals toPaymentAccount.Id into toPaymentAccount
+                    from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
+                    join encashmentHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
+                            .HousingIdForEncachment
+                        equals encashmentHousing.Id into
+                        encashmentHousing
+                    from subEncashmentHousing in encashmentHousing.DefaultIfEmpty()
+                    select new
                     {
-                        Id = p.accountBook.Id,
-                        CreationTime = p.accountBook.CreationTime,
-                        CreatorUserId = p.accountBook.CreatorUserId,
-                        LastModificationTime = p.accountBook.LastModificationTime,
-                        LastModifierUserId = p.accountBook.LastModifierUserId,
-                        ProcessDateTime = p.accountBook.ProcessDateTime,
-                        PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
-                        HousingName = p.subHousing != null
-                            ? p.subBlock.BlockName + "-" + p.subHousing.Apartment
-                            : string.Empty,
-                        Amount = p.accountBook.Amount,
-                        FromPaymentAccountName = p.subFromPaymentAccount != null
-                            ? p.subFromPaymentAccount.AccountName
-                            : string.Empty,
-                        ToPaymentAccountName = p.subToPaymentAccount != null
-                            ? p.subToPaymentAccount.AccountName
-                            : string.Empty,
-                        FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
-                        ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
-                        EncashmentHousing = p.accountBook.EncashmentHousing,
-                        EncashmentHousingBlockApartment = p.subEncashmentHousing != null
-                            ? p.subEncashmentHousing.Block.BlockName + ' ' + p.subEncashmentHousing.Apartment
-                            : string.Empty,
-                        SameDayIndex = p.accountBook.SameDayIndex,
-                        AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
-                    });
+                        accountBook,
+                        paymentCategory,
+                        subHousing,
+                        subBlock,
+                        subFromPaymentAccount,
+                        subToPaymentAccount,
+                        subEncashmentHousing
+                    })
+                .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
+                .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
+                .WhereIf(input.HousingIds.Count > 0,
+                    p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
+                .WhereIf(input.PaymentCategoryIds.Count > 0,
+                    p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId.GetValueOrDefault()))
+                .WhereIf(housingIdsFromPersonFilter.Count > 0,
+                    p => housingIdsFromPersonFilter.Select(s => s.Id)
+                        .Contains(p.accountBook.HousingId ?? Guid.Empty))
+                .WhereIf(input.FromPaymentAccountIds.Count > 0,
+                    p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
+                .WhereIf(input.ToPaymentAccountIds.Count > 0,
+                    p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
+                .Select(p => new AccountBookGetAllOutput
+                {
+                    Id = p.accountBook.Id,
+                    CreationTime = p.accountBook.CreationTime,
+                    CreatorUserId = p.accountBook.CreatorUserId,
+                    LastModificationTime = p.accountBook.LastModificationTime,
+                    LastModifierUserId = p.accountBook.LastModifierUserId,
+                    ProcessDateTime = p.accountBook.ProcessDateTime,
+                    PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
+                    HousingName = p.subHousing != null
+                        ? p.subBlock.BlockName + "-" + p.subHousing.Apartment
+                        : string.Empty,
+                    Amount = p.accountBook.Amount,
+                    FromPaymentAccountName = p.subFromPaymentAccount != null
+                        ? p.subFromPaymentAccount.AccountName
+                        : string.Empty,
+                    ToPaymentAccountName = p.subToPaymentAccount != null
+                        ? p.subToPaymentAccount.AccountName
+                        : string.Empty,
+                    FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
+                    ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
+                    EncashmentHousing = p.accountBook.EncashmentHousing,
+                    EncashmentHousingBlockApartment = p.subEncashmentHousing != null
+                        ? p.subEncashmentHousing.Block.BlockName + ' ' + p.subEncashmentHousing.Apartment
+                        : string.Empty,
+                    SameDayIndex = p.accountBook.SameDayIndex,
+                    AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
+                });
 
-                var accountBooks = await query
-                    .OrderBy(input.Sorting ??
-                             $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC")
-                    .PageBy(input)
-                    .ToListAsync();
+            var accountBooks = await query
+                .OrderBy(input.Sorting ??
+                         $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC")
+                .PageBy(input)
+                .ToListAsync();
 
-                var lastAccountBookDate =
-                    await _accountBookRepository.GetAll().OrderByDescending(p => p.ProcessDateTime)
-                        .FirstOrDefaultAsync();
-                return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
-                    lastAccountBookDate?.ProcessDateTime);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var lastAccountBookDate =
+                await _accountBookRepository.GetAll().OrderByDescending(p => p.ProcessDateTime)
+                    .FirstOrDefaultAsync();
+            return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
+                lastAccountBookDate?.ProcessDateTime);
         }
 
-        public async Task<List<PaymentCategoryLookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(
+        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(
             Guid accountBookId)
         {
             CheckGetAllPermission();
@@ -518,27 +539,30 @@ namespace Sirius.PaymentAccounts
             var accountBook = await _accountBookRepository.GetAll().Where(p => p.Id == accountBookId).AsNoTracking()
                 .SingleAsync();
 
-            var paymentCategory = await _paymentCategoryRepository.GetAsync(accountBook.PaymentCategoryId);
-            if (!paymentCategory.EditInAccountBook
-            ) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
-            {
-                return new List<PaymentCategoryLookUpDto>
-                {
-                    new(paymentCategory.Id.ToString(),
-                        _localizationSource.GetString(paymentCategory.PaymentCategoryName),
-                        paymentCategory.EditInAccountBook)
-                };
-            }
+            var paymentCategory =
+                await _paymentCategoryRepository.GetAsync(accountBook.PaymentCategoryId.GetValueOrDefault());
 
-            var paymentAccounts = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.ShowInLists && p.EditInAccountBook &&
+            // if (!paymentCategory.EditInAccountBook
+            // ) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
+            // {
+            //     return new List<PaymentCategoryLookUpDto>
+            //     {
+            //         new(paymentCategory.Id.ToString(),
+            //             _localizationSource.GetString(paymentCategory.PaymentCategoryName),
+            //             paymentCategory.EditInAccountBook)
+            //     };
+            // }
+
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.IsHousingDue == paymentCategory.IsHousingDue &&
                             p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
+                .WhereIf(paymentCategory != null, p => p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .ToListAsync();
 
             return
-                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
-                    select new PaymentCategoryLookUpDto(l.Id.ToString(),
-                        _localizationSource.GetString(l.PaymentCategoryName), l.EditInAccountBook))
+                (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
                 .ToList();
         }
     }

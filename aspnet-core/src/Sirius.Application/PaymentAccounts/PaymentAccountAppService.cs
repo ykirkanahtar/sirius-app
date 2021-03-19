@@ -186,14 +186,14 @@ namespace Sirius.PaymentAccounts
         {
             if (transferAmount.HasValue && transferProcessDateTime.HasValue)
             {
-                var paymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
+                // incele
+                // var paymentCategory = await _paymentCategoryManager.GetTransferForPaykmentAccountAsync();
 
                 var accountBook = await AccountBook.CreateForPaymentAccountTransferAsync(
                     _accountBookPolicy
                     , SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
                     , transferProcessDateTime.Value
-                    , paymentCategory.Id
                     , paymentAccount
                     , transferAmount.Value
                     , string.Empty

@@ -34,6 +34,39 @@
             ></abp-validation-summary>
           </div>
         </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="startDate">
+            {{ "StartDate" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              id="startDate"
+              name="startDate"
+              class="form-control"
+              [placeholder]="'SelectDate' | localize"
+              bsDatepicker
+              [(ngModel)]="startDate"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="endDate">
+            {{ "EndDate" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              id="endDate"
+              name="endDate"
+              class="form-control"
+              [placeholder]="'SelectDate' | localize"
+              bsDatepicker
+              [(ngModel)]="endDate"
+            />
+          </div>
+        </div>
       </tab>
     </tabset>
   </div>

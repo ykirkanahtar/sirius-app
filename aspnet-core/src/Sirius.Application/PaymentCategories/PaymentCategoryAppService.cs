@@ -47,7 +47,7 @@ namespace Sirius.PaymentCategories
             CheckCreatePermission();
 
             var paymentCategory = PaymentCategory.CreateIncome(SequentialGuidGenerator.Instance.Create(),
-                AbpSession.GetTenantId(), input.PaymentCategoryName, input.HousingDueType, input.IsValidForAllPeriods,
+                AbpSession.GetTenantId(), input.PaymentCategoryName, /*input.HousingDueType,*/ input.IsValidForAllPeriods,
                 input.DefaultToPaymentAccountId);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
@@ -70,8 +70,8 @@ namespace Sirius.PaymentCategories
         {
             CheckCreatePermission();
 
-            var paymentCategory = PaymentCategory.Create(SequentialGuidGenerator.Instance.Create(),
-                AbpSession.GetTenantId(), input.PaymentCategoryName, null, input.IsValidForAllPeriods,
+            var paymentCategory = PaymentCategory.CreateTransferBetweenAccounts(SequentialGuidGenerator.Instance.Create(),
+                AbpSession.GetTenantId(), input.PaymentCategoryName, /*null, */input.IsValidForAllPeriods,
                 input.DefaultFromPaymentAccountId, input.DefaultToPaymentAccountId);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
@@ -126,9 +126,7 @@ namespace Sirius.PaymentCategories
                 {
                     Id = pc.Id,
                     PaymentCategoryName = pc.PaymentCategoryName,
-                    HousingDueType = pc.HousingDueType,
-                    ShowInLists = pc.ShowInLists,
-                    EditInAccountBook = pc.EditInAccountBook,
+                    IsHousingDue = pc.IsHousingDue,
                     IsValidForAllPeriods = pc.IsValidForAllPeriods,
                     DefaultFromPaymentAccountId = pc.DefaultFromPaymentAccountId,
                     DefaultToPaymentAccountId = pc.DefaultToPaymentAccountId,
@@ -148,33 +146,34 @@ namespace Sirius.PaymentCategories
             return new PagedResultDto<PaymentCategoryDto>(query.Count(), paymentCategories);
         }
 
-        public async Task<PaymentCategoryDto> GetRegularHousingDueAsync()
-        {
-            CheckGetAllPermission();
-
-            var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
-            return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
-        }
+        //silinecek
+        // public async Task<PaymentCategoryDto> GetRegularHousingDueAsync()
+        // {
+        //     CheckGetAllPermission();
+        //
+        //     var paymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+        //     return ObjectMapper.Map<PaymentCategoryDto>(paymentCategory);
+        // }
 
         public async Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync()
         {
             CheckGetAllPermission();
 
             var paymentCategories = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.IsActive && p.ShowInLists)
+                .Where(p => p.IsActive)
                 .OrderBy(p => p.PaymentCategoryType)
                 .ToListAsync();
 
             return ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories);
         }
 
-        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives)
+        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives, PaymentCategoryType? paymentCategoryType)
         {
             CheckGetAllPermission();
 
             var paymentCategories = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.ShowInLists)
                 .WhereIf(onlyActives, p => p.IsActive)
+                .WhereIf(paymentCategoryType.HasValue, p => p.PaymentCategoryType == paymentCategoryType.Value)
                 .ToListAsync();
 
             return
@@ -190,7 +189,7 @@ namespace Sirius.PaymentCategories
             CheckGetAllPermission();
 
             var paymentCategories = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.ShowInLists && p.IsActive && p.IsValidForAllPeriods == false)
+                .Where(p => p.IsActive && p.IsValidForAllPeriods == false)
                 .ToListAsync();
 
             return
@@ -200,30 +199,31 @@ namespace Sirius.PaymentCategories
                 .ToList();
         }
 
-        public async Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives)
-        {
-            CheckGetAllPermission();
-
-            var paymentAccounts = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.HousingDueType == HousingDueType.RegularHousingDue ||
-                            p.HousingDueType == HousingDueType.AdditionalHousingDueForOwner ||
-                            p.HousingDueType == HousingDueType.AdditionalHousingDueForResident)
-                .WhereIf(onlyActives, p => p.IsActive)
-                .ToListAsync();
-
-            return
-                (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
-                    select new LookUpDto(l.Id.ToString(),
-                        _localizationSource.GetString(l.PaymentCategoryName)))
-                .ToList();
-        }
+        //silinecek
+        // public async Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives)
+        // {
+        //     CheckGetAllPermission();
+        //
+        //     var paymentAccounts = await _paymentCategoryRepository.GetAll()
+        //         .Where(p => p.HousingDueType == HousingDueType.RegularHousingDue ||
+        //                     p.HousingDueType == HousingDueType.AdditionalHousingDueForOwner ||
+        //                     p.HousingDueType == HousingDueType.AdditionalHousingDueForResident)
+        //         .WhereIf(onlyActives, p => p.IsActive)
+        //         .ToListAsync();
+        //
+        //     return
+        //         (from l in paymentAccounts.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+        //             select new LookUpDto(l.Id.ToString(),
+        //                 _localizationSource.GetString(l.PaymentCategoryName)))
+        //         .ToList();
+        // }
 
         public async Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request)
         {
             CheckGetAllPermission();
 
             var query = from p in _paymentCategoryRepository.GetAll()
-                where p.PaymentCategoryName.Contains(request) && p.ShowInLists
+                where p.PaymentCategoryName.Contains(request)
                 select _localizationSource.GetString(p.PaymentCategoryName);
 
             return await query.ToListAsync();

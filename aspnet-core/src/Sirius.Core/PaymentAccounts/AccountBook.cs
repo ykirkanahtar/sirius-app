@@ -9,6 +9,7 @@ using Abp.Domain.Repositories;
 using Abp.UI;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Sirius.PaymentCategories;
 
 namespace Sirius.PaymentAccounts
 {
@@ -23,11 +24,12 @@ namespace Sirius.PaymentAccounts
         public int TenantId { get; set; }
 
         public DateTime ProcessDateTime { get; private set; }
-        public Guid PaymentCategoryId { get; private set; }
+        public Guid? PaymentCategoryId { get; private set; }
         public Guid? HousingId { get; private set; }
         public Guid? FromPaymentAccountId { get; private set; }
         public Guid? ToPaymentAccountId { get; private set; }
         public decimal Amount { get; private set; }
+        public bool TransferPaymentAccount { get; private set; }
         public string Description { get; private set; }
         public bool EncashmentHousing { get; private set; }
         public Guid? HousingIdForEncachment { get; private set; }
@@ -76,7 +78,7 @@ namespace Sirius.PaymentAccounts
                 processDateTime,
                 paymentCategoryId, housingId, false, null, null,
                 toPaymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
-                null, null);
+                null, null, false);
         }
 
         public static async Task<AccountBook> CreateForPaymentAccountTransferAsync( //Ödeme hesabı devir hareketi için
@@ -84,7 +86,6 @@ namespace Sirius.PaymentAccounts
             Guid id,
             int tenantId,
             DateTime processDateTime,
-            Guid paymentCategoryId,
             PaymentAccount toPaymentAccount,
             decimal amount,
             string description,
@@ -94,9 +95,9 @@ namespace Sirius.PaymentAccounts
             return await BindEntityAsync(accountBookPolicy, false, true, id, tenantId,
                 AccountBookType.ForPaymentAccount,
                 processDateTime,
-                paymentCategoryId, null, false, null, null,
+                null, null, false, null, null,
                 toPaymentAccount, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
-                null, null);
+                null, null, true);
         }
 
         public static async Task<AccountBook> CreateAsync(
@@ -116,7 +117,8 @@ namespace Sirius.PaymentAccounts
             DateTime? documentDateTime,
             string documentNumber,
             ICollection<AccountBookFile> accountBookFiles,
-            long creatorUserId)
+            long creatorUserId,
+            bool transferPaymentAccount)
         {
             return await BindEntityAsync(accountBookPolicy, false, false, id, tenantId,
                 accountBookType,
@@ -124,13 +126,14 @@ namespace Sirius.PaymentAccounts
                 paymentCategoryId, housingId, encashmentHousing, housingIdForEncachment,
                 fromPaymentAccount,
                 toPaymentAccount, amount, description, documentDateTime, documentNumber, accountBookFiles,
-                DateTime.UtcNow, creatorUserId, null, null);
+                DateTime.UtcNow, creatorUserId, null, null, transferPaymentAccount);
         }
 
         public static async Task<AccountBook> UpdateAsync(
             IAccountBookPolicy accountBookPolicy,
             AccountBook existingAccountBook,
             DateTime processDateTime,
+            PaymentCategory paymentCategory,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
@@ -155,14 +158,14 @@ namespace Sirius.PaymentAccounts
                 existingAccountBook.TenantId,
                 existingAccountBook.AccountBookType,
                 processDateTime,
-                existingAccountBook.PaymentCategoryId,
+                paymentCategory.Id,
                 existingAccountBook.HousingId,
                 existingAccountBook.EncashmentHousing,
                 existingAccountBook.HousingIdForEncachment,
                 fromPaymentAccount,
                 toPaymentAccount,
                 amount, description, documentDateTime, documentNumber, existingAccountBook.AccountBookFiles, null, null,
-                DateTime.UtcNow, modifierUserId, existingAccountBook);
+                DateTime.UtcNow, modifierUserId, existingAccountBook.TransferPaymentAccount, existingAccountBook);
         }
 
         private static async Task<AccountBook> BindEntityAsync(
@@ -173,7 +176,7 @@ namespace Sirius.PaymentAccounts
             int tenantId,
             AccountBookType accountBookType,
             DateTime processDateTime,
-            Guid paymentCategoryId,
+            Guid? paymentCategoryId,
             Guid? housingId,
             bool encashmentHousing,
             Guid? housingIdForEncachment,
@@ -188,6 +191,7 @@ namespace Sirius.PaymentAccounts
             long? creatorUserId,
             DateTime? modificationDateTime,
             long? modifierUserId,
+            bool transferPaymentAccount,
             [CanBeNull] AccountBook existingAccountBook = null
         )
         {
@@ -207,6 +211,7 @@ namespace Sirius.PaymentAccounts
             accountBook.Amount = amount;
             accountBook.FromPaymentAccountId = fromPaymentAccount?.Id;
             accountBook.ToPaymentAccountId = toPaymentAccount?.Id;
+            accountBook.TransferPaymentAccount = transferPaymentAccount;
             accountBook.AccountBookFiles = accountBookFiles;
 
             if (creationTime.HasValue)

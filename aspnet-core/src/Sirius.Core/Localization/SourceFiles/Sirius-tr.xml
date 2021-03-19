@@ -171,9 +171,10 @@
     <text name="CreateNewPeriod">Dönem ekle</text>
     <text name="CreateNewPerson">Kişi ekle</text>
     <text name="CreateNewTransferPaymentCategory">Hesaplararası Transfer için Ödeme Kategorisi Ekle</text>
-    <text name="CreditTextForHousingPaymentPlan">Ödeme</text>
+    <text name="Credit">Borç</text>
+    <text name="CreditOrDebt">Borç / Alacak</text>
     <text name="Date">Tarih</text>
-    <text name="DebtTextForHousingPaymentPlan">Aidat Tanımı</text>
+    <text name="Debt">Alacak</text>
     <text name="DefaultFromPaymentAccount">Varsayılan Giden Hesap</text>
     <text name="DefaultPaymentAccountForRegularHousingDue">Varsayılan Olağan Aidat Hesabı</text>
     <text name="DefaultToPaymentAccount">Varsayılan Gelen Hesap</text>
@@ -219,6 +220,7 @@
     <text name="EndDate">Bitiş Tarihi</text>
     <text name="ExistingFiles">Varolan Dosyalar</text>
     <text name="Expense">Gider</text>
+    <text name="Expenses">Giderler</text>
     <text name="ExpensePaymentCategory">Gider Kalemi</text>
     <text name="false">Hayır</text>
     <text name="File(s)IsUploading">Dosya(lar) karşıya yükleniyor...</text>
@@ -238,6 +240,8 @@
     <text name="HousingCategoryNameShort">Konut Grup</text>
     <text name="HousingDeleteWarningMessage">Konutu silmek istediğinize emin misiniz?</text>
     <text name="HousingDue">Aidat ödemesi</text>
+    <text name="HousingDueDefinition">Aidat tanımı</text>
+    <text name="HousingDuePayment">Aidat ödemesi</text>
     <text name="HousingOwner">Ev Sahibi</text>
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
     <text name="HousingPaymentPlanGroupDeleteWarningMessage">Aidat ödeme planı tanımını kaldırmak istediğinize emin misiniz?</text>
@@ -246,16 +250,19 @@
     <text name="HousingPaymentPlanGroupsMenu">Aidat Ödeme Planları (Menü)</text>
     <text name="HousingPaymentPlanGroups">Aidat Ödeme Planları</text>
     <text name="HousingPaymentPlanGroupStartDateCanNotBeSmallThanPeriodStartDate">Aidat Ödeme Planı başlangıç tarihi, dönem başlangıç tarihinden önce olamaz.</text>
+    <text name="HousingPaymentPlanType">İşlem türü</text>
     <text name="HousingPersonDeleteWarningMessage">Kişi tanımını kaldırmak istediğinize emin misiniz?</text>
     <text name="Housings">Konutlar</text>
     <text name="HousingsMenu">Konutlar (Menü)</text>
     <text name="HousingTenant">Kiracı</text>
     <text name="Images">Görseller</text>
     <text name="Income">Gelir</text>
+    <text name="Incomes">Gelirler</text>
     <text name="IncomePaymentCategory">Gelir Kalemi</text>
     <text name="IsDebtText">Site / Apt. alacaklı</text>
     <text name="IsDefaultPaymentAccount">Varsayılan ödeme hesabı</text>
     <text name="IsDefaultPaymentAccountShort">Varsayılan öd. hsb.</text>
+    <text name="IsHousingDue">Aidat ödemesi mi?</text>
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
@@ -277,7 +284,6 @@
     <text name="PaymentCategoryName">Kategori Adı</text>
     <text name="PaymentCategoryNameShort">Kategori</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
-    <text name="PaymentPlanType">Borç / Alacak</text>
     <text name="People">Kişiler</text>
     <text name="PeopleMenu">Kişiler (Menü)</text>
     <text name="PeriodsForSiteMenu">Dönemler (Site)</text>
@@ -309,6 +315,7 @@
     <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
+    <text name="Transfer">Devir</text>
     <text name="TransferBalance">Devir bakiyesi</text>
     <text name="TransferBetweenAccounts">Hesaplararası transfer</text>
     <text name="TransferDate">Devir tarihi</text>

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Abp.Application.Services;
 using Sirius.PaymentCategories.Dto;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentCategories
 {
@@ -13,10 +14,10 @@ namespace Sirius.PaymentCategories
         Task<PaymentCategoryDto> CreateExpenseAsync(CreateExpensePaymentCategoryDto input);
         Task<PaymentCategoryDto> CreateTransferAsync(CreateTransferPaymentCategoryDto input);
         Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync();
-        Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives);
-        Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives);
+        Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives, PaymentCategoryType? paymentCategoryType);
+        // Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives);
         Task<List<LookUpDto>> GetPaymentCategoryForTransferLookUpAsync();
-        Task<PaymentCategoryDto> GetRegularHousingDueAsync();
+        // Task<PaymentCategoryDto> GetRegularHousingDueAsync();
         Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request);
     }
 }

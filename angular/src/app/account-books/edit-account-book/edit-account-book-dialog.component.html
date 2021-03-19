@@ -44,9 +44,6 @@
                   [placeholder]="'PleaseSelect' | localize"
                   [options]="paymentCategories"
                   [(ngModel)]="accountBook.paymentCategoryId"
-                  [disabled]="
-                    !canEditPaymentCategory(accountBook.paymentCategoryId)
-                  "
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
@@ -63,13 +60,11 @@
                   PaymentCategoryTypeEnum.TransferBetweenAccounts
               "
             >
-              <label
-                class="col-md-12 col-form-label"
-                for="fromPaymentAccountId"
-              >
-                {{ "FromPaymentAccount" | localize }}
-              </label>
-              <div class="col-md-9 pr-4">
+              <div class="col-md-10">
+                <label for="fromPaymentAccounts">
+                  {{ "FromPaymentAccount" | localize }}
+                  <span class="text-danger">*</span>
+                </label>
                 <p-dropdown
                   id="fromPaymentAccounts"
                   name="fromPaymentAccounts"
@@ -79,16 +74,9 @@
                   [filter]="true"
                   [style]="{ width: '100%' }"
                   required
+                  [showClear]="true"
                 >
                 </p-dropdown>
-              </div>
-              <div class="col-md-3">
-                <span class="btn btn-danger">
-                  <i
-                    class="fas fa-trash-alt"
-                    (click)="accountBook.fromPaymentAccountId = null"
-                  ></i>
-                </span>
               </div>
             </div>
             <div
@@ -100,10 +88,11 @@
                   PaymentCategoryTypeEnum.TransferBetweenAccounts
               "
             >
-              <label class="col-md-12 col-form-label" for="toPaymentAccountId">
-                {{ "ToPaymentAccount" | localize }}
-              </label>
-              <div class="col-md-9 pr-4">
+              <div class="col-md-10">
+                <label for="toPaymentAccounts">
+                  {{ "ToPaymentAccount" | localize }}
+                  <span class="text-danger">*</span>
+                </label>
                 <p-dropdown
                   id="toPaymentAccounts"
                   name="toPaymentAccounts"
@@ -113,16 +102,9 @@
                   [filter]="true"
                   [style]="{ width: '100%' }"
                   required
+                  [showClear]="true"
                 >
                 </p-dropdown>
-              </div>
-              <div class="col-md-3">
-                <span class="btn btn-danger">
-                  <i
-                    class="fas fa-trash-alt"
-                    (click)="accountBook.toPaymentAccountId = null"
-                  ></i>
-                </span>
               </div>
             </div>
             <div class="form-group row required">

@@ -8,5 +8,6 @@ namespace Sirius.HousingPaymentPlans.Dto
     public class UpdateHousingPaymentPlanGroupDto : FullAuditedEntityDto<Guid>
     {
         public string HousingPaymentPlanGroupName { get; set; }
+        public Guid DefaultToPaymentAccountId { get; set; }
     }
 }

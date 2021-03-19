@@ -5,7 +5,7 @@
         <div class="col-6">
           <h1>{{ "AccountBooks" | localize }}</h1>
         </div>
-        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+        <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
 
         <div
           class="col-6 text-right"
@@ -15,7 +15,7 @@
             type="button"
             class="btn bg-blue"
             pButton
-            icon="fa fa-arrow-down"
+            icon="fa fa-angle-down"
             [label]="'Create' | localize"
             (click)="menu.toggle($event)"
           ></button>

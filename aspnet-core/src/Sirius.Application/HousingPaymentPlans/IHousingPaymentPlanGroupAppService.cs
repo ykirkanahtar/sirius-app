@@ -9,6 +9,6 @@ namespace Sirius.HousingPaymentPlans
         PagedHousingPaymentPlanGroupResultRequestDto, CreateHousingPaymentPlanGroupDto, UpdateHousingPaymentPlanGroupDto
     >
     {
-        
+        Task<UpdateHousingPaymentPlanGroupDto> GetForUpdate(Guid id);
     }
 }

@@ -25,8 +25,7 @@ import {
   PaymentCategoryDto,
   PaymentCategoryType,
 } from "@shared/service-proxies/service-proxies";
-import { CreateHousingDueAccountBookDialogComponent } from "./create-account-book/create-housing-due-account-book-dialog.component";
-import { CreateOtherPaymentAccountBookDialogComponent } from "./create-account-book/create-other-payment-account-book-dialog.component";
+import { CreateAccountBookDialogComponent } from "./create-account-book/create-account-book-dialog.component";
 import { Table } from "primeng/table";
 import { LazyLoadEvent, SelectItem } from "primeng/api";
 import * as moment from "moment";
@@ -49,7 +48,7 @@ export class AccountBooksComponent
   sortingColumn: string;
   advancedFiltersVisible = false;
 
-  items: MenuItem[] = [];
+  menuItems: MenuItem[] = [];
 
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
@@ -111,47 +110,71 @@ export class AccountBooksComponent
     this._paymentCategoryService
       .getPaymentCategoryForMenu()
       .subscribe((paymentCategories: PaymentCategoryDto[]) => {
-        this.items = [];
-        let item: MenuItem;
+        this.menuItems = [];
 
         if (paymentCategories.length > 15) {
-          this.items = [
-            {
-              label: this.l("HousingDue"),
-              icon: "pi pi-home",
-              command: () => {
-                this.createHousingDueAccountBook();
-              },
+          let incomeMenuItem: MenuItem;
+          incomeMenuItem = {
+            label: this.l("Income"),
+            icon: "pi pi-arrow-left",
+            command: () => {
+              this.showCreateAccountBookDialogForPaymentCategoryType(
+                PaymentCategoryType.Income
+              );
             },
-            {
-              label: this.l("OtherPayments"),
-              icon: "pi pi-money-bill",
-              command: () => {
-                this.createOtherPaymentAccountBook();
-              },
+          };
+          this.menuItems.push(incomeMenuItem);
+
+          let expenseMenuItem: MenuItem;
+          expenseMenuItem = {
+            label: this.l("Expense"),
+            icon: "pi pi-arrow-right",
+            command: () => {
+              this.showCreateAccountBookDialogForPaymentCategoryType(
+                PaymentCategoryType.Expense
+              );            
             },
-          ];
+          };
+          this.menuItems.push(expenseMenuItem);
+
+          let transferBetweenAccounts: MenuItem;
+          transferBetweenAccounts = {
+            label: this.l("TransferBetweenAccounts"),
+            icon: "pi pi-sort-alt",
+            command: () => {
+              this.showCreateAccountBookDialogForPaymentCategoryType(
+                PaymentCategoryType.TransferBetweenAccounts
+              );            
+            },
+          };
+          this.menuItems.push(transferBetweenAccounts);
         } else {
-          for (let index = 0; index < paymentCategories.length; index++) {
-            item = {
-              label: this.l(paymentCategories[index].paymentCategoryName),
-              icon: this.getMenuIcon(
-                paymentCategories[index].paymentCategoryType
-              ),
-              command: () => {
-                this.showCreateAccountBookDialogForPaymentCategoryType(
-                  paymentCategories[index].paymentCategoryType, 
-                  paymentCategories[index].id
-                );
-              },
-            };
-            this.items.push(item);
-          }
+          let housingDuePaymentCategories = paymentCategories.filter(
+            (p) => p.isHousingDue
+          );
+          this.createMenuItem(
+            housingDuePaymentCategories,
+            this.l("HousingDue")
+          );
+
+          let incomePaymentCategories = paymentCategories.filter(
+            (p) =>
+              p.paymentCategoryType === PaymentCategoryType.Income &&
+              p.isHousingDue === false
+          );
+          this.createMenuItem(incomePaymentCategories, this.l("Incomes"));
+
+          let expensePaymentCategories = paymentCategories.filter(
+            (p) =>
+              p.paymentCategoryType === PaymentCategoryType.Expense &&
+              p.isHousingDue === false
+          );
+          this.createMenuItem(expensePaymentCategories, this.l("Expenses"));
         }
       });
 
     this._paymentCategoryService
-      .getPaymentCategoryLookUp(false)
+      .getPaymentCategoryLookUp(false, null)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategoriesFilter = result;
       });
@@ -174,7 +197,45 @@ export class AccountBooksComponent
     this.getDataPage(1);
   }
 
-  getMenuIcon(paymentCategoryType: PaymentCategoryType): string {
+  createMenuItem(
+    groupedPaymentCategories: PaymentCategoryDto[],
+    label: string
+  ) {
+    let groupedMenuItem: MenuItem;
+
+    let groupedMenuItems: MenuItem[] = [];
+    for (let index = 0; index < groupedPaymentCategories.length; index++) {
+      groupedMenuItem = {
+        label: this.l(groupedPaymentCategories[index].paymentCategoryName),
+        icon: this.getMenuIcon(
+          groupedPaymentCategories[index].paymentCategoryType,
+          groupedPaymentCategories[index].isHousingDue
+        ),
+        command: () => {
+          this.showCreateAccountBookDialogForPaymentCategoryType(
+            groupedPaymentCategories[index].paymentCategoryType,
+            groupedPaymentCategories[index]
+          );
+        },
+      };
+      groupedMenuItems.push(groupedMenuItem);
+    }
+
+    groupedMenuItem = {
+      label: label,
+      items: groupedMenuItems,
+    };
+    this.menuItems.push(groupedMenuItem);
+  }
+
+  getMenuIcon(
+    paymentCategoryType: PaymentCategoryType,
+    isHousingDue: boolean
+  ): string {
+    if (isHousingDue) {
+      return "pi pi-home";
+    }
+
     if (paymentCategoryType === PaymentCategoryType.Income) {
       return "pi pi-arrow-left";
     }
@@ -186,18 +247,6 @@ export class AccountBooksComponent
     if (paymentCategoryType === PaymentCategoryType.TransferBetweenAccounts) {
       return "pi pi-sort-alt";
     }
-  }
-
-  createAccountBook(): void {
-    this.showCreateAccountBookDialog(false);
-  }
-
-  createHousingDueAccountBook(): void {
-    this.showCreateAccountBookDialog(true);
-  }
-
-  createOtherPaymentAccountBook(): void {
-    this.showCreateAccountBookDialog(false);
   }
 
   editAccountBook(accountBook: AccountBookDto): void {
@@ -280,36 +329,18 @@ export class AccountBooksComponent
 
   private showCreateAccountBookDialogForPaymentCategoryType(
     paymentCategoryType: PaymentCategoryType,
-    paymentCategoryId: string
+    paymentCategory?: PaymentCategoryDto
   ): void {
     let createAccountBookDialog: BsModalRef;
+
     createAccountBookDialog = this._modalService.show(
-      CreateOtherPaymentAccountBookDialogComponent,
+      CreateAccountBookDialogComponent,
       {
         class: "modal-lg",
         initialState: {
           lastAccountBookDate: this.lastAccountBookProcessDate,
           paymentCategoryType: paymentCategoryType,
-          paymentCategoryId: paymentCategoryId,
-        },
-      }
-    );
-
-    createAccountBookDialog.content.onSave.subscribe(() => {
-      this.refresh();
-    });
-  }
-
-  private showCreateAccountBookDialog(isHousingDue: boolean): void {
-    let createAccountBookDialog: BsModalRef;
-    createAccountBookDialog = this._modalService.show(
-      isHousingDue
-        ? CreateHousingDueAccountBookDialogComponent
-        : CreateOtherPaymentAccountBookDialogComponent,
-      {
-        class: "modal-lg",
-        initialState: {
-          lastAccountBookDate: this.lastAccountBookProcessDate,
+          paymentCategory: paymentCategory,
         },
       }
     );

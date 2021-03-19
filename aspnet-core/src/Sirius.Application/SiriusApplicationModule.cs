@@ -2,6 +2,7 @@
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Sirius.Authorization;
+using Sirius.Authorization.Users;
 
 namespace Sirius
 {
