@@ -78,16 +78,31 @@ export class CreateAccountBookDialogComponent
     this.baseUrl = baseUrl ? baseUrl : "";
   }
 
+  setDefaultPaymentAccount(paymentCategory: PaymentCategoryDto): void {
+    if(paymentCategory.paymentCategoryType) {
+      if(paymentCategory.paymentCategoryType === PaymentCategoryType.Income || 
+        paymentCategory.paymentCategoryType === PaymentCategoryType.TransferBetweenAccounts) {
+          this.accountBook.toPaymentAccountId = paymentCategory.defaultToPaymentAccountId;
+        }
+
+        if(paymentCategory.paymentCategoryType === PaymentCategoryType.Expense || 
+          paymentCategory.paymentCategoryType === PaymentCategoryType.TransferBetweenAccounts) {
+            this.accountBook.toPaymentAccountId = paymentCategory.defaultFromPaymentAccountId;
+          }
+    }
+  }
+
   ngOnInit(): void {
     if (this.paymentCategory) {
       this.accountBook.paymentCategoryId = this.paymentCategory.id;
       this.paymentCategoryType = this.paymentCategory.paymentCategoryType;
       this.isHousingDue = this.paymentCategory.isHousingDue;
       this.definedPaymentCategory = true;
+      this.setDefaultPaymentAccount(this.paymentCategory);
     }
 
     this._paymentCategoryServiceProxy
-      .getPaymentCategoryLookUp(true, this.paymentCategoryType)
+      .getLookUpByPaymentCategoryType(true, this.paymentCategoryType)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategories = result;
       });
@@ -139,10 +154,11 @@ export class CreateAccountBookDialogComponent
       this._paymentCategoryServiceProxy
         .get(selectedPaymentCategory)
         .subscribe((result: PaymentCategoryDto) => {
-          this.accountBook.fromPaymentAccountId =
-            result.defaultFromPaymentAccountId;
-          this.accountBook.toPaymentAccountId =
-            result.defaultToPaymentAccountId;
+          // this.accountBook.fromPaymentAccountId =
+          //   result.defaultFromPaymentAccountId;
+          // this.accountBook.toPaymentAccountId =
+          //   result.defaultToPaymentAccountId;
+          this.setDefaultPaymentAccount(selectedPaymentCategory);
           this.accountBook.isHousingDue = result.isHousingDue;
           if(this.accountBook.isHousingDue === false) {
             this.accountBook.housingId = "00000000-0000-0000-0000-000000000000";

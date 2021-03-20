@@ -14,7 +14,8 @@ namespace Sirius.PaymentCategories
         Task<PaymentCategoryDto> CreateExpenseAsync(CreateExpensePaymentCategoryDto input);
         Task<PaymentCategoryDto> CreateTransferAsync(CreateTransferPaymentCategoryDto input);
         Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync();
-        Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives, PaymentCategoryType? paymentCategoryType);
+        Task<List<LookUpDto>> GetLookUp(bool onlyActives);
+        Task<List<LookUpDto>> GetLookUpByPaymentCategoryType(bool onlyActives, PaymentCategoryType paymentCategoryType);
         // Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives);
         Task<List<LookUpDto>> GetPaymentCategoryForTransferLookUpAsync();
         // Task<PaymentCategoryDto> GetRegularHousingDueAsync();

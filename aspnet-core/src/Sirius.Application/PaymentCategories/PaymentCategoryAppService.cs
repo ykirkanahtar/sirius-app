@@ -166,14 +166,28 @@ namespace Sirius.PaymentCategories
 
             return ObjectMapper.Map<List<PaymentCategoryDto>>(paymentCategories);
         }
-
-        public async Task<List<LookUpDto>> GetPaymentCategoryLookUpAsync(bool onlyActives, PaymentCategoryType? paymentCategoryType)
+        
+        public async Task<List<LookUpDto>> GetLookUp(bool onlyActives)
         {
             CheckGetAllPermission();
 
             var paymentCategories = await _paymentCategoryRepository.GetAll()
                 .WhereIf(onlyActives, p => p.IsActive)
-                .WhereIf(paymentCategoryType.HasValue, p => p.PaymentCategoryType == paymentCategoryType.Value)
+                .ToListAsync();
+
+            return
+                (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
+                .ToList();
+        }
+
+        public async Task<List<LookUpDto>> GetLookUpByPaymentCategoryType(bool onlyActives, PaymentCategoryType paymentCategoryType)
+        {
+            CheckGetAllPermission();
+
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
+                .WhereIf(onlyActives, p => p.IsActive && p.PaymentCategoryType == paymentCategoryType)
                 .ToListAsync();
 
             return

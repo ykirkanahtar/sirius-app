@@ -4455,11 +4455,71 @@ export class PaymentCategoryServiceProxy {
 
     /**
      * @param onlyActives (optional) 
+     * @return Success
+     */
+    getLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetLookUp?";
+        if (onlyActives === null)
+            throw new Error("The parameter 'onlyActives' cannot be null.");
+        else if (onlyActives !== undefined)
+            url_ += "onlyActives=" + encodeURIComponent("" + onlyActives) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param onlyActives (optional) 
      * @param paymentCategoryType (optional) 
      * @return Success
      */
-    getPaymentCategoryLookUp(onlyActives: boolean | undefined, paymentCategoryType: PaymentCategoryType | undefined): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp?";
+    getLookUpByPaymentCategoryType(onlyActives: boolean | undefined, paymentCategoryType: PaymentCategoryType | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetLookUpByPaymentCategoryType?";
         if (onlyActives === null)
             throw new Error("The parameter 'onlyActives' cannot be null.");
         else if (onlyActives !== undefined)
@@ -4479,11 +4539,11 @@ export class PaymentCategoryServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetPaymentCategoryLookUp(response_);
+            return this.processGetLookUpByPaymentCategoryType(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetPaymentCategoryLookUp(<any>response_);
+                    return this.processGetLookUpByPaymentCategoryType(<any>response_);
                 } catch (e) {
                     return <Observable<LookUpDto[]>><any>_observableThrow(e);
                 }
@@ -4492,7 +4552,7 @@ export class PaymentCategoryServiceProxy {
         }));
     }
 
-    protected processGetPaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+    protected processGetLookUpByPaymentCategoryType(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

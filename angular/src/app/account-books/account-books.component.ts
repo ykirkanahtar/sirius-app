@@ -107,6 +107,34 @@ export class AccountBooksComponent
   }
 
   ngOnInit(): void {
+
+    this.createMenu();
+
+    this._paymentCategoryService
+      .getLookUp(false)
+      .subscribe((result: LookUpDto[]) => {
+        this.paymentCategoriesFilter = result;
+      });
+
+    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+      this.housingsFilters = result;
+    });
+
+    this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
+      this.peopleFilters = result;
+    });
+
+    this._paymentAccountService
+      .getPaymentAccountLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.fromPaymentAccountsFilter = result;
+        this.toPaymentAccountsFilter = result;
+      });
+
+    this.getDataPage(1);
+  }
+
+  createMenu(): void {
     this._paymentCategoryService
       .getPaymentCategoryForMenu()
       .subscribe((paymentCategories: PaymentCategoryDto[]) => {
@@ -172,29 +200,6 @@ export class AccountBooksComponent
           this.createMenuItem(expensePaymentCategories, this.l("Expenses"));
         }
       });
-
-    this._paymentCategoryService
-      .getPaymentCategoryLookUp(false, null)
-      .subscribe((result: LookUpDto[]) => {
-        this.paymentCategoriesFilter = result;
-      });
-
-    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
-      this.housingsFilters = result;
-    });
-
-    this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
-      this.peopleFilters = result;
-    });
-
-    this._paymentAccountService
-      .getPaymentAccountLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.fromPaymentAccountsFilter = result;
-        this.toPaymentAccountsFilter = result;
-      });
-
-    this.getDataPage(1);
   }
 
   createMenuItem(
