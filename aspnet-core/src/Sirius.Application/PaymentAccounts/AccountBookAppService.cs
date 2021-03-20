@@ -191,6 +191,7 @@ namespace Sirius.PaymentAccounts
                 , null
                 , input.EncachmentFromHousingDue
                 , input.HousingIdForEncachment
+                , input.PaymentCategoryIdForEncachment
                 , fromPaymentAccount
                 , toPaymentAccount
                 , input.Amount
@@ -210,17 +211,19 @@ namespace Sirius.PaymentAccounts
                 }
 
                 var encashmentHousing = await _housingRepository.GetAsync(input.HousingIdForEncachment.Value);
+                var encashmentPaymentCategory =   await _paymentCategoryRepository.GetAsync(input.PaymentCategoryIdForEncachment.GetValueOrDefault());
 
                 await _accountBookManager.CreateOtherPaymentWithEncachmentForHousingDueAsync(accountBook,
                     encashmentHousing,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null);
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null,
+                    encashmentPaymentCategory);
             }
             else
             {
                 await _accountBookManager.CreateAsync(accountBook, accountBookType,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null);
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null, null, null);
             }
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);
@@ -341,7 +344,7 @@ namespace Sirius.PaymentAccounts
 
                 var paymentCategory =
                     await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
-                
+
                 if (input.PaymentCategoryId != existingAccountBook.PaymentCategoryId)
                 {
                     var oldPaymentCategory =
@@ -554,7 +557,8 @@ namespace Sirius.PaymentAccounts
             // }
 
             var paymentCategories = await _paymentCategoryRepository.GetAll()
-                .Where(p => p.IsHousingDue == paymentCategory.IsHousingDue &&
+                .Where(p => (p.IsHousingDue == paymentCategory.IsHousingDue &&
+                             p.HousingDueForResidentOrOwner == paymentCategory.HousingDueForResidentOrOwner) &&
                             p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .WhereIf(paymentCategory != null, p => p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .ToListAsync();

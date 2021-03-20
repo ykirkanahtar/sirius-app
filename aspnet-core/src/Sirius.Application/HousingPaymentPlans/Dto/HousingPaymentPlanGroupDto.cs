@@ -4,6 +4,7 @@ using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Sirius.Housings.Dto;
 using Sirius.PaymentCategories.Dto;
+using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
@@ -22,6 +23,7 @@ namespace Sirius.HousingPaymentPlans.Dto
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
         public string Description { get; set; }
+        public ResidentOrOwner ResidentOrOwner { get; set; }
 
         public virtual HousingCategoryDto HousingCategory { get; set; }
 

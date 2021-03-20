@@ -70,12 +70,12 @@ namespace Sirius.Housings
                 var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
                     AbpSession.GetTenantId(),
                     block, input.Apartment, housingCategory, input.TenantIsResiding);
-
+                
                 if (input.CreateTransferForHousingDue.Amount != 0)
                 {
                     housing = input.CreateTransferForHousingDue.IsDebt
-                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount)
-                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount);
+                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount, input.CreateTransferForHousingDue.ResidentOrOwner)
+                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount, input.CreateTransferForHousingDue.ResidentOrOwner);
                 }
 
                 await _housingManager.CreateAsync(housing);
@@ -180,7 +180,9 @@ namespace Sirius.Housings
                     Block = p.housing.Block.BlockName,
                     HousingCategoryName = p.housing.HousingCategory.HousingCategoryName,
                     TenantIsResiding = p.housing.TenantIsResiding,
-                    Balance = p.housing.Balance
+                    Balance = p.housing.Balance,
+                    ResidentBalance = p.housing.ResidentBalance,
+                    OwnerBalance = p.housing.OwnerBalance
                 })
                 .Select(p => p.Key);
 

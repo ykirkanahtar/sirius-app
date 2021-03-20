@@ -43,27 +43,29 @@ namespace Sirius.PaymentAccounts
         public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
             PaymentAccount toPaymentAccount)
         {
-            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing);
+            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing, null, null);
         }
 
         //Yapılan ödemeyi aidattan düşme
-        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
+        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housingForEncashment,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForEncashment)
         {
             await CreateAsync(accountBook, AccountBookType.OtherPaymentWithEncachmentForHousingDue,
-                fromPaymentAccount, toPaymentAccount, housing);
+                fromPaymentAccount, toPaymentAccount, null, housingForEncashment, paymentCategoryForEncashment);
         }
 
         public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
         {
-            await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null);
+            await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null, null, null);
         }
 
         public async Task CreateAsync(AccountBook accountBook,
             AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
-            [CanBeNull] Housing housing)
+            [CanBeNull] Housing housing,
+            [CanBeNull] Housing housingForEncashment,
+            [CanBeNull] PaymentCategory paymentCategoryForEncashment)
         {
             if (fromPaymentAccount == null
                 && toPaymentAccount == null
@@ -90,7 +92,7 @@ namespace Sirius.PaymentAccounts
             {
                 // var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
 
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+                await _housingManager.DecreaseBalance(housing, accountBook.Amount, paymentCategory.HousingDueForResidentOrOwner.Value);
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
@@ -109,18 +111,18 @@ namespace Sirius.PaymentAccounts
             if (accountBookType == AccountBookType.OtherPaymentWithEncachmentForHousingDue)
             {
                 // var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+                await _housingManager.DecreaseBalance(housingForEncashment, accountBook.Amount, paymentCategoryForEncashment.HousingDueForResidentOrOwner.GetValueOrDefault());
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
-                    , housing
-                    , paymentCategory
+                    , housingForEncashment
+                    , paymentCategoryForEncashment
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
                     , accountBook.Description
                     , accountBook
-                    , HousingPaymentPlanType.Netting
+                    , HousingPaymentPlanType.Encashment
                     , null
                 ));
             }

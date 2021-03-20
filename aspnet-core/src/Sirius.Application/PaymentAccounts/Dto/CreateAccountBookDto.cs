@@ -29,6 +29,7 @@ namespace Sirius.PaymentAccounts.Dto
         public bool EncachmentFromHousingDue { get; set; }
         
         public Guid? HousingIdForEncachment { get; set; }
+        public Guid? PaymentCategoryIdForEncachment { get; set; }
 
         public void Normalize()
         {

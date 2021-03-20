@@ -15,10 +15,12 @@ using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
 using System.Linq.Dynamic.Core;
+using Abp.Extensions;
 using Abp.UI;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
 using Sirius.People;
+using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans
@@ -62,7 +64,7 @@ namespace Sirius.HousingPaymentPlans
             _paymentCategoryRepository = paymentCategoryRepository;
             _paymentAccountRepository = paymentAccountRepository;
         }
-
+        
         public override async Task<HousingPaymentPlanGroupDto> CreateAsync(
             CreateHousingPaymentPlanGroupDto input)
         {
@@ -72,7 +74,7 @@ namespace Sirius.HousingPaymentPlans
 
             var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
-                input.DefaultToPaymentAccountId);
+                input.DefaultToPaymentAccountId, input.ResidentOrOwner);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
 
@@ -80,7 +82,7 @@ namespace Sirius.HousingPaymentPlans
                 AbpSession.GetTenantId(),
                 input.HousingPaymentPlanGroupName, housingCategory, paymentCategory, input.AmountPerMonth,
                 input.CountOfMonth, input.PaymentDayOfMonth
-                , input.StartDate, input.Description);
+                , input.StartDate, input.Description, input.ResidentOrOwner);
 
             await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
                 paymentCategory, false, null);
@@ -191,6 +193,16 @@ namespace Sirius.HousingPaymentPlans
 
             return new PagedResultDto<HousingPaymentPlanGroupDto>(query.Count(),
                 ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups));
+        }
+        
+        public List<LookUpDto> GetResidentOrOwnerLookUp()
+        {
+            CheckGetAllPermission();
+
+            var residentLookUp = new LookUpDto(((int)ResidentOrOwner.Resident).ToString(), L(ResidentOrOwner.Resident.ToString()));
+            var ownerLookUp = new LookUpDto(((int)ResidentOrOwner.Owner).ToString(), L(ResidentOrOwner.Owner.ToString()));
+            var lookUps = new List<LookUpDto> {residentLookUp, ownerLookUp};
+            return lookUps;
         }
     }
 }

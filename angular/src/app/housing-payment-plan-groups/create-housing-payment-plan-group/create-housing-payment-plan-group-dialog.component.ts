@@ -15,6 +15,7 @@ import {
   LookUpDto,
   HousingPaymentPlanGroupServiceProxy,
   PaymentAccountServiceProxy,
+  ResidentOrOwner,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
 import { BsModalRef } from "ngx-bootstrap/modal";
@@ -29,6 +30,8 @@ export class CreateHousingPaymentPlanGroupDialogComponent
   input = new CreateHousingPaymentPlanGroupDto();
   housingCategories: LookUpDto[];
   paymentAccounts: LookUpDto[];
+  residentOrOwners: any[];
+  residentOrOwnerEnum = ResidentOrOwner;
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -54,6 +57,11 @@ export class CreateHousingPaymentPlanGroupDialogComponent
       .subscribe((result: LookUpDto[]) => {
         this.paymentAccounts = result;
       });
+
+    this.residentOrOwners = [
+      {value: ResidentOrOwner.Resident.toString(), label: this.l(this.residentOrOwnerEnum[ResidentOrOwner.Resident])},
+      {value: ResidentOrOwner.Owner.toString(), label: this.l(this.residentOrOwnerEnum[ResidentOrOwner.Owner])},
+    ];
   }
 
   save(): void {

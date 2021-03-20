@@ -1,6 +1,7 @@
 using System;
 using Abp.AutoMapper;
 using Abp.Runtime.Validation;
+using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
@@ -15,6 +16,7 @@ namespace Sirius.HousingPaymentPlans.Dto
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
         public string Description { get; set; }
+        public ResidentOrOwner ResidentOrOwner { get; set; }
         
         public void Normalize()
         {

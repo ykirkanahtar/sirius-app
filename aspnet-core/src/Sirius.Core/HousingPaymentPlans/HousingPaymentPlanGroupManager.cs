@@ -33,7 +33,8 @@ namespace Sirius.HousingPaymentPlans
         }
 
         public async Task CreateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup, List<Housing> housings,
-            DateTime startDate, PaymentCategory paymentCategory, bool transferFromPreviousPeriod, DateTime? periodStartDate)
+            DateTime startDate, PaymentCategory paymentCategory, bool transferFromPreviousPeriod,
+            DateTime? periodStartDate)
         {
             var newStartDate = GetStartDate(startDate, housingPaymentPlanGroup.PaymentDayOfMonth);
 
@@ -74,11 +75,11 @@ namespace Sirius.HousingPaymentPlans
                                 , HousingPaymentPlanType.Transfer
                                 , null
                             );
-                        
+
                         housingPaymentPlans.Add(housingPaymentPlanForHousingDueTransfer);
                     }
                 }
-                
+
                 var date = newStartDate;
                 for (var i = 0; i < housingPaymentPlanGroup.CountOfMonth; i++)
                 {
@@ -109,7 +110,8 @@ namespace Sirius.HousingPaymentPlans
 
             await _housingPaymentPlanManager.BulkCreateAsync(housingPaymentPlans);
             _housingManager.BulkIncreaseBalance(housings,
-                housingPaymentPlanGroup.AmountPerMonth * housingPaymentPlanGroup.CountOfMonth);
+                housingPaymentPlanGroup.AmountPerMonth * housingPaymentPlanGroup.CountOfMonth,
+                housingPaymentPlanGroup.ResidentOrOwner);
         }
 
         public async Task UpdateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup)

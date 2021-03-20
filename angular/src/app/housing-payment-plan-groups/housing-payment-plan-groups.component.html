@@ -165,6 +165,12 @@
                     field="paymentCategory.paymentCategoryName"
                   ></p-sortIcon>
                 </th>
+                <th pSortableColumn="residentOrOwner">
+                  {{ "ResidentOrOwnerShort" | localize }}
+                  <p-sortIcon
+                    field="residentOrOwner"
+                  ></p-sortIcon>
+                </th>
                 <th pSortableColumn="amountPerMonth">
                   {{ "AmountPerMonth" | localize }}
                   <p-sortIcon field="amountPerMonth"></p-sortIcon>
@@ -203,6 +209,7 @@
                 <td>{{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}</td>
                 <td>{{ housingPaymentPlanGroup.housingCategory.housingCategoryName }}</td>
                 <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName | localize }}</td>
+                <td>{{ residentOrOwnerEnum[housingPaymentPlanGroup.residentOrOwner] | localize }}</td>
                 <td>{{ housingPaymentPlanGroup.amountPerMonth | number: "1.2-2" }}</td>
                 <td>{{ housingPaymentPlanGroup.countOfMonth | number }}</td>
                 <td>{{ housingPaymentPlanGroup.paymentDayOfMonth | number }}</td>

@@ -5,12 +5,12 @@ import {
   EventEmitter,
   Output,
   AfterViewInit,
-  AfterViewChecked
-} from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-import * as _ from 'lodash';
-import { AppComponentBase } from '@shared/app-component-base';
+  AfterViewChecked,
+} from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef } from "ngx-bootstrap/modal";
+import * as _ from "lodash";
+import { AppComponentBase } from "@shared/app-component-base";
 import {
   HousingServiceProxy,
   CreateHousingDto,
@@ -18,14 +18,16 @@ import {
   HousingCategoryServiceProxy,
   BlockServiceProxy,
   CreateTransferForHousingDueDto,
-} from '@shared/service-proxies/service-proxies';
-import { Moment } from 'moment';
-import * as moment from 'moment';
+  ResidentOrOwner,
+} from "@shared/service-proxies/service-proxies";
+import { Moment } from "moment";
+import * as moment from "moment";
 
 @Component({
-  templateUrl: 'create-housing-dialog.component.html'
+  templateUrl: "create-housing-dialog.component.html",
 })
-export class CreateHousingDialogComponent extends AppComponentBase
+export class CreateHousingDialogComponent
+  extends AppComponentBase
   implements OnInit {
   saving = false;
   housing = new CreateHousingDto();
@@ -33,7 +35,9 @@ export class CreateHousingDialogComponent extends AppComponentBase
   blocks: LookUpDto[];
   isCredit: boolean;
   dateForDatepicker = moment();
-
+  residentOrOwners: any[];
+  residentOrOwnerEnum = ResidentOrOwner;
+  
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
@@ -56,14 +60,23 @@ export class CreateHousingDialogComponent extends AppComponentBase
         }
       });
 
-    this._blockService
-      .getBlockLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.blocks = result;
-      });
+    this._blockService.getBlockLookUp().subscribe((result: LookUpDto[]) => {
+      this.blocks = result;
+    });
 
     this.housing.createTransferForHousingDue = new CreateTransferForHousingDueDto();
     this.housing.createTransferForHousingDue.isDebt = true;
+
+    this.residentOrOwners = [
+      {
+        value: ResidentOrOwner.Resident.toString(),
+        label: this.l(this.residentOrOwnerEnum[ResidentOrOwner.Resident]),
+      },
+      {
+        value: ResidentOrOwner.Owner.toString(),
+        label: this.l(this.residentOrOwnerEnum[ResidentOrOwner.Owner]),
+      },
+    ];
   }
 
   save(): void {
@@ -80,7 +93,7 @@ export class CreateHousingDialogComponent extends AppComponentBase
         })
       )
       .subscribe(() => {
-        this.notify.info(this.l('SavedSuccessfully'));
+        this.notify.info(this.l("SavedSuccessfully"));
         this.bsModalRef.hide();
         this.onSave.emit();
       });

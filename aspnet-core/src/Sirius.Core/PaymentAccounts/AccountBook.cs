@@ -9,6 +9,7 @@ using Abp.Domain.Repositories;
 using Abp.UI;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Sirius.Housings;
 using Sirius.PaymentCategories;
 
 namespace Sirius.PaymentAccounts
@@ -33,6 +34,7 @@ namespace Sirius.PaymentAccounts
         public string Description { get; private set; }
         public bool EncashmentHousing { get; private set; }
         public Guid? HousingIdForEncachment { get; private set; }
+        public Guid? PaymentCategoryIdForEncachment { get; private set; }
         public DateTime? DocumentDateTime { get; private set; }
         public string DocumentNumber { get; private set; }
         public decimal? FromPaymentAccountCurrentBalance { get; private set; }
@@ -76,7 +78,7 @@ namespace Sirius.PaymentAccounts
             return await BindEntityAsync(accountBookPolicy, false, false, id, tenantId,
                 AccountBookType.HousingDue,
                 processDateTime,
-                paymentCategoryId, housingId, false, null, null,
+                paymentCategoryId, housingId, false, null, null, null,
                 toPaymentAccountId, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
                 null, null, false);
         }
@@ -95,7 +97,7 @@ namespace Sirius.PaymentAccounts
             return await BindEntityAsync(accountBookPolicy, false, true, id, tenantId,
                 AccountBookType.ForPaymentAccount,
                 processDateTime,
-                null, null, false, null, null,
+                null, null, false, null, null, null,
                 toPaymentAccount, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
                 null, null, true);
         }
@@ -110,6 +112,7 @@ namespace Sirius.PaymentAccounts
             Guid? housingId,
             bool encashmentHousing,
             Guid? housingIdForEncachment,
+            Guid? paymentCategoryIdForEncachment,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
@@ -123,7 +126,7 @@ namespace Sirius.PaymentAccounts
             return await BindEntityAsync(accountBookPolicy, false, false, id, tenantId,
                 accountBookType,
                 processDateTime,
-                paymentCategoryId, housingId, encashmentHousing, housingIdForEncachment,
+                paymentCategoryId, housingId, encashmentHousing, housingIdForEncachment,paymentCategoryIdForEncachment,
                 fromPaymentAccount,
                 toPaymentAccount, amount, description, documentDateTime, documentNumber, accountBookFiles,
                 DateTime.UtcNow, creatorUserId, null, null, transferPaymentAccount);
@@ -162,6 +165,7 @@ namespace Sirius.PaymentAccounts
                 existingAccountBook.HousingId,
                 existingAccountBook.EncashmentHousing,
                 existingAccountBook.HousingIdForEncachment,
+                existingAccountBook.PaymentCategoryIdForEncachment,
                 fromPaymentAccount,
                 toPaymentAccount,
                 amount, description, documentDateTime, documentNumber, existingAccountBook.AccountBookFiles, null, null,
@@ -180,6 +184,7 @@ namespace Sirius.PaymentAccounts
             Guid? housingId,
             bool encashmentHousing,
             Guid? housingIdForEncachment,
+            Guid? paymentCategoryIdForEncachment,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
@@ -207,6 +212,7 @@ namespace Sirius.PaymentAccounts
             accountBook.DocumentNumber = documentNumber;
             accountBook.EncashmentHousing = encashmentHousing;
             accountBook.HousingIdForEncachment = housingIdForEncachment;
+            accountBook.PaymentCategoryIdForEncachment = paymentCategoryIdForEncachment;
             accountBook.HousingId = housingId;
             accountBook.Amount = amount;
             accountBook.FromPaymentAccountId = fromPaymentAccount?.Id;

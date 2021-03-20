@@ -11,6 +11,8 @@ namespace Sirius.Housings.Dto
         public string Apartment { get; set; }
         public Guid HousingCategoryId { get; set; }
         public decimal Balance { get; set; }
+        public decimal ResidentBalance { get; set; }
+        public decimal OwnerBalance { get; set; }
         public bool TenantIsResiding { get; set; }
 
         public virtual Block Block { get; set; }

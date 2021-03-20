@@ -16,9 +16,8 @@ namespace Sirius.PaymentCategories
         Task<List<PaymentCategoryDto>> GetPaymentCategoryForMenuAsync();
         Task<List<LookUpDto>> GetLookUp(bool onlyActives);
         Task<List<LookUpDto>> GetLookUpByPaymentCategoryType(bool onlyActives, PaymentCategoryType paymentCategoryType);
-        // Task<List<LookUpDto>> GetHousingDuePaymentCategoryLookUpAsync(bool onlyActives);
         Task<List<LookUpDto>> GetPaymentCategoryForTransferLookUpAsync();
-        // Task<PaymentCategoryDto> GetRegularHousingDueAsync();
+        Task<List<LookUpDto>> GetLookUpByHousingId(Guid housingId);
         Task<List<string>> GetPaymentCategoryFromAutoCompleteFilterAsync(string request);
     }
 }

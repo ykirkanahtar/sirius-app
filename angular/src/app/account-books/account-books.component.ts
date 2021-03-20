@@ -107,7 +107,6 @@ export class AccountBooksComponent
   }
 
   ngOnInit(): void {
-
     this.createMenu();
 
     this._paymentCategoryService
@@ -160,7 +159,7 @@ export class AccountBooksComponent
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
                 PaymentCategoryType.Expense
-              );            
+              );
             },
           };
           this.menuItems.push(expenseMenuItem);
@@ -172,7 +171,7 @@ export class AccountBooksComponent
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
                 PaymentCategoryType.TransferBetweenAccounts
-              );            
+              );
             },
           };
           this.menuItems.push(transferBetweenAccounts);
@@ -180,24 +179,33 @@ export class AccountBooksComponent
           let housingDuePaymentCategories = paymentCategories.filter(
             (p) => p.isHousingDue
           );
-          this.createMenuItem(
-            housingDuePaymentCategories,
-            this.l("HousingDue")
-          );
+
+          if (housingDuePaymentCategories.length > 0) {
+            this.createMenuItem(
+              housingDuePaymentCategories,
+              this.l("HousingDue")
+            );
+          }
 
           let incomePaymentCategories = paymentCategories.filter(
             (p) =>
               p.paymentCategoryType === PaymentCategoryType.Income &&
               p.isHousingDue === false
           );
-          this.createMenuItem(incomePaymentCategories, this.l("Incomes"));
+
+          if (incomePaymentCategories.length > 0) {
+            this.createMenuItem(incomePaymentCategories, this.l("Incomes"));
+          }
 
           let expensePaymentCategories = paymentCategories.filter(
             (p) =>
               p.paymentCategoryType === PaymentCategoryType.Expense &&
               p.isHousingDue === false
           );
-          this.createMenuItem(expensePaymentCategories, this.l("Expenses"));
+
+          if (expensePaymentCategories.length > 0) {
+            this.createMenuItem(expensePaymentCategories, this.l("Expenses"));
+          }
         }
       });
   }

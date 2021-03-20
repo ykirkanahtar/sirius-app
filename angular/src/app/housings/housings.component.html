@@ -171,9 +171,13 @@
                     field="tenantIsResiding"
                   ></p-sortIcon>
                 </th>
-                <th pSortableColumn="balance">
-                  {{ "Balance" | localize }}
-                  <p-sortIcon field="balance"></p-sortIcon>
+                <th pSortableColumn="residentBalance">
+                  {{ "ResidentBalance" | localize }}
+                  <p-sortIcon field="residentBalance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="ownerBalance">
+                  {{ "OwnerBalance" | localize }}
+                  <p-sortIcon field="ownerBalance"></p-sortIcon>
                 </th>
                 <th style="width: 350px">{{ "Actions" | localize }}</th>
               </tr>
@@ -198,7 +202,8 @@
                 <td>{{ housing.apartment }}</td>
                 <td>{{ housing.housingCategoryName }}</td>
                 <td>{{ housing.tenantIsResiding.toString() | localize }}</td>
-                <td>{{ housing.balance | number: "1.2-2" }}</td>
+                <td>{{ housing.residentBalance | number: "1.2-2" }}</td>
+                <td>{{ housing.ownerBalance | number: "1.2-2" }}</td>
                 <td>
                   <button
                     type="button"

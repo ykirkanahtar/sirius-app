@@ -213,6 +213,7 @@
     <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>
     <text name="Employees">Çalışanlar</text>
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
+    <text name="Encashment">Mahsuplaşma</text>
     <text name="EncachmentFromHousingDue">Mahsuplaşma</text>
     <text name="EncachmentFromHousingDueDescription">Eğer ödeme, bir konut aidatından düşülecekse yukarıdaki seçeneği seçiniz.</text>
     <text name="EncashmentHousingText">Mahsuplaşmanın yapıldığı konut: </text>
@@ -266,10 +267,11 @@
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
-    <text name="Netting">Mahsuplaşma</text>
     <text name="NoDataFound">Veri bulunamadı</text>
     <text name="OtherPayment">Diğer işlemler</text>
     <text name="OtherPayments">Diğer ödemeler</text>
+    <text name="Owner">Tapu Sahibi</text>
+    <text name="OwnerBalance">Tapu Sahibi Hesabı Bakiye</text>
     <text name="PaymentAccount">Ödeme hesabı</text>
     <text name="PaymentAccountName">Ödeme Hesabı</text>
     <text name="PaymentAccounts">Hesaplar</text>
@@ -281,6 +283,7 @@
     <text name="PaymentCategoriesMenu">Ödeme Kategorileri (Menü)</text>
     <text name="PaymentCategory">Ödeme türü</text>
     <text name="PaymentCategoryDeleteWarningMessage">Ödeme türünü silmek istediğinize emin misiniz?</text>
+    <text name="PaymentCategoryForEncashment">Mahsuplaşma için ödeme kategorisi</text>
     <text name="PaymentCategoryName">Kategori Adı</text>
     <text name="PaymentCategoryNameShort">Kategori</text>
     <text name="PaymentDayOfMonth">Ödeme Günü</text>
@@ -302,6 +305,10 @@
     <text name="RegularHousingDue">Olağan aidat ödemesi</text>
     <text name="RegularHousingDueName">Olağan aidat ödeme ismi</text>
     <text name="RemovePerson">Kişi tanımını kaldır</text>
+    <text name="Resident">Malik</text>
+    <text name="ResidentBalance">Malik Hesabı Bakiye</text>
+    <text name="ResidentOrOwner">Malik/Tapu Sahibi</text>
+    <text name="ResidentOrOwnerShort">Malik/Tapu Sb.</text>
     <text name="SalaryPayment">Maaş ödemesi</text>
     <text name="SelectDate">Tarih Seçiniz</text>
     <text name="SelectHousingPaymentPlans">Konut ödeme planı gir</text>

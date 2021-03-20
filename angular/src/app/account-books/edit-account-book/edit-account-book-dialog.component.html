@@ -52,7 +52,8 @@
               </div>
             </div>
             <div
-              class="form-group row required"
+              class="form-group row"
+              [ngClass]="accountBook.encachmentFromHousingDue === false ? 'required' : ''"
               *ngIf="
                 paymentCategory.paymentCategoryType ===
                   PaymentCategoryTypeEnum.Expense ||
@@ -63,7 +64,7 @@
               <div class="col-md-10">
                 <label for="fromPaymentAccounts">
                   {{ "FromPaymentAccount" | localize }}
-                  <span class="text-danger">*</span>
+                  <span *ngIf="accountBook.encachmentFromHousingDue === false" class="text-danger">*</span>
                 </label>
                 <p-dropdown
                   id="fromPaymentAccounts"
@@ -73,7 +74,7 @@
                   [(ngModel)]="accountBook.fromPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
-                  required
+                  [required]="accountBook.encachmentFromHousingDue === false"
                   [showClear]="true"
                 >
                 </p-dropdown>

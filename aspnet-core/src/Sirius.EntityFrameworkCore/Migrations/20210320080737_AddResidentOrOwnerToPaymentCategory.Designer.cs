@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210320080737_AddResidentOrOwnerToPaymentCategory")]
+    partial class AddResidentOrOwnerToPaymentCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1791,12 +1793,6 @@ namespace Sirius.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
-                    b.Property<decimal>("OwnerBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ResidentBalance")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
 
@@ -2024,9 +2020,6 @@ namespace Sirius.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<Guid?>("PaymentCategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("PaymentCategoryIdForEncachment")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ProcessDateTime")

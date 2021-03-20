@@ -21,6 +21,7 @@ namespace Sirius.PaymentCategories
 
         [StringLength(50)] public string PaymentCategoryName { get; private set; }
         public bool IsHousingDue { get; set; }
+        public ResidentOrOwner? HousingDueForResidentOrOwner { get; set; }
 
         // public HousingDueType? HousingDueType { get; private set; }
         public bool IsValidForAllPeriods { get; private set; }
@@ -54,10 +55,10 @@ namespace Sirius.PaymentCategories
 
         public static PaymentCategory CreateHousingDue(Guid id, int tenantId, string paymentCategoryName,
             /*HousingDueType? housingDueType, */
-            Guid defaultToPaymentAccountId)
+            Guid defaultToPaymentAccountId, ResidentOrOwner housingDueForResidentOrOwner)
         {
             return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, true, /*housingDueType,*/
-                false, null, defaultToPaymentAccountId, PaymentCategoryType.Income,  true);
+                false, null, defaultToPaymentAccountId, PaymentCategoryType.Income,  true, housingDueForResidentOrOwner);
         }
 
         public static PaymentCategory CreateTransferBetweenAccounts(Guid id, int tenantId, string paymentCategoryName,
@@ -92,7 +93,7 @@ namespace Sirius.PaymentCategories
             string paymentCategoryName, bool isHousingDue, /*HousingDueType? housingDueType, */
             bool isValidForAllPeriods, Guid?
                 defaultFromPaymentAccountId, Guid? defaultToPaymentAccountId, PaymentCategoryType paymentCategoryType,
-            bool isActive)
+            bool isActive, ResidentOrOwner? housingDueForResidentOrOwner = null)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
             {
@@ -116,6 +117,7 @@ namespace Sirius.PaymentCategories
             paymentCategory.DefaultToPaymentAccountId = defaultToPaymentAccountId;
             paymentCategory.IsActive = isActive;
             paymentCategory.PaymentCategoryType = paymentCategoryType;
+            paymentCategory.HousingDueForResidentOrOwner = housingDueForResidentOrOwner;
 
             return paymentCategory;
         }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.HousingPaymentPlans;
 using Sirius.PaymentAccounts;
 using Sirius.People;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {
@@ -61,21 +62,21 @@ namespace Sirius.Housings
             await _housingRepository.DeleteAsync(housing);
         }
 
-        public async Task IncreaseBalance(Housing housing, decimal amount)
+        public async Task IncreaseBalance(Housing housing, decimal amount, ResidentOrOwner residentOrOwner)
         {
-            housing = Housing.IncreaseBalance(housing, amount);
+            housing = Housing.IncreaseBalance(housing, amount, residentOrOwner);
             await _housingRepository.UpdateAsync(housing);
         }
 
-        public void BulkIncreaseBalance(IEnumerable<Housing> housings, decimal amount)
+        public void BulkIncreaseBalance(IEnumerable<Housing> housings, decimal amount, ResidentOrOwner residentOrOwner)
         {
-            var updatedHousings = housings.Select(housing => Housing.IncreaseBalance(housing, amount)).ToList();
+            var updatedHousings = housings.Select(housing => Housing.IncreaseBalance(housing, amount, residentOrOwner)).ToList();
             _housingRepository.GetDbContext().UpdateRange(updatedHousings);
         }
 
-        public async Task DecreaseBalance(Housing housing, decimal amount)
+        public async Task DecreaseBalance(Housing housing, decimal amount, ResidentOrOwner residentOrOwner)
         {
-            housing = Housing.DecreaseBalance(housing, amount);
+            housing = Housing.DecreaseBalance(housing, amount, residentOrOwner);
             await _housingRepository.UpdateAsync(housing);
         }
 
