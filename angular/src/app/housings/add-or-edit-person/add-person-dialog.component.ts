@@ -21,6 +21,8 @@ export class AddPersonDialogComponent extends AppComponentBase
   housing = new HousingDto();
   block = new BlockDto();
   people: LookUpDto[];
+  selectedPeople: string[] = [];
+
   housingPerson = new CreateHousingPersonDto();
   housingPersonId: string;
 

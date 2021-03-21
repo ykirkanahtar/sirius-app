@@ -1739,7 +1739,7 @@ export class HousingServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    addPerson(body: CreateHousingPersonDto | undefined): Observable<HousingPersonDto> {
+    addPerson(body: CreateHousingPersonDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/Housing/AddPerson";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1751,7 +1751,6 @@ export class HousingServiceProxy {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
             })
         };
 
@@ -1762,14 +1761,14 @@ export class HousingServiceProxy {
                 try {
                     return this.processAddPerson(<any>response_);
                 } catch (e) {
-                    return <Observable<HousingPersonDto>><any>_observableThrow(e);
+                    return <Observable<void>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<HousingPersonDto>><any>_observableThrow(response_);
+                return <Observable<void>><any>_observableThrow(response_);
         }));
     }
 
-    protected processAddPerson(response: HttpResponseBase): Observable<HousingPersonDto> {
+    protected processAddPerson(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1778,17 +1777,14 @@ export class HousingServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = HousingPersonDto.fromJS(resultData200);
-            return _observableOf(result200);
+            return _observableOf<void>(<any>null);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<HousingPersonDto>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
     /**
@@ -9596,7 +9592,7 @@ export interface IHousingForListDtoPagedResultDto {
 
 export class CreateHousingPersonDto implements ICreateHousingPersonDto {
     housingId: string;
-    personId: string;
+    peopleIds: string[] | undefined;
     isTenant: boolean;
     contact: boolean;
 
@@ -9612,7 +9608,11 @@ export class CreateHousingPersonDto implements ICreateHousingPersonDto {
     init(_data?: any) {
         if (_data) {
             this.housingId = _data["housingId"];
-            this.personId = _data["personId"];
+            if (Array.isArray(_data["peopleIds"])) {
+                this.peopleIds = [] as any;
+                for (let item of _data["peopleIds"])
+                    this.peopleIds.push(item);
+            }
             this.isTenant = _data["isTenant"];
             this.contact = _data["contact"];
         }
@@ -9628,7 +9628,11 @@ export class CreateHousingPersonDto implements ICreateHousingPersonDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["housingId"] = this.housingId;
-        data["personId"] = this.personId;
+        if (Array.isArray(this.peopleIds)) {
+            data["peopleIds"] = [];
+            for (let item of this.peopleIds)
+                data["peopleIds"].push(item);
+        }
         data["isTenant"] = this.isTenant;
         data["contact"] = this.contact;
         return data; 
@@ -9644,7 +9648,7 @@ export class CreateHousingPersonDto implements ICreateHousingPersonDto {
 
 export interface ICreateHousingPersonDto {
     housingId: string;
-    personId: string;
+    peopleIds: string[] | undefined;
     isTenant: boolean;
     contact: boolean;
 }

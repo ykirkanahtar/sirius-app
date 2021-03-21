@@ -204,14 +204,15 @@ namespace Sirius.Housings
                     select new LookUpDto(l.Id.ToString(), l.GetName())).ToList();
         }
 
-        public async Task<HousingPersonDto> AddPersonAsync(CreateHousingPersonDto input)
+        public async Task AddPersonAsync(CreateHousingPersonDto input)
         {
             CheckUpdatePermission();
             var housing = await _housingManager.GetAsync(input.HousingId);
-            var person = await _personManager.GetAsync(input.PersonId);
-
-            var housingPerson = await _housingManager.AddPersonAsync(housing, person, input.IsTenant, input.Contact);
-            return ObjectMapper.Map<HousingPersonDto>(housingPerson);
+            foreach (var personId in input.PeopleIds)
+            {
+                var person = await _personManager.GetAsync(personId);
+                await _housingManager.AddPersonAsync(housing, person, input.IsTenant, input.Contact);
+            }
         }
 
         public async Task RemovePersonAsync(RemoveHousingPersonDto input)
