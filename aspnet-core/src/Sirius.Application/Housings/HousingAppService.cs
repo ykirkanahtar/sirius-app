@@ -71,16 +71,16 @@ namespace Sirius.Housings
                     AbpSession.GetTenantId(),
                     block, input.Apartment, housingCategory, input.TenantIsResiding);
                 
-                if (input.CreateTransferForHousingDue.Amount != 0)
+                if (input.CreateTransferForHousingDue.Amount.GetValueOrDefault() != 0)
                 {
                     housing = input.CreateTransferForHousingDue.IsDebt
-                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount, input.CreateTransferForHousingDue.ResidentOrOwner)
-                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount, input.CreateTransferForHousingDue.ResidentOrOwner);
+                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount.GetValueOrDefault(), input.CreateTransferForHousingDue.ResidentOrOwner)
+                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount.GetValueOrDefault(), input.CreateTransferForHousingDue.ResidentOrOwner);
                 }
 
                 await _housingManager.CreateAsync(housing);
 
-                if (input.CreateTransferForHousingDue.Amount != 0)
+                if (input.CreateTransferForHousingDue.Amount.GetValueOrDefault() != 0)
                 {
                     // var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
                     // var paymentCategory = await _paymentCategoryManager.GetAsync(input.CreateTransferForHousingDue.PaymentCategoryId);
@@ -93,7 +93,7 @@ namespace Sirius.Housings
                             , housing
                             , null
                             , input.CreateTransferForHousingDue.Date
-                            , input.CreateTransferForHousingDue.Amount
+                            , input.CreateTransferForHousingDue.Amount.GetValueOrDefault()
                             , input.CreateTransferForHousingDue.Description
                             , HousingPaymentPlanType.Transfer
                             , null
@@ -104,7 +104,7 @@ namespace Sirius.Housings
                             , housing
                             , null
                             , input.CreateTransferForHousingDue.Date
-                            , input.CreateTransferForHousingDue.Amount
+                            , input.CreateTransferForHousingDue.Amount.GetValueOrDefault()
                             , input.CreateTransferForHousingDue.Description
                             , null
                             , HousingPaymentPlanType.Transfer
