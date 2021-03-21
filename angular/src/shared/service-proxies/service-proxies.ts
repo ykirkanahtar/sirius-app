@@ -8803,7 +8803,7 @@ export enum ResidentOrOwner {
 export class CreateTransferForHousingDueDto implements ICreateTransferForHousingDueDto {
     housingId: string;
     residentOrOwner: ResidentOrOwner;
-    amount: number;
+    amount: number | undefined;
     isDebt: boolean;
     paymentCategoryId: string;
     date: moment.Moment;
@@ -8860,7 +8860,7 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
 export interface ICreateTransferForHousingDueDto {
     housingId: string;
     residentOrOwner: ResidentOrOwner;
-    amount: number;
+    amount: number | undefined;
     isDebt: boolean;
     paymentCategoryId: string;
     date: moment.Moment;

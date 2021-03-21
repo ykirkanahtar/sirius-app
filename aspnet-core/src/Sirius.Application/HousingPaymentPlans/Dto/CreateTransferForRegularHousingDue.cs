@@ -10,7 +10,7 @@ namespace Sirius.HousingPaymentPlans.Dto
     {
         public Guid HousingId { get; set; }
         public ResidentOrOwner ResidentOrOwner { get; set; }
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
         public bool IsDebt { get; set; }
         public Guid PaymentCategoryId { get; set; }
 
@@ -19,7 +19,7 @@ namespace Sirius.HousingPaymentPlans.Dto
 
         public void Normalize()
         {
-            Amount = Math.Abs(Amount);
+            Amount = Math.Abs(Amount.GetValueOrDefault());
         }
     }
 }
