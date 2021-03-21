@@ -11,7 +11,7 @@ namespace Sirius.Housings
     public interface IHousingAppService : IAsyncCrudAppService<HousingDto, Guid, PagedHousingResultRequestDto, CreateHousingDto, UpdateHousingDto>
     {
         Task<List<LookUpDto>> GetHousingLookUpAsync();
-        Task<HousingPersonDto> AddPersonAsync(CreateHousingPersonDto input);
+        Task AddPersonAsync(CreateHousingPersonDto input);
         Task RemovePersonAsync(RemoveHousingPersonDto input);
         Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId);
         Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input);
