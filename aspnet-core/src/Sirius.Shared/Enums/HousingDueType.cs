@@ -1,12 +1,10 @@
 namespace Sirius.Shared.Enums
 {
-    public enum HousingDueType
+    public enum HousingPaymentPlanType
     {
-        RegularHousingDue = 1,
-        TransferForRegularHousingDue = 2,
-        Netting = 3,
-        AdditionalHousingDueForResident = 4,
-        AdditionalHousingDueForOwner = 5,
-        TransferForAdditionalHousingDue = 6,
+        HousingDueDefinition = 1,
+        HousingDuePayment = 2,
+        Transfer = 3,
+        Encashment = 4
     }
 }

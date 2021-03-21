@@ -37,12 +37,12 @@ namespace Sirius.PaymentAccounts
 
         public async Task DeleteAsync(PaymentAccount paymentAccount)
         {
-            var transferPaymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
+            // incele
+            // var transferPaymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
 
             var accountBooks = await _accountBookRepository.GetAllListAsync(
-                p => (p.FromPaymentAccountId == paymentAccount.Id
-                      || p.ToPaymentAccountId == paymentAccount.Id)
-                     && p.PaymentCategoryId == transferPaymentCategory.Id);
+                p => p.FromPaymentAccountId == paymentAccount.Id
+                      || p.ToPaymentAccountId == paymentAccount.Id);
             if (accountBooks.Count > 0)
             {
                 throw new UserFriendlyException(
@@ -51,14 +51,14 @@ namespace Sirius.PaymentAccounts
 
             await _paymentAccountRepository.DeleteAsync(paymentAccount);
 
-            var transferAccountBook =
-                await _accountBookRepository.GetAll().Where(p => p.PaymentCategoryId == transferPaymentCategory.Id)
-                    .SingleOrDefaultAsync();
-
-            if (transferAccountBook != null)
-            {
-                await _accountBookRepository.DeleteAsync(transferAccountBook);
-            }
+            // var transferAccountBook =
+            //     await _accountBookRepository.GetAll().Where(p => p.PaymentCategoryId == transferPaymentCategory.Id)
+            //         .SingleOrDefaultAsync();
+            //
+            // if (transferAccountBook != null)
+            // {
+            //     await _accountBookRepository.DeleteAsync(transferAccountBook);
+            // }
         }
 
         public async Task<PaymentAccount> GetAsync(Guid id)

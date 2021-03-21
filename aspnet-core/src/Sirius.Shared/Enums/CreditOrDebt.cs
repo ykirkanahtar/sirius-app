@@ -1,6 +1,6 @@
 ﻿namespace Sirius.Shared.Enums
 {
-    public enum PaymentPlanType
+    public enum CreditOrDebt
     {
         Credit = 1,
         Debt = 2

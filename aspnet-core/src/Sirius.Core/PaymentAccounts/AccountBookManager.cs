@@ -43,27 +43,29 @@ namespace Sirius.PaymentAccounts
         public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
             PaymentAccount toPaymentAccount)
         {
-            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing);
+            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing, null, null);
         }
 
         //Yapılan ödemeyi aidattan düşme
-        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housing,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount)
+        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housingForEncashment,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForEncashment)
         {
             await CreateAsync(accountBook, AccountBookType.OtherPaymentWithEncachmentForHousingDue,
-                fromPaymentAccount, toPaymentAccount, housing);
+                fromPaymentAccount, toPaymentAccount, null, housingForEncashment, paymentCategoryForEncashment);
         }
 
         public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
         {
-            await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null);
+            await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null, null, null);
         }
 
         public async Task CreateAsync(AccountBook accountBook,
             AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
-            [CanBeNull] Housing housing)
+            [CanBeNull] Housing housing,
+            [CanBeNull] Housing housingForEncashment,
+            [CanBeNull] PaymentCategory paymentCategoryForEncashment)
         {
             if (fromPaymentAccount == null
                 && toPaymentAccount == null
@@ -82,38 +84,46 @@ namespace Sirius.PaymentAccounts
                 return;
             }
 
+            var paymentCategory = accountBook.PaymentCategoryId.HasValue
+                ? await _paymentCategoryManager.GetAsync(accountBook.PaymentCategoryId.Value)
+                : null;
+
             if (accountBookType == AccountBookType.HousingDue)
             {
-                var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
+                // var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
 
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+                await _housingManager.DecreaseBalance(housing, accountBook.Amount, paymentCategory.HousingDueForResidentOrOwner.Value);
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
                     , housing
-                    , housingDuePaymentCategory
+                    , paymentCategory
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
                     , accountBook.Description
                     , accountBook
+                    , HousingPaymentPlanType.HousingDuePayment
+                    , null
                 ));
             }
 
             if (accountBookType == AccountBookType.OtherPaymentWithEncachmentForHousingDue)
             {
-                var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount);
+                // var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
+                await _housingManager.DecreaseBalance(housingForEncashment, accountBook.Amount, paymentCategoryForEncashment.HousingDueForResidentOrOwner.GetValueOrDefault());
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
-                    , housing
-                    , nettingPaymentCategory
+                    , housingForEncashment
+                    , paymentCategoryForEncashment
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
                     , accountBook.Description
                     , accountBook
+                    , HousingPaymentPlanType.Encashment
+                    , null
                 ));
             }
 
@@ -165,7 +175,8 @@ namespace Sirius.PaymentAccounts
             //Giden hesabın son hesap hareketi mi 
             var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll()
                 .Include(p => p.FromPaymentAccount).Where(p =>
-                    p.ProcessDateTime > accountBook.ProcessDateTime &&
+                    (p.ProcessDateTime > accountBook.ProcessDateTime ||
+                     (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
                     p.FromPaymentAccountId == paymentAccount.Id)
                 .OrderBy(p => p.ProcessDateTime)
                 .ThenBy(p => p.SameDayIndex)
@@ -188,7 +199,8 @@ namespace Sirius.PaymentAccounts
             //Gelen hesabın son hesap hareketi mi 
             var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll()
                 .Include(p => p.ToPaymentAccount).Where(p =>
-                    p.ProcessDateTime > accountBook.ProcessDateTime &&
+                    (p.ProcessDateTime > accountBook.ProcessDateTime ||
+                     (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
                     p.ToPaymentAccountId == paymentAccount.Id)
                 .OrderBy(p => p.ProcessDateTime)
                 .ThenBy(p => p.SameDayIndex)
@@ -223,26 +235,45 @@ namespace Sirius.PaymentAccounts
             else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
-                        p.ProcessDateTime <= accountBook.ProcessDateTime &&
+                        (p.ProcessDateTime < accountBook.ProcessDateTime ||
+                         (p.ProcessDateTime == accountBook.ProcessDateTime &&
+                          p.SameDayIndex < accountBook.SameDayIndex))
+                        &&
                         (p.FromPaymentAccountId == paymentAccount.Id ||
                          p.ToPaymentAccountId == paymentAccount.Id))
                     .OrderByDescending(p => p.ProcessDateTime)
                     .ThenByDescending(p => p.SameDayIndex)
-                    .FirstAsync();
+                    .FirstOrDefaultAsync();
 
                 if (paymentAccountDirection == PaymentAccountDirection.From)
                 {
-                    var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                        ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
-                        : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
-                    accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
+                    if (previousAccountBook == null
+                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+                    {
+                        accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, accountBook.Amount);
+                    }
+                    else
+                    {
+                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
+                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
+                        accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
+                    }
                 }
                 else
                 {
-                    var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                        ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
-                        : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
-                    accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
+                    if (previousAccountBook == null
+                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+                    {
+                        accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, accountBook.Amount);
+                    }
+                    else
+                    {
+                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
+                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
+                        accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
+                    }
                 }
             }
         }

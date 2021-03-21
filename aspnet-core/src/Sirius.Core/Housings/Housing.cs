@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Abp.UI;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings
 {
@@ -26,6 +27,8 @@ namespace Sirius.Housings
         public Guid HousingCategoryId { get; private set; }
 
         [DefaultValue(0)] public decimal Balance { get; private set; }
+        [DefaultValue(0)] public decimal ResidentBalance { get; private set; }
+        [DefaultValue(0)] public decimal OwnerBalance { get; private set; }
         
         public bool TenantIsResiding { get; private set; }
 
@@ -81,24 +84,42 @@ namespace Sirius.Housings
             return housing;
         }
 
-        public static Housing IncreaseBalance(Housing housing, decimal amount)
+        public static Housing IncreaseBalance(Housing housing, decimal amount, ResidentOrOwner residentOrOwner)
         {
             if (amount < 0)
             {
                 throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
+            }
+            
+            if (residentOrOwner == ResidentOrOwner.Resident)
+            {
+                housing.ResidentBalance += amount;
+            }
+            else
+            {
+                housing.OwnerBalance += amount;
             }
 
             housing.Balance += amount;
             return housing;
         }
 
-        public static Housing DecreaseBalance(Housing housing, decimal amount)
+        public static Housing DecreaseBalance(Housing housing, decimal amount, ResidentOrOwner residentOrOwner)
         {
             if (amount < 0)
             {
                 throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
             }
 
+            if (residentOrOwner == ResidentOrOwner.Resident)
+            {
+                housing.ResidentBalance -= amount;
+            }
+            else
+            {
+                housing.OwnerBalance -= amount;
+            }
+            
             housing.Balance -= amount;
             return housing;
         }

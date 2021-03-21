@@ -102,12 +102,30 @@
               mode="decimal"
               [minFractionDigits]="2"
               [maxFractionDigits]="2"
-              [style]="{'width':'100%'}"
+              [style]="{ width: '100%' }"
             >
             </p-inputNumber>
           </div>
         </div>
         <div *ngIf="housing.createTransferForHousingDue.amount > 0">
+          <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="residentOrOwner">
+              {{ "ResidentOrOwner" | localize }}
+            </label>
+            <div class="col-md-9">
+              <p-dropdown
+                id="residentOrOwner"
+                name="residentOrOwner"
+                [placeholder]="'PleaseSelect' | localize"
+                [options]="residentOrOwners"
+                [(ngModel)]="housing.createTransferForHousingDue.residentOrOwner"
+                [filter]="true"
+                [style]="{ width: '100%' }"
+                required
+              >
+              </p-dropdown>
+            </div>
+          </div>
           <div class="form-group row required">
             <label class="col-md-3 col-form-label" for="date">
               {{ "TransferDate" | localize }}

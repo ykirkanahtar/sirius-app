@@ -11,5 +11,7 @@ namespace Sirius.Housings.Dto
         public string HousingCategoryName { get; set; }
         public bool TenantIsResiding { get; set; }
         public decimal Balance { get; set; }
+        public decimal ResidentBalance { get; set; }
+        public decimal OwnerBalance { get; set; }
     }
 }

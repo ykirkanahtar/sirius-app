@@ -13,7 +13,6 @@ import {
   PaymentCategoryServiceProxy,
   PaymentCategoryDtoPagedResultDto,
   PaymentCategoryType,
-  HousingDueType,
 } from "@shared/service-proxies/service-proxies";
 import { Table } from "primeng/table";
 import { LazyLoadEvent } from "primeng/api";
@@ -41,7 +40,6 @@ export class PaymentCategoriesComponent
 
   paymentCategoriesFilter: string[] = [];
   selectedPaymentCategoryFilter: string;
-  HousingDueTypeEnum = HousingDueType;
 
   constructor(
     injector: Injector,

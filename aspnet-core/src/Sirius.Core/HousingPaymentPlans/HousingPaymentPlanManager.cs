@@ -12,15 +12,18 @@ namespace Sirius.HousingPaymentPlans
     public class HousingPaymentPlanManager : IHousingPaymentPlanManager
     {
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
+        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IHousingManager _housingManager;
 
         public HousingPaymentPlanManager(IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
-            IHousingManager housingManager, IRepository<Housing, Guid> housingRepository)
+            IHousingManager housingManager, IRepository<Housing, Guid> housingRepository,
+            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
         {
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingManager = housingManager;
             _housingRepository = housingRepository;
+            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
         }
 
         public async Task CreateAsync(HousingPaymentPlan housingPaymentPlan)
@@ -38,7 +41,11 @@ namespace Sirius.HousingPaymentPlans
         {
             var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(housingPaymentPlanId);
 
-            var amountDiff = existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Credit
+            var housingPaymentPlanGroup =
+                await _housingPaymentPlanGroupRepository.GetAsync(existingHousingPaymentPlan.HousingPaymentPlanGroupId
+                    .GetValueOrDefault());
+
+            var amountDiff = existingHousingPaymentPlan.CreditOrDebt == CreditOrDebt.Credit
                 ? Math.Abs(existingHousingPaymentPlan.Amount) - Math.Abs(amount)
                 : Math.Abs(amount) - Math.Abs(existingHousingPaymentPlan.Amount);
 
@@ -48,19 +55,23 @@ namespace Sirius.HousingPaymentPlans
             if (amountDiff != 0)
             {
                 var housing = await _housingRepository.GetAsync(existingHousingPaymentPlan.HousingId);
-                if (existingHousingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
+                if (existingHousingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
                 {
                     if (amountDiff > 0)
-                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff));
+                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff),
+                            housingPaymentPlanGroup.ResidentOrOwner);
                     else
-                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff));
+                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff),
+                            housingPaymentPlanGroup.ResidentOrOwner);
                 }
                 else
                 {
                     if (amountDiff > 0)
-                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff));
+                        await _housingManager.IncreaseBalance(housing, Math.Abs(amountDiff),
+                            housingPaymentPlanGroup.ResidentOrOwner);
                     else
-                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff));
+                        await _housingManager.DecreaseBalance(housing, Math.Abs(amountDiff),
+                            housingPaymentPlanGroup.ResidentOrOwner);
                 }
             }
 
@@ -75,15 +86,18 @@ namespace Sirius.HousingPaymentPlans
                     "Bu kayıt işletme defterine girilen kayıt sonrası otomatik oluşmuştur. İşletme defterindeki kaydı siliniz.");
             }
 
+            var housingPaymentPlanGroup = await _housingPaymentPlanGroupRepository.GetAsync(housingPaymentPlan.Id);
             var housing = await _housingManager.GetAsync(housingPaymentPlan.HousingId);
 
-            if (housingPaymentPlan.PaymentPlanType == PaymentPlanType.Debt)
+            if (housingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
             {
-                await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount));
+                await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
+                    housingPaymentPlanGroup.ResidentOrOwner);
             }
             else
             {
-                await _housingManager.IncreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount));
+                await _housingManager.IncreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
+                    housingPaymentPlanGroup.ResidentOrOwner);
             }
 
             await _housingPaymentPlanRepository.DeleteAsync(housingPaymentPlan);

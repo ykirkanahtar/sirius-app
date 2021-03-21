@@ -211,118 +211,6 @@ export class AccountBookServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createHousingDue(body: CreateHousingDueAccountBookDto | undefined): Observable<AccountBookDto> {
-        let url_ = this.baseUrl + "/api/services/app/AccountBook/CreateHousingDue";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateHousingDue(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateHousingDue(<any>response_);
-                } catch (e) {
-                    return <Observable<AccountBookDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<AccountBookDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreateHousingDue(response: HttpResponseBase): Observable<AccountBookDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AccountBookDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<AccountBookDto>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    createOtherPayment(body: CreateOtherPaymentAccountBookDto | undefined): Observable<AccountBookDto> {
-        let url_ = this.baseUrl + "/api/services/app/AccountBook/CreateOtherPayment";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateOtherPayment(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateOtherPayment(<any>response_);
-                } catch (e) {
-                    return <Observable<AccountBookDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<AccountBookDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreateOtherPayment(response: HttpResponseBase): Observable<AccountBookDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AccountBookDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<AccountBookDto>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
     update(body: UpdateAccountBookDto | undefined): Observable<AccountBookDto> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/Update";
         url_ = url_.replace(/[?&]$/, "");
@@ -572,7 +460,7 @@ export class AccountBookServiceProxy {
      * @param accountBookId (optional) 
      * @return Success
      */
-    getPaymentCategoryLookUpForEditAccountBook(accountBookId: string | undefined): Observable<PaymentCategoryLookUpDto[]> {
+    getPaymentCategoryLookUpForEditAccountBook(accountBookId: string | undefined): Observable<LookUpDto[]> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/GetPaymentCategoryLookUpForEditAccountBook?";
         if (accountBookId === null)
             throw new Error("The parameter 'accountBookId' cannot be null.");
@@ -595,14 +483,14 @@ export class AccountBookServiceProxy {
                 try {
                     return this.processGetPaymentCategoryLookUpForEditAccountBook(<any>response_);
                 } catch (e) {
-                    return <Observable<PaymentCategoryLookUpDto[]>><any>_observableThrow(e);
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<PaymentCategoryLookUpDto[]>><any>_observableThrow(response_);
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetPaymentCategoryLookUpForEditAccountBook(response: HttpResponseBase): Observable<PaymentCategoryLookUpDto[]> {
+    protected processGetPaymentCategoryLookUpForEditAccountBook(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -616,7 +504,7 @@ export class AccountBookServiceProxy {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200.push(PaymentCategoryLookUpDto.fromJS(item));
+                    result200.push(LookUpDto.fromJS(item));
             }
             return _observableOf(result200);
             }));
@@ -625,7 +513,7 @@ export class AccountBookServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<PaymentCategoryLookUpDto[]>(<any>null);
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -2706,58 +2594,6 @@ export class HousingPaymentPlanServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createTransferForHousingDue(body: CreateTransferForHousingDueDto | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateTransferForHousingDue";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateTransferForHousingDue(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateTransferForHousingDue(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreateTransferForHousingDue(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
     createCreditPayment(body: CreateCreditHousingPaymentPlanDto | undefined): Observable<HousingPaymentPlanDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/CreateCreditPayment";
         url_ = url_.replace(/[?&]$/, "");
@@ -3401,6 +3237,62 @@ export class HousingPaymentPlanGroupServiceProxy {
     }
 
     /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getForUpdate(id: string | undefined): Observable<UpdateHousingPaymentPlanGroupDto> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/GetForUpdate?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetForUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetForUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<UpdateHousingPaymentPlanGroupDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UpdateHousingPaymentPlanGroupDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetForUpdate(response: HttpResponseBase): Observable<UpdateHousingPaymentPlanGroupDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UpdateHousingPaymentPlanGroupDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UpdateHousingPaymentPlanGroupDto>(<any>null);
+    }
+
+    /**
      * @param housingIds (optional) 
      * @param housingCategoryIds (optional) 
      * @param personIds (optional) 
@@ -3471,6 +3363,61 @@ export class HousingPaymentPlanGroupServiceProxy {
             }));
         }
         return _observableOf<HousingPaymentPlanGroupDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getResidentOrOwnerLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlanGroup/GetResidentOrOwnerLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetResidentOrOwnerLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetResidentOrOwnerLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetResidentOrOwnerLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -4457,57 +4404,6 @@ export class PaymentCategoryServiceProxy {
     /**
      * @return Success
      */
-    getRegularHousingDue(): Observable<PaymentCategoryDto> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetRegularHousingDue";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetRegularHousingDue(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetRegularHousingDue(<any>response_);
-                } catch (e) {
-                    return <Observable<PaymentCategoryDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<PaymentCategoryDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetRegularHousingDue(response: HttpResponseBase): Observable<PaymentCategoryDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PaymentCategoryDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<PaymentCategoryDto>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
     getPaymentCategoryForMenu(): Observable<PaymentCategoryDto[]> {
         let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryForMenu";
         url_ = url_.replace(/[?&]$/, "");
@@ -4564,8 +4460,8 @@ export class PaymentCategoryServiceProxy {
      * @param onlyActives (optional) 
      * @return Success
      */
-    getPaymentCategoryLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetPaymentCategoryLookUp?";
+    getLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetLookUp?";
         if (onlyActives === null)
             throw new Error("The parameter 'onlyActives' cannot be null.");
         else if (onlyActives !== undefined)
@@ -4581,11 +4477,11 @@ export class PaymentCategoryServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetPaymentCategoryLookUp(response_);
+            return this.processGetLookUp(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetPaymentCategoryLookUp(<any>response_);
+                    return this.processGetLookUp(<any>response_);
                 } catch (e) {
                     return <Observable<LookUpDto[]>><any>_observableThrow(e);
                 }
@@ -4594,7 +4490,132 @@ export class PaymentCategoryServiceProxy {
         }));
     }
 
-    protected processGetPaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+    protected processGetLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param onlyActives (optional) 
+     * @param paymentCategoryType (optional) 
+     * @return Success
+     */
+    getLookUpByPaymentCategoryType(onlyActives: boolean | undefined, paymentCategoryType: PaymentCategoryType | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetLookUpByPaymentCategoryType?";
+        if (onlyActives === null)
+            throw new Error("The parameter 'onlyActives' cannot be null.");
+        else if (onlyActives !== undefined)
+            url_ += "onlyActives=" + encodeURIComponent("" + onlyActives) + "&";
+        if (paymentCategoryType === null)
+            throw new Error("The parameter 'paymentCategoryType' cannot be null.");
+        else if (paymentCategoryType !== undefined)
+            url_ += "paymentCategoryType=" + encodeURIComponent("" + paymentCategoryType) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLookUpByPaymentCategoryType(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLookUpByPaymentCategoryType(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetLookUpByPaymentCategoryType(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @param housingId (optional) 
+     * @return Success
+     */
+    getLookUpByHousingId(housingId: string | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetLookUpByHousingId?";
+        if (housingId === null)
+            throw new Error("The parameter 'housingId' cannot be null.");
+        else if (housingId !== undefined)
+            url_ += "housingId=" + encodeURIComponent("" + housingId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLookUpByHousingId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLookUpByHousingId(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetLookUpByHousingId(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -4650,66 +4671,6 @@ export class PaymentCategoryServiceProxy {
     }
 
     protected processGetPaymentCategoryForTransferLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200.push(LookUpDto.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<LookUpDto[]>(<any>null);
-    }
-
-    /**
-     * @param onlyActives (optional) 
-     * @return Success
-     */
-    getHousingDuePaymentCategoryLookUp(onlyActives: boolean | undefined): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetHousingDuePaymentCategoryLookUp?";
-        if (onlyActives === null)
-            throw new Error("The parameter 'onlyActives' cannot be null.");
-        else if (onlyActives !== undefined)
-            url_ += "onlyActives=" + encodeURIComponent("" + onlyActives) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetHousingDuePaymentCategoryLookUp(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetHousingDuePaymentCategoryLookUp(<any>response_);
-                } catch (e) {
-                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetHousingDuePaymentCategoryLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -5139,21 +5100,21 @@ export class PeriodServiceProxy {
 
     /**
      * @param name (optional) 
-     * @param periodFor (optional) 
+     * @param siteOrBlock (optional) 
      * @param blockId (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(name: string | null | undefined, periodFor: PeriodFor | undefined, blockId: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PeriodDtoPagedResultDto> {
+    getAll(name: string | null | undefined, siteOrBlock: SiteOrBlock | undefined, blockId: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PeriodDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Period/GetAll?";
         if (name !== undefined)
             url_ += "Name=" + encodeURIComponent("" + name) + "&";
-        if (periodFor === null)
-            throw new Error("The parameter 'periodFor' cannot be null.");
-        else if (periodFor !== undefined)
-            url_ += "PeriodFor=" + encodeURIComponent("" + periodFor) + "&";
+        if (siteOrBlock === null)
+            throw new Error("The parameter 'siteOrBlock' cannot be null.");
+        else if (siteOrBlock !== undefined)
+            url_ += "SiteOrBlock=" + encodeURIComponent("" + siteOrBlock) + "&";
         if (blockId !== undefined)
             url_ += "BlockId=" + encodeURIComponent("" + blockId) + "&";
         if (sorting !== undefined)
@@ -7628,15 +7589,28 @@ export interface IRegisterOutput {
     canLogin: boolean;
 }
 
+export enum PaymentCategoryType {
+    Income = 1,
+    Expense = 2,
+    TransferBetweenAccounts = 3,
+}
+
 export class CreateAccountBookDto implements ICreateAccountBookDto {
     processDateTime: moment.Moment;
-    housingId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
+    isHousingDue: boolean;
+    housingId: string;
+    paymentCategoryId: string;
     fromPaymentAccountId: string | undefined;
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFileUrls: string[] | undefined;
+    encachmentFromHousingDue: boolean;
+    housingIdForEncachment: string | undefined;
+    paymentCategoryIdForEncachment: string | undefined;
 
     constructor(data?: ICreateAccountBookDto) {
         if (data) {
@@ -7650,13 +7624,24 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
     init(_data?: any) {
         if (_data) {
             this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.paymentCategoryType = _data["paymentCategoryType"];
+            this.isHousingDue = _data["isHousingDue"];
             this.housingId = _data["housingId"];
+            this.paymentCategoryId = _data["paymentCategoryId"];
             this.fromPaymentAccountId = _data["fromPaymentAccountId"];
             this.toPaymentAccountId = _data["toPaymentAccountId"];
             this.amount = _data["amount"];
             this.description = _data["description"];
             this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
             this.documentNumber = _data["documentNumber"];
+            if (Array.isArray(_data["accountBookFileUrls"])) {
+                this.accountBookFileUrls = [] as any;
+                for (let item of _data["accountBookFileUrls"])
+                    this.accountBookFileUrls.push(item);
+            }
+            this.encachmentFromHousingDue = _data["encachmentFromHousingDue"];
+            this.housingIdForEncachment = _data["housingIdForEncachment"];
+            this.paymentCategoryIdForEncachment = _data["paymentCategoryIdForEncachment"];
         }
     }
 
@@ -7670,13 +7655,24 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["paymentCategoryType"] = this.paymentCategoryType;
+        data["isHousingDue"] = this.isHousingDue;
         data["housingId"] = this.housingId;
+        data["paymentCategoryId"] = this.paymentCategoryId;
         data["fromPaymentAccountId"] = this.fromPaymentAccountId;
         data["toPaymentAccountId"] = this.toPaymentAccountId;
         data["amount"] = this.amount;
         data["description"] = this.description;
         data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
         data["documentNumber"] = this.documentNumber;
+        if (Array.isArray(this.accountBookFileUrls)) {
+            data["accountBookFileUrls"] = [];
+            for (let item of this.accountBookFileUrls)
+                data["accountBookFileUrls"].push(item);
+        }
+        data["encachmentFromHousingDue"] = this.encachmentFromHousingDue;
+        data["housingIdForEncachment"] = this.housingIdForEncachment;
+        data["paymentCategoryIdForEncachment"] = this.paymentCategoryIdForEncachment;
         return data; 
     }
 
@@ -7690,13 +7686,20 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
 
 export interface ICreateAccountBookDto {
     processDateTime: moment.Moment;
-    housingId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
+    isHousingDue: boolean;
+    housingId: string;
+    paymentCategoryId: string;
     fromPaymentAccountId: string | undefined;
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
+    accountBookFileUrls: string[] | undefined;
+    encachmentFromHousingDue: boolean;
+    housingIdForEncachment: string | undefined;
+    paymentCategoryIdForEncachment: string | undefined;
 }
 
 export class AccountBookFileDto implements IAccountBookFileDto {
@@ -7915,168 +7918,6 @@ export interface IAccountBookDto {
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: string;
-}
-
-export class CreateHousingDueAccountBookDto implements ICreateHousingDueAccountBookDto {
-    processDateTime: moment.Moment;
-    housingId: string;
-    toPaymentAccountId: string;
-    amount: number;
-    description: string | undefined;
-    accountBookFileUrls: string[] | undefined;
-
-    constructor(data?: ICreateHousingDueAccountBookDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
-            this.housingId = _data["housingId"];
-            this.toPaymentAccountId = _data["toPaymentAccountId"];
-            this.amount = _data["amount"];
-            this.description = _data["description"];
-            if (Array.isArray(_data["accountBookFileUrls"])) {
-                this.accountBookFileUrls = [] as any;
-                for (let item of _data["accountBookFileUrls"])
-                    this.accountBookFileUrls.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): CreateHousingDueAccountBookDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateHousingDueAccountBookDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
-        data["housingId"] = this.housingId;
-        data["toPaymentAccountId"] = this.toPaymentAccountId;
-        data["amount"] = this.amount;
-        data["description"] = this.description;
-        if (Array.isArray(this.accountBookFileUrls)) {
-            data["accountBookFileUrls"] = [];
-            for (let item of this.accountBookFileUrls)
-                data["accountBookFileUrls"].push(item);
-        }
-        return data; 
-    }
-
-    clone(): CreateHousingDueAccountBookDto {
-        const json = this.toJSON();
-        let result = new CreateHousingDueAccountBookDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateHousingDueAccountBookDto {
-    processDateTime: moment.Moment;
-    housingId: string;
-    toPaymentAccountId: string;
-    amount: number;
-    description: string | undefined;
-    accountBookFileUrls: string[] | undefined;
-}
-
-export class CreateOtherPaymentAccountBookDto implements ICreateOtherPaymentAccountBookDto {
-    processDateTime: moment.Moment;
-    paymentCategoryId: string;
-    fromPaymentAccountId: string | undefined;
-    toPaymentAccountId: string | undefined;
-    amount: number;
-    description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
-    documentNumber: string | undefined;
-    accountBookFileUrls: string[] | undefined;
-    encachmentFromHousingDue: boolean;
-    housingIdForEncachment: string | undefined;
-
-    constructor(data?: ICreateOtherPaymentAccountBookDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
-            this.paymentCategoryId = _data["paymentCategoryId"];
-            this.fromPaymentAccountId = _data["fromPaymentAccountId"];
-            this.toPaymentAccountId = _data["toPaymentAccountId"];
-            this.amount = _data["amount"];
-            this.description = _data["description"];
-            this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
-            this.documentNumber = _data["documentNumber"];
-            if (Array.isArray(_data["accountBookFileUrls"])) {
-                this.accountBookFileUrls = [] as any;
-                for (let item of _data["accountBookFileUrls"])
-                    this.accountBookFileUrls.push(item);
-            }
-            this.encachmentFromHousingDue = _data["encachmentFromHousingDue"];
-            this.housingIdForEncachment = _data["housingIdForEncachment"];
-        }
-    }
-
-    static fromJS(data: any): CreateOtherPaymentAccountBookDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateOtherPaymentAccountBookDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
-        data["paymentCategoryId"] = this.paymentCategoryId;
-        data["fromPaymentAccountId"] = this.fromPaymentAccountId;
-        data["toPaymentAccountId"] = this.toPaymentAccountId;
-        data["amount"] = this.amount;
-        data["description"] = this.description;
-        data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
-        data["documentNumber"] = this.documentNumber;
-        if (Array.isArray(this.accountBookFileUrls)) {
-            data["accountBookFileUrls"] = [];
-            for (let item of this.accountBookFileUrls)
-                data["accountBookFileUrls"].push(item);
-        }
-        data["encachmentFromHousingDue"] = this.encachmentFromHousingDue;
-        data["housingIdForEncachment"] = this.housingIdForEncachment;
-        return data; 
-    }
-
-    clone(): CreateOtherPaymentAccountBookDto {
-        const json = this.toJSON();
-        let result = new CreateOtherPaymentAccountBookDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateOtherPaymentAccountBookDto {
-    processDateTime: moment.Moment;
-    paymentCategoryId: string;
-    fromPaymentAccountId: string | undefined;
-    toPaymentAccountId: string | undefined;
-    amount: number;
-    description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
-    documentNumber: string | undefined;
-    accountBookFileUrls: string[] | undefined;
-    encachmentFromHousingDue: boolean;
-    housingIdForEncachment: string | undefined;
 }
 
 export class UpdateAccountBookDto implements IUpdateAccountBookDto {
@@ -8392,12 +8233,11 @@ export interface IPagedAccountBookResultDto {
     items: AccountBookGetAllOutput[] | undefined;
 }
 
-export class PaymentCategoryLookUpDto implements IPaymentCategoryLookUpDto {
-    readonly editInAccountBook: boolean;
+export class LookUpDto implements ILookUpDto {
     readonly value: string | undefined;
     readonly label: string | undefined;
 
-    constructor(data?: IPaymentCategoryLookUpDto) {
+    constructor(data?: ILookUpDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -8408,37 +8248,34 @@ export class PaymentCategoryLookUpDto implements IPaymentCategoryLookUpDto {
 
     init(_data?: any) {
         if (_data) {
-            (<any>this).editInAccountBook = _data["editInAccountBook"];
             (<any>this).value = _data["value"];
             (<any>this).label = _data["label"];
         }
     }
 
-    static fromJS(data: any): PaymentCategoryLookUpDto {
+    static fromJS(data: any): LookUpDto {
         data = typeof data === 'object' ? data : {};
-        let result = new PaymentCategoryLookUpDto();
+        let result = new LookUpDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["editInAccountBook"] = this.editInAccountBook;
         data["value"] = this.value;
         data["label"] = this.label;
         return data; 
     }
 
-    clone(): PaymentCategoryLookUpDto {
+    clone(): LookUpDto {
         const json = this.toJSON();
-        let result = new PaymentCategoryLookUpDto();
+        let result = new LookUpDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IPaymentCategoryLookUpDto {
-    editInAccountBook: boolean;
+export interface ILookUpDto {
     value: string | undefined;
     label: string | undefined;
 }
@@ -8718,53 +8555,6 @@ export interface IBlockDtoPagedResultDto {
     items: BlockDto[] | undefined;
 }
 
-export class LookUpDto implements ILookUpDto {
-    readonly value: string | undefined;
-    readonly label: string | undefined;
-
-    constructor(data?: ILookUpDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            (<any>this).value = _data["value"];
-            (<any>this).label = _data["label"];
-        }
-    }
-
-    static fromJS(data: any): LookUpDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LookUpDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["value"] = this.value;
-        data["label"] = this.label;
-        return data; 
-    }
-
-    clone(): LookUpDto {
-        const json = this.toJSON();
-        let result = new LookUpDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ILookUpDto {
-    value: string | undefined;
-    label: string | undefined;
-}
-
 export class ChangeUiThemeInput implements IChangeUiThemeInput {
     theme: string;
 
@@ -9009,11 +8799,17 @@ export interface IEmployeeDtoPagedResultDto {
     items: EmployeeDto[] | undefined;
 }
 
+export enum ResidentOrOwner {
+    Resident = 1,
+    Owner = 2,
+}
+
 export class CreateTransferForHousingDueDto implements ICreateTransferForHousingDueDto {
     housingId: string;
+    residentOrOwner: ResidentOrOwner;
     amount: number;
     isDebt: boolean;
-    paymentCategoryId: string | undefined;
+    paymentCategoryId: string;
     date: moment.Moment;
     description: string | undefined;
 
@@ -9029,6 +8825,7 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
     init(_data?: any) {
         if (_data) {
             this.housingId = _data["housingId"];
+            this.residentOrOwner = _data["residentOrOwner"];
             this.amount = _data["amount"];
             this.isDebt = _data["isDebt"];
             this.paymentCategoryId = _data["paymentCategoryId"];
@@ -9047,6 +8844,7 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["housingId"] = this.housingId;
+        data["residentOrOwner"] = this.residentOrOwner;
         data["amount"] = this.amount;
         data["isDebt"] = this.isDebt;
         data["paymentCategoryId"] = this.paymentCategoryId;
@@ -9065,9 +8863,10 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
 
 export interface ICreateTransferForHousingDueDto {
     housingId: string;
+    residentOrOwner: ResidentOrOwner;
     amount: number;
     isDebt: boolean;
-    paymentCategoryId: string | undefined;
+    paymentCategoryId: string;
     date: moment.Moment;
     description: string | undefined;
 }
@@ -9476,6 +9275,8 @@ export class HousingDto implements IHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    residentBalance: number;
+    ownerBalance: number;
     tenantIsResiding: boolean;
     block: Block;
     housingCategory: HousingCategoryDto;
@@ -9504,6 +9305,8 @@ export class HousingDto implements IHousingDto {
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
             this.balance = _data["balance"];
+            this.residentBalance = _data["residentBalance"];
+            this.ownerBalance = _data["ownerBalance"];
             this.tenantIsResiding = _data["tenantIsResiding"];
             this.block = _data["block"] ? Block.fromJS(_data["block"]) : <any>undefined;
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
@@ -9532,6 +9335,8 @@ export class HousingDto implements IHousingDto {
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         data["balance"] = this.balance;
+        data["residentBalance"] = this.residentBalance;
+        data["ownerBalance"] = this.ownerBalance;
         data["tenantIsResiding"] = this.tenantIsResiding;
         data["block"] = this.block ? this.block.toJSON() : <any>undefined;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
@@ -9560,6 +9365,8 @@ export interface IHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     balance: number;
+    residentBalance: number;
+    ownerBalance: number;
     tenantIsResiding: boolean;
     block: Block;
     housingCategory: HousingCategoryDto;
@@ -9640,6 +9447,8 @@ export class HousingForListDto implements IHousingForListDto {
     housingCategoryName: string | undefined;
     tenantIsResiding: boolean;
     balance: number;
+    residentBalance: number;
+    ownerBalance: number;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -9665,6 +9474,8 @@ export class HousingForListDto implements IHousingForListDto {
             this.housingCategoryName = _data["housingCategoryName"];
             this.tenantIsResiding = _data["tenantIsResiding"];
             this.balance = _data["balance"];
+            this.residentBalance = _data["residentBalance"];
+            this.ownerBalance = _data["ownerBalance"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -9690,6 +9501,8 @@ export class HousingForListDto implements IHousingForListDto {
         data["housingCategoryName"] = this.housingCategoryName;
         data["tenantIsResiding"] = this.tenantIsResiding;
         data["balance"] = this.balance;
+        data["residentBalance"] = this.residentBalance;
+        data["ownerBalance"] = this.ownerBalance;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -9715,6 +9528,8 @@ export interface IHousingForListDto {
     housingCategoryName: string | undefined;
     tenantIsResiding: boolean;
     balance: number;
+    residentBalance: number;
+    ownerBalance: number;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10091,7 +9906,7 @@ export interface IHousingCategoryDtoPagedResultDto {
 
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {
     housingId: string;
-    readonly paymentCategoryId: string;
+    readonly paymentCategoryId: string | undefined;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10145,38 +9960,28 @@ export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPa
 
 export interface ICreateCreditHousingPaymentPlanDto {
     housingId: string;
-    paymentCategoryId: string;
+    paymentCategoryId: string | undefined;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
     accountBookId: string;
 }
 
-export enum PaymentPlanType {
+export enum CreditOrDebt {
     Credit = 1,
     Debt = 2,
 }
 
-export enum HousingDueType {
-    RegularHousingDue = 1,
-    TransferForRegularHousingDue = 2,
-    Netting = 3,
-    AdditionalHousingDueForResident = 4,
-    AdditionalHousingDueForOwner = 5,
-    TransferForAdditionalHousingDue = 6,
-}
-
-export enum PaymentCategoryType {
-    Income = 1,
-    Expense = 2,
-    TransferBetweenAccounts = 3,
+export enum HousingPaymentPlanType {
+    HousingDueDefinition = 1,
+    HousingDuePayment = 2,
+    Transfer = 3,
+    Encashment = 4,
 }
 
 export class PaymentCategoryDto implements IPaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
-    showInLists: boolean;
-    editInAccountBook: boolean;
+    isHousingDue: boolean;
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
@@ -10204,9 +10009,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
     init(_data?: any) {
         if (_data) {
             this.paymentCategoryName = _data["paymentCategoryName"];
-            this.housingDueType = _data["housingDueType"];
-            this.showInLists = _data["showInLists"];
-            this.editInAccountBook = _data["editInAccountBook"];
+            this.isHousingDue = _data["isHousingDue"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
             this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
@@ -10234,9 +10037,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["paymentCategoryName"] = this.paymentCategoryName;
-        data["housingDueType"] = this.housingDueType;
-        data["showInLists"] = this.showInLists;
-        data["editInAccountBook"] = this.editInAccountBook;
+        data["isHousingDue"] = this.isHousingDue;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
         data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
@@ -10264,9 +10065,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
 
 export interface IPaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
-    showInLists: boolean;
-    editInAccountBook: boolean;
+    isHousingDue: boolean;
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
@@ -10287,7 +10086,8 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
     housingId: string;
     paymentCategoryId: string;
     date: moment.Moment;
-    paymentPlanType: PaymentPlanType;
+    creditOrDebt: CreditOrDebt;
+    housingPaymentPlanType: HousingPaymentPlanType;
     amount: number;
     description: string | undefined;
     accountBookId: string | undefined;
@@ -10315,7 +10115,8 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
             this.housingId = _data["housingId"];
             this.paymentCategoryId = _data["paymentCategoryId"];
             this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.paymentPlanType = _data["paymentPlanType"];
+            this.creditOrDebt = _data["creditOrDebt"];
+            this.housingPaymentPlanType = _data["housingPaymentPlanType"];
             this.amount = _data["amount"];
             this.description = _data["description"];
             this.accountBookId = _data["accountBookId"];
@@ -10343,7 +10144,8 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
         data["housingId"] = this.housingId;
         data["paymentCategoryId"] = this.paymentCategoryId;
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["paymentPlanType"] = this.paymentPlanType;
+        data["creditOrDebt"] = this.creditOrDebt;
+        data["housingPaymentPlanType"] = this.housingPaymentPlanType;
         data["amount"] = this.amount;
         data["description"] = this.description;
         data["accountBookId"] = this.accountBookId;
@@ -10371,7 +10173,8 @@ export interface IHousingPaymentPlanDto {
     housingId: string;
     paymentCategoryId: string;
     date: moment.Moment;
-    paymentPlanType: PaymentPlanType;
+    creditOrDebt: CreditOrDebt;
+    housingPaymentPlanType: HousingPaymentPlanType;
     amount: number;
     description: string | undefined;
     accountBookId: string | undefined;
@@ -10388,7 +10191,7 @@ export interface IHousingPaymentPlanDto {
 
 export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymentPlanDto {
     housingId: string;
-    readonly paymentCategoryId: string;
+    readonly paymentCategoryId: string | undefined;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10439,7 +10242,7 @@ export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymen
 
 export interface ICreateDebtHousingPaymentPlanDto {
     housingId: string;
-    paymentCategoryId: string;
+    paymentCategoryId: string | undefined;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10588,10 +10391,11 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     housingCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
+    defaultToPaymentAccountId: string;
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
-    paymentCategoryId: string;
+    residentOrOwner: ResidentOrOwner;
 
     constructor(data?: ICreateHousingPaymentPlanGroupDto) {
         if (data) {
@@ -10608,10 +10412,11 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
             this.housingCategoryId = _data["housingCategoryId"];
             this.amountPerMonth = _data["amountPerMonth"];
             this.countOfMonth = _data["countOfMonth"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
             this.paymentDayOfMonth = _data["paymentDayOfMonth"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.description = _data["description"];
-            this.paymentCategoryId = _data["paymentCategoryId"];
+            this.residentOrOwner = _data["residentOrOwner"];
         }
     }
 
@@ -10628,10 +10433,11 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
         data["housingCategoryId"] = this.housingCategoryId;
         data["amountPerMonth"] = this.amountPerMonth;
         data["countOfMonth"] = this.countOfMonth;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         data["paymentDayOfMonth"] = this.paymentDayOfMonth;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["description"] = this.description;
-        data["paymentCategoryId"] = this.paymentCategoryId;
+        data["residentOrOwner"] = this.residentOrOwner;
         return data; 
     }
 
@@ -10648,10 +10454,11 @@ export interface ICreateHousingPaymentPlanGroupDto {
     housingCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
+    defaultToPaymentAccountId: string;
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
-    paymentCategoryId: string;
+    residentOrOwner: ResidentOrOwner;
 }
 
 export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
@@ -10663,6 +10470,7 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
+    residentOrOwner: ResidentOrOwner;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
     housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
@@ -10694,6 +10502,7 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
             this.paymentDayOfMonth = _data["paymentDayOfMonth"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.description = _data["description"];
+            this.residentOrOwner = _data["residentOrOwner"];
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
             if (Array.isArray(_data["housingPaymentPlans"])) {
@@ -10729,6 +10538,7 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
         data["paymentDayOfMonth"] = this.paymentDayOfMonth;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["description"] = this.description;
+        data["residentOrOwner"] = this.residentOrOwner;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
         if (Array.isArray(this.housingPaymentPlans)) {
@@ -10764,6 +10574,7 @@ export interface IHousingPaymentPlanGroupDto {
     paymentDayOfMonth: number;
     startDate: moment.Moment;
     description: string | undefined;
+    residentOrOwner: ResidentOrOwner;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
     housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
@@ -10779,6 +10590,7 @@ export interface IHousingPaymentPlanGroupDto {
 
 export class UpdateHousingPaymentPlanGroupDto implements IUpdateHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
+    defaultToPaymentAccountId: string;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10800,6 +10612,7 @@ export class UpdateHousingPaymentPlanGroupDto implements IUpdateHousingPaymentPl
     init(_data?: any) {
         if (_data) {
             this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -10821,6 +10634,7 @@ export class UpdateHousingPaymentPlanGroupDto implements IUpdateHousingPaymentPl
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -10842,6 +10656,7 @@ export class UpdateHousingPaymentPlanGroupDto implements IUpdateHousingPaymentPl
 
 export interface IUpdateHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
+    defaultToPaymentAccountId: string;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -11346,7 +11161,6 @@ export interface IPaymentAccountDtoPagedResultDto {
 
 export class CreateIncomePaymentCategoryDto implements ICreateIncomePaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
     isValidForAllPeriods: boolean;
     defaultToPaymentAccountId: string;
 
@@ -11362,7 +11176,6 @@ export class CreateIncomePaymentCategoryDto implements ICreateIncomePaymentCateg
     init(_data?: any) {
         if (_data) {
             this.paymentCategoryName = _data["paymentCategoryName"];
-            this.housingDueType = _data["housingDueType"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
         }
@@ -11378,7 +11191,6 @@ export class CreateIncomePaymentCategoryDto implements ICreateIncomePaymentCateg
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["paymentCategoryName"] = this.paymentCategoryName;
-        data["housingDueType"] = this.housingDueType;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         return data; 
@@ -11394,7 +11206,6 @@ export class CreateIncomePaymentCategoryDto implements ICreateIncomePaymentCateg
 
 export interface ICreateIncomePaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
     isValidForAllPeriods: boolean;
     defaultToPaymentAccountId: string;
 }
@@ -11507,7 +11318,7 @@ export interface ICreateTransferPaymentCategoryDto {
 
 export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
+    isHousingDue: boolean;
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
@@ -11524,7 +11335,7 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     init(_data?: any) {
         if (_data) {
             this.paymentCategoryName = _data["paymentCategoryName"];
-            this.housingDueType = _data["housingDueType"];
+            this.isHousingDue = _data["isHousingDue"];
             this.isValidForAllPeriods = _data["isValidForAllPeriods"];
             this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
@@ -11541,7 +11352,7 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["paymentCategoryName"] = this.paymentCategoryName;
-        data["housingDueType"] = this.housingDueType;
+        data["isHousingDue"] = this.isHousingDue;
         data["isValidForAllPeriods"] = this.isValidForAllPeriods;
         data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
@@ -11558,7 +11369,7 @@ export class CreatePaymentCategoryDto implements ICreatePaymentCategoryDto {
 
 export interface ICreatePaymentCategoryDto {
     paymentCategoryName: string | undefined;
-    housingDueType: HousingDueType;
+    isHousingDue: boolean;
     isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
@@ -11681,10 +11492,8 @@ export interface IPaymentCategoryDtoPagedResultDto {
 export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
-    regularHousingDueName: string | undefined;
-    defaultPaymentAccountIdForRegularHousingDue: string;
+    endDate: moment.Moment | undefined;
     paymentCategories: string[] | undefined;
-    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 
     constructor(data?: ICreatePeriodForSiteDto) {
         if (data) {
@@ -11699,17 +11508,11 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         if (_data) {
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.regularHousingDueName = _data["regularHousingDueName"];
-            this.defaultPaymentAccountIdForRegularHousingDue = _data["defaultPaymentAccountIdForRegularHousingDue"];
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
                     this.paymentCategories.push(item);
-            }
-            if (Array.isArray(_data["housingPaymentPlanGroups"])) {
-                this.housingPaymentPlanGroups = [] as any;
-                for (let item of _data["housingPaymentPlanGroups"])
-                    this.housingPaymentPlanGroups.push(CreateHousingPaymentPlanGroupDto.fromJS(item));
             }
         }
     }
@@ -11725,17 +11528,11 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["regularHousingDueName"] = this.regularHousingDueName;
-        data["defaultPaymentAccountIdForRegularHousingDue"] = this.defaultPaymentAccountIdForRegularHousingDue;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
                 data["paymentCategories"].push(item);
-        }
-        if (Array.isArray(this.housingPaymentPlanGroups)) {
-            data["housingPaymentPlanGroups"] = [];
-            for (let item of this.housingPaymentPlanGroups)
-                data["housingPaymentPlanGroups"].push(item.toJSON());
         }
         return data; 
     }
@@ -11751,13 +11548,11 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
 export interface ICreatePeriodForSiteDto {
     name: string | undefined;
     startDate: moment.Moment;
-    regularHousingDueName: string | undefined;
-    defaultPaymentAccountIdForRegularHousingDue: string;
+    endDate: moment.Moment | undefined;
     paymentCategories: string[] | undefined;
-    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 }
 
-export enum PeriodFor {
+export enum SiteOrBlock {
     Site = 1,
     Block = 2,
 }
@@ -11767,7 +11562,7 @@ export class PeriodDto implements IPeriodDto {
     startDate: moment.Moment;
     isActive: boolean;
     endDate: moment.Moment | undefined;
-    periodFor: PeriodFor;
+    siteOrBlock: SiteOrBlock;
     blockId: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -11793,7 +11588,7 @@ export class PeriodDto implements IPeriodDto {
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.isActive = _data["isActive"];
             this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
-            this.periodFor = _data["periodFor"];
+            this.siteOrBlock = _data["siteOrBlock"];
             this.blockId = _data["blockId"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -11819,7 +11614,7 @@ export class PeriodDto implements IPeriodDto {
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["isActive"] = this.isActive;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
-        data["periodFor"] = this.periodFor;
+        data["siteOrBlock"] = this.siteOrBlock;
         data["blockId"] = this.blockId;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -11845,7 +11640,7 @@ export interface IPeriodDto {
     startDate: moment.Moment;
     isActive: boolean;
     endDate: moment.Moment | undefined;
-    periodFor: PeriodFor;
+    siteOrBlock: SiteOrBlock;
     blockId: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -11861,10 +11656,8 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
-    regularHousingDueName: string | undefined;
-    defaultPaymentAccountIdForRegularHousingDue: string;
+    endDate: moment.Moment | undefined;
     paymentCategories: string[] | undefined;
-    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 
     constructor(data?: ICreatePeriodForBlockDto) {
         if (data) {
@@ -11880,17 +11673,11 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
             this.blockId = _data["blockId"];
             this.name = _data["name"];
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.regularHousingDueName = _data["regularHousingDueName"];
-            this.defaultPaymentAccountIdForRegularHousingDue = _data["defaultPaymentAccountIdForRegularHousingDue"];
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
                     this.paymentCategories.push(item);
-            }
-            if (Array.isArray(_data["housingPaymentPlanGroups"])) {
-                this.housingPaymentPlanGroups = [] as any;
-                for (let item of _data["housingPaymentPlanGroups"])
-                    this.housingPaymentPlanGroups.push(CreateHousingPaymentPlanGroupDto.fromJS(item));
             }
         }
     }
@@ -11907,17 +11694,11 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
         data["blockId"] = this.blockId;
         data["name"] = this.name;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["regularHousingDueName"] = this.regularHousingDueName;
-        data["defaultPaymentAccountIdForRegularHousingDue"] = this.defaultPaymentAccountIdForRegularHousingDue;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
                 data["paymentCategories"].push(item);
-        }
-        if (Array.isArray(this.housingPaymentPlanGroups)) {
-            data["housingPaymentPlanGroups"] = [];
-            for (let item of this.housingPaymentPlanGroups)
-                data["housingPaymentPlanGroups"].push(item.toJSON());
         }
         return data; 
     }
@@ -11934,15 +11715,15 @@ export interface ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
     startDate: moment.Moment;
-    regularHousingDueName: string | undefined;
-    defaultPaymentAccountIdForRegularHousingDue: string;
+    endDate: moment.Moment | undefined;
     paymentCategories: string[] | undefined;
-    housingPaymentPlanGroups: CreateHousingPaymentPlanGroupDto[] | undefined;
 }
 
 export class UpdatePeriodDto implements IUpdatePeriodDto {
     id: string;
     name: string | undefined;
+    startDate: moment.Moment;
+    endDate: moment.Moment | undefined;
 
     constructor(data?: IUpdatePeriodDto) {
         if (data) {
@@ -11957,6 +11738,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
         }
     }
 
@@ -11971,6 +11754,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         return data; 
     }
 
@@ -11985,6 +11770,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
 export interface IUpdatePeriodDto {
     id: string;
     name: string | undefined;
+    startDate: moment.Moment;
+    endDate: moment.Moment | undefined;
 }
 
 export class PeriodDtoPagedResultDto implements IPeriodDtoPagedResultDto {

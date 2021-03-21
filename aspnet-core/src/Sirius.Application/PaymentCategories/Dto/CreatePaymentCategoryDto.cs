@@ -12,7 +12,8 @@ namespace Sirius.PaymentCategories.Dto
     {
         [StringLength(50)]
         public string PaymentCategoryName { get; set; }
-        public HousingDueType? HousingDueType { get; set; }
+        public bool IsHousingDue { get; set; }
+        // public HousingDueType? HousingDueType { get; set; }
         public bool IsValidForAllPeriods { get; set; }
         public Guid? DefaultFromPaymentAccountId { get; set; }
         public Guid? DefaultToPaymentAccountId { get; set; }

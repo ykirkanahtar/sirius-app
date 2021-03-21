@@ -1592,6 +1592,9 @@ namespace Sirius.Migrations
                     b.Property<long?>("CreatorUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("CreditOrDebt")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -1610,6 +1613,9 @@ namespace Sirius.Migrations
                     b.Property<Guid?>("HousingPaymentPlanGroupId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("HousingPaymentPlanType")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1619,20 +1625,22 @@ namespace Sirius.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("PaymentCategoryId")
+                    b.Property<Guid?>("PaymentCategoryId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("PaymentPlanType")
-                        .HasColumnType("int");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("TransferFromPaymentCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HousingPaymentPlanGroupId");
 
                     b.HasIndex("PaymentCategoryId");
+
+                    b.HasIndex("TransferFromPaymentCategoryId");
 
                     b.ToTable("AppHousingPaymentPlans");
                 });
@@ -1683,6 +1691,9 @@ namespace Sirius.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("PaymentDayOfMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResidentOrOwner")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -1779,6 +1790,12 @@ namespace Sirius.Migrations
 
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("OwnerBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ResidentBalance")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
@@ -2006,7 +2023,10 @@ namespace Sirius.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("PaymentCategoryId")
+                    b.Property<Guid?>("PaymentCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PaymentCategoryIdForEncachment")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ProcessDateTime")
@@ -2023,6 +2043,9 @@ namespace Sirius.Migrations
 
                     b.Property<Guid?>("ToPaymentAccountId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("TransferPaymentAccount")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -2172,16 +2195,16 @@ namespace Sirius.Migrations
                     b.Property<DateTime?>("DeletionTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("EditInAccountBook")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("HousingDueType")
+                    b.Property<int?>("HousingDueForResidentOrOwner")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHousingDue")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsValidForAllPeriods")
@@ -2199,9 +2222,6 @@ namespace Sirius.Migrations
 
                     b.Property<int>("PaymentCategoryType")
                         .HasColumnType("int");
-
-                    b.Property<bool>("ShowInLists")
-                        .HasColumnType("bit");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
@@ -2545,11 +2565,15 @@ namespace Sirius.Migrations
 
                     b.HasOne("Sirius.PaymentCategories.PaymentCategory", "PaymentCategory")
                         .WithMany()
-                        .HasForeignKey("PaymentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PaymentCategoryId");
+
+                    b.HasOne("Sirius.PaymentCategories.PaymentCategory", "TransferFromPaymentCategory")
+                        .WithMany()
+                        .HasForeignKey("TransferFromPaymentCategoryId");
 
                     b.Navigation("PaymentCategory");
+
+                    b.Navigation("TransferFromPaymentCategory");
                 });
 
             modelBuilder.Entity("Sirius.HousingPaymentPlans.HousingPaymentPlanGroup", b =>

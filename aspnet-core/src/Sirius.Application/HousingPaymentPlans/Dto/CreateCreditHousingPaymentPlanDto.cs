@@ -9,7 +9,7 @@ namespace Sirius.HousingPaymentPlans.Dto
     public class CreateCreditHousingPaymentPlanDto : IShouldNormalize
     {
         public Guid HousingId { get; set; }
-        public Guid PaymentCategoryId { get; private set; }
+        public Guid? PaymentCategoryId { get; private set; }
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }

@@ -14,6 +14,7 @@ import {
   HousingPaymentPlanGroupDto,
   HousingPaymentPlanGroupServiceProxy,
   HousingPaymentPlanGroupDtoPagedResultDto,
+  ResidentOrOwner,
 } from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -35,6 +36,7 @@ export class HousingPaymentPlanGroupsComponent
 
   sortingColumn: string;
   advancedFiltersVisible = false;
+  residentOrOwnerEnum = ResidentOrOwner;
 
   housingPaymentPlanGroups: HousingPaymentPlanGroupDto[] = [];
 

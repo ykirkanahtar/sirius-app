@@ -4,31 +4,37 @@ import {
   OnInit,
   EventEmitter,
   Output,
-} from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-import * as _ from 'lodash';
-import { AppComponentBase } from '@shared/app-component-base';
+} from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef } from "ngx-bootstrap/modal";
+import * as _ from "lodash";
+import { AppComponentBase } from "@shared/app-component-base";
 import {
   UpdateHousingPaymentPlanGroupDto,
   HousingPaymentPlanGroupServiceProxy,
   HousingPaymentPlanGroupDto,
-} from '@shared/service-proxies/service-proxies';
+  LookUpDto,
+  PaymentAccountServiceProxy,
+} from "@shared/service-proxies/service-proxies";
 
 @Component({
-  templateUrl: './edit-housing-payment-plan-group-dialog.component.html',
+  templateUrl: "./edit-housing-payment-plan-group-dialog.component.html",
 })
-export class EditHousingPaymentPlanGroupDialogComponent extends AppComponentBase
+export class EditHousingPaymentPlanGroupDialogComponent
+  extends AppComponentBase
   implements OnInit {
   saving = false;
   id: string;
+  input = new UpdateHousingPaymentPlanGroupDto();
   housingPaymentPlanGroup = new HousingPaymentPlanGroupDto();
+  paymentAccounts: LookUpDto[];
 
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
     injector: Injector,
     private _housingPaymentPlanGroupService: HousingPaymentPlanGroupServiceProxy,
+    private _paymentAccountService: PaymentAccountServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
@@ -36,27 +42,31 @@ export class EditHousingPaymentPlanGroupDialogComponent extends AppComponentBase
 
   ngOnInit(): void {
     this._housingPaymentPlanGroupService
-      .get(this.id)
-      .subscribe((result: HousingPaymentPlanGroupDto) => {
-        this.housingPaymentPlanGroup = result;
+      .getForUpdate(this.id)
+      .subscribe((result: UpdateHousingPaymentPlanGroupDto) => {
+        this.input = result;
+      });
+
+    this._paymentAccountService
+      .getPaymentAccountLookUp()
+      .subscribe((result: LookUpDto[]) => {
+        this.paymentAccounts = result;
       });
   }
 
   save(): void {
     this.saving = true;
 
-    const housingPaymentPlanGroup = new UpdateHousingPaymentPlanGroupDto();
-    housingPaymentPlanGroup.init(this.housingPaymentPlanGroup);
 
     this._housingPaymentPlanGroupService
-      .update(housingPaymentPlanGroup)
+      .update(this.input)
       .pipe(
         finalize(() => {
           this.saving = false;
         })
       )
       .subscribe(() => {
-        this.notify.info(this.l('SavedSuccessfully'));
+        this.notify.info(this.l("SavedSuccessfully"));
         this.bsModalRef.hide();
         this.onSave.emit();
       });

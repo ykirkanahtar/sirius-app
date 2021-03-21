@@ -23,9 +23,10 @@
               id="housingPaymentPlanGroupName"
               minlength="0"
               maxlength="50"
-              [(ngModel)]="housingPaymentPlanGroup.housingPaymentPlanGroupName"
+              [(ngModel)]="input.housingPaymentPlanGroupName"
               #housingPaymentPlanGroupNameModel="ngModel"
               #housingPaymentPlanGroupNameEl
+              required
             />
             <abp-validation-summary
               [control]="housingPaymentPlanGroupNameModel"
@@ -33,6 +34,24 @@
             ></abp-validation-summary>
           </div>
         </div>
+        <div class="form-group row required">
+          <label class="col-md-3 col-form-label" for="paymentAccounts">
+            {{ "DefaultToPaymentAccount" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-dropdown
+              id="paymentAccounts"
+              name="paymentAccounts"
+              [placeholder]="'PleaseSelect' | localize"
+              [options]="paymentAccounts"
+              [(ngModel)]="input.defaultToPaymentAccountId"
+              [filter]="true"
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-dropdown>
+          </div>
+        </div>  
       </tab>
     </tabset>
   </div>

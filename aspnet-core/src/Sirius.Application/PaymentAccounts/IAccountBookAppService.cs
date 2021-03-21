@@ -5,17 +5,16 @@ using Abp.Application.Services;
 using Sirius.AccountBooks.Dto;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories.Dto;
+using Sirius.Shared.Dtos;
 
 namespace Sirius.PaymentAccounts
 {
     public interface IAccountBookAppService : IAsyncCrudAppService<AccountBookDto, Guid,
         PagedAccountBookResultRequestDto, CreateAccountBookDto, UpdateAccountBookDto>
     {
-        Task<AccountBookDto> CreateHousingDueAsync(CreateHousingDueAccountBookDto input);
-
-        Task<AccountBookDto> CreateOtherPaymentAsync(CreateOtherPaymentAccountBookDto input);
-
         Task<PagedAccountBookResultDto> GetAllListAsync(PagedAccountBookResultRequestDto input);
-        Task<List<PaymentCategoryLookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(Guid accountBookId);
+
+        Task<List<LookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(
+            Guid accountBookId);
     }
 } 

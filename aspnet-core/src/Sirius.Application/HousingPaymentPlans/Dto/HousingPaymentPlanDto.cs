@@ -13,7 +13,8 @@ namespace Sirius.HousingPaymentPlans.Dto
         public Guid HousingId { get; set; }
         public Guid PaymentCategoryId { get; set; }
         public DateTime Date { get; set; }
-        public PaymentPlanType PaymentPlanType { get; set; }
+        public CreditOrDebt CreditOrDebt { get; set; }
+        public HousingPaymentPlanType HousingPaymentPlanType { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public Guid? AccountBookId { get; set; }

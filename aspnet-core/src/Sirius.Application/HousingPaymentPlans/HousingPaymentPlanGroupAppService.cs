@@ -15,9 +15,12 @@ using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
 using System.Linq.Dynamic.Core;
+using Abp.Extensions;
 using Abp.UI;
 using Sirius.EntityFrameworkCore.Repositories;
+using Sirius.PaymentAccounts;
 using Sirius.People;
+using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans
@@ -36,6 +39,7 @@ namespace Sirius.HousingPaymentPlans
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
+        private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
 
         public HousingPaymentPlanGroupAppService(
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
@@ -45,7 +49,8 @@ namespace Sirius.HousingPaymentPlans
             IPaymentCategoryManager paymentCategoryManager, IRepository<Person, Guid> personRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<HousingPerson, Guid> housingPersonRepository,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository)
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository, 
+            IRepository<PaymentAccount, Guid> paymentAccountRepository)
             : base(housingPaymentPlanGroupRepository)
         {
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
@@ -57,28 +62,27 @@ namespace Sirius.HousingPaymentPlans
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingPersonRepository = housingPersonRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
+            _paymentAccountRepository = paymentAccountRepository;
         }
-
+        
         public override async Task<HousingPaymentPlanGroupDto> CreateAsync(
             CreateHousingPaymentPlanGroupDto input)
         {
             CheckCreatePermission();
             var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
             var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
-            var paymentCategory = await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
 
-            if (paymentCategory.HousingDueType != HousingDueType.RegularHousingDue ||
-                paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForOwner ||
-                paymentCategory.HousingDueType != HousingDueType.AdditionalHousingDueForResident)
-            {
-                throw new UserFriendlyException("Aidat dışı bir ödeme kategorisi ile işlem yapılamaz.");
-            }
+            var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
+                AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
+                input.DefaultToPaymentAccountId, input.ResidentOrOwner);
+
+            await _paymentCategoryManager.CreateAsync(paymentCategory);
 
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(),
                 input.HousingPaymentPlanGroupName, housingCategory, paymentCategory, input.AmountPerMonth,
                 input.CountOfMonth, input.PaymentDayOfMonth
-                , input.StartDate, input.Description);
+                , input.StartDate, input.Description, input.ResidentOrOwner);
 
             await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
                 paymentCategory, false, null);
@@ -90,8 +94,19 @@ namespace Sirius.HousingPaymentPlans
         {
             CheckUpdatePermission();
             var existingHousingPaymentPlanGroup = await _housingPaymentPlanGroupRepository.GetAsync(input.Id);
+
+            var paymentCategory =
+                await _paymentCategoryRepository.GetAsync(existingHousingPaymentPlanGroup.PaymentCategoryId);
+
+            if (input.DefaultToPaymentAccountId != paymentCategory.DefaultToPaymentAccountId)
+            {
+                var paymentAccount = await _paymentAccountRepository.GetAsync(input.DefaultToPaymentAccountId);
+                paymentCategory.SetDefaultToPaymentAccount(paymentAccount);
+            }
+
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Update(existingHousingPaymentPlanGroup,
                 input.HousingPaymentPlanGroupName);
+            
             await _housingPaymentPlanGroupManager.UpdateAsync(housingPaymentPlanGroup);
             return ObjectMapper.Map<HousingPaymentPlanGroupDto>(housingPaymentPlanGroup);
         }
@@ -103,6 +118,27 @@ namespace Sirius.HousingPaymentPlans
             await _housingPaymentPlanGroupManager.DeleteAsync(housingPaymentPlanGroup);
         }
 
+        public async Task<UpdateHousingPaymentPlanGroupDto> GetForUpdate(Guid id)
+        {
+            CheckGetPermission();
+            var existingHousingPaymentPlanGroup = await _housingPaymentPlanGroupRepository.GetAsync(id);
+
+            var paymentCategory =
+                await _paymentCategoryRepository.GetAsync(existingHousingPaymentPlanGroup.PaymentCategoryId);
+
+            return new UpdateHousingPaymentPlanGroupDto //TODO object mapper'a taşıs
+            {
+                Id = id,
+                CreationTime = existingHousingPaymentPlanGroup.CreationTime,
+                CreatorUserId = existingHousingPaymentPlanGroup.CreatorUserId,
+                IsDeleted = existingHousingPaymentPlanGroup.IsDeleted,
+                LastModificationTime = existingHousingPaymentPlanGroup.LastModificationTime,
+                LastModifierUserId = existingHousingPaymentPlanGroup.LastModifierUserId,
+                DefaultToPaymentAccountId = paymentCategory.DefaultToPaymentAccountId.GetValueOrDefault(),
+                HousingPaymentPlanGroupName = existingHousingPaymentPlanGroup.HousingPaymentPlanGroupName
+            };
+        }
+        
         public override async Task<PagedResultDto<HousingPaymentPlanGroupDto>> GetAllAsync(
             PagedHousingPaymentPlanGroupResultRequestDto input)
         {
@@ -157,6 +193,16 @@ namespace Sirius.HousingPaymentPlans
 
             return new PagedResultDto<HousingPaymentPlanGroupDto>(query.Count(),
                 ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups));
+        }
+        
+        public List<LookUpDto> GetResidentOrOwnerLookUp()
+        {
+            CheckGetAllPermission();
+
+            var residentLookUp = new LookUpDto(((int)ResidentOrOwner.Resident).ToString(), L(ResidentOrOwner.Resident.ToString()));
+            var ownerLookUp = new LookUpDto(((int)ResidentOrOwner.Owner).ToString(), L(ResidentOrOwner.Owner.ToString()));
+            var lookUps = new List<LookUpDto> {residentLookUp, ownerLookUp};
+            return lookUps;
         }
     }
 }

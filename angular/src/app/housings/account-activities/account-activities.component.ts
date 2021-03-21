@@ -14,8 +14,9 @@ import {
   HousingPaymentPlanDto,
   HousingPaymentPlanDtoPagedResultDto,
   HousingPaymentPlanServiceProxy,
+  HousingPaymentPlanType,
   HousingServiceProxy,
-  PaymentPlanType
+  CreditOrDebt
 } from '@shared/service-proxies/service-proxies';
 import {
   PagedRequestDto
@@ -47,7 +48,8 @@ export class AccountActivitiesDialogComponent extends AppComponentBase
   housingPaymentPlans: HousingPaymentPlanDto[] = [];
   housing = new HousingDto();
   block = new BlockDto();
-  paymentPlanTypeEnum = PaymentPlanType;
+  creditOrDebtEnum = CreditOrDebt;
+  housingPaymentPlanTypeEnum = HousingPaymentPlanType;
 
   id: string;
   @Output() onSave = new EventEmitter<any>();

@@ -48,34 +48,69 @@
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
-                  [disabled]="checkForPaymentCategoryType"
+                  [disabled]="definedPaymentCategory"
+                >
+                </p-dropdown>
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="accountBook.isHousingDue">
+              <div class="col-md-10">
+                <label for="people">
+                  {{ "Person" | localize }}
+                </label>
+                <p-dropdown
+                  id="people"
+                  name="people"
+                  [placeholder]="'PleaseSelect' | localize"
+                  [options]="people"
+                  (onChange)="onSelectedPersonChange($event)"
+                  [filter]="true"
+                  [style]="{ width: '100%' }"
+                  [showClear]="true"
+                >
+                </p-dropdown>
+              </div>
+            </div>
+            <div
+              class="form-group row required"
+              *ngIf="accountBook.isHousingDue"
+            >
+              <div class="col-md-10">
+                <label for="housings">
+                  {{ "Housing" | localize }}
+                </label>
+                <p-dropdown
+                  id="housings"
+                  name="housings"
+                  [placeholder]="'PleaseSelect' | localize"
+                  [options]="housings"
+                  [(ngModel)]="accountBook.housingId"
+                  [filter]="true"
+                  [style]="{ width: '100%' }"
+                  [showClear]="true"
+                  required
                 >
                 </p-dropdown>
               </div>
             </div>
             <div
               class="form-group row"
-              [ngClass]="
-                (paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
-                  paymentCategoryType ===
-                    PaymentCategoryTypeEnum.TransferBetweenAccounts) === true
-                  ? 'required'
-                  : ''
-              "
+              [ngClass]="isFromPaymentAccountRequired() ? 'required' : ''"
               *ngIf="
-                !checkForPaymentCategoryType ||
                 paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
                 paymentCategoryType ===
                   PaymentCategoryTypeEnum.TransferBetweenAccounts
               "
             >
-              <label
-                class="col-md-12 col-form-label"
-                for="fromPaymentAccountId"
-              >
-                {{ "FromPaymentAccount" | localize }}
-              </label>
-              <div class="col-md-9 pr-4">
+              <div class="col-md-10">
+                <label for="fromPaymentAccounts">
+                  {{ "FromPaymentAccount" | localize }}
+                  <span
+                    *ngIf="isFromPaymentAccountRequired()"
+                    class="text-danger"
+                    >*</span
+                  >
+                </label>
                 <p-dropdown
                   id="fromPaymentAccounts"
                   name="fromPaymentAccounts"
@@ -84,21 +119,10 @@
                   [(ngModel)]="accountBook.fromPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
-                  [required]="
-                    paymentCategoryType === PaymentCategoryTypeEnum.Expense ||
-                    paymentCategoryType ===
-                      PaymentCategoryTypeEnum.TransferBetweenAccounts
-                  "
+                  [showClear]="true"
+                  [required]="isFromPaymentAccountRequired()"
                 >
                 </p-dropdown>
-              </div>
-              <div class="col-md-3">
-                <span class="btn btn-danger">
-                  <i
-                    class="fas fa-trash-alt"
-                    (click)="accountBook.fromPaymentAccountId = null"
-                  ></i>
-                </span>
               </div>
             </div>
             <div
@@ -111,16 +135,15 @@
                   : ''
               "
               *ngIf="
-                !checkForPaymentCategoryType ||
                 paymentCategoryType === PaymentCategoryTypeEnum.Income ||
                 paymentCategoryType ===
                   PaymentCategoryTypeEnum.TransferBetweenAccounts
               "
             >
-              <label class="col-md-12 col-form-label" for="toPaymentAccountId">
-                {{ "ToPaymentAccount" | localize }}
-              </label>
-              <div class="col-md-9 pr-4">
+              <div class="col-md-10">
+                <label for="housings">
+                  {{ "ToPaymentAccount" | localize }}
+                </label>
                 <p-dropdown
                   id="toPaymentAccounts"
                   name="toPaymentAccounts"
@@ -129,6 +152,7 @@
                   [(ngModel)]="accountBook.toPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
+                  [showClear]="true"
                   [required]="
                     paymentCategoryType === PaymentCategoryTypeEnum.Income ||
                     paymentCategoryType ===
@@ -136,14 +160,6 @@
                   "
                 >
                 </p-dropdown>
-              </div>
-              <div class="col-md-3">
-                <span class="btn btn-danger">
-                  <i
-                    class="fas fa-trash-alt"
-                    (click)="accountBook.toPaymentAccountId = null"
-                  ></i>
-                </span>
               </div>
             </div>
             <div class="form-group row required">
@@ -165,8 +181,6 @@
                 </p-inputNumber>
               </div>
             </div>
-          </div>
-          <div class="col-md-6">
             <div class="form-group row">
               <div class="col-md-10">
                 <label for="description">
@@ -189,10 +203,12 @@
                 ></abp-validation-summary>
               </div>
             </div>
+          </div>
+          <div class="col-md-6">
             <div
               class="form-group row"
               *ngIf="
-                !checkForPaymentCategoryType ||
+                !definedPaymentCategory ||
                 paymentCategoryType === PaymentCategoryTypeEnum.Expense
               "
             >
@@ -214,7 +230,7 @@
             <div
               class="form-group row"
               *ngIf="
-                !checkForPaymentCategoryType ||
+                !definedPaymentCategory ||
                 paymentCategoryType === PaymentCategoryTypeEnum.Expense
               "
             >
@@ -242,7 +258,7 @@
             <div
               class="form-group row mb-0"
               *ngIf="
-                !checkForPaymentCategoryType ||
+                !definedPaymentCategory ||
                 paymentCategoryType === PaymentCategoryTypeEnum.Expense
               "
             >
@@ -280,7 +296,7 @@
                     name="people"
                     [placeholder]="'PleaseSelect' | localize"
                     [options]="people"
-                    (onChange)="onSelectedPersonChange($event)"
+                    (onChange)="onSelectedPersonForEncashmentChange($event)"
                     [filter]="true"
                     [style]="{ width: '100%' }"
                     [showClear]="true"
@@ -298,10 +314,32 @@
                     id="housings"
                     name="housings"
                     [placeholder]="'PleaseSelect' | localize"
-                    [options]="housings"
+                    [options]="housingsForEncashment"
                     [(ngModel)]="accountBook.housingIdForEncachment"
+                    (onChange)="onSelectedHousingForEncashmentChange($event)"
                     [filter]="true"
                     [style]="{ width: '100%' }"
+                    [showClear]="true"
+                    required
+                  >
+                  </p-dropdown>
+                </div>
+              </div>
+              <div class="form-group row required">
+                <div class="col-md-10">
+                  <label for="housings">
+                    {{ "PaymentCategoryForEncashment" | localize }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <p-dropdown
+                    id="paymentCategoryForEncashment"
+                    name="paymentCategoryForEncashment"
+                    [placeholder]="'PleaseSelect' | localize"
+                    [options]="paymentCategoriesForEncashment"
+                    [(ngModel)]="accountBook.paymentCategoryIdForEncachment"
+                    [filter]="true"
+                    [style]="{ width: '100%' }"
+                    [showClear]="true"
                     required
                   >
                   </p-dropdown>

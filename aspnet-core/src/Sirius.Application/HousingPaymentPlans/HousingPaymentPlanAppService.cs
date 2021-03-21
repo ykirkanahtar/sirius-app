@@ -54,56 +54,64 @@ namespace Sirius.HousingPaymentPlans
             _unitOfWorkManager = unitOfWorkManager;
         }
 
-        public async Task CreateTransferForHousingDueAsync(
-            CreateTransferForHousingDueDto input)
-        {
-            CheckCreatePermission();
-            var housing = await _housingRepository.GetAsync(input.HousingId);
-            var paymentCategory = input.PaymentCategoryId.HasValue
-                ? await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId.Value)
-                : await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
-
-            if (paymentCategory.HousingDueType != HousingDueType.TransferForRegularHousingDue)
-                throw new Exception("Kritik hata! Ödeme türü kategorisi devir tipinde olmalıdır.");
-
-            var housingPaymentPlan = input.IsDebt
-                ? HousingPaymentPlan.CreateDebt(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , null
-                    , housing
-                    , paymentCategory
-                    , input.Date
-                    , input.Amount
-                    , input.Description
-                )
-                : HousingPaymentPlan.CreateCredit(
-                    SequentialGuidGenerator.Instance.Create()
-                    , AbpSession.GetTenantId()
-                    , housing
-                    , paymentCategory
-                    , input.Date
-                    , input.Amount
-                    , input.Description
-                    , null
-                );
-
-            await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
-            if (input.IsDebt)
-            {
-                await _housingManager.IncreaseBalance(housing, input.Amount);
-            }
-            else
-            {
-                await _housingManager.DecreaseBalance(housing, input.Amount);
-            }
-        }
+        // public async Task CreateTransferForHousingDueAsync(
+        //     CreateTransferForHousingDueDto input)
+        // {
+        //     CheckCreatePermission();
+        //     var housing = await _housingRepository.GetAsync(input.HousingId);
+        //     // var paymentCategory = input.PaymentCategoryId.HasValue
+        //     //     ? await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId.Value)
+        //     //     : await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
+        //
+        //     var paymentCategory = await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
+        //
+        //     // if (paymentCategory.HousingDueType != HousingDueType.TransferForRegularHousingDue)
+        //     //     throw new Exception("Kritik hata! Ödeme türü kategorisi devir tipinde olmalıdır.");
+        //
+        //     var housingPaymentPlan = input.IsDebt
+        //         ? HousingPaymentPlan.CreateDebt(
+        //             SequentialGuidGenerator.Instance.Create()
+        //             , AbpSession.GetTenantId()
+        //             , null
+        //             , housing
+        //             , paymentCategory
+        //             , input.Date
+        //             , input.Amount
+        //             , input.Description
+        //             , HousingPaymentPlanType.Transfer
+        //             , null
+        //         )
+        //         : HousingPaymentPlan.CreateCredit(
+        //             SequentialGuidGenerator.Instance.Create()
+        //             , AbpSession.GetTenantId()
+        //             , housing
+        //             , paymentCategory
+        //             , input.Date
+        //             , input.Amount
+        //             , input.Description
+        //             , null
+        //             , HousingPaymentPlanType.Transfer
+        //             , null
+        //         );
+        //
+        //     await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
+        //     if (input.IsDebt)
+        //     {
+        //         await _housingManager.IncreaseBalance(housing, input.Amount, ResidentOrOwner.Owner); //Todo buraya bak
+        //     }
+        //     else
+        //     {
+        //         await _housingManager.DecreaseBalance(housing, input.Amount, ResidentOrOwner.Owner); //Todo buraya bak
+        //     }
+        // }
 
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)
         {
             CheckCreatePermission();
             var housing = await _housingRepository.GetAsync(input.HousingId);
-            var paymentCategory = await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
+            var paymentCategory = input.PaymentCategoryId.HasValue
+                ? await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId.Value)
+                : null;
             var accountBook = await _accountBookRepository.GetAsync(input.AccountBookId);
 
             var housingPaymentPlan = HousingPaymentPlan.CreateCredit(
@@ -115,6 +123,8 @@ namespace Sirius.HousingPaymentPlans
                 , input.Amount
                 , input.Description
                 , accountBook
+                , HousingPaymentPlanType.HousingDuePayment
+                , null
             );
 
             await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -125,7 +135,9 @@ namespace Sirius.HousingPaymentPlans
         {
             CheckCreatePermission();
             var housing = await _housingRepository.GetAsync(input.HousingId);
-            var paymentCategory = await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId);
+            var paymentCategory = input.PaymentCategoryId.HasValue
+                ? await _paymentCategoryRepository.GetAsync(input.PaymentCategoryId.Value)
+                : null;
 
             var housingPaymentPlan = HousingPaymentPlan.CreateDebt(
                 SequentialGuidGenerator.Instance.Create()
@@ -136,6 +148,8 @@ namespace Sirius.HousingPaymentPlans
                 , input.Date
                 , input.Amount
                 , input.Description
+                , HousingPaymentPlanType.HousingDueDefinition
+                , null
             );
 
             await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -157,7 +171,7 @@ namespace Sirius.HousingPaymentPlans
             var updatedHousingPaymentPlan = await _housingPaymentPlanManager.UpdateAsync(existingHousingPaymentPlan.Id,
                 input.Date, input.Amount,
                 input.Description);
-            
+
             return ObjectMapper.Map<HousingPaymentPlanDto>(updatedHousingPaymentPlan);
         }
 

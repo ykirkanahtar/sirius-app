@@ -10,9 +10,7 @@ namespace Sirius.PaymentCategories.Dto
     public class PaymentCategoryDto : FullAuditedEntityDto<Guid>
     {
         public string PaymentCategoryName { get; set; }
-        public HousingDueType? HousingDueType { get; set; }
-        public bool ShowInLists { get;  set; }
-        public bool EditInAccountBook { get;  set; }
+        public bool IsHousingDue { get; set; }
         public bool IsValidForAllPeriods { get; set; }
         
         public Guid? DefaultFromPaymentAccountId { get; set; }
