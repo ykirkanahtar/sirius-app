@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sirius.EntityFrameworkCore;
 
 namespace Sirius.Migrations
 {
     [DbContext(typeof(SiriusDbContext))]
-    partial class SiriusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210322061523_AddFirstHousingTransferIsResidentOrOwnerToHousingPaymentPlan")]
+    partial class AddFirstHousingTransferIsResidentOrOwnerToHousingPaymentPlan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1607,7 +1609,7 @@ namespace Sirius.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FirstHousingDueTransferIsResidentOrOwner")
+                    b.Property<int?>("FirstHousingTransferIsResidentOrOwner")
                         .HasColumnType("int");
 
                     b.Property<Guid>("HousingId")

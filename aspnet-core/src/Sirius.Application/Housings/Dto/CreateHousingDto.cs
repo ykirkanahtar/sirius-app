@@ -10,13 +10,13 @@ namespace Sirius.Housings.Dto
     {
         public CreateHousingDto()
         {
-            CreateTransferForHousingDue = new CreateTransferForHousingDueDto();
+            TransferForHousingDue = new CreateOrUpdateTransferForHousingDueDto();
         }
         
         public Guid BlockId { get; set; }
         public string Apartment { get; set; }
         public Guid HousingCategoryId { get; set; }
         public bool TenantIsResiding { get; set; }
-        public CreateTransferForHousingDueDto CreateTransferForHousingDue { get; set; }
+        public CreateOrUpdateTransferForHousingDueDto TransferForHousingDue { get; set; }
     }
 }

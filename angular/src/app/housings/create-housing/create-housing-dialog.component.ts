@@ -17,9 +17,8 @@ import {
   LookUpDto,
   HousingCategoryServiceProxy,
   BlockServiceProxy,
-  CreateTransferForHousingDueDto,
   ResidentOrOwner,
-} from "@shared/service-proxies/service-proxies";
+  CreateOrUpdateTransferForHousingDueDto} from "@shared/service-proxies/service-proxies";
 import { Moment } from "moment";
 import * as moment from "moment";
 
@@ -64,8 +63,8 @@ export class CreateHousingDialogComponent
       this.blocks = result;
     });
 
-    this.housing.createTransferForHousingDue = new CreateTransferForHousingDueDto();
-    this.housing.createTransferForHousingDue.isDebt = true;
+    this.housing.transferForHousingDue = new CreateOrUpdateTransferForHousingDueDto();
+    this.housing.transferForHousingDue.isDebt = true;
 
     this.residentOrOwners = [
       {

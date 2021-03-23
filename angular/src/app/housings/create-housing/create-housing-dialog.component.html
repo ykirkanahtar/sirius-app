@@ -96,7 +96,7 @@
           </label>
           <div class="col-md-9">
             <p-inputNumber
-              [(ngModel)]="housing.createTransferForHousingDue.amount"
+              [(ngModel)]="housing.transferForHousingDue.amount"
               name="amount"
               id="amount"
               mode="decimal"
@@ -107,7 +107,7 @@
             </p-inputNumber>
           </div>
         </div>
-        <div *ngIf="housing.createTransferForHousingDue.amount > 0">
+        <div *ngIf="housing.transferForHousingDue.amount > 0">
           <div class="form-group row required">
             <label class="col-md-3 col-form-label" for="residentOrOwner">
               {{ "ResidentOrOwner" | localize }}
@@ -118,7 +118,7 @@
                 name="residentOrOwner"
                 [placeholder]="'PleaseSelect' | localize"
                 [options]="residentOrOwners"
-                [(ngModel)]="housing.createTransferForHousingDue.residentOrOwner"
+                [(ngModel)]="housing.transferForHousingDue.residentOrOwner"
                 [filter]="true"
                 [style]="{ width: '100%' }"
                 required
@@ -136,7 +136,7 @@
                 class="form-control m-input"
                 type="datetime"
                 bsDatepicker
-                [(ngModel)]="housing.createTransferForHousingDue.date"
+                [(ngModel)]="housing.transferForHousingDue.date"
                 id="date"
                 name="date"
                 [bsConfig]="{
@@ -158,7 +158,7 @@
                   class="custom-control-input"
                   name="isDebt"
                   id="isDebt"
-                  [(ngModel)]="housing.createTransferForHousingDue.isDebt"
+                  [(ngModel)]="housing.transferForHousingDue.isDebt"
                 />
                 <label class="custom-control-label mt-2" for="isDebt"></label>
               </div>

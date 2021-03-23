@@ -90,8 +90,6 @@ namespace Sirius.PaymentAccounts
 
             if (accountBookType == AccountBookType.HousingDue)
             {
-                // var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
-
                 await _housingManager.DecreaseBalance(housing, accountBook.Amount, paymentCategory.HousingDueForResidentOrOwner.Value);
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
@@ -104,6 +102,7 @@ namespace Sirius.PaymentAccounts
                     , accountBook.Description
                     , accountBook
                     , HousingPaymentPlanType.HousingDuePayment
+                    , null
                     , null
                 ));
             }
@@ -123,6 +122,7 @@ namespace Sirius.PaymentAccounts
                     , accountBook.Description
                     , accountBook
                     , HousingPaymentPlanType.Encashment
+                    , null
                     , null
                 ));
             }

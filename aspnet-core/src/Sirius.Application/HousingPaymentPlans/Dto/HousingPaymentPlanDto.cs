@@ -18,7 +18,8 @@ namespace Sirius.HousingPaymentPlans.Dto
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public Guid? AccountBookId { get; set; }
-
+        public ResidentOrOwner? FirstHousingDueTransferIsResidentOrOwner { get; private set; } 
+        
         public virtual PaymentCategoryDto PaymentCategory { get; set; }
         
         //Burayı açınca Angular tarafında circular dependency oluşuyor

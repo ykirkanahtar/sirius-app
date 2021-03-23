@@ -93,6 +93,103 @@
             </p-dropdown>
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label">
+            {{ "DeleteTransferForHousingDue" | localize }}
+          </label>
+          <div class="col-md-9">
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="deleteTransferForHousingDue"
+                id="deleteTransferForHousingDue"
+                [(ngModel)]="housing.deleteTransferForHousingDue"
+                (change)="deleteTransferForHousingDue()"
+                [disabled]="(housing.transferAmount > 0 || housing.transferAmount < 0) === false"
+              />
+              <label
+                class="custom-control-label mt-2"
+                for="deleteTransferForHousingDue"
+              ></label>
+            </div>
+          </div>
+        </div> 
+        <div class="form-group row" *ngIf="housing.deleteTransferForHousingDue === false">
+          <label class="col-md-3 col-form-label" for="amount">
+            {{ "TransferBalance" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-inputNumber
+              [(ngModel)]="housing.transferAmount"
+              name="amount"
+              id="amount"
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [style]="{ width: '100%' }"
+            >
+            </p-inputNumber>
+          </div>
+        </div> 
+        <div *ngIf="housing.transferAmount > 0">
+          <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="residentOrOwner">
+              {{ "ResidentOrOwner" | localize }}
+            </label>
+            <div class="col-md-9">
+              <p-dropdown
+                id="residentOrOwner"
+                name="residentOrOwner"
+                [placeholder]="'PleaseSelect' | localize"
+                [options]="residentOrOwners"
+                [(ngModel)]="residentOrOwner"
+                [filter]="true"
+                [style]="{ width: '100%' }"
+                required
+              >
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="date">
+              {{ "TransferDate" | localize }}
+            </label>
+            <div class="col-md-9">
+              <input
+                required
+                class="form-control m-input"
+                type="datetime"
+                bsDatepicker
+                [(ngModel)]="transferDate"
+                id="date"
+                name="date"
+                [bsConfig]="{
+                  adaptivePosition: true,
+                  customTodayClass: 'datepicker-today-class',
+                  showWeekNumbers: false
+                }"
+              />
+            </div>
+          </div>
+          <div class="form-group row mb-0">
+            <label class="col-md-3 col-form-label" for="isDebt">
+              {{ "IsDebtText" | localize }}
+            </label>
+            <div class="col-md-9">
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  name="isDebt"
+                  id="isDebt"
+                  [(ngModel)]="housing.transferIsDebt"
+                />
+                <label class="custom-control-label mt-2" for="isDebt"></label>
+              </div>
+            </div>
+          </div>
+        </div>                
       </tab>
     </tabset>
   </div>

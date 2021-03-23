@@ -86,18 +86,23 @@ namespace Sirius.HousingPaymentPlans
                     "Bu kayıt işletme defterine girilen kayıt sonrası otomatik oluşmuştur. İşletme defterindeki kaydı siliniz.");
             }
 
-            var housingPaymentPlanGroup = await _housingPaymentPlanGroupRepository.GetAsync(housingPaymentPlan.Id);
-            var housing = await _housingManager.GetAsync(housingPaymentPlan.HousingId);
+            if (housingPaymentPlan.HousingPaymentPlanGroupId.HasValue)
+            {
+                var housingPaymentPlanGroup =
+                    await _housingPaymentPlanGroupRepository.GetAsync(
+                        housingPaymentPlan.HousingPaymentPlanGroupId.Value);
+                var housing = await _housingManager.GetAsync(housingPaymentPlan.HousingId);
 
-            if (housingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
-            {
-                await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
-                    housingPaymentPlanGroup.ResidentOrOwner);
-            }
-            else
-            {
-                await _housingManager.IncreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
-                    housingPaymentPlanGroup.ResidentOrOwner);
+                if (housingPaymentPlan.CreditOrDebt == CreditOrDebt.Debt)
+                {
+                    await _housingManager.DecreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
+                        housingPaymentPlanGroup.ResidentOrOwner);
+                }
+                else
+                {
+                    await _housingManager.IncreaseBalance(housing, Math.Abs(housingPaymentPlan.Amount),
+                        housingPaymentPlanGroup.ResidentOrOwner);
+                }
             }
 
             await _housingPaymentPlanRepository.DeleteAsync(housingPaymentPlan);

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.Authorization;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.HousingPaymentPlans;
+using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings.Dto;
 using Sirius.PaymentCategories;
 using Sirius.People;
@@ -39,12 +40,14 @@ namespace Sirius.Housings
         private readonly IHousingPolicy _housingPolicy;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
+        private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
 
         public HousingAppService(IHousingManager housingManager, IHousingRepository housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
             IRepository<Person, Guid> personRepository, IRepository<HousingPerson, Guid> housingPersonRepository,
             IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy,
-            IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager)
+            IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager,
+            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -57,6 +60,7 @@ namespace Sirius.Housings
             _housingPolicy = housingPolicy;
             _paymentCategoryManager = paymentCategoryManager;
             _housingPaymentPlanManager = housingPaymentPlanManager;
+            _housingPaymentPlanRepository = housingPaymentPlanRepository;
         }
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
@@ -70,45 +74,49 @@ namespace Sirius.Housings
                 var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
                     AbpSession.GetTenantId(),
                     block, input.Apartment, housingCategory, input.TenantIsResiding);
-                
-                if (input.CreateTransferForHousingDue.Amount.GetValueOrDefault() != 0)
+
+                if (input.TransferForHousingDue.Amount.GetValueOrDefault() != 0)
                 {
-                    housing = input.CreateTransferForHousingDue.IsDebt
-                        ? Housing.IncreaseBalance(housing, input.CreateTransferForHousingDue.Amount.GetValueOrDefault(), input.CreateTransferForHousingDue.ResidentOrOwner)
-                        : Housing.DecreaseBalance(housing, input.CreateTransferForHousingDue.Amount.GetValueOrDefault(), input.CreateTransferForHousingDue.ResidentOrOwner);
+                    housing = input.TransferForHousingDue.IsDebt
+                        ? Housing.IncreaseBalance(housing, input.TransferForHousingDue.Amount.GetValueOrDefault(),
+                            input.TransferForHousingDue.ResidentOrOwner)
+                        : Housing.DecreaseBalance(housing, input.TransferForHousingDue.Amount.GetValueOrDefault(),
+                            input.TransferForHousingDue.ResidentOrOwner);
                 }
 
                 await _housingManager.CreateAsync(housing);
 
-                if (input.CreateTransferForHousingDue.Amount.GetValueOrDefault() != 0)
+                if (input.TransferForHousingDue.Amount.GetValueOrDefault() != 0)
                 {
                     // var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
                     // var paymentCategory = await _paymentCategoryManager.GetAsync(input.CreateTransferForHousingDue.PaymentCategoryId);
 
-                    var housingPaymentPlan = input.CreateTransferForHousingDue.IsDebt
+                    var housingPaymentPlan = input.TransferForHousingDue.IsDebt
                         ? HousingPaymentPlan.CreateDebt(
                             SequentialGuidGenerator.Instance.Create()
                             , AbpSession.GetTenantId()
                             , null
                             , housing
                             , null
-                            , input.CreateTransferForHousingDue.Date
-                            , input.CreateTransferForHousingDue.Amount.GetValueOrDefault()
-                            , input.CreateTransferForHousingDue.Description
+                            , input.TransferForHousingDue.Date
+                            , input.TransferForHousingDue.Amount.GetValueOrDefault()
+                            , input.TransferForHousingDue.Description
                             , HousingPaymentPlanType.Transfer
                             , null
+                            , input.TransferForHousingDue.ResidentOrOwner
                         )
                         : HousingPaymentPlan.CreateCredit(
                             SequentialGuidGenerator.Instance.Create()
                             , AbpSession.GetTenantId()
                             , housing
                             , null
-                            , input.CreateTransferForHousingDue.Date
-                            , input.CreateTransferForHousingDue.Amount.GetValueOrDefault()
-                            , input.CreateTransferForHousingDue.Description
+                            , input.TransferForHousingDue.Date
+                            , input.TransferForHousingDue.Amount.GetValueOrDefault()
+                            , input.TransferForHousingDue.Description
                             , null
                             , HousingPaymentPlanType.Transfer
                             , null
+                            , input.TransferForHousingDue.ResidentOrOwner
                         );
 
                     await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -134,7 +142,7 @@ namespace Sirius.Housings
 
             var housing = await Housing.UpdateAsync(_housingPolicy, existingHousing, block, input.Apartment,
                 housingCategory, input.TenantIsResiding);
-            await _housingManager.UpdateAsync(housing);
+            // await _housingManager.UpdateAsync(housing);
 
             //Eğer kiralık seçeneği kaldırılırsa, kiracı olarak işaretlenen kişiler de siliniyor
             if (oldTenantIsResidingValue && housing.TenantIsResiding == false)
@@ -146,6 +154,77 @@ namespace Sirius.Housings
                 tenantPeople.ForEach(async x => await _housingPersonRepository.DeleteAsync(x.Id));
             }
 
+            /*Devir işlemleri*/
+            if (input.TransferAmount.GetValueOrDefault() != 0 || input.DeleteTransferForHousingDue)
+            {
+                var housingPaymentPlanForTransfer = await _housingPaymentPlanRepository.GetAll()
+                    .Where(p => p.HousingId == input.Id &&
+                                p.HousingPaymentPlanType == HousingPaymentPlanType.Transfer &&
+                                p.FirstHousingDueTransferIsResidentOrOwner != null).FirstOrDefaultAsync();
+
+                if (housingPaymentPlanForTransfer != null) //Eski devir hareketinden gelen tutarlar geri alınıyor
+                {
+                    if (input.DeleteTransferForHousingDue)
+                    {
+                        await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlanForTransfer);
+                    }
+                    
+                    housing = housingPaymentPlanForTransfer.CreditOrDebt == CreditOrDebt.Debt
+                        ? Housing.DecreaseBalance(housing, housingPaymentPlanForTransfer.Amount,
+                            housingPaymentPlanForTransfer.FirstHousingDueTransferIsResidentOrOwner.GetValueOrDefault())
+                        : Housing.IncreaseBalance(housing, housingPaymentPlanForTransfer.Amount,
+                            housingPaymentPlanForTransfer.FirstHousingDueTransferIsResidentOrOwner
+                                .GetValueOrDefault());
+                }
+
+                //Yeni devir hareketi tutarları bakiyeye ekleniyor
+                housing = input.TransferIsDebt
+                    ? Housing.IncreaseBalance(housing, input.TransferAmount.GetValueOrDefault(),
+                        input.TransferIsForResidentOrOwner)
+                    : Housing.DecreaseBalance(housing, input.TransferAmount.GetValueOrDefault(),
+                        input.TransferIsForResidentOrOwner);
+
+                if (housingPaymentPlanForTransfer == null) //Yeni kayıt
+                {
+                    var housingPaymentPlan = input.TransferIsDebt
+                        ? HousingPaymentPlan.CreateDebt(
+                            SequentialGuidGenerator.Instance.Create()
+                            , AbpSession.GetTenantId()
+                            , null
+                            , housing
+                            , null
+                            , input.TransferDate
+                            , input.TransferAmount.GetValueOrDefault()
+                            , input.TransferDescription
+                            , HousingPaymentPlanType.Transfer
+                            , null
+                            , input.TransferIsForResidentOrOwner
+                        )
+                        : HousingPaymentPlan.CreateCredit(
+                            SequentialGuidGenerator.Instance.Create()
+                            , AbpSession.GetTenantId()
+                            , housing
+                            , null
+                            , input.TransferDate
+                            , input.TransferAmount.GetValueOrDefault()
+                            , input.TransferDescription
+                            , null
+                            , HousingPaymentPlanType.Transfer
+                            , null
+                            , input.TransferIsForResidentOrOwner
+                        );
+
+                    await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
+                }
+                else //Güncelleme ise
+                {
+                    HousingPaymentPlan.UpdateForFirstHousingDueTransfer(housingPaymentPlanForTransfer,
+                        input.TransferIsForResidentOrOwner
+                        , input.TransferAmount.GetValueOrDefault(),
+                        input.TransferIsDebt,
+                        input.TransferDate, input.TransferDescription);
+                }
+            }
             return ObjectMapper.Map<HousingDto>(housing);
         }
 
@@ -154,6 +233,40 @@ namespace Sirius.Housings
             CheckDeletePermission();
             var housing = await _housingManager.GetAsync(input.Id);
             await _housingManager.DeleteAsync(housing);
+        }
+
+        public async Task<UpdateHousingDto> GetHousingForUpdate(Guid id)
+        {
+            CheckGetAllPermission();
+            var housing = await _housingRepository.GetAsync(id);
+            var updateHousingDto = new UpdateHousingDto //TODO object mapper'a çevir
+            {
+                Apartment = housing.Apartment,
+                Id = housing.Id,
+                BlockId = housing.BlockId,
+                HousingCategoryId = housing.HousingCategoryId,
+                TenantIsResiding = housing.TenantIsResiding,
+                DeleteTransferForHousingDue = false
+            };
+
+            var housingPaymentPlanForTransfer = await _housingPaymentPlanRepository.GetAll()
+                .Where(p => p.HousingId == id && p.HousingPaymentPlanType == HousingPaymentPlanType.Transfer &&
+                            p.FirstHousingDueTransferIsResidentOrOwner != null).FirstOrDefaultAsync();
+
+            if (housingPaymentPlanForTransfer != null)
+            {
+                // housingPaymentPlanForTransfer.SetAbsAmount();
+                updateHousingDto.TransferAmount = housingPaymentPlanForTransfer.Amount;
+                updateHousingDto.TransferDate = housingPaymentPlanForTransfer.Date;
+                updateHousingDto.TransferDescription = housingPaymentPlanForTransfer.Description;
+                updateHousingDto.TransferIsDebt =
+                    housingPaymentPlanForTransfer.CreditOrDebt == CreditOrDebt.Debt;
+                updateHousingDto.TransferIsForResidentOrOwner = housingPaymentPlanForTransfer
+                    .FirstHousingDueTransferIsResidentOrOwner
+                    .GetValueOrDefault();
+            }
+
+            return updateHousingDto;
         }
 
         public async Task<PagedResultDto<HousingForListDto>> GetAllListAsync(PagedHousingResultRequestDto input)

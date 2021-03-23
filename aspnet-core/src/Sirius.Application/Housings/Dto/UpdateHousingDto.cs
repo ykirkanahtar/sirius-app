@@ -1,8 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using Abp.Application.Services.Dto;
-using Abp.Extensions;
-using Abp.Runtime.Validation;
+using Sirius.HousingPaymentPlans.Dto;
+using Sirius.Shared.Enums;
 
 namespace Sirius.Housings.Dto
 {
@@ -13,6 +12,11 @@ namespace Sirius.Housings.Dto
         public string Apartment { get; set; }
         public Guid HousingCategoryId { get; set; }
         public bool TenantIsResiding { get; set; }
-
+        public bool DeleteTransferForHousingDue { get; set; }
+        public ResidentOrOwner TransferIsForResidentOrOwner { get; set; }
+        public decimal? TransferAmount { get; set; }
+        public bool TransferIsDebt { get; set; }
+        public DateTime TransferDate { get; set; }
+        public string TransferDescription { get; set; }
     }
 }

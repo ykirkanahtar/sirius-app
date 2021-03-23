@@ -62,6 +62,7 @@ namespace Sirius.HousingPaymentPlans
                                 , string.Empty //Description
                                 , HousingPaymentPlanType.Transfer
                                 , null
+                                , null
                             )
                             : HousingPaymentPlan.CreateCredit(
                                 SequentialGuidGenerator.Instance.Create()
@@ -73,6 +74,7 @@ namespace Sirius.HousingPaymentPlans
                                 , string.Empty //Description
                                 , null
                                 , HousingPaymentPlanType.Transfer
+                                , null
                                 , null
                             );
 
@@ -101,6 +103,7 @@ namespace Sirius.HousingPaymentPlans
                         , housingPaymentPlanGroup.AmountPerMonth
                         , housingPaymentPlanGroup.Description
                         , HousingPaymentPlanType.HousingDueDefinition
+                        , null
                         , null
                     );
 

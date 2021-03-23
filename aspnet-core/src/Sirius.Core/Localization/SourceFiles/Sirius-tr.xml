@@ -191,6 +191,7 @@
     <text name="DeletePaymentCategory">Ödeme türü sil</text>
     <text name="DeletePeriod">Dönem sil</text>
     <text name="DeletePerson">Kişi sil</text>
+    <text name="DeleteTransferForHousingDue">Devir hareketini sil</text>
     <text name="DeleteWarningMessage">Bu kaydı silmek istediğinize emin misiniz?</text>
     <text name="Description">Açıklama</text>
     <text name="Details">Detaylar</text>
