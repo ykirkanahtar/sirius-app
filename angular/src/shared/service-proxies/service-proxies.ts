@@ -1608,6 +1608,62 @@ export class HousingServiceProxy {
     }
 
     /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getHousingForUpdate(id: string | undefined): Observable<UpdateHousingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/GetHousingForUpdate?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingForUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingForUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<UpdateHousingDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UpdateHousingDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingForUpdate(response: HttpResponseBase): Observable<UpdateHousingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UpdateHousingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UpdateHousingDto>(<any>null);
+    }
+
+    /**
      * @param housingIds (optional) 
      * @param housingCategoryIds (optional) 
      * @param personIds (optional) 
@@ -8800,16 +8856,15 @@ export enum ResidentOrOwner {
     Owner = 2,
 }
 
-export class CreateTransferForHousingDueDto implements ICreateTransferForHousingDueDto {
+export class CreateOrUpdateTransferForHousingDueDto implements ICreateOrUpdateTransferForHousingDueDto {
     housingId: string;
     residentOrOwner: ResidentOrOwner;
     amount: number | undefined;
     isDebt: boolean;
-    paymentCategoryId: string;
     date: moment.Moment;
     description: string | undefined;
 
-    constructor(data?: ICreateTransferForHousingDueDto) {
+    constructor(data?: ICreateOrUpdateTransferForHousingDueDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -8824,15 +8879,14 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
             this.residentOrOwner = _data["residentOrOwner"];
             this.amount = _data["amount"];
             this.isDebt = _data["isDebt"];
-            this.paymentCategoryId = _data["paymentCategoryId"];
             this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
             this.description = _data["description"];
         }
     }
 
-    static fromJS(data: any): CreateTransferForHousingDueDto {
+    static fromJS(data: any): CreateOrUpdateTransferForHousingDueDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateTransferForHousingDueDto();
+        let result = new CreateOrUpdateTransferForHousingDueDto();
         result.init(data);
         return result;
     }
@@ -8843,26 +8897,24 @@ export class CreateTransferForHousingDueDto implements ICreateTransferForHousing
         data["residentOrOwner"] = this.residentOrOwner;
         data["amount"] = this.amount;
         data["isDebt"] = this.isDebt;
-        data["paymentCategoryId"] = this.paymentCategoryId;
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["description"] = this.description;
         return data; 
     }
 
-    clone(): CreateTransferForHousingDueDto {
+    clone(): CreateOrUpdateTransferForHousingDueDto {
         const json = this.toJSON();
-        let result = new CreateTransferForHousingDueDto();
+        let result = new CreateOrUpdateTransferForHousingDueDto();
         result.init(json);
         return result;
     }
 }
 
-export interface ICreateTransferForHousingDueDto {
+export interface ICreateOrUpdateTransferForHousingDueDto {
     housingId: string;
     residentOrOwner: ResidentOrOwner;
     amount: number | undefined;
     isDebt: boolean;
-    paymentCategoryId: string;
     date: moment.Moment;
     description: string | undefined;
 }
@@ -8872,7 +8924,7 @@ export class CreateHousingDto implements ICreateHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     tenantIsResiding: boolean;
-    createTransferForHousingDue: CreateTransferForHousingDueDto;
+    transferForHousingDue: CreateOrUpdateTransferForHousingDueDto;
 
     constructor(data?: ICreateHousingDto) {
         if (data) {
@@ -8889,7 +8941,7 @@ export class CreateHousingDto implements ICreateHousingDto {
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
             this.tenantIsResiding = _data["tenantIsResiding"];
-            this.createTransferForHousingDue = _data["createTransferForHousingDue"] ? CreateTransferForHousingDueDto.fromJS(_data["createTransferForHousingDue"]) : <any>undefined;
+            this.transferForHousingDue = _data["transferForHousingDue"] ? CreateOrUpdateTransferForHousingDueDto.fromJS(_data["transferForHousingDue"]) : <any>undefined;
         }
     }
 
@@ -8906,7 +8958,7 @@ export class CreateHousingDto implements ICreateHousingDto {
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         data["tenantIsResiding"] = this.tenantIsResiding;
-        data["createTransferForHousingDue"] = this.createTransferForHousingDue ? this.createTransferForHousingDue.toJSON() : <any>undefined;
+        data["transferForHousingDue"] = this.transferForHousingDue ? this.transferForHousingDue.toJSON() : <any>undefined;
         return data; 
     }
 
@@ -8923,7 +8975,233 @@ export interface ICreateHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     tenantIsResiding: boolean;
-    createTransferForHousingDue: CreateTransferForHousingDueDto;
+    transferForHousingDue: CreateOrUpdateTransferForHousingDueDto;
+}
+
+export enum CreditOrDebt {
+    Credit = 1,
+    Debt = 2,
+}
+
+export enum HousingPaymentPlanType {
+    HousingDueDefinition = 1,
+    HousingDuePayment = 2,
+    Transfer = 3,
+    Encashment = 4,
+}
+
+export class PaymentCategoryDto implements IPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isHousingDue: boolean;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
+    defaultFromPaymentAccountName: string | undefined;
+    defaultToPaymentAccountName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IPaymentCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.isHousingDue = _data["isHousingDue"];
+            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
+            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
+            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
+            this.paymentCategoryType = _data["paymentCategoryType"];
+            this.defaultFromPaymentAccountName = _data["defaultFromPaymentAccountName"];
+            this.defaultToPaymentAccountName = _data["defaultToPaymentAccountName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PaymentCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["isHousingDue"] = this.isHousingDue;
+        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
+        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
+        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
+        data["paymentCategoryType"] = this.paymentCategoryType;
+        data["defaultFromPaymentAccountName"] = this.defaultFromPaymentAccountName;
+        data["defaultToPaymentAccountName"] = this.defaultToPaymentAccountName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): PaymentCategoryDto {
+        const json = this.toJSON();
+        let result = new PaymentCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentCategoryDto {
+    paymentCategoryName: string | undefined;
+    isHousingDue: boolean;
+    isValidForAllPeriods: boolean;
+    defaultFromPaymentAccountId: string | undefined;
+    defaultToPaymentAccountId: string | undefined;
+    paymentCategoryType: PaymentCategoryType;
+    defaultFromPaymentAccountName: string | undefined;
+    defaultToPaymentAccountName: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+}
+
+export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
+    housingId: string;
+    paymentCategoryId: string;
+    date: moment.Moment;
+    creditOrDebt: CreditOrDebt;
+    housingPaymentPlanType: HousingPaymentPlanType;
+    amount: number;
+    description: string | undefined;
+    accountBookId: string | undefined;
+    firstHousingTransferIsResidentOrOwner: ResidentOrOwner;
+    paymentCategory: PaymentCategoryDto;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
+
+    constructor(data?: IHousingPaymentPlanDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.paymentCategoryId = _data["paymentCategoryId"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.creditOrDebt = _data["creditOrDebt"];
+            this.housingPaymentPlanType = _data["housingPaymentPlanType"];
+            this.amount = _data["amount"];
+            this.description = _data["description"];
+            this.accountBookId = _data["accountBookId"];
+            this.firstHousingTransferIsResidentOrOwner = _data["firstHousingTransferIsResidentOrOwner"];
+            this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["paymentCategoryId"] = this.paymentCategoryId;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["creditOrDebt"] = this.creditOrDebt;
+        data["housingPaymentPlanType"] = this.housingPaymentPlanType;
+        data["amount"] = this.amount;
+        data["description"] = this.description;
+        data["accountBookId"] = this.accountBookId;
+        data["firstHousingTransferIsResidentOrOwner"] = this.firstHousingTransferIsResidentOrOwner;
+        data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanDto {
+    housingId: string;
+    paymentCategoryId: string;
+    date: moment.Moment;
+    creditOrDebt: CreditOrDebt;
+    housingPaymentPlanType: HousingPaymentPlanType;
+    amount: number;
+    description: string | undefined;
+    accountBookId: string | undefined;
+    firstHousingTransferIsResidentOrOwner: ResidentOrOwner;
+    paymentCategory: PaymentCategoryDto;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: string;
 }
 
 export class Block implements IBlock {
@@ -9274,6 +9552,7 @@ export class HousingDto implements IHousingDto {
     residentBalance: number;
     ownerBalance: number;
     tenantIsResiding: boolean;
+    firstHousingDueTransferPaymentPlan: HousingPaymentPlanDto;
     block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
@@ -9304,6 +9583,7 @@ export class HousingDto implements IHousingDto {
             this.residentBalance = _data["residentBalance"];
             this.ownerBalance = _data["ownerBalance"];
             this.tenantIsResiding = _data["tenantIsResiding"];
+            this.firstHousingDueTransferPaymentPlan = _data["firstHousingDueTransferPaymentPlan"] ? HousingPaymentPlanDto.fromJS(_data["firstHousingDueTransferPaymentPlan"]) : <any>undefined;
             this.block = _data["block"] ? Block.fromJS(_data["block"]) : <any>undefined;
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.housingPerson = _data["housingPerson"] ? HousingPersonDto.fromJS(_data["housingPerson"]) : <any>undefined;
@@ -9334,6 +9614,7 @@ export class HousingDto implements IHousingDto {
         data["residentBalance"] = this.residentBalance;
         data["ownerBalance"] = this.ownerBalance;
         data["tenantIsResiding"] = this.tenantIsResiding;
+        data["firstHousingDueTransferPaymentPlan"] = this.firstHousingDueTransferPaymentPlan ? this.firstHousingDueTransferPaymentPlan.toJSON() : <any>undefined;
         data["block"] = this.block ? this.block.toJSON() : <any>undefined;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["housingPerson"] = this.housingPerson ? this.housingPerson.toJSON() : <any>undefined;
@@ -9364,6 +9645,7 @@ export interface IHousingDto {
     residentBalance: number;
     ownerBalance: number;
     tenantIsResiding: boolean;
+    firstHousingDueTransferPaymentPlan: HousingPaymentPlanDto;
     block: Block;
     housingCategory: HousingCategoryDto;
     housingPerson: HousingPersonDto;
@@ -9383,6 +9665,12 @@ export class UpdateHousingDto implements IUpdateHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     tenantIsResiding: boolean;
+    deleteTransferForHousingDue: boolean;
+    transferIsForResidentOrOwner: ResidentOrOwner;
+    transferAmount: number | undefined;
+    transferIsDebt: boolean;
+    transferDate: moment.Moment;
+    transferDescription: string | undefined;
 
     constructor(data?: IUpdateHousingDto) {
         if (data) {
@@ -9400,6 +9688,12 @@ export class UpdateHousingDto implements IUpdateHousingDto {
             this.apartment = _data["apartment"];
             this.housingCategoryId = _data["housingCategoryId"];
             this.tenantIsResiding = _data["tenantIsResiding"];
+            this.deleteTransferForHousingDue = _data["deleteTransferForHousingDue"];
+            this.transferIsForResidentOrOwner = _data["transferIsForResidentOrOwner"];
+            this.transferAmount = _data["transferAmount"];
+            this.transferIsDebt = _data["transferIsDebt"];
+            this.transferDate = _data["transferDate"] ? moment(_data["transferDate"].toString()) : <any>undefined;
+            this.transferDescription = _data["transferDescription"];
         }
     }
 
@@ -9417,6 +9711,12 @@ export class UpdateHousingDto implements IUpdateHousingDto {
         data["apartment"] = this.apartment;
         data["housingCategoryId"] = this.housingCategoryId;
         data["tenantIsResiding"] = this.tenantIsResiding;
+        data["deleteTransferForHousingDue"] = this.deleteTransferForHousingDue;
+        data["transferIsForResidentOrOwner"] = this.transferIsForResidentOrOwner;
+        data["transferAmount"] = this.transferAmount;
+        data["transferIsDebt"] = this.transferIsDebt;
+        data["transferDate"] = this.transferDate ? this.transferDate.toISOString() : <any>undefined;
+        data["transferDescription"] = this.transferDescription;
         return data; 
     }
 
@@ -9434,6 +9734,12 @@ export interface IUpdateHousingDto {
     apartment: string | undefined;
     housingCategoryId: string;
     tenantIsResiding: boolean;
+    deleteTransferForHousingDue: boolean;
+    transferIsForResidentOrOwner: ResidentOrOwner;
+    transferAmount: number | undefined;
+    transferIsDebt: boolean;
+    transferDate: moment.Moment;
+    transferDescription: string | undefined;
 }
 
 export class HousingForListDto implements IHousingForListDto {
@@ -9969,228 +10275,6 @@ export interface ICreateCreditHousingPaymentPlanDto {
     amount: number;
     description: string | undefined;
     accountBookId: string;
-}
-
-export enum CreditOrDebt {
-    Credit = 1,
-    Debt = 2,
-}
-
-export enum HousingPaymentPlanType {
-    HousingDueDefinition = 1,
-    HousingDuePayment = 2,
-    Transfer = 3,
-    Encashment = 4,
-}
-
-export class PaymentCategoryDto implements IPaymentCategoryDto {
-    paymentCategoryName: string | undefined;
-    isHousingDue: boolean;
-    isValidForAllPeriods: boolean;
-    defaultFromPaymentAccountId: string | undefined;
-    defaultToPaymentAccountId: string | undefined;
-    paymentCategoryType: PaymentCategoryType;
-    defaultFromPaymentAccountName: string | undefined;
-    defaultToPaymentAccountName: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IPaymentCategoryDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.paymentCategoryName = _data["paymentCategoryName"];
-            this.isHousingDue = _data["isHousingDue"];
-            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
-            this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
-            this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
-            this.paymentCategoryType = _data["paymentCategoryType"];
-            this.defaultFromPaymentAccountName = _data["defaultFromPaymentAccountName"];
-            this.defaultToPaymentAccountName = _data["defaultToPaymentAccountName"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): PaymentCategoryDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaymentCategoryDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["paymentCategoryName"] = this.paymentCategoryName;
-        data["isHousingDue"] = this.isHousingDue;
-        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
-        data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
-        data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
-        data["paymentCategoryType"] = this.paymentCategoryType;
-        data["defaultFromPaymentAccountName"] = this.defaultFromPaymentAccountName;
-        data["defaultToPaymentAccountName"] = this.defaultToPaymentAccountName;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): PaymentCategoryDto {
-        const json = this.toJSON();
-        let result = new PaymentCategoryDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPaymentCategoryDto {
-    paymentCategoryName: string | undefined;
-    isHousingDue: boolean;
-    isValidForAllPeriods: boolean;
-    defaultFromPaymentAccountId: string | undefined;
-    defaultToPaymentAccountId: string | undefined;
-    paymentCategoryType: PaymentCategoryType;
-    defaultFromPaymentAccountName: string | undefined;
-    defaultToPaymentAccountName: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-}
-
-export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
-    housingId: string;
-    paymentCategoryId: string;
-    date: moment.Moment;
-    creditOrDebt: CreditOrDebt;
-    housingPaymentPlanType: HousingPaymentPlanType;
-    amount: number;
-    description: string | undefined;
-    accountBookId: string | undefined;
-    paymentCategory: PaymentCategoryDto;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
-
-    constructor(data?: IHousingPaymentPlanDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.housingId = _data["housingId"];
-            this.paymentCategoryId = _data["paymentCategoryId"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.creditOrDebt = _data["creditOrDebt"];
-            this.housingPaymentPlanType = _data["housingPaymentPlanType"];
-            this.amount = _data["amount"];
-            this.description = _data["description"];
-            this.accountBookId = _data["accountBookId"];
-            this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): HousingPaymentPlanDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new HousingPaymentPlanDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["housingId"] = this.housingId;
-        data["paymentCategoryId"] = this.paymentCategoryId;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["creditOrDebt"] = this.creditOrDebt;
-        data["housingPaymentPlanType"] = this.housingPaymentPlanType;
-        data["amount"] = this.amount;
-        data["description"] = this.description;
-        data["accountBookId"] = this.accountBookId;
-        data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): HousingPaymentPlanDto {
-        const json = this.toJSON();
-        let result = new HousingPaymentPlanDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IHousingPaymentPlanDto {
-    housingId: string;
-    paymentCategoryId: string;
-    date: moment.Moment;
-    creditOrDebt: CreditOrDebt;
-    housingPaymentPlanType: HousingPaymentPlanType;
-    amount: number;
-    description: string | undefined;
-    accountBookId: string | undefined;
-    paymentCategory: PaymentCategoryDto;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: string;
 }
 
 export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymentPlanDto {

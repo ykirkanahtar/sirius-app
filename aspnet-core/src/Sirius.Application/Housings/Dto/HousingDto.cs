@@ -1,6 +1,9 @@
 ﻿using System;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
+using JetBrains.Annotations;
+using Sirius.HousingPaymentPlans;
+using Sirius.HousingPaymentPlans.Dto;
 
 namespace Sirius.Housings.Dto
 {
@@ -14,6 +17,7 @@ namespace Sirius.Housings.Dto
         public decimal ResidentBalance { get; set; }
         public decimal OwnerBalance { get; set; }
         public bool TenantIsResiding { get; set; }
+        [CanBeNull] public HousingPaymentPlanDto FirstHousingDueTransferPaymentPlan { get; set; }
 
         public virtual Block Block { get; set; }
         public virtual HousingCategoryDto HousingCategory { get; set; }

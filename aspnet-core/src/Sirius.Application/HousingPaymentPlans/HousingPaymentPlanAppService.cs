@@ -125,6 +125,7 @@ namespace Sirius.HousingPaymentPlans
                 , accountBook
                 , HousingPaymentPlanType.HousingDuePayment
                 , null
+                , null
             );
 
             await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -149,6 +150,7 @@ namespace Sirius.HousingPaymentPlans
                 , input.Amount
                 , input.Description
                 , HousingPaymentPlanType.HousingDueDefinition
+                , null
                 , null
             );
 
