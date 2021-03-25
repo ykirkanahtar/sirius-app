@@ -1737,10 +1737,16 @@ export class HousingServiceProxy {
     }
 
     /**
+     * @param personId (optional) 
+     * @param paymentCategoryId (optional) 
      * @return Success
      */
-    getHousingLookUp(): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/Housing/GetHousingLookUp";
+    getHousingLookUp(personId: string | null | undefined, paymentCategoryId: string | null | undefined): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Housing/GetHousingLookUp?";
+        if (personId !== undefined)
+            url_ += "PersonId=" + encodeURIComponent("" + personId) + "&";
+        if (paymentCategoryId !== undefined)
+            url_ += "PaymentCategoryId=" + encodeURIComponent("" + paymentCategoryId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2027,66 +2033,6 @@ export class HousingServiceProxy {
             }));
         }
         return _observableOf<HousingPersonDtoPagedResultDto>(<any>null);
-    }
-
-    /**
-     * @param personId (optional) 
-     * @return Success
-     */
-    getHousingsLookUpByPersonId(personId: string | undefined): Observable<LookUpDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/Housing/GetHousingsLookUpByPersonId?";
-        if (personId === null)
-            throw new Error("The parameter 'personId' cannot be null.");
-        else if (personId !== undefined)
-            url_ += "personId=" + encodeURIComponent("" + personId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetHousingsLookUpByPersonId(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetHousingsLookUpByPersonId(<any>response_);
-                } catch (e) {
-                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetHousingsLookUpByPersonId(response: HttpResponseBase): Observable<LookUpDto[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200.push(LookUpDto.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -9102,7 +9048,7 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
     amount: number;
     description: string | undefined;
     accountBookId: string | undefined;
-    firstHousingTransferIsResidentOrOwner: ResidentOrOwner;
+    firstHousingDueTransferIsResidentOrOwner: ResidentOrOwner;
     paymentCategory: PaymentCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -9132,7 +9078,7 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
             this.amount = _data["amount"];
             this.description = _data["description"];
             this.accountBookId = _data["accountBookId"];
-            this.firstHousingTransferIsResidentOrOwner = _data["firstHousingTransferIsResidentOrOwner"];
+            this.firstHousingDueTransferIsResidentOrOwner = _data["firstHousingDueTransferIsResidentOrOwner"];
             this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -9162,7 +9108,7 @@ export class HousingPaymentPlanDto implements IHousingPaymentPlanDto {
         data["amount"] = this.amount;
         data["description"] = this.description;
         data["accountBookId"] = this.accountBookId;
-        data["firstHousingTransferIsResidentOrOwner"] = this.firstHousingTransferIsResidentOrOwner;
+        data["firstHousingDueTransferIsResidentOrOwner"] = this.firstHousingDueTransferIsResidentOrOwner;
         data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -9192,7 +9138,7 @@ export interface IHousingPaymentPlanDto {
     amount: number;
     description: string | undefined;
     accountBookId: string | undefined;
-    firstHousingTransferIsResidentOrOwner: ResidentOrOwner;
+    firstHousingDueTransferIsResidentOrOwner: ResidentOrOwner;
     paymentCategory: PaymentCategoryDto;
     isDeleted: boolean;
     deleterUserId: number | undefined;

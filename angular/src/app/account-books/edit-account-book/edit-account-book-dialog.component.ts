@@ -49,7 +49,6 @@ export class EditAccountBookDialogComponent
   paymentCategory = new PaymentCategoryDto();
   PaymentCategoryTypeEnum = PaymentCategoryType;
 
-  housing = new HousingDto();
   paymentAccounts: LookUpDto[];
   paymentCategories: LookUpDto[] = [];
   people: LookUpDto[];
@@ -62,6 +61,7 @@ export class EditAccountBookDialogComponent
   showPaymentCategory = false;
 
   processDate: Date;
+  housingDueBlockAndApartmentText: string;
   encashmentHousingText: string;
 
   @Input() lastAccountBookDate: moment.Moment;
@@ -114,6 +114,15 @@ export class EditAccountBookDialogComponent
           .get(this.accountBook.paymentCategoryId)
           .subscribe((paymentCategory: PaymentCategoryDto) => {
             this.paymentCategory = paymentCategory;
+
+            if (paymentCategory.isHousingDue) {
+              this._housingServiceProxy
+                .get(this.accountBook.housingId)
+                .subscribe((result: HousingDto) => {
+                  this.housingDueBlockAndApartmentText =
+                    result.block.blockName + " " + result.apartment;
+                });
+            }
 
             this._accountBookServiceProxy
               .getPaymentCategoryLookUpForEditAccountBook(this.id)

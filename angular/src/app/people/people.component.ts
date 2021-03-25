@@ -54,7 +54,7 @@ export class PeopleComponent
   }
 
   ngOnInit(): void {
-    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+    this._housingService.getHousingLookUp(undefined, undefined).subscribe((result: LookUpDto[]) => {
       this.housingsFilter = result;
     });
 

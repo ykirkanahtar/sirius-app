@@ -43,6 +43,7 @@ namespace Sirius.PaymentAccounts
         private readonly IBlobService _blobService;
         private readonly IAccountBookPolicy _accountBookPolicy;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymetPlanRepository;
+        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly ILocalizationSource _localizationSource;
 
@@ -59,7 +60,7 @@ namespace Sirius.PaymentAccounts
             IRepository<AccountBookFile, Guid> accountBookFileRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymetPlanRepository,
             IHousingPaymentPlanManager housingPaymentPlanManager,
-            ILocalizationManager localizationManager)
+            ILocalizationManager localizationManager, IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -75,6 +76,7 @@ namespace Sirius.PaymentAccounts
             _accountBookFileRepository = accountBookFileRepository;
             _housingPaymetPlanRepository = housingPaymetPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
+            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -94,10 +96,16 @@ namespace Sirius.PaymentAccounts
             CheckCreatePermission();
             input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
 
-            // var housingDuePaymentCategory = await _paymentCategoryManager.GetRegularHousingDueAsync();
             var housingDuePaymentCategory = await _paymentCategoryManager.GetAsync(input.PaymentCategoryId);
-
+            
             var housing = await _housingManager.GetAsync(input.HousingId);
+            
+            //Check housingCategory
+            if (housing.HousingCategoryId != housingDuePaymentCategory.HousingCategoryId)
+            {
+                throw new UserFriendlyException("Ödeme kategorisi konut grubu uyumsuz.");
+            }
+            
             var toPaymentAccount =
                 await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId.GetValueOrDefault());
 
@@ -545,23 +553,17 @@ namespace Sirius.PaymentAccounts
             var paymentCategory =
                 await _paymentCategoryRepository.GetAsync(accountBook.PaymentCategoryId.GetValueOrDefault());
 
-            // if (!paymentCategory.EditInAccountBook
-            // ) //Eğer düzenlemeye izin verilmeyen bir ödeme türü ise, sadece o döndürülüyor
-            // {
-            //     return new List<PaymentCategoryLookUpDto>
-            //     {
-            //         new(paymentCategory.Id.ToString(),
-            //             _localizationSource.GetString(paymentCategory.PaymentCategoryName),
-            //             paymentCategory.EditInAccountBook)
-            //     };
-            // }
-
             var paymentCategories = await _paymentCategoryRepository.GetAll()
                 .Where(p => (p.IsHousingDue == paymentCategory.IsHousingDue &&
                              p.HousingDueForResidentOrOwner == paymentCategory.HousingDueForResidentOrOwner) &&
                             p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .WhereIf(paymentCategory != null, p => p.PaymentCategoryType == paymentCategory.PaymentCategoryType)
                 .ToListAsync();
+
+            if (paymentCategory != null && paymentCategory.IsHousingDue)
+            {
+                paymentCategories = paymentCategories.Where(p => p.HousingCategoryId == paymentCategory.HousingCategoryId).ToList();
+            }
 
             return
                 (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))

@@ -74,7 +74,7 @@ namespace Sirius.HousingPaymentPlans
 
             var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
-                input.DefaultToPaymentAccountId, input.ResidentOrOwner);
+                input.DefaultToPaymentAccountId, input.ResidentOrOwner, input.HousingCategoryId);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
 

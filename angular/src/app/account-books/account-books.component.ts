@@ -49,6 +49,7 @@ export class AccountBooksComponent
   advancedFiltersVisible = false;
 
   menuItems: MenuItem[] = [];
+  menuLimit: number = 15;
 
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
@@ -115,7 +116,7 @@ export class AccountBooksComponent
         this.paymentCategoriesFilter = result;
       });
 
-    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+    this._housingService.getHousingLookUp(undefined, undefined).subscribe((result: LookUpDto[]) => {
       this.housingsFilters = result;
     });
 
@@ -139,7 +140,7 @@ export class AccountBooksComponent
       .subscribe((paymentCategories: PaymentCategoryDto[]) => {
         this.menuItems = [];
 
-        if (paymentCategories.length > 15) {
+        if (paymentCategories.length > this.menuLimit) {
           let incomeMenuItem: MenuItem;
           incomeMenuItem = {
             label: this.l("Income"),

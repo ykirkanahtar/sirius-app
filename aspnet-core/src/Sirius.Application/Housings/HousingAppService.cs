@@ -11,6 +11,7 @@ using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.UI;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using Sirius.Authorization;
 using Sirius.EntityFrameworkCore.Repositories;
@@ -41,13 +42,15 @@ namespace Sirius.Housings
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
+        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
 
         public HousingAppService(IHousingManager housingManager, IHousingRepository housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
             IRepository<Person, Guid> personRepository, IRepository<HousingPerson, Guid> housingPersonRepository,
             IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy,
             IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager,
-            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
+            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
+            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -61,6 +64,7 @@ namespace Sirius.Housings
             _paymentCategoryManager = paymentCategoryManager;
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
+            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
         }
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
@@ -168,7 +172,7 @@ namespace Sirius.Housings
                     {
                         await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlanForTransfer);
                     }
-                    
+
                     housing = housingPaymentPlanForTransfer.CreditOrDebt == CreditOrDebt.Debt
                         ? Housing.DecreaseBalance(housing, housingPaymentPlanForTransfer.Amount,
                             housingPaymentPlanForTransfer.FirstHousingDueTransferIsResidentOrOwner.GetValueOrDefault())
@@ -225,6 +229,7 @@ namespace Sirius.Housings
                         input.TransferDate, input.TransferDescription);
                 }
             }
+
             return ObjectMapper.Map<HousingDto>(housing);
         }
 
@@ -307,10 +312,30 @@ namespace Sirius.Housings
             return new PagedResultDto<HousingForListDto>(query.Count(), housings);
         }
 
-        public async Task<List<LookUpDto>> GetHousingLookUpAsync()
+        public async Task<List<LookUpDto>> GetHousingLookUpAsync(HousingLookUpFilter filter)
         {
             CheckGetAllPermission();
-            var query = _housingRepository.GetAll().Include(p => p.Block);
+            IQueryable<Housing> query;
+
+            if (filter.PersonId.HasValue)
+            {
+                query = from h in _housingRepository.GetAll().Include(p => p.Block)
+                    join hp in _housingPersonRepository.GetAll() on h.Id equals hp.HousingId
+                    where hp.PersonId == filter.PersonId.Value
+                    select h;
+            }
+            else
+            {
+                query = _housingRepository.GetAll().Include(p => p.Block).Select(p => p);
+            }
+
+            if (filter.PaymentCategoryId.HasValue)
+            {
+                var paymentCategory = await _paymentCategoryManager.GetAsync(filter.PaymentCategoryId.Value);
+
+                query = query.WhereIf(paymentCategory.IsHousingDue,
+                    p => p.HousingCategoryId == paymentCategory.HousingCategoryId).Select(p => p);
+            }
 
             return
                 (from l in await query.ToListAsync()
@@ -375,21 +400,6 @@ namespace Sirius.Housings
 
             return new PagedResultDto<HousingPersonDto>(query.Count(),
                 ObjectMapper.Map<List<HousingPersonDto>>(housingPeople));
-        }
-
-        public async Task<List<LookUpDto>> GetHousingsLookUpByPersonIdAsync(Guid personId)
-        {
-            var housings = await (from h in _housingRepository.GetAll().Include(p => p.Block)
-                join hp in _housingPersonRepository.GetAll() on h.Id equals hp.HousingId
-                where hp.PersonId == personId
-                select h).ToListAsync();
-
-            if (housings.Count == 0)
-            {
-                throw new UserFriendlyException("Sistemde uygun konut bulunamadı.");
-            }
-
-            return housings.Select(p => new LookUpDto(p.Id.ToString(), p.GetName())).ToList();
         }
     }
 }
