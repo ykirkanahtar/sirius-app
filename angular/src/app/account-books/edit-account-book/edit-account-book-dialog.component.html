@@ -53,7 +53,9 @@
             </div>
             <div
               class="form-group row"
-              [ngClass]="accountBook.encachmentFromHousingDue === false ? 'required' : ''"
+              [ngClass]="
+                accountBook.encachmentFromHousingDue === false ? 'required' : ''
+              "
               *ngIf="
                 paymentCategory.paymentCategoryType ===
                   PaymentCategoryTypeEnum.Expense ||
@@ -64,7 +66,11 @@
               <div class="col-md-10">
                 <label for="fromPaymentAccounts">
                   {{ "FromPaymentAccount" | localize }}
-                  <span *ngIf="accountBook.encachmentFromHousingDue === false" class="text-danger">*</span>
+                  <span
+                    *ngIf="accountBook.encachmentFromHousingDue === false"
+                    class="text-danger"
+                    >*</span
+                  >
                 </label>
                 <p-dropdown
                   id="fromPaymentAccounts"
@@ -127,8 +133,6 @@
                 </p-inputNumber>
               </div>
             </div>
-          </div>
-          <div class="col-md-6">
             <div class="form-group row">
               <div class="col-md-10">
                 <label for="description">
@@ -151,7 +155,29 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div class="form-group row">
+          </div>
+          <div class="col-md-6">
+            <div
+              class="form-group row required"
+              *ngIf="paymentCategory.isHousingDue"
+            >
+              <div class="col-md-10">
+                <label for="housings">
+                  {{ "Housing" | localize }}
+                </label>
+                <br>
+                <label for="housings">
+                  {{ housingDueBlockAndApartmentText }}
+                </label>
+              </div>
+            </div>
+            <div
+              class="form-group row"
+              *ngIf="
+                paymentCategory.paymentCategoryType ===
+                PaymentCategoryTypeEnum.Expense
+              "
+            >
               <div class="col-md-10">
                 <label for="documentDateTime">
                   {{ "DocumentDateTime" | localize }}
@@ -167,7 +193,13 @@
                 />
               </div>
             </div>
-            <div class="form-group row">
+            <div
+              class="form-group row"
+              *ngIf="
+                paymentCategory.paymentCategoryType ===
+                PaymentCategoryTypeEnum.Expense
+              "
+            >
               <div class="col-md-10">
                 <label for="documentNumber">
                   {{ "DocumentNumber" | localize }}

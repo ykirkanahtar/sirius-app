@@ -29,8 +29,6 @@ import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
-import { threadId } from "worker_threads";
-import { debug } from "console";
 
 @Component({
   templateUrl: "create-account-book-dialog.component.html",
@@ -105,12 +103,14 @@ export class CreateAccountBookDialogComponent
 
   ngOnInit(): void {
     if (this.paymentCategory) {
-      console.log(this.paymentCategory);
       this.accountBook.paymentCategoryId = this.paymentCategory.id;
       this.paymentCategoryType = this.paymentCategory.paymentCategoryType;
       this.isHousingDue = this.paymentCategory.isHousingDue;
       this.definedPaymentCategory = true;
       this.setDefaultPaymentAccount(this.paymentCategory);
+      this.getHousings(this.paymentCategory);
+    } else {
+      this.getHousings();
     }
 
     this._paymentCategoryServiceProxy
@@ -120,8 +120,6 @@ export class CreateAccountBookDialogComponent
       });
 
     this.accountBook.isHousingDue = this.isHousingDue;
-
-    this.getHousings();
 
     this._paymentAccountServiceProxy
       .getPaymentAccountLookUp()
@@ -143,8 +141,7 @@ export class CreateAccountBookDialogComponent
   }
 
   isFromPaymentAccountRequired(): boolean {
-
-    if(this.accountBook.encachmentFromHousingDue) {
+    if (this.accountBook.encachmentFromHousingDue) {
       return false;
     }
 
@@ -160,10 +157,10 @@ export class CreateAccountBookDialogComponent
     var selectedPerson = event.value;
 
     if (!selectedPerson) {
-      this.getHousings();
+      this.getHousings(this.paymentCategory);
     } else {
       this._housingServiceProxy
-        .getHousingsLookUpByPersonId(selectedPerson)
+        .getHousingLookUp(selectedPerson, this.paymentCategory.id) 
         .subscribe((result: LookUpDto[]) => {
           this.housings = result;
           debugger;
@@ -181,7 +178,7 @@ export class CreateAccountBookDialogComponent
       this.getHousings();
     } else {
       this._housingServiceProxy
-        .getHousingsLookUpByPersonId(selectedPerson)
+        .getHousingLookUp(selectedPerson, undefined)
         .subscribe((result: LookUpDto[]) => {
           this.housingsForEncashment = result;
           if (this.housingsForEncashment.length === 1) {
@@ -216,12 +213,9 @@ export class CreateAccountBookDialogComponent
       this._paymentCategoryServiceProxy
         .get(selectedPaymentCategory)
         .subscribe((result: PaymentCategoryDto) => {
-          // this.accountBook.fromPaymentAccountId =
-          //   result.defaultFromPaymentAccountId;
-          // this.accountBook.toPaymentAccountId =
-          //   result.defaultToPaymentAccountId;
           this.setDefaultPaymentAccount(selectedPaymentCategory);
           this.accountBook.isHousingDue = result.isHousingDue;
+          this.getHousings(result);
           if (this.accountBook.isHousingDue === false) {
             this.accountBook.housingId = "00000000-0000-0000-0000-000000000000";
           }
@@ -229,14 +223,24 @@ export class CreateAccountBookDialogComponent
     }
   }
 
-  getHousings() {
-    this._housingServiceProxy
-      .getHousingLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housings = result;
-        this.housingsForEncashment = result;
-        this.accountBook.housingIdForEncachment = null;
-      });
+  getHousings(paymentCategory?: PaymentCategoryDto) {
+    if (paymentCategory != null) {
+      this._housingServiceProxy
+        .getHousingLookUp(undefined, paymentCategory.id)
+        .subscribe((result: LookUpDto[]) => {
+          this.housings = result;
+          this.housingsForEncashment = result;
+          this.accountBook.housingIdForEncachment = null;
+        });
+    } else {
+      this._housingServiceProxy
+        .getHousingLookUp(undefined, undefined)
+        .subscribe((result: LookUpDto[]) => {
+          this.housings = result;
+          this.housingsForEncashment = result;
+          this.accountBook.housingIdForEncachment = null;
+        });
+    }
   }
 
   uploadHandler(event): void {

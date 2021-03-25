@@ -11,12 +11,11 @@ namespace Sirius.Housings
     public interface IHousingAppService : IAsyncCrudAppService<HousingDto, Guid, PagedHousingResultRequestDto, CreateHousingDto, UpdateHousingDto>
     {
         Task<UpdateHousingDto> GetHousingForUpdate(Guid id);
-        Task<List<LookUpDto>> GetHousingLookUpAsync();
+        Task<List<LookUpDto>> GetHousingLookUpAsync(HousingLookUpFilter filter);
         Task AddPersonAsync(CreateHousingPersonDto input);
         Task RemovePersonAsync(RemoveHousingPersonDto input);
         Task<List<LookUpDto>> GetPeopleLookUpAsync(Guid housingId);
         Task<PagedResultDto<HousingPersonDto>> GetHousingPeopleAsync(PagedHousingPersonResultRequestDto input);
-        Task<List<LookUpDto>> GetHousingsLookUpByPersonIdAsync(Guid personId);
         Task<PagedResultDto<HousingForListDto>> GetAllListAsync(PagedHousingResultRequestDto input);
     }
 }

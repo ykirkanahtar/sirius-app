@@ -67,7 +67,7 @@ export class HousingPaymentPlanGroupsComponent
         this.housingCategoriesFilter = result;
       });
 
-    this._housingService.getHousingLookUp().subscribe((result: LookUpDto[]) => {
+    this._housingService.getHousingLookUp(undefined, undefined).subscribe((result: LookUpDto[]) => {
       this.housingsFilters = result;
     });
 
