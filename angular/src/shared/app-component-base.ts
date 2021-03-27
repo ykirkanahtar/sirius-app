@@ -1,6 +1,5 @@
 import { Injector, ElementRef } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
-
 import {
     LocalizationService,
     PermissionCheckerService,
