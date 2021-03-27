@@ -27,7 +27,6 @@ namespace Sirius.PaymentCategories
         public Guid? DefaultToPaymentAccountId { get; private set; }
         public PaymentCategoryType PaymentCategoryType { get; private set; }
         public bool IsActive { get; set; }
-        public Guid? HousingCategoryId { get; private set; }
 
         public void SetPassive()
         {
@@ -52,10 +51,10 @@ namespace Sirius.PaymentCategories
 
         public static PaymentCategory CreateHousingDue(Guid id, int tenantId, string paymentCategoryName,
             /*HousingDueType? housingDueType, */
-            Guid defaultToPaymentAccountId, ResidentOrOwner housingDueForResidentOrOwner, Guid housingCategoryId)
+            Guid defaultToPaymentAccountId, ResidentOrOwner housingDueForResidentOrOwner)
         {
             return BindEntity(new PaymentCategory(), id, tenantId, paymentCategoryName, true, /*housingDueType,*/
-                false, null, defaultToPaymentAccountId, PaymentCategoryType.Income, true, housingDueForResidentOrOwner, housingCategoryId);
+                false, null, defaultToPaymentAccountId, PaymentCategoryType.Income, true, housingDueForResidentOrOwner);
         }
 
         public static PaymentCategory CreateTransferBetweenAccounts(Guid id, int tenantId, string paymentCategoryName,
@@ -73,8 +72,7 @@ namespace Sirius.PaymentCategories
             return BindEntity(existingPaymentCategory, existingPaymentCategory.Id, existingPaymentCategory.TenantId,
                 paymentCategoryName, existingPaymentCategory.IsHousingDue, /*existingPaymentCategory.HousingDueType,*/
                 existingPaymentCategory.IsValidForAllPeriods, defaultFromPaymentAccountId, defaultToPaymentAccountId,
-                existingPaymentCategory.PaymentCategoryType, true, existingPaymentCategory.HousingDueForResidentOrOwner,
-                existingPaymentCategory.HousingCategoryId);
+                existingPaymentCategory.PaymentCategoryType, true, existingPaymentCategory.HousingDueForResidentOrOwner);
         }
 
         public void SetDefaultFromPaymentAccount(PaymentAccount defaultFromPaymentAccount)
@@ -91,7 +89,7 @@ namespace Sirius.PaymentCategories
             string paymentCategoryName, bool isHousingDue, /*HousingDueType? housingDueType, */
             bool isValidForAllPeriods, Guid?
                 defaultFromPaymentAccountId, Guid? defaultToPaymentAccountId, PaymentCategoryType paymentCategoryType,
-            bool isActive, ResidentOrOwner? housingDueForResidentOrOwner = null, Guid? housingCategoryId = null)
+            bool isActive, ResidentOrOwner? housingDueForResidentOrOwner = null)
         {
             if (paymentCategoryName.IsNullOrWhiteSpace())
             {
@@ -116,7 +114,6 @@ namespace Sirius.PaymentCategories
             paymentCategory.IsActive = isActive;
             paymentCategory.PaymentCategoryType = paymentCategoryType;
             paymentCategory.HousingDueForResidentOrOwner = housingDueForResidentOrOwner;
-            paymentCategory.HousingCategoryId = housingCategoryId;
 
             return paymentCategory;
         }

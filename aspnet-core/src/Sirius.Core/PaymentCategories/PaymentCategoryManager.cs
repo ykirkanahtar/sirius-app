@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
@@ -17,16 +18,17 @@ namespace Sirius.PaymentCategories
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
 
         public PaymentCategoryManager(IRepository<PaymentCategory, Guid> paymentCategoryRepository,
-            IUnitOfWorkManager unitOfWorkManager, IRepository<AccountBook, Guid> accountBookRepository,
-            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository)
+            IRepository<AccountBook, Guid> accountBookRepository,
+            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
+            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
         {
             _paymentCategoryRepository = paymentCategoryRepository;
-            _unitOfWorkManager = unitOfWorkManager;
             _accountBookRepository = accountBookRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
+            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
         }
 
         public async Task CreateAsync(PaymentCategory paymentCategory)
@@ -60,32 +62,6 @@ namespace Sirius.PaymentCategories
             await _paymentCategoryRepository.DeleteAsync(paymentCategory);
         }
 
-        // public async Task<PaymentCategory> GetRegularHousingDueAsync()
-        // {
-        //     return await _paymentCategoryRepository.SingleAsync(p =>
-        //         p.HousingDueType == HousingDueType.RegularHousingDue && p.IsActive);
-        // }
-
-        // public async Task<PaymentCategory> GetTransferForRegularHousingDueAsync()
-        // {
-        //     return await _paymentCategoryRepository.SingleAsync(p =>
-        //         p.HousingDueType == HousingDueType.TransferForRegularHousingDue && p.IsActive);
-        // }
-        //
-        // public async Task<PaymentCategory> GetNettingAsync()
-        // {
-        //     return await _paymentCategoryRepository.SingleAsync(p =>
-        //         p.HousingDueType == HousingDueType.Netting && p.IsActive);
-        // }
-
-        // public async Task<PaymentCategory> GetTransferForPaymentAccountAsync()
-        // {
-        //     return await _paymentCategoryRepository.GetAll().Where(p =>
-        //             p.PaymentCategoryName ==
-        //             AppConstants.TransferForPaymentAccount && p.IsActive)
-        //         .SingleOrDefaultAsync();
-        // }
-
         public async Task<PaymentCategory> GetAsync(Guid id)
         {
             var paymentCategory = await _paymentCategoryRepository.GetAsync(id);
@@ -95,6 +71,27 @@ namespace Sirius.PaymentCategories
             }
 
             return paymentCategory;
+        }
+
+        public async Task<List<Guid>> GetHousingCategories(Guid paymentCategoryId)
+        {
+            var housingPaymentPlanGroups = await _housingPaymentPlanGroupRepository.GetAll()
+                .Include(p => p.HousingPaymentPlanGroupHousingCategories)
+                .Where(p => p.PaymentCategoryId == paymentCategoryId).ToListAsync();
+
+            return housingPaymentPlanGroups
+                .Select(p => p.HousingPaymentPlanGroupHousingCategories.ToList()).ToList().SelectMany(p => p)
+                .ToList().Select(p => p.HousingCategoryId).ToList();
+        }
+
+        public async Task<List<Guid>> GetPaymentCategoriesByHousingCategoryIds(List<Guid> housingCategoryIds)
+        {
+            return await _housingPaymentPlanGroupRepository.GetAll()
+                .Include(p =>
+                    p.HousingPaymentPlanGroupHousingCategories)
+                .Where(p => p.HousingPaymentPlanGroupHousingCategories.Any(p =>
+                    housingCategoryIds.Contains(p.HousingCategoryId)))
+                .Select(p => p.PaymentCategoryId).ToListAsync();
         }
     }
 }

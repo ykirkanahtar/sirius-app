@@ -70,20 +70,27 @@
         </div>
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="housingCategoryId">
-            {{ "HousingCategory" | localize }}
+            {{ "HousingCategories" | localize }}
           </label>
           <div class="col-md-9">
-            <p-dropdown
-              id="housingCategories"
+            <p-multiSelect
               name="housingCategories"
-              [placeholder]="'PleaseSelect' | localize"
               [options]="housingCategories"
-              [(ngModel)]="input.housingCategoryId"
+              [showToggleAll]="false"
+              [(ngModel)]="input.housingCategoryIds"
+              [virtualScroll]="true"
               [filter]="true"
-              [style]="{ width: '100%' }"
-              required
+              [itemSize]="34"
+              [defaultLabel]="l('HousingCategory')"
+              class="multiselect-custom-virtual-scroll"
+              [style]="{ minWidth: '100%' }"
             >
-            </p-dropdown>
+              <ng-template let-housingCategory pTemplate="item">
+                <div class="housingCategory-item">
+                  <div>{{ housingCategory.label | localize }}</div>
+                </div>
+              </ng-template>
+            </p-multiSelect>
           </div>
         </div>
         <div class="form-group row required">
@@ -121,7 +128,7 @@
             >
             </p-dropdown>
           </div>
-        </div>        
+        </div>
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="amountPerMonth">
             {{ "AmountPerMonth" | localize }}
@@ -134,7 +141,7 @@
               mode="decimal"
               [minFractionDigits]="2"
               [maxFractionDigits]="2"
-              [style]="{'width':'100%'}"
+              [style]="{ width: '100%' }"
               required
             >
             </p-inputNumber>
@@ -149,7 +156,7 @@
               [(ngModel)]="input.countOfMonth"
               name="countOfMonth"
               id="countOfMonth"
-              [style]="{'width':'100%'}"
+              [style]="{ width: '100%' }"
               required
             >
             </p-inputNumber>
@@ -166,7 +173,7 @@
               id="paymentDayOfMonth"
               min="1"
               max="31"
-              [style]="{'width':'100%'}"
+              [style]="{ width: '100%' }"
               required
             >
             </p-inputNumber>

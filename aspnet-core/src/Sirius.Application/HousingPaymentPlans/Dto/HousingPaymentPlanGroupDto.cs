@@ -16,7 +16,6 @@ namespace Sirius.HousingPaymentPlans.Dto
         }
 
         public string HousingPaymentPlanGroupName { get; set; }
-        public Guid HousingCategoryId { get; set; }
         public Guid PaymentCategoryId { get; set; }
         public decimal AmountPerMonth { get; set; }
         public int CountOfMonth { get; set; }
@@ -24,11 +23,15 @@ namespace Sirius.HousingPaymentPlans.Dto
         public DateTime StartDate { get; set; }
         public string Description { get; set; }
         public ResidentOrOwner ResidentOrOwner { get; set; }
+        public string HousingCategoryNames { get; set; }
 
         public virtual HousingCategoryDto HousingCategory { get; set; }
 
         public virtual PaymentCategoryDto PaymentCategory { get; set; }
-
-        public virtual ICollection<HousingPaymentPlanDto> HousingPaymentPlans { get; set; }
+        public virtual ICollection<HousingPaymentPlanGroupHousingCategoryDto> HousingPaymentPlanGroupHousingCategories
+        {
+            get;
+            set;
+        }
     }
 }

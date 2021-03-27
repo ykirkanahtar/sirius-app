@@ -10422,7 +10422,6 @@ export interface IHousingPaymentPlanDtoPagedResultDto {
 
 export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
-    housingCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
     defaultToPaymentAccountId: string;
@@ -10430,6 +10429,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     startDate: moment.Moment;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
+    housingCategoryIds: string[] | undefined;
 
     constructor(data?: ICreateHousingPaymentPlanGroupDto) {
         if (data) {
@@ -10443,7 +10443,6 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     init(_data?: any) {
         if (_data) {
             this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
-            this.housingCategoryId = _data["housingCategoryId"];
             this.amountPerMonth = _data["amountPerMonth"];
             this.countOfMonth = _data["countOfMonth"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
@@ -10451,6 +10450,11 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.description = _data["description"];
             this.residentOrOwner = _data["residentOrOwner"];
+            if (Array.isArray(_data["housingCategoryIds"])) {
+                this.housingCategoryIds = [] as any;
+                for (let item of _data["housingCategoryIds"])
+                    this.housingCategoryIds.push(item);
+            }
         }
     }
 
@@ -10464,7 +10468,6 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
-        data["housingCategoryId"] = this.housingCategoryId;
         data["amountPerMonth"] = this.amountPerMonth;
         data["countOfMonth"] = this.countOfMonth;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
@@ -10472,6 +10475,11 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["description"] = this.description;
         data["residentOrOwner"] = this.residentOrOwner;
+        if (Array.isArray(this.housingCategoryIds)) {
+            data["housingCategoryIds"] = [];
+            for (let item of this.housingCategoryIds)
+                data["housingCategoryIds"].push(item);
+        }
         return data; 
     }
 
@@ -10485,7 +10493,6 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
 
 export interface ICreateHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
-    housingCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
     defaultToPaymentAccountId: string;
@@ -10493,11 +10500,66 @@ export interface ICreateHousingPaymentPlanGroupDto {
     startDate: moment.Moment;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
+    housingCategoryIds: string[] | undefined;
+}
+
+export class HousingPaymentPlanGroupHousingCategoryDto implements IHousingPaymentPlanGroupHousingCategoryDto {
+    id: string;
+    tenantId: number;
+    readonly housingCategoryId: string;
+    readonly housingPaymentPlanGroupId: string;
+
+    constructor(data?: IHousingPaymentPlanGroupHousingCategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tenantId = _data["tenantId"];
+            (<any>this).housingCategoryId = _data["housingCategoryId"];
+            (<any>this).housingPaymentPlanGroupId = _data["housingPaymentPlanGroupId"];
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanGroupHousingCategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanGroupHousingCategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tenantId"] = this.tenantId;
+        data["housingCategoryId"] = this.housingCategoryId;
+        data["housingPaymentPlanGroupId"] = this.housingPaymentPlanGroupId;
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanGroupHousingCategoryDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanGroupHousingCategoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanGroupHousingCategoryDto {
+    id: string;
+    tenantId: number;
+    housingCategoryId: string;
+    housingPaymentPlanGroupId: string;
 }
 
 export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
-    housingCategoryId: string;
     paymentCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
@@ -10505,9 +10567,10 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     startDate: moment.Moment;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
+    housingCategoryNames: string | undefined;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
-    housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
+    housingPaymentPlanGroupHousingCategories: HousingPaymentPlanGroupHousingCategoryDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10529,7 +10592,6 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     init(_data?: any) {
         if (_data) {
             this.housingPaymentPlanGroupName = _data["housingPaymentPlanGroupName"];
-            this.housingCategoryId = _data["housingCategoryId"];
             this.paymentCategoryId = _data["paymentCategoryId"];
             this.amountPerMonth = _data["amountPerMonth"];
             this.countOfMonth = _data["countOfMonth"];
@@ -10537,12 +10599,13 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
             this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
             this.description = _data["description"];
             this.residentOrOwner = _data["residentOrOwner"];
+            this.housingCategoryNames = _data["housingCategoryNames"];
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
-            if (Array.isArray(_data["housingPaymentPlans"])) {
-                this.housingPaymentPlans = [] as any;
-                for (let item of _data["housingPaymentPlans"])
-                    this.housingPaymentPlans.push(HousingPaymentPlanDto.fromJS(item));
+            if (Array.isArray(_data["housingPaymentPlanGroupHousingCategories"])) {
+                this.housingPaymentPlanGroupHousingCategories = [] as any;
+                for (let item of _data["housingPaymentPlanGroupHousingCategories"])
+                    this.housingPaymentPlanGroupHousingCategories.push(HousingPaymentPlanGroupHousingCategoryDto.fromJS(item));
             }
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -10565,7 +10628,6 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["housingPaymentPlanGroupName"] = this.housingPaymentPlanGroupName;
-        data["housingCategoryId"] = this.housingCategoryId;
         data["paymentCategoryId"] = this.paymentCategoryId;
         data["amountPerMonth"] = this.amountPerMonth;
         data["countOfMonth"] = this.countOfMonth;
@@ -10573,12 +10635,13 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["description"] = this.description;
         data["residentOrOwner"] = this.residentOrOwner;
+        data["housingCategoryNames"] = this.housingCategoryNames;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
-        if (Array.isArray(this.housingPaymentPlans)) {
-            data["housingPaymentPlans"] = [];
-            for (let item of this.housingPaymentPlans)
-                data["housingPaymentPlans"].push(item.toJSON());
+        if (Array.isArray(this.housingPaymentPlanGroupHousingCategories)) {
+            data["housingPaymentPlanGroupHousingCategories"] = [];
+            for (let item of this.housingPaymentPlanGroupHousingCategories)
+                data["housingPaymentPlanGroupHousingCategories"].push(item.toJSON());
         }
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -10601,7 +10664,6 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
 
 export interface IHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
-    housingCategoryId: string;
     paymentCategoryId: string;
     amountPerMonth: number;
     countOfMonth: number;
@@ -10609,9 +10671,10 @@ export interface IHousingPaymentPlanGroupDto {
     startDate: moment.Moment;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
+    housingCategoryNames: string | undefined;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
-    housingPaymentPlans: HousingPaymentPlanDto[] | undefined;
+    housingPaymentPlanGroupHousingCategories: HousingPaymentPlanGroupHousingCategoryDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
