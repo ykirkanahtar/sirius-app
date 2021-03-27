@@ -4,6 +4,5 @@
     {
         Cash = 1,
         BankAccount = 2,
-        AdvanceAccount = 3
     }
 }

@@ -61,14 +61,7 @@ export class PaymentAccountsComponent
         command: () => {
           this.createPaymentAccount(this.paymentAccountTypeEnum.BankAccount);
         },
-      },
-      {
-        label: this.l("AdvanceAccount"),
-        icon: "pi pi-forward",
-        command: () => {
-          this.createPaymentAccount(this.paymentAccountTypeEnum.AdvanceAccount);
-        },
-      },
+      }
     ];
 
     this.getDataPage(1);

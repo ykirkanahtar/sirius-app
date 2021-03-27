@@ -118,7 +118,6 @@
     <text name="AddPerson">Kişi Ekle</text>
     <text name="AddPersonToHousing">Konuta kişi ekle</text>
     <text name="AdministrationMenu">Yönetim (Menü)</text>
-    <text name="AdvanceAccount">Avans Hesabı</text>
     <text name="AdvancedFilters">Detaylı Arama</text>
     <text name="AllowNegativeBalance">Eksi bakiyeye izin verilsin mi?</text>
     <text name="Amount">Tutar</text>
@@ -155,7 +154,6 @@
     <text name="CreatePeriodForSite">Dönem oluştur (Site için)</text>
     <text name="CreatePeriodForSiteMenu">Site için</text>
     <text name="CreatePerson">Kişi oluştur</text>
-    <text name="CreateNewAdvanceAccount">Avans hesabı ekle</text>
     <text name="CreateNewBankAccount">Banka hesabı ekle</text>
     <text name="CreateNewBlock">Blok ekle</text>
     <text name="CreateNewCash">Nakit hesabı ekle</text>
@@ -198,7 +196,6 @@
     <text name="DocumentDateTime">Belge Tarihi</text>
     <text name="DocumentNumber">Belge Numarası</text>
     <text name="EditAccountBook">İşletme Defteri düzenle</text>
-    <text name="EditAdvanceAccount">Avans hesabı düzenle</text>
     <text name="EditBankAccount">Banka hesabı düzenle</text>
     <text name="EditBlock">Blok / Apt. düzenle</text>
     <text name="EditCashAccount">Nakit hesabı düzenle</text>
@@ -330,7 +327,6 @@
     <text name="TransferForPaymentAccount">Ödeme hesabı devir</text>
     <text name="TransferForRegularHousingDue">Aidat hesabı devir</text>
     <text name="TransferFromThePreviousPeriod">Devir</text>
-    <text name="TransferToAdvanceAccount">Avana hesaba transfer</text>
     <text name="true">Evet</text>
     <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>
