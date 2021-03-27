@@ -4,7 +4,7 @@ using Abp.AutoMapper;
 namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapTo(typeof(PaymentAccount))]
-    public class CreateBankOrAdvanceAccountDto
+    public class CreateBankAccountDto
     {
         public string AccountName { get; set; }
         public string Description { get; set; }

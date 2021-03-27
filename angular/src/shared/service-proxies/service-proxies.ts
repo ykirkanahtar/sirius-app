@@ -3490,63 +3490,7 @@ export class PaymentAccountServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createAdvanceAccount(body: CreateBankOrAdvanceAccountDto | undefined): Observable<PaymentAccountDto> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentAccount/CreateAdvanceAccount";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateAdvanceAccount(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateAdvanceAccount(<any>response_);
-                } catch (e) {
-                    return <Observable<PaymentAccountDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<PaymentAccountDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreateAdvanceAccount(response: HttpResponseBase): Observable<PaymentAccountDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PaymentAccountDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<PaymentAccountDto>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    createBankAccount(body: CreateBankOrAdvanceAccountDto | undefined): Observable<PaymentAccountDto> {
+    createBankAccount(body: CreateBankAccountDto | undefined): Observable<PaymentAccountDto> {
         let url_ = this.baseUrl + "/api/services/app/PaymentAccount/CreateBankAccount";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -10819,7 +10763,7 @@ export interface IHousingPaymentPlanGroupDtoPagedResultDto {
     items: HousingPaymentPlanGroupDto[] | undefined;
 }
 
-export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccountDto {
+export class CreateBankAccountDto implements ICreateBankAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
@@ -10831,7 +10775,7 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
 
-    constructor(data?: ICreateBankOrAdvanceAccountDto) {
+    constructor(data?: ICreateBankAccountDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -10855,9 +10799,9 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         }
     }
 
-    static fromJS(data: any): CreateBankOrAdvanceAccountDto {
+    static fromJS(data: any): CreateBankAccountDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateBankOrAdvanceAccountDto();
+        let result = new CreateBankAccountDto();
         result.init(data);
         return result;
     }
@@ -10877,15 +10821,15 @@ export class CreateBankOrAdvanceAccountDto implements ICreateBankOrAdvanceAccoun
         return data; 
     }
 
-    clone(): CreateBankOrAdvanceAccountDto {
+    clone(): CreateBankAccountDto {
         const json = this.toJSON();
-        let result = new CreateBankOrAdvanceAccountDto();
+        let result = new CreateBankAccountDto();
         result.init(json);
         return result;
     }
 }
 
-export interface ICreateBankOrAdvanceAccountDto {
+export interface ICreateBankAccountDto {
     accountName: string | undefined;
     description: string | undefined;
     personId: string | undefined;
@@ -10901,7 +10845,6 @@ export interface ICreateBankOrAdvanceAccountDto {
 export enum PaymentAccountType {
     Cash = 1,
     BankAccount = 2,
-    AdvanceAccount = 3,
 }
 
 export class PaymentAccountDto implements IPaymentAccountDto {

@@ -44,34 +44,8 @@ namespace Sirius.PaymentAccounts
             _accountBookPolicy = accountBookPolicy;
             _accountBookManager = accountBookManager;
         }
-
-        public async Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input)
-        {
-            CheckCreatePermission();
-
-            var newPaymentAccountId = SequentialGuidGenerator.Instance.Create();
-            var paymentAccount = PaymentAccount.CreateAdvanceAccount(
-                newPaymentAccountId
-                , AbpSession.GetTenantId()
-                , input.AccountName
-                , input.Description
-                , input.Iban
-                , input.PersonId
-                , input.EmployeeId
-                , input.TenantIsOwner
-                , input.IsDefault
-                , input.AllowNegativeBalance
-                , input.TransferAmount
-                , input.FirstTransferDateTime
-            );
-            await _paymentAccountManager.CreateAsync(paymentAccount);
-
-            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
-
-            return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
-        }
-
-        public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input)
+        
+        public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankAccountDto input)
         {
             CheckUpdatePermission();
 

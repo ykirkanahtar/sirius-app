@@ -14,7 +14,7 @@ import {
   PaymentAccountDto, 
   PaymentAccountServiceProxy, 
   CreateCashAccountDto, 
-  CreateBankOrAdvanceAccountDto, 
+  CreateBankAccountDto, 
   PaymentAccountType,
 } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
@@ -64,27 +64,11 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
           this.onSave.emit();
         });
     } else if (this.paymentAccountType === PaymentAccountType.BankAccount) {
-      const bankAccountPaymentAccount = new CreateBankOrAdvanceAccountDto();
+      const bankAccountPaymentAccount = new CreateBankAccountDto();
       bankAccountPaymentAccount.init(this.paymentAccount);
 
       this._paymentAccountService
         .createBankAccount(bankAccountPaymentAccount)
-        .pipe(
-          finalize(() => {
-            this.saving = false;
-          })
-        )
-        .subscribe(() => {
-          this.notify.info(this.l('SavedSuccessfully'));
-          this.bsModalRef.hide();
-          this.onSave.emit();
-        });
-    } else if (this.paymentAccountType === PaymentAccountType.AdvanceAccount) {
-      const advanceAccountPaymentAccount = new CreateBankOrAdvanceAccountDto();
-      advanceAccountPaymentAccount.init(this.paymentAccount);
-      
-      this._paymentAccountService
-        .createAdvanceAccount(advanceAccountPaymentAccount)
         .pipe(
           finalize(() => {
             this.saving = false;

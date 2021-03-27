@@ -55,16 +55,6 @@ namespace Sirius.PaymentAccounts
                 tenantIsOwner, isDefault, allowNegativeBalance, iban, balance, firstTransferDateTime);
         }
 
-        public static PaymentAccount CreateAdvanceAccount(Guid id, int tenantId, string accountName, string description,
-            string iban, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
-            bool allowNegativeBalance, decimal? balance = null,
-            DateTime? firstTransferDateTime = null)
-        {
-            return BindEntity(new PaymentAccount(), id, tenantId, PaymentAccountType.AdvanceAccount, accountName,
-                description, personId, employeeId,
-                tenantIsOwner, isDefault, allowNegativeBalance, iban, balance, firstTransferDateTime);
-        }
-
         public static PaymentAccount Update(PaymentAccount existingPaymentAccount, string accountName,
             string description, Guid? personId, Guid? employeeId, bool tenantIsOwner, bool isDefault,
             decimal balance, bool allowNegativeBalance, string iban = null, DateTime? firstTransferDateTime = null)

@@ -10,8 +10,7 @@ namespace Sirius.PaymentAccounts
     public interface IPaymentAccountAppService : IAsyncCrudAppService<PaymentAccountDto, Guid, PagedPaymentAccountResultRequestDto, CreateCashAccountDto, UpdatePaymentAccountDto>
     {
         Task<PaymentAccountDto> CreateCashAccountAsync(CreateCashAccountDto input);
-        Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankOrAdvanceAccountDto input);
-        Task<PaymentAccountDto> CreateAdvanceAccountAsync(CreateBankOrAdvanceAccountDto input);
+        Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankAccountDto input);
         Task<List<LookUpDto>> GetPaymentAccountLookUpAsync();
         Task<PaymentAccountDto> GetDefaultPaymentAccountAsync();
     }
