@@ -59,13 +59,6 @@ export class PaymentCategoriesComponent
         },
       },
       {
-        label: this.l("AdditionalHousingDue"),
-        icon: "pi pi-arrow-left",
-        command: () => {
-          this.createPaymentCategory(PaymentCategoryType.Income, true);
-        },
-      },
-      {
         label: this.l("IncomePaymentCategory"),
         icon: "pi pi-arrow-left",
         command: () => {

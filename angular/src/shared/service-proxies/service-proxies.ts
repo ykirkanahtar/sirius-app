@@ -7550,9 +7550,9 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
-    encachmentFromHousingDue: boolean;
-    housingIdForEncachment: string | undefined;
-    paymentCategoryIdForEncachment: string | undefined;
+    nettingFromHousingDue: boolean;
+    housingIdForNetting: string | undefined;
+    paymentCategoryIdForNetting: string | undefined;
 
     constructor(data?: ICreateAccountBookDto) {
         if (data) {
@@ -7581,9 +7581,9 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
                 for (let item of _data["accountBookFileUrls"])
                     this.accountBookFileUrls.push(item);
             }
-            this.encachmentFromHousingDue = _data["encachmentFromHousingDue"];
-            this.housingIdForEncachment = _data["housingIdForEncachment"];
-            this.paymentCategoryIdForEncachment = _data["paymentCategoryIdForEncachment"];
+            this.nettingFromHousingDue = _data["nettingFromHousingDue"];
+            this.housingIdForNetting = _data["housingIdForNetting"];
+            this.paymentCategoryIdForNetting = _data["paymentCategoryIdForNetting"];
         }
     }
 
@@ -7612,9 +7612,9 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
             for (let item of this.accountBookFileUrls)
                 data["accountBookFileUrls"].push(item);
         }
-        data["encachmentFromHousingDue"] = this.encachmentFromHousingDue;
-        data["housingIdForEncachment"] = this.housingIdForEncachment;
-        data["paymentCategoryIdForEncachment"] = this.paymentCategoryIdForEncachment;
+        data["nettingFromHousingDue"] = this.nettingFromHousingDue;
+        data["housingIdForNetting"] = this.housingIdForNetting;
+        data["paymentCategoryIdForNetting"] = this.paymentCategoryIdForNetting;
         return data; 
     }
 
@@ -7639,9 +7639,9 @@ export interface ICreateAccountBookDto {
     documentDateTime: moment.Moment | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
-    encachmentFromHousingDue: boolean;
-    housingIdForEncachment: string | undefined;
-    paymentCategoryIdForEncachment: string | undefined;
+    nettingFromHousingDue: boolean;
+    housingIdForNetting: string | undefined;
+    paymentCategoryIdForNetting: string | undefined;
 }
 
 export class AccountBookFileDto implements IAccountBookFileDto {
@@ -7735,8 +7735,8 @@ export class AccountBookDto implements IAccountBookDto {
     documentNumber: string | undefined;
     fromPaymentAccountCurrentBalance: number | undefined;
     toPaymentAccountCurrentBalance: number | undefined;
-    encashmentHousing: boolean;
-    housingIdForEncachment: string | undefined;
+    nettingHousing: boolean;
+    housingIdForNetting: string | undefined;
     sameDayIndex: number;
     accountBookFiles: AccountBookFileDto[] | undefined;
     isDeleted: boolean;
@@ -7770,8 +7770,8 @@ export class AccountBookDto implements IAccountBookDto {
             this.documentNumber = _data["documentNumber"];
             this.fromPaymentAccountCurrentBalance = _data["fromPaymentAccountCurrentBalance"];
             this.toPaymentAccountCurrentBalance = _data["toPaymentAccountCurrentBalance"];
-            this.encashmentHousing = _data["encashmentHousing"];
-            this.housingIdForEncachment = _data["housingIdForEncachment"];
+            this.nettingHousing = _data["nettingHousing"];
+            this.housingIdForNetting = _data["housingIdForNetting"];
             this.sameDayIndex = _data["sameDayIndex"];
             if (Array.isArray(_data["accountBookFiles"])) {
                 this.accountBookFiles = [] as any;
@@ -7809,8 +7809,8 @@ export class AccountBookDto implements IAccountBookDto {
         data["documentNumber"] = this.documentNumber;
         data["fromPaymentAccountCurrentBalance"] = this.fromPaymentAccountCurrentBalance;
         data["toPaymentAccountCurrentBalance"] = this.toPaymentAccountCurrentBalance;
-        data["encashmentHousing"] = this.encashmentHousing;
-        data["housingIdForEncachment"] = this.housingIdForEncachment;
+        data["nettingHousing"] = this.nettingHousing;
+        data["housingIdForNetting"] = this.housingIdForNetting;
         data["sameDayIndex"] = this.sameDayIndex;
         if (Array.isArray(this.accountBookFiles)) {
             data["accountBookFiles"] = [];
@@ -7848,8 +7848,8 @@ export interface IAccountBookDto {
     documentNumber: string | undefined;
     fromPaymentAccountCurrentBalance: number | undefined;
     toPaymentAccountCurrentBalance: number | undefined;
-    encashmentHousing: boolean;
-    housingIdForEncachment: string | undefined;
+    nettingHousing: boolean;
+    housingIdForNetting: string | undefined;
     sameDayIndex: number;
     accountBookFiles: AccountBookFileDto[] | undefined;
     isDeleted: boolean;
@@ -7998,8 +7998,8 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     toPaymentAccountName: string | undefined;
     fromPaymentAccountBalance: number | undefined;
     toPaymentAccountBalance: number | undefined;
-    encashmentHousing: boolean;
-    encashmentHousingBlockApartment: string | undefined;
+    nettingHousing: boolean;
+    nettingHousingBlockApartment: string | undefined;
     sameDayIndex: number;
     accountBookFiles: string[] | undefined;
     isDeleted: boolean;
@@ -8030,8 +8030,8 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
             this.toPaymentAccountName = _data["toPaymentAccountName"];
             this.fromPaymentAccountBalance = _data["fromPaymentAccountBalance"];
             this.toPaymentAccountBalance = _data["toPaymentAccountBalance"];
-            this.encashmentHousing = _data["encashmentHousing"];
-            this.encashmentHousingBlockApartment = _data["encashmentHousingBlockApartment"];
+            this.nettingHousing = _data["nettingHousing"];
+            this.nettingHousingBlockApartment = _data["nettingHousingBlockApartment"];
             this.sameDayIndex = _data["sameDayIndex"];
             if (Array.isArray(_data["accountBookFiles"])) {
                 this.accountBookFiles = [] as any;
@@ -8066,8 +8066,8 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
         data["toPaymentAccountName"] = this.toPaymentAccountName;
         data["fromPaymentAccountBalance"] = this.fromPaymentAccountBalance;
         data["toPaymentAccountBalance"] = this.toPaymentAccountBalance;
-        data["encashmentHousing"] = this.encashmentHousing;
-        data["encashmentHousingBlockApartment"] = this.encashmentHousingBlockApartment;
+        data["nettingHousing"] = this.nettingHousing;
+        data["nettingHousingBlockApartment"] = this.nettingHousingBlockApartment;
         data["sameDayIndex"] = this.sameDayIndex;
         if (Array.isArray(this.accountBookFiles)) {
             data["accountBookFiles"] = [];
@@ -8102,8 +8102,8 @@ export interface IAccountBookGetAllOutput {
     toPaymentAccountName: string | undefined;
     fromPaymentAccountBalance: number | undefined;
     toPaymentAccountBalance: number | undefined;
-    encashmentHousing: boolean;
-    encashmentHousingBlockApartment: string | undefined;
+    nettingHousing: boolean;
+    nettingHousingBlockApartment: string | undefined;
     sameDayIndex: number;
     accountBookFiles: string[] | undefined;
     isDeleted: boolean;
@@ -8877,7 +8877,7 @@ export enum HousingPaymentPlanType {
     HousingDueDefinition = 1,
     HousingDuePayment = 2,
     Transfer = 3,
-    Encashment = 4,
+    Netting = 4,
 }
 
 export class PaymentCategoryDto implements IPaymentCategoryDto {

@@ -5,6 +5,6 @@ namespace Sirius.Shared.Enums
         HousingDueDefinition = 1,
         HousingDuePayment = 2,
         Transfer = 3,
-        Encashment = 4
+        Netting = 4
     }
 }

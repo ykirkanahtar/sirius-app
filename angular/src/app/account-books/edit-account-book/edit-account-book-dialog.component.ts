@@ -62,7 +62,7 @@ export class EditAccountBookDialogComponent
 
   processDate: Date;
   housingDueBlockAndApartmentText: string;
-  encashmentHousingText: string;
+  nettingHousingText: string;
 
   @Input() lastAccountBookDate: moment.Moment;
 
@@ -131,11 +131,11 @@ export class EditAccountBookDialogComponent
               });
           });
 
-        if (this.accountBook.encashmentHousing) {
+        if (this.accountBook.nettingHousing) {
           this._housingServiceProxy
-            .get(this.accountBook.housingIdForEncachment)
+            .get(this.accountBook.housingIdForNetting)
             .subscribe((result: HousingDto) => {
-              this.encashmentHousingText =
+              this.nettingHousingText =
                 result.block.blockName + " " + result.apartment;
             });
         }

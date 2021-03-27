@@ -47,11 +47,11 @@ namespace Sirius.PaymentAccounts
         }
 
         //Yapılan ödemeyi aidattan düşme
-        public async Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housingForEncashment,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForEncashment)
+        public async Task CreateOtherPaymentWithNettingForHousingDueAsync(AccountBook accountBook, Housing housingForNetting,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForNetting)
         {
-            await CreateAsync(accountBook, AccountBookType.OtherPaymentWithEncachmentForHousingDue,
-                fromPaymentAccount, toPaymentAccount, null, housingForEncashment, paymentCategoryForEncashment);
+            await CreateAsync(accountBook, AccountBookType.OtherPaymentWithNettingForHousingDue,
+                fromPaymentAccount, toPaymentAccount, null, housingForNetting, paymentCategoryForNetting);
         }
 
         public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
@@ -64,12 +64,12 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing,
-            [CanBeNull] Housing housingForEncashment,
-            [CanBeNull] PaymentCategory paymentCategoryForEncashment)
+            [CanBeNull] Housing housingForNetting,
+            [CanBeNull] PaymentCategory paymentCategoryForNetting)
         {
             if (fromPaymentAccount == null
                 && toPaymentAccount == null
-                && accountBook.EncashmentHousing == false)
+                && accountBook.NettingHousing == false)
             {
                 throw new UserFriendlyException(
                     "Gelen hesap, giden hesap ya da mahsuplaşmadan en az biri seçilmelidir.");
@@ -107,21 +107,21 @@ namespace Sirius.PaymentAccounts
                 ));
             }
 
-            if (accountBookType == AccountBookType.OtherPaymentWithEncachmentForHousingDue)
+            if (accountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue)
             {
                 // var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
-                await _housingManager.DecreaseBalance(housingForEncashment, accountBook.Amount, paymentCategoryForEncashment.HousingDueForResidentOrOwner.GetValueOrDefault());
+                await _housingManager.DecreaseBalance(housingForNetting, accountBook.Amount, paymentCategoryForNetting.HousingDueForResidentOrOwner.GetValueOrDefault());
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
-                    , housingForEncashment
-                    , paymentCategoryForEncashment
+                    , housingForNetting
+                    , paymentCategoryForNetting
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
                     , accountBook.Description
                     , accountBook
-                    , HousingPaymentPlanType.Encashment
+                    , HousingPaymentPlanType.Netting
                     , null
                     , null
                 ));

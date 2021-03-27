@@ -41,10 +41,10 @@ export class CreateAccountBookDialogComponent
   accountBook = new CreateAccountBookDto();
 
   housings: LookUpDto[];
-  housingsForEncashment: LookUpDto[];
+  housingsForNetting: LookUpDto[];
   paymentAccounts: LookUpDto[];
   paymentCategories: LookUpDto[];
-  paymentCategoriesForEncashment: LookUpDto[];
+  paymentCategoriesForNetting: LookUpDto[];
   people: LookUpDto[];
   paymentCategory: PaymentCategoryDto;
   definedPaymentCategory: boolean = false;
@@ -141,7 +141,7 @@ export class CreateAccountBookDialogComponent
   }
 
   isFromPaymentAccountRequired(): boolean {
-    if (this.accountBook.encachmentFromHousingDue) {
+    if (this.accountBook.nettingFromHousingDue) {
       return false;
     }
 
@@ -149,7 +149,7 @@ export class CreateAccountBookDialogComponent
       this.paymentCategoryType === this.PaymentCategoryTypeEnum.Expense ||
       this.paymentCategoryType ===
         this.PaymentCategoryTypeEnum.TransferBetweenAccounts ||
-      this.accountBook.encachmentFromHousingDue === false
+      this.accountBook.nettingFromHousingDue === false
     );
   }
 
@@ -171,7 +171,7 @@ export class CreateAccountBookDialogComponent
     }
   }
 
-  onSelectedPersonForEncashmentChange(event) {
+  onSelectedPersonForNettingChange(event) {
     var selectedPerson = event.value;
 
     if (!selectedPerson) {
@@ -180,27 +180,27 @@ export class CreateAccountBookDialogComponent
       this._housingServiceProxy
         .getHousingLookUp(selectedPerson, undefined)
         .subscribe((result: LookUpDto[]) => {
-          this.housingsForEncashment = result;
-          if (this.housingsForEncashment.length === 1) {
-            this.accountBook.housingIdForEncachment = this.housingsForEncashment[0].value;
-            this.onSelectedHousingForEncashmentChange(
-              this.housingsForEncashment
+          this.housingsForNetting = result;
+          if (this.housingsForNetting.length === 1) {
+            this.accountBook.housingIdForNetting = this.housingsForNetting[0].value;
+            this.onSelectedHousingForNettingChange(
+              this.housingsForNetting
             );
           }
         });
     }
   }
 
-  onSelectedHousingForEncashmentChange(event) {
-    if (!this.accountBook.housingIdForEncachment) {
-      this.accountBook.paymentCategoryIdForEncachment = null;
+  onSelectedHousingForNettingChange(event) {
+    if (!this.accountBook.housingIdForNetting) {
+      this.accountBook.paymentCategoryIdForNetting = null;
     } else {
       this._paymentCategoryServiceProxy
-        .getLookUpByHousingId(this.accountBook.housingIdForEncachment)
+        .getLookUpByHousingId(this.accountBook.housingIdForNetting)
         .subscribe((result: LookUpDto[]) => {
-          this.paymentCategoriesForEncashment = result;
+          this.paymentCategoriesForNetting = result;
           if (this.housings.length === 1) {
-            this.accountBook.paymentCategoryIdForEncachment = this.paymentCategoriesForEncashment[0].value;
+            this.accountBook.paymentCategoryIdForNetting = this.paymentCategoriesForNetting[0].value;
           }
         });
     }
@@ -229,16 +229,16 @@ export class CreateAccountBookDialogComponent
         .getHousingLookUp(undefined, paymentCategory.id)
         .subscribe((result: LookUpDto[]) => {
           this.housings = result;
-          this.housingsForEncashment = result;
-          this.accountBook.housingIdForEncachment = null;
+          this.housingsForNetting = result;
+          this.accountBook.housingIdForNetting = null;
         });
     } else {
       this._housingServiceProxy
         .getHousingLookUp(undefined, undefined)
         .subscribe((result: LookUpDto[]) => {
           this.housings = result;
-          this.housingsForEncashment = result;
-          this.accountBook.housingIdForEncachment = null;
+          this.housingsForNetting = result;
+          this.accountBook.housingIdForNetting = null;
         });
     }
   }

@@ -32,9 +32,9 @@ namespace Sirius.PaymentAccounts
         public decimal Amount { get; private set; }
         public bool TransferPaymentAccount { get; private set; }
         public string Description { get; private set; }
-        public bool EncashmentHousing { get; private set; }
-        public Guid? HousingIdForEncachment { get; private set; }
-        public Guid? PaymentCategoryIdForEncachment { get; private set; }
+        public bool NettingHousing { get; private set; }
+        public Guid? HousingIdForNetting { get; private set; }
+        public Guid? PaymentCategoryIdForNetting{ get; private set; }
         public DateTime? DocumentDateTime { get; private set; }
         public string DocumentNumber { get; private set; }
         public decimal? FromPaymentAccountCurrentBalance { get; private set; }
@@ -110,9 +110,9 @@ namespace Sirius.PaymentAccounts
             DateTime processDateTime,
             Guid paymentCategoryId,
             Guid? housingId,
-            bool encashmentHousing,
-            Guid? housingIdForEncachment,
-            Guid? paymentCategoryIdForEncachment,
+            bool nettingHousing,
+            Guid? housingIdForNetting,
+            Guid? paymentCategoryIdForNetting,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
@@ -126,7 +126,7 @@ namespace Sirius.PaymentAccounts
             return await BindEntityAsync(accountBookPolicy, false, false, id, tenantId,
                 accountBookType,
                 processDateTime,
-                paymentCategoryId, housingId, encashmentHousing, housingIdForEncachment,paymentCategoryIdForEncachment,
+                paymentCategoryId, housingId, nettingHousing, housingIdForNetting ,paymentCategoryIdForNetting,
                 fromPaymentAccount,
                 toPaymentAccount, amount, description, documentDateTime, documentNumber, accountBookFiles,
                 DateTime.UtcNow, creatorUserId, null, null, transferPaymentAccount);
@@ -163,9 +163,9 @@ namespace Sirius.PaymentAccounts
                 processDateTime,
                 paymentCategory.Id,
                 existingAccountBook.HousingId,
-                existingAccountBook.EncashmentHousing,
-                existingAccountBook.HousingIdForEncachment,
-                existingAccountBook.PaymentCategoryIdForEncachment,
+                existingAccountBook.NettingHousing,
+                existingAccountBook.HousingIdForNetting,
+                existingAccountBook.PaymentCategoryIdForNetting,
                 fromPaymentAccount,
                 toPaymentAccount,
                 amount, description, documentDateTime, documentNumber, existingAccountBook.AccountBookFiles, null, null,
@@ -182,9 +182,9 @@ namespace Sirius.PaymentAccounts
             DateTime processDateTime,
             Guid? paymentCategoryId,
             Guid? housingId,
-            bool encashmentHousing,
-            Guid? housingIdForEncachment,
-            Guid? paymentCategoryIdForEncachment,
+            bool nettingHousing,
+            Guid? housingIdForNetting,
+            Guid? paymentCategoryIdForNetting,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             decimal amount,
@@ -210,9 +210,9 @@ namespace Sirius.PaymentAccounts
             accountBook.PaymentCategoryId = paymentCategoryId;
             accountBook.Description = description;
             accountBook.DocumentNumber = documentNumber;
-            accountBook.EncashmentHousing = encashmentHousing;
-            accountBook.HousingIdForEncachment = housingIdForEncachment;
-            accountBook.PaymentCategoryIdForEncachment = paymentCategoryIdForEncachment;
+            accountBook.NettingHousing = nettingHousing;
+            accountBook.HousingIdForNetting = housingIdForNetting;
+            accountBook.PaymentCategoryIdForNetting = paymentCategoryIdForNetting;
             accountBook.HousingId = housingId;
             accountBook.Amount = amount;
             accountBook.FromPaymentAccountId = fromPaymentAccount?.Id;

@@ -289,11 +289,11 @@
                 <td>
                   {{ accountBook.paymentCategoryName | localize }}
                   <span
-                    *ngIf="accountBook.encashmentHousing"
+                    *ngIf="accountBook.nettingHousing"
                     class="font-italic font-weight-light"
-                    >{{ "EncashmentShort" | localize
+                    >{{ "NettingShort" | localize
                     }}{{
-                      " " + accountBook.encashmentHousingBlockApartment
+                      " " + accountBook.nettingHousingBlockApartment
                     }}</span
                   >
                 </td>

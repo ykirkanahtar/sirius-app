@@ -192,8 +192,8 @@ namespace Sirius.PaymentAccounts
                 accountBookFiles.Add(entity);
             }
 
-            var accountBookType = input.EncachmentFromHousingDue //Mahsuplaşma var mı kontrolü yapılıyor
-                ? AccountBookType.OtherPaymentWithEncachmentForHousingDue
+            var accountBookType = input.NettingFromHousingDue //Mahsuplaşma var mı kontrolü yapılıyor
+                ? AccountBookType.OtherPaymentWithNettingForHousingDue
                 : AccountBookType.Other;
 
             var accountBook = await AccountBook.CreateAsync(
@@ -204,9 +204,9 @@ namespace Sirius.PaymentAccounts
                 , input.ProcessDateTime
                 , input.PaymentCategoryId
                 , null
-                , input.EncachmentFromHousingDue
-                , input.HousingIdForEncachment
-                , input.PaymentCategoryIdForEncachment
+                , input.NettingFromHousingDue
+                , input.HousingIdForNetting
+                , input.PaymentCategoryIdForNetting
                 , fromPaymentAccount
                 , toPaymentAccount
                 , input.Amount
@@ -217,7 +217,7 @@ namespace Sirius.PaymentAccounts
                 , AbpSession.GetUserId()
                 , false);
 
-            if (input.EncachmentFromHousingDue && input.HousingIdForEncachment.HasValue
+            if (input.NettingFromHousingDue && input.HousingIdForNetting.HasValue
             ) //Mahsuplaşma kaydı gerçekleştiriyor
             {
                 if (input.FromPaymentAccountId.HasValue && fromPaymentAccount.TenantIsOwner)
@@ -225,15 +225,15 @@ namespace Sirius.PaymentAccounts
                     throw new UserFriendlyException("'Ödeme hesabından' seçeneği, siteye ait bir hesap olamaz.");
                 }
 
-                var encashmentHousing = await _housingRepository.GetAsync(input.HousingIdForEncachment.Value);
-                var encashmentPaymentCategory =
-                    await _paymentCategoryRepository.GetAsync(input.PaymentCategoryIdForEncachment.GetValueOrDefault());
+                var nettingHousing = await _housingRepository.GetAsync(input.HousingIdForNetting.Value);
+                var nettingPaymentCategory =
+                    await _paymentCategoryRepository.GetAsync(input.PaymentCategoryIdForNetting.GetValueOrDefault());
 
-                await _accountBookManager.CreateOtherPaymentWithEncachmentForHousingDueAsync(accountBook,
-                    encashmentHousing,
+                await _accountBookManager.CreateOtherPaymentWithNettingForHousingDueAsync(accountBook,
+                    nettingHousing,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
                     input.ToPaymentAccountId.HasValue ? toPaymentAccount : null,
-                    encashmentPaymentCategory);
+                    nettingPaymentCategory);
             }
             else
             {
@@ -296,8 +296,8 @@ namespace Sirius.PaymentAccounts
                     DocumentDateTime = input.DocumentDateTime,
                     DocumentNumber = input.DocumentNumber,
                     AccountBookFileUrls = accountBookFileUrls,
-                    EncachmentFromHousingDue = existingAccountBook.EncashmentHousing,
-                    HousingIdForEncachment = existingAccountBook.HousingIdForEncachment
+                    NettingFromHousingDue = existingAccountBook.NettingHousing,
+                    HousingIdForNetting = existingAccountBook.HousingIdForNetting
                 };
 
                 await _accountBookManager.DeleteAsync(existingAccountBook);
@@ -480,11 +480,11 @@ namespace Sirius.PaymentAccounts
                             .ToPaymentAccountId
                         equals toPaymentAccount.Id into toPaymentAccount
                     from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
-                    join encashmentHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
-                            .HousingIdForEncachment
-                        equals encashmentHousing.Id into
-                        encashmentHousing
-                    from subEncashmentHousing in encashmentHousing.DefaultIfEmpty()
+                    join nettingHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
+                            .HousingIdForNetting
+                        equals nettingHousing.Id into
+                        nullableNetting
+                    from nettingHousing in nullableNetting.DefaultIfEmpty()
                     select new
                     {
                         accountBook,
@@ -493,7 +493,7 @@ namespace Sirius.PaymentAccounts
                         subBlock,
                         subFromPaymentAccount,
                         subToPaymentAccount,
-                        subEncashmentHousing
+                        nettingHousing
                     })
                 .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
                 .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
@@ -529,9 +529,9 @@ namespace Sirius.PaymentAccounts
                         : string.Empty,
                     FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
                     ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,
-                    EncashmentHousing = p.accountBook.EncashmentHousing,
-                    EncashmentHousingBlockApartment = p.subEncashmentHousing != null
-                        ? p.subEncashmentHousing.Block.BlockName + ' ' + p.subEncashmentHousing.Apartment
+                    NettingHousing = p.accountBook.NettingHousing,
+                    NettingHousingBlockApartment = p.nettingHousing != null
+                        ? p.nettingHousing.Block.BlockName + ' ' + p.nettingHousing.Apartment
                         : string.Empty,
                     SameDayIndex = p.accountBook.SameDayIndex,
                     AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
