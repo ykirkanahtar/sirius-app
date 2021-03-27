@@ -26,10 +26,10 @@ namespace Sirius.PaymentAccounts.Dto
         public string DocumentNumber { get; set; }
         public List<string> AccountBookFileUrls { get; set; }
         
-        public bool EncachmentFromHousingDue { get; set; }
+        public bool NettingFromHousingDue { get; set; }
         
-        public Guid? HousingIdForEncachment { get; set; }
-        public Guid? PaymentCategoryIdForEncachment { get; set; }
+        public Guid? HousingIdForNetting { get; set; }
+        public Guid? PaymentCategoryIdForNetting { get; set; }
 
         public void Normalize()
         {

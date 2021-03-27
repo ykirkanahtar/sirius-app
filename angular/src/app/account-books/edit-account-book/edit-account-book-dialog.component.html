@@ -54,7 +54,7 @@
             <div
               class="form-group row"
               [ngClass]="
-                accountBook.encachmentFromHousingDue === false ? 'required' : ''
+                accountBook.nettingFromHousingDue === false ? 'required' : ''
               "
               *ngIf="
                 paymentCategory.paymentCategoryType ===
@@ -67,7 +67,7 @@
                 <label for="fromPaymentAccounts">
                   {{ "FromPaymentAccount" | localize }}
                   <span
-                    *ngIf="accountBook.encachmentFromHousingDue === false"
+                    *ngIf="accountBook.nettingFromHousingDue === false"
                     class="text-danger"
                     >*</span
                   >
@@ -80,7 +80,7 @@
                   [(ngModel)]="accountBook.fromPaymentAccountId"
                   [filter]="true"
                   [style]="{ width: '100%' }"
-                  [required]="accountBook.encachmentFromHousingDue === false"
+                  [required]="accountBook.nettingFromHousingDue === false"
                   [showClear]="true"
                 >
                 </p-dropdown>
@@ -221,13 +221,13 @@
                 ></abp-validation-summary>
               </div>
             </div>
-            <div *ngIf="accountBook.encashmentHousing">
+            <div *ngIf="accountBook.nettingHousing">
               <div class="form-group row">
                 <div class="col-md-10">
                   <label>
-                    {{ "EncashmentHousingText" | localize }}
+                    {{ "NettingHousingText" | localize }}
                   </label>
-                  <span>{{ " " + encashmentHousingText }}</span>
+                  <span>{{ " " + nettingHousingText }}</span>
                 </div>
               </div>
             </div>

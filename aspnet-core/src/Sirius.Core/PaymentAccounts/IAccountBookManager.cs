@@ -12,16 +12,16 @@ namespace Sirius.PaymentAccounts
     {
         Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing, PaymentAccount toPaymentAccount);
 
-        Task CreateOtherPaymentWithEncachmentForHousingDueAsync(AccountBook accountBook, Housing housingForEncashment,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForEncashment);
+        Task CreateOtherPaymentWithNettingForHousingDueAsync(AccountBook accountBook, Housing housingForNetting,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForNetting);
 
         Task CreateAsync(AccountBook accountBook,
             AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing,
-            [CanBeNull] Housing housingForEncashment,
-            [CanBeNull] PaymentCategory paymentCategoryForEncashment);
+            [CanBeNull] Housing housingForNetting,
+            [CanBeNull] PaymentCategory paymentCategoryForNetting);
         
         Task CreateForPaymentAccountTransferAsync(AccountBook accountBook);
         Task UpdateAsync(AccountBook existingAccountBook, AccountBook accountBook);

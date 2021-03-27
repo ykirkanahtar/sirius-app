@@ -21,8 +21,8 @@ namespace Sirius.PaymentAccounts.Dto
         public string DocumentNumber { get; set; }
         public decimal? FromPaymentAccountCurrentBalance { get; set; }
         public decimal? ToPaymentAccountCurrentBalance { get;  set; }
-        public bool EncashmentHousing { get;  set; }
-        public Guid? HousingIdForEncachment { get;  set; }
+        public bool NettingHousing { get;  set; }
+        public Guid? HousingIdForNetting { get;  set; }
         public int SameDayIndex { get; set; }
 
         public virtual List<AccountBookFileDto> AccountBookFiles { get; set; }
