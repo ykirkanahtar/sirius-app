@@ -49,7 +49,7 @@ namespace Sirius.HousingPaymentPlans
             IPaymentCategoryManager paymentCategoryManager, IRepository<Person, Guid> personRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<HousingPerson, Guid> housingPersonRepository,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository, 
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository)
             : base(housingPaymentPlanGroupRepository)
         {
@@ -64,25 +64,34 @@ namespace Sirius.HousingPaymentPlans
             _paymentCategoryRepository = paymentCategoryRepository;
             _paymentAccountRepository = paymentAccountRepository;
         }
-        
+
         public override async Task<HousingPaymentPlanGroupDto> CreateAsync(
             CreateHousingPaymentPlanGroupDto input)
         {
             CheckCreatePermission();
-            var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
-            var housings = await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
+            var housingCategories = new List<HousingCategory>();
+            var housings = new List<Housing>();
+            foreach (var housingCategoryId in input.HousingCategoryIds)
+            {
+                var housingCategory = await _housingCategoryRepository.GetAsync(housingCategoryId);
+                housingCategories.Add(housingCategory);
+
+                var intHousings =
+                    await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
+                housings.AddRange(intHousings);
+            }
 
             var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
-                input.DefaultToPaymentAccountId, input.ResidentOrOwner, input.HousingCategoryId);
+                input.DefaultToPaymentAccountId, input.ResidentOrOwner);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
 
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(),
-                input.HousingPaymentPlanGroupName, housingCategory, paymentCategory, input.AmountPerMonth,
+                input.HousingPaymentPlanGroupName, paymentCategory, input.AmountPerMonth,
                 input.CountOfMonth, input.PaymentDayOfMonth
-                , input.StartDate, input.Description, input.ResidentOrOwner);
+                , input.StartDate, input.Description, input.ResidentOrOwner, housingCategories);
 
             await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
                 paymentCategory, false, null);
@@ -106,7 +115,7 @@ namespace Sirius.HousingPaymentPlans
 
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Update(existingHousingPaymentPlanGroup,
                 input.HousingPaymentPlanGroupName);
-            
+
             await _housingPaymentPlanGroupManager.UpdateAsync(housingPaymentPlanGroup);
             return ObjectMapper.Map<HousingPaymentPlanGroupDto>(housingPaymentPlanGroup);
         }
@@ -138,18 +147,15 @@ namespace Sirius.HousingPaymentPlans
                 HousingPaymentPlanGroupName = existingHousingPaymentPlanGroup.HousingPaymentPlanGroupName
             };
         }
-        
+
         public override async Task<PagedResultDto<HousingPaymentPlanGroupDto>> GetAllAsync(
             PagedHousingPaymentPlanGroupResultRequestDto input)
         {
             CheckGetAllPermission();
 
             var query = (from housingPaymentPlanGroup in _housingPaymentPlanGroupRepository.GetAll()
-                        .Include(p => p.HousingCategory)
+                        .Include(p => p.HousingPaymentPlanGroupHousingCategories)
                         .Include(p => p.PaymentCategory)
-                        .Include(p => p.HousingPaymentPlans)
-                    join housingCategory in _housingCategoryRepository.GetAll() on housingPaymentPlanGroup
-                        .HousingCategoryId equals housingCategory.Id
                     join paymentCategory in _paymentCategoryRepository.GetAll() on housingPaymentPlanGroup
                         .PaymentCategoryId equals paymentCategory.Id
                     join housingPaymentPlan in _housingPaymentPlanRepository.GetAll() on housingPaymentPlanGroup.Id
@@ -159,19 +165,20 @@ namespace Sirius.HousingPaymentPlans
                         equals housing.Id
                     join housingPerson in _housingPersonRepository.GetAll() on housing.Id equals housingPerson
                             .HousingId
-                        into g1
-                    from housingPerson in g1.DefaultIfEmpty()
+                        into nullableHousingPerson
+                    from housingPerson in nullableHousingPerson.DefaultIfEmpty()
                     join person in _personRepository.GetAll().Where(p => p.TenantId == AbpSession.TenantId) on
-                        housingPerson.PersonId equals person.Id into g2
-                    from person in g2.DefaultIfEmpty()
+                        housingPerson.PersonId equals person.Id into nullablePerson
+                    from person in nullablePerson.DefaultIfEmpty()
                     select new
                     {
-                        housingPaymentPlanGroup, housingCategory, paymentCategory, housingPaymentPlan, housing,
+                        housingPaymentPlanGroup, paymentCategory, housingPaymentPlan, housing,
                         housingPerson, person
                     })
                 .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
                 .WhereIf(input.HousingCategoryIds.Count > 0,
-                    p => input.HousingCategoryIds.Contains(p.housingCategory.Id))
+                    p => p.housingPaymentPlanGroup.HousingPaymentPlanGroupHousingCategories
+                        .Select(p => p.HousingCategoryId).Any(input.HousingCategoryIds.Contains))
                 .WhereIf(input.PersonIds.Count > 0,
                     p => input.PersonIds.Contains(p.person != null ? p.person.Id : Guid.Empty));
 
@@ -186,21 +193,31 @@ namespace Sirius.HousingPaymentPlans
                 .PageBy(input)
                 .ToList();
 
-            // var housingPaymentPlanGroups = await query
-            //     .OrderBy(input.Sorting ?? $"{nameof(HousingPaymentPlanGroupDto.StartDate)} ASC")
-            //     .PageBy(input)
-            //     .ToListAsync();
+            var housingPaymentPlanGroupsDto =
+                ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups);
 
-            return new PagedResultDto<HousingPaymentPlanGroupDto>(query.Count(),
-                ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups));
+            var allHousingCategories = await _housingCategoryRepository.GetAll().ToListAsync();
+            foreach (var housingPaymentPlanGroupDto in housingPaymentPlanGroupsDto)
+            {
+                var housingCategories = allHousingCategories.Where(p =>
+                    housingPaymentPlanGroupDto.HousingPaymentPlanGroupHousingCategories.Select(p => p.HousingCategoryId)
+                        .ToList().Contains(p.Id)).ToList();
+
+                housingPaymentPlanGroupDto.HousingCategoryNames = string.Join(", ",
+                    housingCategories.Select(p => p.HousingCategoryName).ToArray());
+            }
+
+            return new PagedResultDto<HousingPaymentPlanGroupDto>(list.Count(), housingPaymentPlanGroupsDto);
         }
-        
+
         public List<LookUpDto> GetResidentOrOwnerLookUp()
         {
             CheckGetAllPermission();
 
-            var residentLookUp = new LookUpDto(((int)ResidentOrOwner.Resident).ToString(), L(ResidentOrOwner.Resident.ToString()));
-            var ownerLookUp = new LookUpDto(((int)ResidentOrOwner.Owner).ToString(), L(ResidentOrOwner.Owner.ToString()));
+            var residentLookUp = new LookUpDto(((int) ResidentOrOwner.Resident).ToString(),
+                L(ResidentOrOwner.Resident.ToString()));
+            var ownerLookUp = new LookUpDto(((int) ResidentOrOwner.Owner).ToString(),
+                L(ResidentOrOwner.Owner.ToString()));
             var lookUps = new List<LookUpDto> {residentLookUp, ownerLookUp};
             return lookUps;
         }

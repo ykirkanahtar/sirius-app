@@ -207,7 +207,7 @@
             >
               <tr>
                 <td>{{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}</td>
-                <td>{{ housingPaymentPlanGroup.housingCategory.housingCategoryName }}</td>
+                <td>{{ housingPaymentPlanGroup.housingCategoryNames }}</td>
                 <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName | localize }}</td>
                 <td>{{ residentOrOwnerEnum[housingPaymentPlanGroup.residentOrOwner] | localize }}</td>
                 <td>{{ housingPaymentPlanGroup.amountPerMonth | number: "1.2-2" }}</td>

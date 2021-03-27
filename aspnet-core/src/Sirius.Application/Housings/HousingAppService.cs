@@ -333,8 +333,10 @@ namespace Sirius.Housings
             {
                 var paymentCategory = await _paymentCategoryManager.GetAsync(filter.PaymentCategoryId.Value);
 
+                var housingCategoryIds = await _paymentCategoryManager.GetHousingCategories(paymentCategory.Id);
+
                 query = query.WhereIf(paymentCategory.IsHousingDue,
-                    p => p.HousingCategoryId == paymentCategory.HousingCategoryId).Select(p => p);
+                    p => housingCategoryIds.Contains(p.HousingCategoryId));
             }
 
             return
