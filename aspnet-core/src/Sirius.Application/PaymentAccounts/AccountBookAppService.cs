@@ -214,8 +214,7 @@ namespace Sirius.PaymentAccounts
                 , input.DocumentDateTime
                 , input.DocumentNumber
                 , accountBookFiles
-                , AbpSession.GetUserId()
-                , false);
+                , AbpSession.GetUserId());
 
             if (input.NettingFromHousingDue && input.HousingIdForNetting.HasValue
             ) //Mahsuplaşma kaydı gerçekleştiriyor
@@ -464,22 +463,23 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
             var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
-
+            
             var query = (from accountBook in _accountBookRepository.GetAll()
                     join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
-                        equals paymentCategory.Id
+                        equals paymentCategory.Id into nullablePaymentCategory
+                    from paymentCategory in nullablePaymentCategory.DefaultIfEmpty()
                     join housing in _housingRepository.GetAll() on accountBook.HousingId equals housing.Id into
-                        housing
-                    from subHousing in housing.DefaultIfEmpty()
-                    join block in _blockRepository.GetAll() on subHousing.BlockId equals block.Id into block
-                    from subBlock in block.DefaultIfEmpty()
+                        nullableHousing
+                    from housing in nullableHousing.DefaultIfEmpty()
+                    join block in _blockRepository.GetAll() on housing.BlockId equals block.Id into nullableBlock
+                    from block in nullableBlock.DefaultIfEmpty()
                     join fromPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
-                        .FromPaymentAccountId equals fromPaymentAccount.Id into fromPaymentAccount
-                    from subFromPaymentAccount in fromPaymentAccount.DefaultIfEmpty()
+                        .FromPaymentAccountId equals fromPaymentAccount.Id into nullableFromPaymentAccount
+                    from fromPaymentAccount in nullableFromPaymentAccount.DefaultIfEmpty()
                     join toPaymentAccount in _paymentAccountRepository.GetAll() on accountBook
                             .ToPaymentAccountId
-                        equals toPaymentAccount.Id into toPaymentAccount
-                    from subToPaymentAccount in toPaymentAccount.DefaultIfEmpty()
+                        equals toPaymentAccount.Id into nullableToPaymentAccount
+                    from toPaymentAccount in nullableToPaymentAccount.DefaultIfEmpty()
                     join nettingHousing in _housingRepository.GetAll().Include(p => p.Block) on accountBook
                             .HousingIdForNetting
                         equals nettingHousing.Id into
@@ -489,10 +489,10 @@ namespace Sirius.PaymentAccounts
                     {
                         accountBook,
                         paymentCategory,
-                        subHousing,
-                        subBlock,
-                        subFromPaymentAccount,
-                        subToPaymentAccount,
+                        housing,
+                        block,
+                        fromPaymentAccount,
+                        toPaymentAccount,
                         nettingHousing
                     })
                 .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
@@ -511,21 +511,29 @@ namespace Sirius.PaymentAccounts
                 .Select(p => new AccountBookGetAllOutput
                 {
                     Id = p.accountBook.Id,
+                    AccountBookType = p.accountBook.AccountBookType,
                     CreationTime = p.accountBook.CreationTime,
                     CreatorUserId = p.accountBook.CreatorUserId,
                     LastModificationTime = p.accountBook.LastModificationTime,
                     LastModifierUserId = p.accountBook.LastModifierUserId,
                     ProcessDateTime = p.accountBook.ProcessDateTime,
-                    PaymentCategoryName = p.paymentCategory.PaymentCategoryName,
-                    HousingName = p.subHousing != null
-                        ? p.subBlock.BlockName + "-" + p.subHousing.Apartment
+                    PaymentCategoryName =
+                        p.paymentCategory != null
+                            ? p.paymentCategory.PaymentCategoryName
+                            :
+                            p.accountBook.AccountBookType == AccountBookType.TransferForPaymentAccount
+                                ?
+                                "Ödeme hesabı devir"
+                                : string.Empty,
+                    HousingName = p.housing != null
+                        ? p.block.BlockName + "-" + p.housing.Apartment
                         : string.Empty,
                     Amount = p.accountBook.Amount,
-                    FromPaymentAccountName = p.subFromPaymentAccount != null
-                        ? p.subFromPaymentAccount.AccountName
+                    FromPaymentAccountName = p.fromPaymentAccount != null
+                        ? p.fromPaymentAccount.AccountName
                         : string.Empty,
-                    ToPaymentAccountName = p.subToPaymentAccount != null
-                        ? p.subToPaymentAccount.AccountName
+                    ToPaymentAccountName = p.toPaymentAccount != null
+                        ? p.toPaymentAccount.AccountName
                         : string.Empty,
                     FromPaymentAccountBalance = p.accountBook.FromPaymentAccountCurrentBalance,
                     ToPaymentAccountBalance = p.accountBook.ToPaymentAccountCurrentBalance,

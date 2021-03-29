@@ -12,6 +12,5 @@ namespace Sirius.PaymentAccounts
         Task DeleteAsync(PaymentAccount paymentAccount);
         Task IncreaseBalance(PaymentAccount paymentAccount, decimal amount);
         Task DecreaseBalance(PaymentAccount paymentAccount, decimal amount);
-        Task UnSetDefaultPaymentAccount(PaymentAccount paymentAccount);
     }
 }

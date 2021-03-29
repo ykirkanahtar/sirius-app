@@ -51,11 +51,7 @@
                 <th pSortableColumn="Balance">
                   {{ "Balance" | localize }}
                   <p-sortIcon field="Balance"></p-sortIcon>
-                </th>
-                <th pSortableColumn="IsDefault">
-                  {{ "IsDefaultPaymentAccountShort" | localize }}
-                  <p-sortIcon field="IsDefault"></p-sortIcon>
-                </th>                
+                </th>               
                 <th pSortableColumn="TenantIsOwner">
                   {{ "TenantIsOwner" | localize }}
                   <p-sortIcon field="TenantIsOwner"></p-sortIcon>
@@ -86,10 +82,7 @@
                       | localize
                   }}
                 </td>
-                <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>
-                <td>
-                  {{ (paymentAccount.isDefault ? "Yes" : "No") | localize }}
-                </td>                
+                <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>             
                 <td>
                   {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}
                 </td>

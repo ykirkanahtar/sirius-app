@@ -3826,57 +3826,6 @@ export class PaymentAccountServiceProxy {
     }
 
     /**
-     * @return Success
-     */
-    getDefaultPaymentAccount(): Observable<PaymentAccountDto> {
-        let url_ = this.baseUrl + "/api/services/app/PaymentAccount/GetDefaultPaymentAccount";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetDefaultPaymentAccount(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetDefaultPaymentAccount(<any>response_);
-                } catch (e) {
-                    return <Observable<PaymentAccountDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<PaymentAccountDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetDefaultPaymentAccount(response: HttpResponseBase): Observable<PaymentAccountDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PaymentAccountDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<PaymentAccountDto>(<any>null);
-    }
-
-    /**
      * @param id (optional) 
      * @return Success
      */
@@ -7644,6 +7593,13 @@ export interface ICreateAccountBookDto {
     paymentCategoryIdForNetting: string | undefined;
 }
 
+export enum AccountBookType {
+    HousingDue = 1,
+    OtherPaymentWithNettingForHousingDue = 2,
+    TransferForPaymentAccount = 3,
+    Other = 4,
+}
+
 export class AccountBookFileDto implements IAccountBookFileDto {
     fileUrl: string | undefined;
     accountBookId: string;
@@ -7725,6 +7681,7 @@ export interface IAccountBookFileDto {
 
 export class AccountBookDto implements IAccountBookDto {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryId: string;
     housingId: string | undefined;
     fromPaymentAccountId: string | undefined;
@@ -7760,6 +7717,7 @@ export class AccountBookDto implements IAccountBookDto {
     init(_data?: any) {
         if (_data) {
             this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.accountBookType = _data["accountBookType"];
             this.paymentCategoryId = _data["paymentCategoryId"];
             this.housingId = _data["housingId"];
             this.fromPaymentAccountId = _data["fromPaymentAccountId"];
@@ -7799,6 +7757,7 @@ export class AccountBookDto implements IAccountBookDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["accountBookType"] = this.accountBookType;
         data["paymentCategoryId"] = this.paymentCategoryId;
         data["housingId"] = this.housingId;
         data["fromPaymentAccountId"] = this.fromPaymentAccountId;
@@ -7838,6 +7797,7 @@ export class AccountBookDto implements IAccountBookDto {
 
 export interface IAccountBookDto {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryId: string;
     housingId: string | undefined;
     fromPaymentAccountId: string | undefined;
@@ -7991,6 +7951,7 @@ export interface IUpdateAccountBookDto {
 
 export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryName: string | undefined;
     housingName: string | undefined;
     amount: number;
@@ -8023,6 +7984,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     init(_data?: any) {
         if (_data) {
             this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.accountBookType = _data["accountBookType"];
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.housingName = _data["housingName"];
             this.amount = _data["amount"];
@@ -8059,6 +8021,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["accountBookType"] = this.accountBookType;
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["housingName"] = this.housingName;
         data["amount"] = this.amount;
@@ -8095,6 +8058,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
 
 export interface IAccountBookGetAllOutput {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryName: string | undefined;
     housingName: string | undefined;
     amount: number;
@@ -10106,7 +10070,7 @@ export interface IHousingCategoryDtoPagedResultDto {
 
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {
     housingId: string;
-    readonly paymentCategoryId: string | undefined;
+    readonly paymentCategoryId: string;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10160,7 +10124,7 @@ export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPa
 
 export interface ICreateCreditHousingPaymentPlanDto {
     housingId: string;
-    paymentCategoryId: string | undefined;
+    paymentCategoryId: string;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10169,7 +10133,7 @@ export interface ICreateCreditHousingPaymentPlanDto {
 
 export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymentPlanDto {
     housingId: string;
-    readonly paymentCategoryId: string | undefined;
+    readonly paymentCategoryId: string;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10220,7 +10184,7 @@ export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymen
 
 export interface ICreateDebtHousingPaymentPlanDto {
     housingId: string;
-    paymentCategoryId: string | undefined;
+    paymentCategoryId: string;
     date: moment.Moment;
     amount: number;
     description: string | undefined;
@@ -10770,7 +10734,6 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -10792,7 +10755,6 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
@@ -10814,7 +10776,6 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
@@ -10836,7 +10797,6 @@ export interface ICreateBankAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -10856,7 +10816,6 @@ export class PaymentAccountDto implements IPaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -10888,7 +10847,6 @@ export class PaymentAccountDto implements IPaymentAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
@@ -10920,7 +10878,6 @@ export class PaymentAccountDto implements IPaymentAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
@@ -10952,7 +10909,6 @@ export interface IPaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -10972,7 +10928,6 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -10993,7 +10948,6 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.personId = _data["personId"];
             this.employeeId = _data["employeeId"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.isDefault = _data["isDefault"];
             this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
             this.transferAmount = _data["transferAmount"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
@@ -11014,7 +10968,6 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["personId"] = this.personId;
         data["employeeId"] = this.employeeId;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["isDefault"] = this.isDefault;
         data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
         data["transferAmount"] = this.transferAmount;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
@@ -11035,7 +10988,6 @@ export interface ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     firstTransferDateTime: moment.Moment | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
@@ -11048,7 +11000,6 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
@@ -11076,7 +11027,6 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.isDefault = _data["isDefault"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -11104,7 +11054,6 @@ export class UpdatePaymentAccountDto implements IUpdatePaymentAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["isDefault"] = this.isDefault;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -11132,7 +11081,6 @@ export interface IUpdatePaymentAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    isDefault: boolean;
     allowNegativeBalance: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;

@@ -23,7 +23,7 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] Housing housingForNetting,
             [CanBeNull] PaymentCategory paymentCategoryForNetting);
         
-        Task CreateForPaymentAccountTransferAsync(AccountBook accountBook);
+        Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, PaymentAccount toPaymentAccount);
         Task UpdateAsync(AccountBook existingAccountBook, AccountBook accountBook);
         Task DeleteAsync(AccountBook accountBook);
         Task<AccountBook> GetAsync(Guid id);

@@ -24,6 +24,7 @@ import {
   PagedAccountBookResultDto,
   PaymentCategoryDto,
   PaymentCategoryType,
+  AccountBookType,
 } from "@shared/service-proxies/service-proxies";
 import { CreateAccountBookDialogComponent } from "./create-account-book/create-account-book-dialog.component";
 import { Table } from "primeng/table";
@@ -54,6 +55,7 @@ export class AccountBooksComponent
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
   lastAccountBookProcessDate: moment.Moment;
+  AccountBookTypeEnum = AccountBookType;
 
   paymentCategoriesFilter: SelectItem[] = [];
   selectedPaymentCategoriesFilter: string[] = [];

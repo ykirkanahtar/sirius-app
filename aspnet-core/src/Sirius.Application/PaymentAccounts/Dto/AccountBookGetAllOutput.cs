@@ -7,6 +7,7 @@ namespace Sirius.PaymentAccounts.Dto
     public class AccountBookGetAllOutput: FullAuditedEntityDto<Guid>
     {
         public DateTime ProcessDateTime { get; set; }
+        public AccountBookType AccountBookType { get; set; }
         public string PaymentCategoryName { get; set; }
         public string HousingName { get; set; }
         public decimal Amount { get; set; }

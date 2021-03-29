@@ -92,15 +92,13 @@ namespace Sirius.Housings
 
                 if (input.TransferForHousingDue.Amount.GetValueOrDefault() != 0)
                 {
-                    // var paymentCategory = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
-                    // var paymentCategory = await _paymentCategoryManager.GetAsync(input.CreateTransferForHousingDue.PaymentCategoryId);
-
                     var housingPaymentPlan = input.TransferForHousingDue.IsDebt
                         ? HousingPaymentPlan.CreateDebt(
                             SequentialGuidGenerator.Instance.Create()
                             , AbpSession.GetTenantId()
                             , null
                             , housing
+                            , input.TransferForHousingDue.ResidentOrOwner
                             , null
                             , input.TransferForHousingDue.Date
                             , input.TransferForHousingDue.Amount.GetValueOrDefault()
@@ -113,6 +111,7 @@ namespace Sirius.Housings
                             SequentialGuidGenerator.Instance.Create()
                             , AbpSession.GetTenantId()
                             , housing
+                            , input.TransferForHousingDue.ResidentOrOwner
                             , null
                             , input.TransferForHousingDue.Date
                             , input.TransferForHousingDue.Amount.GetValueOrDefault()
@@ -146,7 +145,6 @@ namespace Sirius.Housings
 
             var housing = await Housing.UpdateAsync(_housingPolicy, existingHousing, block, input.Apartment,
                 housingCategory, input.TenantIsResiding);
-            // await _housingManager.UpdateAsync(housing);
 
             //Eğer kiralık seçeneği kaldırılırsa, kiracı olarak işaretlenen kişiler de siliniyor
             if (oldTenantIsResidingValue && housing.TenantIsResiding == false)
@@ -196,6 +194,7 @@ namespace Sirius.Housings
                             , AbpSession.GetTenantId()
                             , null
                             , housing
+                            , input.TransferIsForResidentOrOwner
                             , null
                             , input.TransferDate
                             , input.TransferAmount.GetValueOrDefault()
@@ -208,6 +207,7 @@ namespace Sirius.Housings
                             SequentialGuidGenerator.Instance.Create()
                             , AbpSession.GetTenantId()
                             , housing
+                            , input.TransferIsForResidentOrOwner
                             , null
                             , input.TransferDate
                             , input.TransferAmount.GetValueOrDefault()

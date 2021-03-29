@@ -54,9 +54,9 @@ namespace Sirius.PaymentAccounts
                 fromPaymentAccount, toPaymentAccount, null, housingForNetting, paymentCategoryForNetting);
         }
 
-        public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook)
+        public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, PaymentAccount toPaymentAccount)
         {
-            await CreateAsync(accountBook, AccountBookType.ForPaymentAccount, null, null, null, null, null);
+            await CreateAsync(accountBook, AccountBookType.TransferForPaymentAccount, null, toPaymentAccount, null, null, null);
         }
 
         public async Task CreateAsync(AccountBook accountBook,
@@ -79,9 +79,36 @@ namespace Sirius.PaymentAccounts
 
             await _accountBookRepository.InsertAsync(accountBook);
 
-            if (accountBookType == AccountBookType.ForPaymentAccount)
+            if (accountBookType == AccountBookType.TransferForPaymentAccount)
             {
                 return;
+            }
+
+            //Hareket tarihi banka devir işlemlerinden önce olamaz
+            if (fromPaymentAccount != null)
+            {
+                var transferDate = await _accountBookRepository.GetAll().Where(p =>
+                    p.ToPaymentAccountId == fromPaymentAccount.Id &&
+                    p.AccountBookType == AccountBookType.TransferForPaymentAccount)
+                    .Select(p => p.ProcessDateTime).SingleOrDefaultAsync();
+
+                if (accountBook.ProcessDateTime < transferDate)
+                {
+                    throw new UserFriendlyException($"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
+                }
+            }
+            
+            if (toPaymentAccount != null)
+            {
+                var transferDate = await _accountBookRepository.GetAll().Where(p =>
+                        p.ToPaymentAccountId == toPaymentAccount.Id &&
+                        p.AccountBookType == AccountBookType.TransferForPaymentAccount)
+                    .Select(p => p.ProcessDateTime).SingleOrDefaultAsync();
+
+                if (accountBook.ProcessDateTime < transferDate)
+                {
+                    throw new UserFriendlyException($"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
+                }
             }
 
             var paymentCategory = accountBook.PaymentCategoryId.HasValue
@@ -96,6 +123,7 @@ namespace Sirius.PaymentAccounts
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
                     , housing
+                    , paymentCategory.HousingDueForResidentOrOwner.Value
                     , paymentCategory
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
@@ -109,13 +137,13 @@ namespace Sirius.PaymentAccounts
 
             if (accountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue)
             {
-                // var nettingPaymentCategory = await _paymentCategoryManager.GetNettingAsync();
                 await _housingManager.DecreaseBalance(housingForNetting, accountBook.Amount, paymentCategoryForNetting.HousingDueForResidentOrOwner.GetValueOrDefault());
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
                     , accountBook.TenantId
                     , housingForNetting
+                    , paymentCategoryForNetting.HousingDueForResidentOrOwner.GetValueOrDefault()
                     , paymentCategoryForNetting
                     , accountBook.ProcessDateTime
                     , accountBook.Amount
