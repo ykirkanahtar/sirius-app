@@ -175,7 +175,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetUserId()
                 );
 
-                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook);
+                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook, paymentAccount);
             }
         }
     }

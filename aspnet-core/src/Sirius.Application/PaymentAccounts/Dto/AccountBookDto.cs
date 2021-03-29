@@ -11,6 +11,7 @@ namespace Sirius.PaymentAccounts.Dto
     public class AccountBookDto : FullAuditedEntityDto<Guid>
     {
         public DateTime ProcessDateTime { get; set; }
+        public AccountBookType AccountBookType { get; set; }
         public Guid PaymentCategoryId { get; set; }
         public Guid? HousingId { get; set; }
         public Guid? FromPaymentAccountId { get; set; }

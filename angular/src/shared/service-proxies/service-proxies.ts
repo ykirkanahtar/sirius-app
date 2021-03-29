@@ -7644,6 +7644,13 @@ export interface ICreateAccountBookDto {
     paymentCategoryIdForNetting: string | undefined;
 }
 
+export enum AccountBookType {
+    HousingDue = 1,
+    OtherPaymentWithNettingForHousingDue = 2,
+    TransferForPaymentAccount = 3,
+    Other = 4,
+}
+
 export class AccountBookFileDto implements IAccountBookFileDto {
     fileUrl: string | undefined;
     accountBookId: string;
@@ -7725,6 +7732,7 @@ export interface IAccountBookFileDto {
 
 export class AccountBookDto implements IAccountBookDto {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryId: string;
     housingId: string | undefined;
     fromPaymentAccountId: string | undefined;
@@ -7760,6 +7768,7 @@ export class AccountBookDto implements IAccountBookDto {
     init(_data?: any) {
         if (_data) {
             this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.accountBookType = _data["accountBookType"];
             this.paymentCategoryId = _data["paymentCategoryId"];
             this.housingId = _data["housingId"];
             this.fromPaymentAccountId = _data["fromPaymentAccountId"];
@@ -7799,6 +7808,7 @@ export class AccountBookDto implements IAccountBookDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["accountBookType"] = this.accountBookType;
         data["paymentCategoryId"] = this.paymentCategoryId;
         data["housingId"] = this.housingId;
         data["fromPaymentAccountId"] = this.fromPaymentAccountId;
@@ -7838,6 +7848,7 @@ export class AccountBookDto implements IAccountBookDto {
 
 export interface IAccountBookDto {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryId: string;
     housingId: string | undefined;
     fromPaymentAccountId: string | undefined;
@@ -7991,6 +8002,7 @@ export interface IUpdateAccountBookDto {
 
 export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryName: string | undefined;
     housingName: string | undefined;
     amount: number;
@@ -8023,6 +8035,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     init(_data?: any) {
         if (_data) {
             this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.accountBookType = _data["accountBookType"];
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.housingName = _data["housingName"];
             this.amount = _data["amount"];
@@ -8059,6 +8072,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["accountBookType"] = this.accountBookType;
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["housingName"] = this.housingName;
         data["amount"] = this.amount;
@@ -8095,6 +8109,7 @@ export class AccountBookGetAllOutput implements IAccountBookGetAllOutput {
 
 export interface IAccountBookGetAllOutput {
     processDateTime: moment.Moment;
+    accountBookType: AccountBookType;
     paymentCategoryName: string | undefined;
     housingName: string | undefined;
     amount: number;

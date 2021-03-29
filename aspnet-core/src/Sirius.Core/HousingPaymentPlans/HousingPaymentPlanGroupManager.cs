@@ -56,6 +56,7 @@ namespace Sirius.HousingPaymentPlans
                                 , housingPaymentPlanGroup.TenantId
                                 , null
                                 , housing
+                                , housingPaymentPlanGroup.ResidentOrOwner
                                 , paymentCategory
                                 , periodStartDate.Value
                                 , housing.Balance
@@ -68,6 +69,7 @@ namespace Sirius.HousingPaymentPlans
                                 SequentialGuidGenerator.Instance.Create()
                                 , housingPaymentPlanGroup.TenantId
                                 , housing
+                                , housingPaymentPlanGroup.ResidentOrOwner
                                 , paymentCategory
                                 , periodStartDate.Value
                                 , housing.Balance
@@ -98,6 +100,7 @@ namespace Sirius.HousingPaymentPlans
                         , housingPaymentPlanGroup.TenantId
                         , housingPaymentPlanGroup
                         , housing
+                        , housingPaymentPlanGroup.ResidentOrOwner
                         , paymentCategory
                         , date
                         , housingPaymentPlanGroup.AmountPerMonth
