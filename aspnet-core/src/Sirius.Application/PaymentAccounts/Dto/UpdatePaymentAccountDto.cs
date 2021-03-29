@@ -13,7 +13,6 @@ namespace Sirius.PaymentAccounts.Dto
         public Guid? EmployeeId { get; set; }
         public string Iban { get; set; }
         public bool TenantIsOwner { get; set; }
-        public bool IsDefault { get; set; }
         public bool AllowNegativeBalance { get; set; }
     }
 }

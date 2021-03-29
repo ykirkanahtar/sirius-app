@@ -24,22 +24,16 @@ namespace Sirius.PaymentAccounts
 
         public async Task CreateAsync(PaymentAccount paymentAccount)
         {
-            await UnSetDefaultPaymentAccount(paymentAccount);
             await _paymentAccountRepository.InsertAsync(paymentAccount);
         }
 
         public async Task UpdateAsync(PaymentAccount paymentAccount)
         {
-            await UnSetDefaultPaymentAccount(
-                paymentAccount);
             await _paymentAccountRepository.UpdateAsync(paymentAccount);
         }
 
         public async Task DeleteAsync(PaymentAccount paymentAccount)
         {
-            // incele
-            // var transferPaymentCategory = await _paymentCategoryManager.GetTransferForPaymentAccountAsync();
-
             var accountBooks = await _accountBookRepository.GetAllListAsync(
                 p => p.FromPaymentAccountId == paymentAccount.Id
                       || p.ToPaymentAccountId == paymentAccount.Id);
@@ -50,15 +44,6 @@ namespace Sirius.PaymentAccounts
             }
 
             await _paymentAccountRepository.DeleteAsync(paymentAccount);
-
-            // var transferAccountBook =
-            //     await _accountBookRepository.GetAll().Where(p => p.PaymentCategoryId == transferPaymentCategory.Id)
-            //         .SingleOrDefaultAsync();
-            //
-            // if (transferAccountBook != null)
-            // {
-            //     await _accountBookRepository.DeleteAsync(transferAccountBook);
-            // }
         }
 
         public async Task<PaymentAccount> GetAsync(Guid id)
@@ -82,22 +67,6 @@ namespace Sirius.PaymentAccounts
         {
             paymentAccount = PaymentAccount.DecreaseBalance(paymentAccount, amount);
             await _paymentAccountRepository.UpdateAsync(paymentAccount);
-        }
-
-        public async Task UnSetDefaultPaymentAccount(PaymentAccount paymentAccount)
-        {
-            if (paymentAccount.IsDefault)
-            {
-                var defaultPaymentAccount =
-                    await _paymentAccountRepository.GetAll().Where(p => p.IsDefault && p.Id != paymentAccount.Id)
-                        .SingleOrDefaultAsync();
-
-                if (defaultPaymentAccount != null)
-                {
-                    defaultPaymentAccount = PaymentAccount.UnSetDefaultPaymentAccount(defaultPaymentAccount);
-                    await _paymentAccountRepository.UpdateAsync(defaultPaymentAccount);
-                }
-            }
         }
     }
 }
