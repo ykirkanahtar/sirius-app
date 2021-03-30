@@ -67,7 +67,7 @@ export class HousingPeopleDialogComponent
 
     this.sortingColumn = this.primengTableHelper.getSorting(this.dataTable);
 
-    if (event.first) {
+    if (event.first || event.first === 0) {
       this.skipCount = event.first;
     }
 
