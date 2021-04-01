@@ -16,6 +16,7 @@ using Sirius.Identity;
 using Abp.AspNetCore.SignalR.Hubs;
 using Abp.Dependency;
 using Abp.Json;
+using Abp.Timing;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -46,6 +47,8 @@ namespace Sirius.Web.Host.Startup
             services.AddScoped(x => new BlobServiceClient(_appConfiguration["AzureBlobStorage:ConnectionString"]));
             services.AddScoped<IImageService, ImageService>();
             services.AddSingleton<IBlobService, BlobService>();
+
+            Clock.Provider = ClockProviders.Local;
 
             //MVC
             services.AddControllersWithViews(

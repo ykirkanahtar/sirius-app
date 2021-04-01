@@ -278,6 +278,7 @@ namespace Sirius.PaymentAccounts
                 };
 
                 var retValue = await CreateHousingDueAsync(createHousingDueAccountBookDto);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
                 await _accountBookManager.DeleteAsync(existingAccountBook);
                 return retValue;
             }

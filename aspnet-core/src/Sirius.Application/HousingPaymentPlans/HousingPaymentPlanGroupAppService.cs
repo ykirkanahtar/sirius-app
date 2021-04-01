@@ -65,8 +65,7 @@ namespace Sirius.HousingPaymentPlans
             _paymentAccountRepository = paymentAccountRepository;
         }
 
-        public override async Task<HousingPaymentPlanGroupDto> CreateAsync(
-            CreateHousingPaymentPlanGroupDto input)
+        public override async Task<HousingPaymentPlanGroupDto> CreateAsync(CreateHousingPaymentPlanGroupDto input)
         {
             CheckCreatePermission();
             var housingCategories = new List<HousingCategory>();

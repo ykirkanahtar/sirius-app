@@ -150,19 +150,30 @@ namespace Sirius.HousingPaymentPlans
             return housingPaymentPlanGroup;
         }
 
+        private DateTime GetValidDate(int year, int month, int day)
+        {
+            try
+            {
+                return new DateTime(year, month, day);
+            }
+            catch
+            {
+                return new DateTime(year, month + 1, 1);
+            }
+        }
+
         public DateTime GetStartDate(DateTime startDate, int paymentDayOfMonth)
         {
-            var newStartDate = startDate > Clock.Now ? startDate : Clock.Now;
-
-            if (newStartDate.Day > paymentDayOfMonth)
+            var firstPaymentDate = GetValidDate(startDate.Year, startDate.Month, paymentDayOfMonth);
+            if (startDate > firstPaymentDate)
             {
-                var year = newStartDate.Year;
-                var month = newStartDate.Month == 12 ? 1 : newStartDate.Month + 1;
+                var year = startDate.Year;
+                var month = startDate.Month == 12 ? 1 : startDate.Month + 1;
                 year = month == 1 ? year + 1 : year;
-                newStartDate = new DateTime(year, month, paymentDayOfMonth);
+                firstPaymentDate = new DateTime(year, month, paymentDayOfMonth);
             }
 
-            return newStartDate;
+            return firstPaymentDate;
         }
     }
 }
