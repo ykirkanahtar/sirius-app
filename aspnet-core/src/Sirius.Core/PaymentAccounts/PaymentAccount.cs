@@ -117,5 +117,15 @@ namespace Sirius.PaymentAccounts
 
             return paymentAccount;
         }
+
+        public void SetBalance(decimal amount)
+        {
+            if (AllowNegativeBalance == false && amount < 0)
+            {
+                throw new UserFriendlyException("Tutar sıfırdan küçük olamaz");
+            }
+
+            Balance = amount;
+        }
     }
 }
