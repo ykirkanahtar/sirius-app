@@ -148,38 +148,54 @@
             (onLazyLoad)="getData($event)"
             [lazy]="true"
             [loading]="isTableLoading"
+            [responsive]="true"
           >
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="block">
+                <th rowspan="2" pSortableColumn="block">
                   {{ "Block" | localize }}
                   <p-sortIcon field="block"></p-sortIcon>
                 </th>
-                <th pSortableColumn="apartment">
+                <th rowspan="2" pSortableColumn="apartment">
                   {{ "Apartment" | localize }}
                   <p-sortIcon field="apartment"></p-sortIcon>
                 </th>
-                <th pSortableColumn="housingCategoryName">
-                  {{ "HousingCategory" | localize }}
-                  <p-sortIcon
-                    field="housingCategoryName"
-                  ></p-sortIcon>
+                <th
+                  rowspan="2"
+                  [style]="{ width: '25px' }"
+                  pSortableColumn="housingCategoryName"
+                  [title]="l('HousingCategory')"
+                >
+                  {{ "HousingCategoryShort" | localize }}
+                  <p-sortIcon field="housingCategoryName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="tenantIsResiding">
-                  {{ "TenantIsResiding" | localize }}
-                  <p-sortIcon
-                    field="tenantIsResiding"
-                  ></p-sortIcon>
+                <th
+                  rowspan="2"
+                  pSortableColumn="tenantIsResiding"
+                  [title]="l('TenantIsResiding')"
+                >
+                  {{ "TenantIsResidingShort" | localize }}
+                  <p-sortIcon field="tenantIsResiding"></p-sortIcon>
                 </th>
-                <th pSortableColumn="residentBalance">
-                  {{ "ResidentBalance" | localize }}
+                <th
+                  rowspan="2"
+                  pSortableColumn="residentBalance"
+                  [title]="l('ResidentBalance')"
+                >
+                  {{ "ResidentBalanceShort" | localize }}
                   <p-sortIcon field="residentBalance"></p-sortIcon>
                 </th>
-                <th pSortableColumn="ownerBalance">
-                  {{ "OwnerBalance" | localize }}
+                <th
+                  rowspan="2"
+                  pSortableColumn="ownerBalance"
+                  [title]="l('OwnerBalance')"
+                >
+                  {{ "OwnerBalanceShort" | localize }}
                   <p-sortIcon field="ownerBalance"></p-sortIcon>
                 </th>
-                <th style="width: 350px">{{ "Actions" | localize }}</th>
+                <th rowspan="2" style="width: 350px">
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template
@@ -200,7 +216,9 @@
               <tr>
                 <td>{{ housing.block }}</td>
                 <td>{{ housing.apartment }}</td>
-                <td>{{ housing.housingCategoryName }}</td>
+                <td [style]="{ width: '25px' }">
+                  {{ housing.housingCategoryName }}
+                </td>
                 <td>{{ housing.tenantIsResiding.toString() | localize }}</td>
                 <td>{{ housing.residentBalance | number: "1.2-2" }}</td>
                 <td>{{ housing.ownerBalance | number: "1.2-2" }}</td>

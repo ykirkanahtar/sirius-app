@@ -229,6 +229,7 @@
     <text name="HousingCategories">Konut Grupları</text>
     <text name="HousingCategoriesMenu">Konut grubu (Menü)</text>
     <text name="HousingCategory">Konut grubu</text>
+    <text name="HousingCategoryShort">Konut grb.</text>
     <text name="HousingCategoryDeleteWarningMessage">Konut Grubunu silmek istediğinize emin misiniz?</text>
     <text name="HousingCategoryName">Konut Grup Adı</text>
     <text name="HousingCategoryNameShort">Konut Grup</text>
@@ -268,6 +269,7 @@
     <text name="OtherPayments">Diğer ödemeler</text>
     <text name="Owner">Tapu Sahibi</text>
     <text name="OwnerBalance">Tapu Sahibi Hesabı Bakiye</text>
+    <text name="OwnerBalanceShort">Tapu Sh. Bakiye</text>
     <text name="PaymentAccount">Ödeme hesabı</text>
     <text name="PaymentAccountName">Ödeme Hesabı</text>
     <text name="PaymentAccounts">Hesaplar</text>
@@ -303,6 +305,7 @@
     <text name="RemovePerson">Kişi tanımını kaldır</text>
     <text name="Resident">Malik</text>
     <text name="ResidentBalance">Malik Hesabı Bakiye</text>
+    <text name="ResidentBalanceShort">Malik Bakiye</text>
     <text name="ResidentOrOwner">Malik/Tapu Sahibi</text>
     <text name="ResidentOrOwnerShort">Malik/Tapu Sb.</text>
     <text name="SalaryPayment">Maaş ödemesi</text>
@@ -315,6 +318,7 @@
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
     <text name="TenantIsResiding">Kiracı oturuyor</text>
+    <text name="TenantIsResidingShort">Kiracı</text>
     <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
