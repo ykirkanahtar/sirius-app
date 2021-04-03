@@ -24,6 +24,163 @@
         <section class="content px-2">
           <div class="container-fluid">
             <div class="card">
+
+
+
+
+              <div class="card-header">
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <button
+                      type="button"
+                      class="btn bg-blue"
+                      (click)="advancedFiltersVisible = !advancedFiltersVisible"
+                    >
+                      {{ "AdvancedFilters" | localize }}
+                      <i
+                        class="fas"
+                        [class.fa-angle-up]="advancedFiltersVisible"
+                        [class.fa-angle-down]="!advancedFiltersVisible"
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+                  <div class="card-body">
+                    <form class="form-horizontal">
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-label">
+                              {{ "StartDate" | localize }}
+                            </label>
+                            <input
+                              type="text"
+                              id="startDateFilter"
+                              name="startDateFilter"
+                              [placeholder]="'StartDate' | localize"
+                              class="form-control"
+                              [(ngModel)]="startDateFilter"
+                              bsDatepicker
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-label">
+                              {{ "EndDate" | localize }}
+                            </label>
+                            <input
+                              type="text"
+                              id="endDateFilter"
+                              name="endDateFilter"
+                              [placeholder]="'EndDate' | localize"
+                              class="form-control"
+                              [(ngModel)]="endDateFilter"
+                              bsDatepicker
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-label">
+                              {{ "CreditOrDebt" | localize }}
+                            </label>
+                            <p-multiSelect
+                              name="creditOrDebtFilter"
+                              [options]="creditOrDebtsFilter"
+                              [showToggleAll]="false"
+                              [(ngModel)]="selectedCreditOrDebtFilter"
+                              [virtualScroll]="true"
+                              [filter]="true"
+                              [itemSize]="34"
+                              [defaultLabel]="l('CreditOrDebt')"
+                              class="multiselect-custom-virtual-scroll"
+                              [style]="{ minWidth: '100%' }"
+                            >
+                            </p-multiSelect>
+                            <ng-template let-creditOrDebt pTemplate="item">
+                              <div class="creditOrDebt-item">
+                                <div>{{ creditOrDebt.label | localize }}</div>
+                              </div>
+                            </ng-template>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-label">
+                              {{ "PaymentCategory" | localize }}
+                            </label>
+                            <p-multiSelect
+                              name="paymentCategories"
+                              [options]="paymentCategoriesFilter"
+                              [showToggleAll]="false"
+                              [(ngModel)]="selectedPaymentCategoriesFilter"
+                              [virtualScroll]="true"
+                              [filter]="true"
+                              [itemSize]="34"
+                              [defaultLabel]="l('PaymentCategory')"
+                              class="multiselect-custom-virtual-scroll"
+                              [style]="{ minWidth: '100%' }"
+                            >
+                              <ng-template let-paymentCategory pTemplate="item">
+                                <div class="paymentCategory-item">
+                                  <div>{{ paymentCategory.label | localize }}</div>
+                                </div>
+                              </ng-template>
+                            </p-multiSelect>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-label">
+                              {{ "HousingPaymentPlanType" | localize }}
+                            </label>
+                            <p-multiSelect
+                              name="housingPaymentPlanTypesFilter"
+                              [options]="housingPaymentPlanTypeFilter"
+                              [showToggleAll]="false"
+                              [(ngModel)]="selectedHousingPaymentPlanTypesFilter"
+                              [virtualScroll]="true"
+                              [filter]="true"
+                              [itemSize]="34"
+                              [defaultLabel]="l('HousingPaymentPlanType')"
+                              class="multiselect-custom-virtual-scroll"
+                              [style]="{ minWidth: '100%' }"
+                            >
+                              <ng-template let-housingPaymentPlanType pTemplate="item">
+                                <div class="housingPaymentPlanType-item">
+                                  <div>{{ housingPaymentPlanType.label | localize }}</div>
+                                </div>
+                              </ng-template>
+                            </p-multiSelect>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="card-footer">
+                    <button
+                      type="button"
+                      class="btn bg-blue"
+                      (click)="getData()"
+                    >
+                      {{ "Search" | localize }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-default float-right"
+                      (click)="clearFilters()"
+                    >
+                      {{ "Clear" | localize }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+
+
+
               <div class="card-body table-responsive p-0">
                 <p-table
                   #dataTable

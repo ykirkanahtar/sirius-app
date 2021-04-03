@@ -195,6 +195,21 @@ namespace Sirius.PaymentCategories
                 .ToList();
         }
         
+        public async Task<List<LookUpDto>> GetHousingDueLookUp()
+        {
+            CheckGetAllPermission();
+
+            var paymentCategories = await _paymentCategoryRepository.GetAll()
+                .Where(p => p.IsHousingDue)
+                .ToListAsync();
+
+            return
+                (from l in paymentCategories.OrderBy(p => _localizationSource.GetString(p.PaymentCategoryName))
+                    select new LookUpDto(l.Id.ToString(),
+                        _localizationSource.GetString(l.PaymentCategoryName)))
+                .ToList();
+        }
+        
         public async Task<List<LookUpDto>> GetLookUpByHousingId(Guid housingId)
         {
             CheckGetAllPermission();
