@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp;
@@ -41,22 +42,29 @@ namespace Sirius.PaymentAccounts
         }
 
         public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
-            PaymentAccount toPaymentAccount)
+            PaymentAccount toPaymentAccount, bool organizeBalances)
         {
-            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing, null, null);
+            await CreateAsync(accountBook, AccountBookType.HousingDue, null, toPaymentAccount, housing, null, null,
+                organizeBalances);
         }
 
         //Yapılan ödemeyi aidattan düşme
-        public async Task CreateOtherPaymentWithNettingForHousingDueAsync(AccountBook accountBook, Housing housingForNetting,
-            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount, PaymentCategory paymentCategoryForNetting)
+        public async Task CreateOtherPaymentWithNettingForHousingDueAsync(AccountBook accountBook,
+            Housing housingForNetting,
+            [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount,
+            PaymentCategory paymentCategoryForNetting,
+            bool organizeBalances)
         {
             await CreateAsync(accountBook, AccountBookType.OtherPaymentWithNettingForHousingDue,
-                fromPaymentAccount, toPaymentAccount, null, housingForNetting, paymentCategoryForNetting);
+                fromPaymentAccount, toPaymentAccount, null, housingForNetting, paymentCategoryForNetting,
+                organizeBalances);
         }
 
-        public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, PaymentAccount toPaymentAccount)
+        public async Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, PaymentAccount toPaymentAccount,
+            bool organizeBalances)
         {
-            await CreateAsync(accountBook, AccountBookType.TransferForPaymentAccount, null, toPaymentAccount, null, null, null);
+            await CreateAsync(accountBook, AccountBookType.TransferForPaymentAccount, null, toPaymentAccount, null,
+                null, null, organizeBalances);
         }
 
         public async Task CreateAsync(AccountBook accountBook,
@@ -65,7 +73,8 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing,
             [CanBeNull] Housing housingForNetting,
-            [CanBeNull] PaymentCategory paymentCategoryForNetting)
+            [CanBeNull] PaymentCategory paymentCategoryForNetting,
+            bool organizeBalances)
         {
             if (fromPaymentAccount == null
                 && toPaymentAccount == null
@@ -88,16 +97,17 @@ namespace Sirius.PaymentAccounts
             if (fromPaymentAccount != null)
             {
                 var transferDate = await _accountBookRepository.GetAll().Where(p =>
-                    p.ToPaymentAccountId == fromPaymentAccount.Id &&
-                    p.AccountBookType == AccountBookType.TransferForPaymentAccount)
+                        p.ToPaymentAccountId == fromPaymentAccount.Id &&
+                        p.AccountBookType == AccountBookType.TransferForPaymentAccount)
                     .Select(p => p.ProcessDateTime).SingleOrDefaultAsync();
 
                 if (accountBook.ProcessDateTime < transferDate)
                 {
-                    throw new UserFriendlyException($"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
+                    throw new UserFriendlyException(
+                        $"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
                 }
             }
-            
+
             if (toPaymentAccount != null)
             {
                 var transferDate = await _accountBookRepository.GetAll().Where(p =>
@@ -107,7 +117,8 @@ namespace Sirius.PaymentAccounts
 
                 if (accountBook.ProcessDateTime < transferDate)
                 {
-                    throw new UserFriendlyException($"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
+                    throw new UserFriendlyException(
+                        $"Hareket tarihi, bu ödeme hesabının {transferDate:dd-MM-yyyy} tarihli devir tarihinden önce olamaz.");
                 }
             }
 
@@ -117,7 +128,8 @@ namespace Sirius.PaymentAccounts
 
             if (accountBookType == AccountBookType.HousingDue)
             {
-                await _housingManager.DecreaseBalance(housing, accountBook.Amount, paymentCategory.HousingDueForResidentOrOwner.Value);
+                await _housingManager.DecreaseBalance(housing, accountBook.Amount,
+                    paymentCategory.HousingDueForResidentOrOwner.Value);
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
@@ -137,7 +149,8 @@ namespace Sirius.PaymentAccounts
 
             if (accountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue)
             {
-                await _housingManager.DecreaseBalance(housingForNetting, accountBook.Amount, paymentCategoryForNetting.HousingDueForResidentOrOwner.GetValueOrDefault());
+                await _housingManager.DecreaseBalance(housingForNetting, accountBook.Amount,
+                    paymentCategoryForNetting.HousingDueForResidentOrOwner.GetValueOrDefault());
 
                 await _housingPaymentPlanManager.CreateAsync(HousingPaymentPlan.CreateCredit(
                     SequentialGuidGenerator.Instance.Create()
@@ -155,156 +168,179 @@ namespace Sirius.PaymentAccounts
                 ));
             }
 
-            if (fromPaymentAccount != null)
+            if (organizeBalances)
             {
-                await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
-                await OrganizePaymentAccountCurrentBalances(accountBook, fromPaymentAccount,
-                    PaymentAccountDirection.From, CudType.Create);
+                var paymentAccounts = new List<PaymentAccount>();
+                if (fromPaymentAccount != null)
+                {
+                    paymentAccounts.Add(fromPaymentAccount);
+                }
+
+                if (toPaymentAccount != null)
+                {
+                    paymentAccounts.Add(toPaymentAccount);
+                }
+
+                if (paymentAccounts.Any())
+                {
+                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
+                    await balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                        paymentAccounts, new List<AccountBook> {accountBook}, null, null);
+                    balanceOrganizer.OrganizeAccountBookBalances();
+                    balanceOrganizer.OrganizePaymentAccountBalances();
+                }
             }
 
-            if (toPaymentAccount != null)
-            {
-                await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
-                await OrganizePaymentAccountCurrentBalances(accountBook, toPaymentAccount, PaymentAccountDirection.To,
-                    CudType.Create);
-            }
+            // if (fromPaymentAccount != null)
+            // {
+            //     await _paymentAccountManager.DecreaseBalance(fromPaymentAccount, accountBook.Amount);
+            //     await OrganizePaymentAccountCurrentBalances(accountBook, fromPaymentAccount,
+            //         PaymentAccountDirection.From, CudType.Create);
+            // }
+            //
+            // if (toPaymentAccount != null)
+            // {
+            //     await _paymentAccountManager.IncreaseBalance(toPaymentAccount, accountBook.Amount);
+            //     await OrganizePaymentAccountCurrentBalances(accountBook, toPaymentAccount, PaymentAccountDirection.To,
+            //         CudType.Create);
+            // }
         }
 
-        private async Task OrganizePaymentAccountCurrentBalances(AccountBook accountBook, PaymentAccount paymentAccount,
-            PaymentAccountDirection paymentAccountDirection, CudType cudType,
-            [CanBeNull] AccountBook oldAccountBook = null)
-        {
-            var amount = accountBook.Amount;
-
-            var fromPaymentAccount = accountBook.FromPaymentAccountId.HasValue
-                ? await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value)
-                : null;
-            var toPaymentAccount = accountBook.ToPaymentAccountId.HasValue
-                ? await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value)
-                : null;
-
-
-            if (cudType == CudType.Update)
-            {
-                if (oldAccountBook == null)
-                {
-                    throw new Exception("Güncelleme işlemi için eski işletme defteri değeri boş olamaz.");
-                }
-
-                amount = accountBook.Amount - oldAccountBook.Amount;
-            }
-            else if (cudType == CudType.Delete)
-            {
-                amount *= -1;
-            }
-
-            //Eğer ödeme hesabına ait son hareket değilse, ondan sonra kaydedilen hesapların bakiye bilgisi güncellenmeli
-
-            //Giden hesabın son hesap hareketi mi 
-            var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll()
-                .Include(p => p.FromPaymentAccount).Where(p =>
-                    (p.ProcessDateTime > accountBook.ProcessDateTime ||
-                     (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
-                    p.FromPaymentAccountId == paymentAccount.Id)
-                .OrderBy(p => p.ProcessDateTime)
-                .ThenBy(p => p.SameDayIndex)
-                .ToListAsync();
-
-            if (nextAccountBooksForFromPaymentAccount.Count > 0)
-            {
-                foreach (var t in nextAccountBooksForFromPaymentAccount)
-                {
-                    var existingAccountBook = t;
-                    var newBalance = paymentAccountDirection == PaymentAccountDirection.From
-                        ? (t.FromPaymentAccountCurrentBalance ?? 0) - amount
-                        : (t.FromPaymentAccountCurrentBalance ?? 0) + amount;
-                    t.SetFromPaymentAccountCurrentBalance(t.FromPaymentAccount, newBalance);
-
-                    await UpdateAsync(existingAccountBook, t);
-                }
-            }
-
-            //Gelen hesabın son hesap hareketi mi 
-            var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll()
-                .Include(p => p.ToPaymentAccount).Where(p =>
-                    (p.ProcessDateTime > accountBook.ProcessDateTime ||
-                     (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
-                    p.ToPaymentAccountId == paymentAccount.Id)
-                .OrderBy(p => p.ProcessDateTime)
-                .ThenBy(p => p.SameDayIndex)
-                .ToListAsync();
-
-            if (nextAccountBooksForToPaymentAccount.Count > 0)
-            {
-                foreach (var p in nextAccountBooksForToPaymentAccount)
-                {
-                    var existingAccountBook = p;
-                    var newBalance = paymentAccountDirection == PaymentAccountDirection.From
-                        ? (p.ToPaymentAccountCurrentBalance ?? 0) - amount
-                        : (p.ToPaymentAccountCurrentBalance ?? 0) + amount;
-                    p.SetToPaymentAccountCurrentBalance(p.ToPaymentAccount, newBalance);
-
-                    await UpdateAsync(existingAccountBook, p);
-                }
-            }
-
-            //Eğer kaydedilen ödeme hesap hareketi son hesap hareketi ise, o zaman ödeme hesabının bakiyesi kaydediliyor
-            if (nextAccountBooksForFromPaymentAccount.Count == 0 && nextAccountBooksForToPaymentAccount.Count == 0)
-            {
-                if (paymentAccountDirection == PaymentAccountDirection.From)
-                {
-                    accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, paymentAccount.Balance);
-                }
-                else
-                {
-                    accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, paymentAccount.Balance);
-                }
-            }
-            else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
-            {
-                var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
-                        (p.ProcessDateTime < accountBook.ProcessDateTime ||
-                         (p.ProcessDateTime == accountBook.ProcessDateTime &&
-                          p.SameDayIndex < accountBook.SameDayIndex))
-                        &&
-                        (p.FromPaymentAccountId == paymentAccount.Id ||
-                         p.ToPaymentAccountId == paymentAccount.Id))
-                    .OrderByDescending(p => p.ProcessDateTime)
-                    .ThenByDescending(p => p.SameDayIndex)
-                    .FirstOrDefaultAsync();
-
-                if (paymentAccountDirection == PaymentAccountDirection.From)
-                {
-                    if (previousAccountBook == null
-                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
-                    {
-                        accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, accountBook.Amount);
-                    }
-                    else
-                    {
-                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
-                        accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
-                    }
-                }
-                else
-                {
-                    if (previousAccountBook == null
-                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
-                    {
-                        accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, accountBook.Amount);
-                    }
-                    else
-                    {
-                        var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
-                        accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
-                    }
-                }
-            }
-        }
+        // private async Task OrganizePaymentAccountCurrentBalances(AccountBook accountBook, PaymentAccount paymentAccount,
+        //     PaymentAccountDirection paymentAccountDirection, CudType cudType,
+        //     [CanBeNull] AccountBook oldAccountBook = null)
+        // {
+        //     var amount = accountBook.Amount;
+        //
+        //     var fromPaymentAccount = accountBook.FromPaymentAccountId.HasValue
+        //         ? await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value)
+        //         : null;
+        //     var toPaymentAccount = accountBook.ToPaymentAccountId.HasValue
+        //         ? await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value)
+        //         : null;
+        //
+        //
+        //     if (cudType == CudType.Update)
+        //     {
+        //         if (oldAccountBook == null)
+        //         {
+        //             throw new Exception("Güncelleme işlemi için eski işletme defteri değeri boş olamaz.");
+        //         }
+        //
+        //         amount = accountBook.Amount - oldAccountBook.Amount;
+        //     }
+        //     else if (cudType == CudType.Delete)
+        //     {
+        //         amount *= -1;
+        //     }
+        //
+        //     //Eğer ödeme hesabına ait son hareket değilse, ondan sonra kaydedilen hesapların bakiye bilgisi güncellenmeli
+        //
+        //     //Giden hesabın son hesap hareketi mi 
+        //     var nextAccountBooksForFromPaymentAccount = await _accountBookRepository.GetAll()
+        //         .Include(p => p.FromPaymentAccount).Where(p =>
+        //             (p.ProcessDateTime > accountBook.ProcessDateTime ||
+        //              (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
+        //             p.FromPaymentAccountId == paymentAccount.Id)
+        //         .OrderBy(p => p.ProcessDateTime)
+        //         .ThenBy(p => p.SameDayIndex)
+        //         .ToListAsync();
+        //
+        //     if (nextAccountBooksForFromPaymentAccount.Count > 0)
+        //     {
+        //         foreach (var t in nextAccountBooksForFromPaymentAccount)
+        //         {
+        //             var existingAccountBook = t;
+        //             var newBalance = paymentAccountDirection == PaymentAccountDirection.From
+        //                 ? (t.FromPaymentAccountCurrentBalance ?? 0) - amount
+        //                 : (t.FromPaymentAccountCurrentBalance ?? 0) + amount;
+        //             t.SetFromPaymentAccountCurrentBalance(t.FromPaymentAccount, newBalance);
+        //
+        //             await UpdateAsync(existingAccountBook, t);
+        //         }
+        //     }
+        //
+        //     //Gelen hesabın son hesap hareketi mi 
+        //     var nextAccountBooksForToPaymentAccount = await _accountBookRepository.GetAll()
+        //         .Include(p => p.ToPaymentAccount).Where(p =>
+        //             (p.ProcessDateTime > accountBook.ProcessDateTime ||
+        //              (p.ProcessDateTime == accountBook.ProcessDateTime && p.SameDayIndex > accountBook.SameDayIndex)) &&
+        //             p.ToPaymentAccountId == paymentAccount.Id)
+        //         .OrderBy(p => p.ProcessDateTime)
+        //         .ThenBy(p => p.SameDayIndex)
+        //         .ToListAsync();
+        //
+        //     if (nextAccountBooksForToPaymentAccount.Count > 0)
+        //     {
+        //         foreach (var p in nextAccountBooksForToPaymentAccount)
+        //         {
+        //             var existingAccountBook = p;
+        //             var newBalance = paymentAccountDirection == PaymentAccountDirection.From
+        //                 ? (p.ToPaymentAccountCurrentBalance ?? 0) - amount
+        //                 : (p.ToPaymentAccountCurrentBalance ?? 0) + amount;
+        //             p.SetToPaymentAccountCurrentBalance(p.ToPaymentAccount, newBalance);
+        //
+        //             await UpdateAsync(existingAccountBook, p);
+        //         }
+        //     }
+        //
+        //     //Eğer kaydedilen ödeme hesap hareketi son hesap hareketi ise, o zaman ödeme hesabının bakiyesi kaydediliyor
+        //     if (nextAccountBooksForFromPaymentAccount.Count == 0 && nextAccountBooksForToPaymentAccount.Count == 0)
+        //     {
+        //         if (paymentAccountDirection == PaymentAccountDirection.From)
+        //         {
+        //             accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, paymentAccount.Balance);
+        //         }
+        //         else
+        //         {
+        //             accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, paymentAccount.Balance);
+        //         }
+        //     }
+        //     else // Değilse hesaba ait son işletme defteri hareketi bulunup o hareketteki bakiyenin üstüne tutar toplanıyor.
+        //     {
+        //         var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
+        //                 (p.ProcessDateTime < accountBook.ProcessDateTime ||
+        //                  (p.ProcessDateTime == accountBook.ProcessDateTime &&
+        //                   p.SameDayIndex < accountBook.SameDayIndex))
+        //                 &&
+        //                 (p.FromPaymentAccountId == paymentAccount.Id ||
+        //                  p.ToPaymentAccountId == paymentAccount.Id))
+        //             .OrderByDescending(p => p.ProcessDateTime)
+        //             .ThenByDescending(p => p.SameDayIndex)
+        //             .FirstOrDefaultAsync();
+        //
+        //         if (paymentAccountDirection == PaymentAccountDirection.From)
+        //         {
+        //             if (previousAccountBook == null
+        //             ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+        //             {
+        //                 accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, accountBook.Amount);
+        //             }
+        //             else
+        //             {
+        //                 var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+        //                     ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - accountBook.Amount
+        //                     : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - accountBook.Amount;
+        //                 accountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             if (previousAccountBook == null
+        //             ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+        //             {
+        //                 accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, accountBook.Amount);
+        //             }
+        //             else
+        //             {
+        //                 var newBalance = previousAccountBook.FromPaymentAccountId == paymentAccount.Id
+        //                     ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + accountBook.Amount
+        //                     : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + accountBook.Amount;
+        //                 accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
+        //             }
+        //         }
+        //     }
+        // }
 
         public async Task UpdateAsync(AccountBook existingAccountBook, AccountBook updatedAccountBook)
         {
@@ -335,8 +371,8 @@ namespace Sirius.PaymentAccounts
                             await _paymentAccountManager.IncreaseBalance(fromPaymentAccount, Math.Abs(amountDiff));
                         }
 
-                        await OrganizePaymentAccountCurrentBalances(updatedAccountBook, fromPaymentAccount,
-                            PaymentAccountDirection.From, CudType.Update, existingAccountBook);
+                        // await OrganizePaymentAccountCurrentBalances(updatedAccountBook, fromPaymentAccount,
+                        //     PaymentAccountDirection.From, CudType.Update, existingAccountBook);
                     }
 
                     if (updatedAccountBook.ToPaymentAccountId.HasValue)
@@ -359,12 +395,36 @@ namespace Sirius.PaymentAccounts
                             await _paymentAccountManager.DecreaseBalance(toPaymentAccount, Math.Abs(amountDiff));
                         }
 
-                        await OrganizePaymentAccountCurrentBalances(updatedAccountBook, toPaymentAccount,
-                            PaymentAccountDirection.To, CudType.Update, existingAccountBook);
+                        // await OrganizePaymentAccountCurrentBalances(updatedAccountBook, toPaymentAccount,
+                        //     PaymentAccountDirection.To, CudType.Update, existingAccountBook);
                     }
                 }
 
                 await _accountBookRepository.UpdateAsync(updatedAccountBook);
+
+                var paymentAccounts = new List<PaymentAccount>();
+
+                if (updatedAccountBook.FromPaymentAccountId.HasValue)
+                {
+                    var fromPaymentAccount =
+                        await _paymentAccountManager.GetAsync(updatedAccountBook.FromPaymentAccountId.Value);
+                    paymentAccounts.Add(fromPaymentAccount);
+                }
+
+                if (updatedAccountBook.ToPaymentAccountId.HasValue)
+                {
+                    var toPaymentAccount =
+                        await _paymentAccountManager.GetAsync(updatedAccountBook.ToPaymentAccountId.Value);
+                    paymentAccounts.Add(toPaymentAccount);
+                }
+
+                if (paymentAccounts.Any())
+                {
+                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
+                    await balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
+                        paymentAccounts, null, new List<AccountBook> {updatedAccountBook}, null);
+                    balanceOrganizer.OrganizeAccountBookBalances();
+                }
             }
             catch (Exception e)
             {
@@ -373,7 +433,7 @@ namespace Sirius.PaymentAccounts
             }
         }
 
-        public async Task DeleteAsync(AccountBook accountBook)
+        public async Task DeleteAsync(AccountBook accountBook, bool organizeBalances)
         {
             var housingPaymentPlans =
                 await _housingPaymentPlanRepository.GetAllListAsync(p => p.AccountBookId == accountBook.Id);
@@ -383,25 +443,52 @@ namespace Sirius.PaymentAccounts
                 await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan, true);
             }
 
-            if (accountBook.FromPaymentAccountId.HasValue)
-            {
-                var fromPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value);
-                await _paymentAccountManager.IncreaseBalance(fromPaymentAccount, Math.Abs(accountBook.Amount));
-
-                await OrganizePaymentAccountCurrentBalances(accountBook, fromPaymentAccount,
-                    PaymentAccountDirection.From, CudType.Delete);
-            }
-
-            if (accountBook.ToPaymentAccountId.HasValue)
-            {
-                var toPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value);
-                await _paymentAccountManager.DecreaseBalance(toPaymentAccount, Math.Abs(accountBook.Amount));
-
-                await OrganizePaymentAccountCurrentBalances(accountBook, toPaymentAccount, PaymentAccountDirection.To,
-                    CudType.Delete);
-            }
+            // if (accountBook.FromPaymentAccountId.HasValue)
+            // {
+            //     var fromPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value);
+            //     await _paymentAccountManager.IncreaseBalance(fromPaymentAccount, Math.Abs(accountBook.Amount));
+            //
+            //     await OrganizePaymentAccountCurrentBalances(accountBook, fromPaymentAccount,
+            //         PaymentAccountDirection.From, CudType.Delete);
+            // }
+            //
+            // if (accountBook.ToPaymentAccountId.HasValue)
+            // {
+            //     var toPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value);
+            //     await _paymentAccountManager.DecreaseBalance(toPaymentAccount, Math.Abs(accountBook.Amount));
+            //
+            //     await OrganizePaymentAccountCurrentBalances(accountBook, toPaymentAccount, PaymentAccountDirection.To,
+            //         CudType.Delete);
+            // }
 
             await _accountBookRepository.DeleteAsync(accountBook);
+
+            if (organizeBalances)
+            {
+                var paymentAccounts = new List<PaymentAccount>();
+
+                if (accountBook.FromPaymentAccountId.HasValue)
+                {
+                    var fromPaymentAccount =
+                        await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value);
+                    paymentAccounts.Add(fromPaymentAccount);
+                }
+
+                if (accountBook.ToPaymentAccountId.HasValue)
+                {
+                    var toPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value);
+                    paymentAccounts.Add(toPaymentAccount);
+                }
+
+                if (paymentAccounts.Any())
+                {
+                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
+                    await balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                        paymentAccounts, null, null, new List<AccountBook> {accountBook});
+                    balanceOrganizer.OrganizeAccountBookBalances();
+                    balanceOrganizer.OrganizePaymentAccountBalances();
+                }
+            }
         }
 
         public async Task<AccountBook> GetAsync(Guid id)

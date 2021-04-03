@@ -13,7 +13,7 @@ export class CommonFunctions {
         var day = date.getDate();
         var year = date.getFullYear();
     
-        return moment({ year: year, month: month - 1, day: day }).add(1, 'days');
+        return moment({ year: year, month: month - 1, day: day });
       }
 }
 

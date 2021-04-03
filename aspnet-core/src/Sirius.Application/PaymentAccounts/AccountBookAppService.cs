@@ -12,6 +12,7 @@ using Abp.Localization;
 using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
+using Azure.Storage.Blobs.Models;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
 using Sirius.EntityFrameworkCore.Repositories;
@@ -86,13 +87,15 @@ namespace Sirius.PaymentAccounts
             CheckCreatePermission();
             if (input.IsHousingDue)
             {
-                return await CreateHousingDueAsync(input);
+                var housingDueAccountBook = await CreateHousingDueAsync(input, true);
+                return ObjectMapper.Map<AccountBookDto>(housingDueAccountBook);
             }
 
-            return await CreateOtherPaymentAsync(input);
+            var accountBook = await CreateOtherPaymentAsync(input, true);
+            return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
-        private async Task<AccountBookDto> CreateHousingDueAsync(CreateAccountBookDto input)
+        private async Task<AccountBook> CreateHousingDueAsync(CreateAccountBookDto input, bool organizeBalances)
         {
             CheckCreatePermission();
             input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
@@ -148,12 +151,13 @@ namespace Sirius.PaymentAccounts
                 , accountBookFiles
                 , AbpSession.GetUserId());
 
-            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount);
+            await _accountBookManager.CreateForHousingDueAsync(accountBook, housing, toPaymentAccount,
+                organizeBalances);
 
-            return ObjectMapper.Map<AccountBookDto>(accountBook);
+            return accountBook;
         }
 
-        private async Task<AccountBookDto> CreateOtherPaymentAsync(CreateAccountBookDto input)
+        private async Task<AccountBook> CreateOtherPaymentAsync(CreateAccountBookDto input, bool organizeBalances)
         {
             CheckCreatePermission();
             input.ProcessDateTime = input.ProcessDateTime.Date + new TimeSpan(0, 0, 0);
@@ -232,16 +236,17 @@ namespace Sirius.PaymentAccounts
                     nettingHousing,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
                     input.ToPaymentAccountId.HasValue ? toPaymentAccount : null,
-                    nettingPaymentCategory);
+                    nettingPaymentCategory,
+                    organizeBalances);
             }
             else
             {
                 await _accountBookManager.CreateAsync(accountBook, accountBookType,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
-                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null, null, null);
+                    input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null, null, null, organizeBalances);
             }
 
-            return ObjectMapper.Map<AccountBookDto>(accountBook);
+            return accountBook;
         }
 
         private async Task<AccountBookDto> DeleteAndCreateAsync(UpdateAccountBookDto input,
@@ -264,6 +269,8 @@ namespace Sirius.PaymentAccounts
             //Yeniden oluşturma için gerekli bilgiler toplanıyor
             var accountBookType = existingAccountBook.AccountBookType;
 
+            AccountBook newAccountBook;
+
             if (accountBookType == AccountBookType.HousingDue)
             {
                 var createHousingDueAccountBookDto = new CreateAccountBookDto
@@ -277,9 +284,8 @@ namespace Sirius.PaymentAccounts
                     AccountBookFileUrls = accountBookFileUrls
                 };
 
-                var retValue = await CreateHousingDueAsync(createHousingDueAccountBookDto);
-                await _accountBookManager.DeleteAsync(existingAccountBook);
-                return retValue;
+                newAccountBook = await CreateHousingDueAsync(createHousingDueAccountBookDto, false);
+                await _accountBookManager.DeleteAsync(existingAccountBook, false);
             }
             else
             {
@@ -299,10 +305,57 @@ namespace Sirius.PaymentAccounts
                     HousingIdForNetting = existingAccountBook.HousingIdForNetting
                 };
 
-                await _accountBookManager.DeleteAsync(existingAccountBook);
-                await UnitOfWorkManager.Current.SaveChangesAsync();
-                return await CreateOtherPaymentAsync(createOtherPaymentAccountBookDto);
+                await _accountBookManager.DeleteAsync(existingAccountBook, false);
+                newAccountBook = await CreateOtherPaymentAsync(createOtherPaymentAccountBookDto, false);
             }
+
+            //Organize Balances
+            var paymentAccounts = new List<PaymentAccount>();
+
+            if (input.FromPaymentAccountId.HasValue)
+            {
+                var inputFromPaymentAccount =
+                    await _paymentAccountRepository.GetAsync(input.FromPaymentAccountId.GetValueOrDefault());
+                paymentAccounts.Add(inputFromPaymentAccount);
+            }
+
+            if (input.ToPaymentAccountId.HasValue)
+            {
+                var inputToPaymentAccount =
+                    await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId.GetValueOrDefault());
+                paymentAccounts.Add(inputToPaymentAccount);
+            }
+
+            if (existingAccountBook.FromPaymentAccountId.HasValue)
+            {
+                var existingAccountBookFromPaymentAccount =
+                    await _paymentAccountRepository.GetAsync(existingAccountBook.FromPaymentAccountId
+                        .GetValueOrDefault());
+                paymentAccounts.Add(existingAccountBookFromPaymentAccount);
+            }
+
+            if (existingAccountBook.ToPaymentAccountId.HasValue)
+            {
+                var existingAccountBookToPaymentAccount =
+                    await _paymentAccountRepository.GetAsync(existingAccountBook.ToPaymentAccountId
+                        .GetValueOrDefault());
+                paymentAccounts.Add(existingAccountBookToPaymentAccount);
+            }
+
+            var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
+            await balanceOrganizer.GetOrganizedAccountBooksAsync(
+                input.ProcessDateTime < existingAccountBook.ProcessDateTime
+                    ? input.ProcessDateTime
+                    : existingAccountBook.ProcessDateTime,
+                paymentAccounts,
+                new List<AccountBook> {newAccountBook},
+                null,
+                new List<AccountBook> {existingAccountBook}
+            );
+            balanceOrganizer.OrganizeAccountBookBalances();
+            balanceOrganizer.OrganizePaymentAccountBalances();
+
+            return ObjectMapper.Map<AccountBookDto>(newAccountBook);
         }
 
         public override async Task<AccountBookDto> UpdateAsync(UpdateAccountBookDto input)
@@ -442,7 +495,7 @@ namespace Sirius.PaymentAccounts
         {
             CheckDeletePermission();
             var accountBook = await _accountBookManager.GetAsync(input.Id);
-            await _accountBookManager.DeleteAsync(accountBook);
+            await _accountBookManager.DeleteAsync(accountBook, true);
 
             //ToDo transaction commit olduktan sonra azure'dan silinen ilgili dosyaları sil. 
             //Committen sonra silinmesi gerekeceği için bu katmanda sil.
@@ -463,7 +516,7 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
             var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
-            
+
             var query = (from accountBook in _accountBookRepository.GetAll()
                     join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
                         equals paymentCategory.Id into nullablePaymentCategory
@@ -520,10 +573,8 @@ namespace Sirius.PaymentAccounts
                     PaymentCategoryName =
                         p.paymentCategory != null
                             ? p.paymentCategory.PaymentCategoryName
-                            :
-                            p.accountBook.AccountBookType == AccountBookType.TransferForPaymentAccount
-                                ?
-                                "Ödeme hesabı devir"
+                            : p.accountBook.AccountBookType == AccountBookType.TransferForPaymentAccount
+                                ? "Ödeme hesabı devir"
                                 : string.Empty,
                     HousingName = p.housing != null
                         ? p.block.BlockName + "-" + p.housing.Apartment
