@@ -48,13 +48,13 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label class="form-label">
-                        {{ "PaymentCategories" | localize }}
+                        {{ "HousingCategories" | localize }}
                       </label>
                       <p-autoComplete
-                        name="selectedPaymentCategoryFilter"
+                        name="selectedHousingCategoryFilter"
                         [(ngModel)]="selectedHousingCategoryFilter"
                         [suggestions]="housingCategoriesFilter"
-                        (completeMethod)="searchPaymentCategory($event)"
+                        (completeMethod)="searchHousingCategory($event)"
                         [style]="{ minWidth: '100%' }"
                       ></p-autoComplete>
                     </div>

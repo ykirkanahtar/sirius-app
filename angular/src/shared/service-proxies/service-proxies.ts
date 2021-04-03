@@ -2866,17 +2866,32 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
+     * @param startDateFilter (optional) 
+     * @param endDateFilter (optional) 
+     * @param paymentCategoriesFilter (optional) 
+     * @param creditOrDebtsFilter (optional) 
+     * @param housingPaymentPlanTypesFilter (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllByHousingId(housingId: string | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAllByHousingId(housingId: string | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAllByHousingId?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
+        if (startDateFilter !== undefined)
+            url_ += "StartDateFilter=" + encodeURIComponent(startDateFilter ? "" + startDateFilter.toJSON() : "") + "&";
+        if (endDateFilter !== undefined)
+            url_ += "EndDateFilter=" + encodeURIComponent(endDateFilter ? "" + endDateFilter.toJSON() : "") + "&";
+        if (paymentCategoriesFilter !== undefined)
+            paymentCategoriesFilter && paymentCategoriesFilter.forEach(item => { url_ += "PaymentCategoriesFilter=" + encodeURIComponent("" + item) + "&"; });
+        if (creditOrDebtsFilter !== undefined)
+            creditOrDebtsFilter && creditOrDebtsFilter.forEach(item => { url_ += "CreditOrDebtsFilter=" + encodeURIComponent("" + item) + "&"; });
+        if (housingPaymentPlanTypesFilter !== undefined)
+            housingPaymentPlanTypesFilter && housingPaymentPlanTypesFilter.forEach(item => { url_ += "HousingPaymentPlanTypesFilter=" + encodeURIComponent("" + item) + "&"; });
         if (sorting !== undefined)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -2931,6 +2946,116 @@ export class HousingPaymentPlanServiceProxy {
             }));
         }
         return _observableOf<HousingPaymentPlanDtoPagedResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getCreditOrDebtLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetCreditOrDebtLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCreditOrDebtLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCreditOrDebtLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetCreditOrDebtLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getHousingPaymentPlanTypeLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetHousingPaymentPlanTypeLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingPaymentPlanTypeLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingPaymentPlanTypeLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingPaymentPlanTypeLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
     }
 
     /**
@@ -2991,17 +3116,32 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
+     * @param startDateFilter (optional) 
+     * @param endDateFilter (optional) 
+     * @param paymentCategoriesFilter (optional) 
+     * @param creditOrDebtsFilter (optional) 
+     * @param housingPaymentPlanTypesFilter (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(housingId: string | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAll(housingId: string | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAll?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
+        if (startDateFilter !== undefined)
+            url_ += "StartDateFilter=" + encodeURIComponent(startDateFilter ? "" + startDateFilter.toJSON() : "") + "&";
+        if (endDateFilter !== undefined)
+            url_ += "EndDateFilter=" + encodeURIComponent(endDateFilter ? "" + endDateFilter.toJSON() : "") + "&";
+        if (paymentCategoriesFilter !== undefined)
+            paymentCategoriesFilter && paymentCategoriesFilter.forEach(item => { url_ += "PaymentCategoriesFilter=" + encodeURIComponent("" + item) + "&"; });
+        if (creditOrDebtsFilter !== undefined)
+            creditOrDebtsFilter && creditOrDebtsFilter.forEach(item => { url_ += "CreditOrDebtsFilter=" + encodeURIComponent("" + item) + "&"; });
+        if (housingPaymentPlanTypesFilter !== undefined)
+            housingPaymentPlanTypesFilter && housingPaymentPlanTypesFilter.forEach(item => { url_ += "HousingPaymentPlanTypesFilter=" + encodeURIComponent("" + item) + "&"; });
         if (sorting !== undefined)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -4447,6 +4587,61 @@ export class PaymentCategoryServiceProxy {
     }
 
     protected processGetLookUpByPaymentCategoryType(response: HttpResponseBase): Observable<LookUpDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(LookUpDto.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LookUpDto[]>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getHousingDueLookUp(): Observable<LookUpDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetHousingDueLookUp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHousingDueLookUp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHousingDueLookUp(<any>response_);
+                } catch (e) {
+                    return <Observable<LookUpDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<LookUpDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetHousingDueLookUp(response: HttpResponseBase): Observable<LookUpDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

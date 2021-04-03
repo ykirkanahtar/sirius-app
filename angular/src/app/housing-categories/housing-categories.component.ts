@@ -57,7 +57,7 @@ export class HousingCategoriesComponent
     this.showCreateOrEditHousingCategoryDialog(housingCategory.id);
   }
 
-  searchPaymentCategory(event) {
+  searchHousingCategory(event) {
     this._housingCategoryService
       .getHousingCategoryFromAutoCompleteFilter(event.query)
       .subscribe((result) => {

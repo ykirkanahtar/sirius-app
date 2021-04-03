@@ -17,6 +17,7 @@ using Sirius.Shared.Enums;
 using System.Linq.Dynamic.Core;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
+using Sirius.Shared.Dtos;
 
 namespace Sirius.HousingPaymentPlans
 {
@@ -137,7 +138,15 @@ namespace Sirius.HousingPaymentPlans
             CheckGetAllPermission();
             var query = _housingPaymentPlanRepository.GetAll()
                 .Where(p => p.HousingId == input.HousingId)
-                .Include(p => p.PaymentCategory);
+                .Include(p => p.PaymentCategory)
+                .WhereIf(input.StartDateFilter.HasValue && input.EndDateFilter.HasValue,
+                    p => p.Date >= input.StartDateFilter.Value && p.Date <= input.EndDateFilter.Value)
+                .WhereIf(input.CreditOrDebtsFilter.Any(), p => input.CreditOrDebtsFilter.Contains(p.CreditOrDebt))
+                .WhereIf(input.PaymentCategoriesFilter.Any(),
+                    p => input.PaymentCategoriesFilter.Contains(p.PaymentCategoryId ?? Guid.Empty))
+                .WhereIf(input.HousingPaymentPlanTypesFilter.Any(),
+                    p => input.HousingPaymentPlanTypesFilter.Contains(p.HousingPaymentPlanType));
+
 
             var list = await query
                 .OrderBy(input.Sorting ?? "Date")

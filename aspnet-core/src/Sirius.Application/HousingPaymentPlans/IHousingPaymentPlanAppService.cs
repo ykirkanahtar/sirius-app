@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Sirius.HousingPaymentPlans.Dto;
+using Sirius.Shared.Dtos;
 
 namespace Sirius.HousingPaymentPlans
 {
