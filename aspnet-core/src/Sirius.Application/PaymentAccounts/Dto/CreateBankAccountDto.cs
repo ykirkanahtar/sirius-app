@@ -1,10 +1,11 @@
 ﻿using System;
 using Abp.AutoMapper;
+using Abp.Runtime.Validation;
 
 namespace Sirius.PaymentAccounts.Dto
 {
     [AutoMapTo(typeof(PaymentAccount))]
-    public class CreateBankAccountDto
+    public class CreateBankAccountDto : IShouldNormalize
     {
         public string AccountName { get; set; }
         public string Description { get; set; }

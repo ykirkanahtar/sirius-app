@@ -273,6 +273,8 @@ export class CreateAccountBookDialogComponent
     // this.accountBook.processDateTime = CommonFunctions.toMoment(
     //   this.processDate
     // );
+    this.accountBook.processDateTime = moment(this.processDate);
+
 
     for (const fileUrl of this.uploadedFileUrls) {
       this.accountBook.accountBookFileUrls.push(fileUrl);
