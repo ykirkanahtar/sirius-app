@@ -44,7 +44,7 @@
                   [placeholder]="'PleaseSelect' | localize"
                   [options]="paymentCategories"
                   [(ngModel)]="accountBook.paymentCategoryId"
-                  (onChange)="onSelectedPaymentCategoryChange($event)"
+                  (onChange)="onSelectedPaymentCategoryChange(accountBook.paymentCategoryId)"
                   [filter]="true"
                   required
                   [style]="{ width: '100%' }"
