@@ -270,9 +270,9 @@ export class CreateAccountBookDialogComponent
     this.saveLabel = this.l("Processing");
 
     this.accountBook.accountBookFileUrls = [];
-    this.accountBook.processDateTime = CommonFunctions.toMoment(
-      this.processDate
-    );
+    // this.accountBook.processDateTime = CommonFunctions.toMoment(
+    //   this.processDate
+    // );
 
     for (const fileUrl of this.uploadedFileUrls) {
       this.accountBook.accountBookFileUrls.push(fileUrl);
