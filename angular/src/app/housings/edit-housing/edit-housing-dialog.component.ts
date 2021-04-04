@@ -17,7 +17,6 @@ import {
   ResidentOrOwner,
   UpdateHousingDto,
 } from "@shared/service-proxies/service-proxies";
-import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import * as moment from "moment";
 
 @Component({
@@ -100,9 +99,7 @@ export class EditHousingDialogComponent
     this.saving = true;
 
     if (this.housing.transferAmount != 0) {
-      this.housing.transferDate = CommonFunctions.toMoment(
-        this.transferDate
-      );
+      this.housing.transferDate = moment(this.transferDate);
       this.housing.transferIsForResidentOrOwner = this.residentOrOwner === ResidentOrOwner.Resident.toString() ? 1 : 2;
     }
 
