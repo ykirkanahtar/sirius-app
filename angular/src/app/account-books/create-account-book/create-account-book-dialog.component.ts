@@ -27,7 +27,6 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
-import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
 
 @Component({
@@ -270,11 +269,7 @@ export class CreateAccountBookDialogComponent
     this.saveLabel = this.l("Processing");
 
     this.accountBook.accountBookFileUrls = [];
-    // this.accountBook.processDateTime = CommonFunctions.toMoment(
-    //   this.processDate
-    // );
     this.accountBook.processDateTime = moment(this.processDate);
-
 
     for (const fileUrl of this.uploadedFileUrls) {
       this.accountBook.accountBookFileUrls.push(fileUrl);

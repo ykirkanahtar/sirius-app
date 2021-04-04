@@ -30,10 +30,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
-import { CommonFunctions } from "@shared/helpers/CommonFunctions";
-import { update } from "lodash";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
-import { Observable } from "rxjs";
 
 @Component({
   templateUrl: "edit-account-book-dialog.component.html",
@@ -176,22 +173,6 @@ export class EditAccountBookDialogComponent
     }
   }
 
-  // canEditPaymentCategory(paymentCategoryId: string): boolean {
-  //   if (paymentCategoryId) {
-  //     //sayfa yüklenene kadar paymentCategoryId undefined geldiği için bu kontrol eklendi, o zamana kadar da component disabled yapılıyor
-
-  //     let editInAccountBooks = this.paymentCategories
-  //       .filter(
-  //         (paymentCategory) => paymentCategory.value === paymentCategoryId
-  //       )
-  //       .map((p) => p.editInAccountBook);
-
-  //     return editInAccountBooks[0];
-  //   }
-
-  //   return false;
-  // }
-
   showImages(clickedImages: string) {
     this.display = true;
     this.clickedImages.push(clickedImages);
@@ -219,10 +200,8 @@ export class EditAccountBookDialogComponent
     this.saving = true;
     this.saveLabel = this.l("Processing");
 
-    this.accountBook.processDateTime = CommonFunctions.toMoment(
-      this.processDate
-    );
-
+    this.accountBook.processDateTime = moment(this.processDate);
+    
     const updateAccountBookDto = new UpdateAccountBookDto();
     updateAccountBookDto.init(this.accountBook);
 
