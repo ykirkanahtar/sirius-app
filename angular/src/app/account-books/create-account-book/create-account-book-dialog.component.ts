@@ -116,6 +116,10 @@ export class CreateAccountBookDialogComponent
       .getLookUpByPaymentCategoryType(true, this.paymentCategoryType)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategories = result;
+        if(this.paymentCategories.length === 1) {
+          this.accountBook.paymentCategoryId = this.paymentCategories[0].value;
+          this.onSelectedPaymentCategoryChange(this.accountBook.paymentCategoryId);
+        }
       });
 
     this.accountBook.isHousingDue = this.isHousingDue;
@@ -205,14 +209,12 @@ export class CreateAccountBookDialogComponent
     }
   }
 
-  onSelectedPaymentCategoryChange(event) {
-    var selectedPaymentCategory = event.value;
-
-    if (selectedPaymentCategory) {
+  onSelectedPaymentCategoryChange(paymentCategoryId?: string) {
+    if (paymentCategoryId) {
       this._paymentCategoryServiceProxy
-        .get(selectedPaymentCategory)
+        .get(paymentCategoryId)
         .subscribe((result: PaymentCategoryDto) => {
-          this.setDefaultPaymentAccount(selectedPaymentCategory);
+          this.setDefaultPaymentAccount(result);
           this.accountBook.isHousingDue = result.isHousingDue;
           this.getHousings(result);
           if (this.accountBook.isHousingDue === false) {

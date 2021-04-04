@@ -50,7 +50,7 @@ export class AccountBooksComponent
   advancedFiltersVisible = false;
 
   menuItems: MenuItem[] = [];
-  menuLimit: number = 15;
+  menuLimit: number = 10;
 
   accountBooks: AccountBookGetAllOutput[] = [];
   accountBookFiles: string[] = [];
@@ -145,7 +145,7 @@ export class AccountBooksComponent
         if (paymentCategories.length > this.menuLimit) {
           let incomeMenuItem: MenuItem;
           incomeMenuItem = {
-            label: this.l("Income"),
+            label: this.l("HousingDue") + ' & ' + this.l("Income"),
             icon: "pi pi-arrow-left",
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
@@ -208,6 +208,15 @@ export class AccountBooksComponent
 
           if (expensePaymentCategories.length > 0) {
             this.createMenuItem(expensePaymentCategories, this.l("Expenses"));
+          }
+
+          let transferPaymentCategories = paymentCategories.filter(
+            (p) =>
+              p.paymentCategoryType === PaymentCategoryType.TransferBetweenAccounts
+          );
+
+          if (transferPaymentCategories.length > 0) {
+            this.createMenuItem(transferPaymentCategories, this.l("TransferBetweenAccounts"));
           }
         }
       });
