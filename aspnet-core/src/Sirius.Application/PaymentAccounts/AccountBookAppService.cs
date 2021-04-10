@@ -553,7 +553,7 @@ namespace Sirius.PaymentAccounts
                 .WhereIf(input.HousingIds.Count > 0,
                     p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
                 .WhereIf(input.PaymentCategoryIds.Count > 0,
-                    p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId.GetValueOrDefault()))
+                    p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId ?? Guid.Empty))
                 .WhereIf(housingIdsFromPersonFilter.Count > 0,
                     p => housingIdsFromPersonFilter.Select(s => s.Id)
                         .Contains(p.accountBook.HousingId ?? Guid.Empty))
