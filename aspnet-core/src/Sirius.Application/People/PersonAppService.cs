@@ -13,6 +13,8 @@ using Sirius.Housings;
 using Sirius.People.Dto;
 using Sirius.Shared.Dtos;
 using System.Linq.Dynamic.Core;
+using Sirius.PaymentAccounts;
+using Sirius.PaymentCategories;
 
 namespace Sirius.People
 {
@@ -24,15 +26,18 @@ namespace Sirius.People
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<HousingPerson, Guid> _housingPersonRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
+        private readonly IPaymentCategoryManager _paymentCategoryManager;
 
         public PersonAppService(IPersonManager personManager, IRepository<Person, Guid> personRepository,
-            IRepository<HousingPerson, Guid> housingPersonRepository, IRepository<Housing, Guid> housingRepository)
+            IRepository<HousingPerson, Guid> housingPersonRepository, IRepository<Housing, Guid> housingRepository,
+            IPaymentCategoryManager paymentCategoryManager)
             : base(personRepository)
         {
             _personManager = personManager;
             _personRepository = personRepository;
             _housingPersonRepository = housingPersonRepository;
             _housingRepository = housingRepository;
+            _paymentCategoryManager = paymentCategoryManager;
         }
 
         public override async Task<PersonDto> CreateAsync(CreatePersonDto input)
@@ -101,15 +106,43 @@ namespace Sirius.People
             return new PagedResultDto<PersonDto>(query.Count(),
                 ObjectMapper.Map<List<PersonDto>>(people));
         }
-
+        
         public async Task<List<LookUpDto>> GetPersonLookUpAsync()
         {
             CheckGetAllPermission();
 
-            var people = await _personRepository.GetAllListAsync();
+            var people = await _personRepository.GetAll().ToListAsync();
 
             return
                 (from l in people
+                    orderby l.FirstName, l.LastName
+                    select new LookUpDto(l.Id.ToString(), $"{l.FirstName} {l.LastName}")).ToList();
+        }
+
+        public async Task<List<LookUpDto>> GetPersonLookUpForHousingDueAsync(PersonLookUpFilter filter)
+        {
+            CheckGetAllPermission();
+
+            var query = _personRepository.GetAll();
+
+            if (filter.PaymentCategoryId.HasValue)
+            {
+                var paymentCategory = await _paymentCategoryManager.GetAsync(filter.PaymentCategoryId.Value);
+                var housingCategoryIds = await _paymentCategoryManager.GetHousingCategories(paymentCategory.Id);
+
+                var personIds = await (from h in _housingRepository.GetAll()
+                    join housingPerson in _housingPersonRepository.GetAll() on h.Id equals housingPerson.HousingId
+                    where housingCategoryIds.Contains(h.HousingCategoryId)
+                    select housingPerson.PersonId).ToListAsync();
+
+                query = query.Where(p => personIds.Distinct().Contains(p.Id));
+            }
+
+            var people = await query.ToListAsync();
+
+            return
+                (from l in people
+                    orderby l.FirstName, l.LastName
                     select new LookUpDto(l.Id.ToString(), $"{l.FirstName} {l.LastName}")).ToList();
         }
 

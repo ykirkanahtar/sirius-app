@@ -198,6 +198,8 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
+                
+                new Permission(PermissionNames.Pages_Users),
             };
 
             if (siteManagementPermissions.Any())
