@@ -45,6 +45,7 @@ export class CreateAccountBookDialogComponent
   paymentCategories: LookUpDto[];
   paymentCategoriesForNetting: LookUpDto[];
   people: LookUpDto[];
+  peopleForHousingDue: LookUpDto[];
   paymentCategory: PaymentCategoryDto;
   definedPaymentCategory: boolean = false;
 
@@ -116,9 +117,11 @@ export class CreateAccountBookDialogComponent
       .getLookUpByPaymentCategoryType(true, this.paymentCategoryType)
       .subscribe((result: LookUpDto[]) => {
         this.paymentCategories = result;
-        if(this.paymentCategories.length === 1) {
+        if (this.paymentCategories.length === 1) {
           this.accountBook.paymentCategoryId = this.paymentCategories[0].value;
-          this.onSelectedPaymentCategoryChange(this.accountBook.paymentCategoryId);
+          this.onSelectedPaymentCategoryChange(
+            this.accountBook.paymentCategoryId
+          );
         }
       });
 
@@ -163,15 +166,18 @@ export class CreateAccountBookDialogComponent
       this.getHousings(this.paymentCategory);
     } else {
       this._housingServiceProxy
-        .getHousingLookUp(selectedPerson, this.paymentCategory.id) 
+        .getHousingLookUp(selectedPerson, this.accountBook.paymentCategoryId)
         .subscribe((result: LookUpDto[]) => {
           this.housings = result;
-          debugger;
           if (this.housings.length === 1) {
             this.accountBook.housingId = this.housings[0].value;
           }
         });
     }
+  }
+
+  isValidPaymentCategory(): boolean {
+    return this.accountBook.paymentCategoryId !== undefined;
   }
 
   onSelectedPersonForNettingChange(event) {
@@ -186,9 +192,7 @@ export class CreateAccountBookDialogComponent
           this.housingsForNetting = result;
           if (this.housingsForNetting.length === 1) {
             this.accountBook.housingIdForNetting = this.housingsForNetting[0].value;
-            this.onSelectedHousingForNettingChange(
-              this.housingsForNetting
-            );
+            this.onSelectedHousingForNettingChange(this.housingsForNetting);
           }
         });
     }
@@ -209,6 +213,14 @@ export class CreateAccountBookDialogComponent
     }
   }
 
+  getPeopleForHousingDue(paymentCategoryId: string) {
+    this._personServiceProxy
+      .getPersonLookUpForHousingDue(this.accountBook.paymentCategoryId)
+      .subscribe((result: LookUpDto[]) => {
+        this.peopleForHousingDue = result;
+      });
+  }
+
   onSelectedPaymentCategoryChange(paymentCategoryId?: string) {
     if (paymentCategoryId) {
       this._paymentCategoryServiceProxy
@@ -221,6 +233,8 @@ export class CreateAccountBookDialogComponent
             this.accountBook.housingId = "00000000-0000-0000-0000-000000000000";
           }
         });
+
+        this.getPeopleForHousingDue(paymentCategoryId);
     }
   }
 
