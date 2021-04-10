@@ -47,6 +47,7 @@ namespace Sirius.PaymentAccounts
         private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly ILocalizationSource _localizationSource;
+        private readonly IBalanceOrganizer _balanceOrganizer;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -62,7 +63,8 @@ namespace Sirius.PaymentAccounts
             IRepository<HousingPaymentPlan, Guid> housingPaymetPlanRepository,
             IHousingPaymentPlanManager housingPaymentPlanManager,
             ILocalizationManager localizationManager,
-            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
+            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository, 
+            IBalanceOrganizer balanceOrganizer)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -79,6 +81,7 @@ namespace Sirius.PaymentAccounts
             _housingPaymetPlanRepository = housingPaymetPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
+            _balanceOrganizer = balanceOrganizer;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -342,8 +345,7 @@ namespace Sirius.PaymentAccounts
                 paymentAccounts.Add(existingAccountBookToPaymentAccount);
             }
 
-            var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
-            await balanceOrganizer.GetOrganizedAccountBooksAsync(
+            await _balanceOrganizer.GetOrganizedAccountBooksAsync(
                 input.ProcessDateTime < existingAccountBook.ProcessDateTime
                     ? input.ProcessDateTime
                     : existingAccountBook.ProcessDateTime,
@@ -352,8 +354,8 @@ namespace Sirius.PaymentAccounts
                 null,
                 new List<AccountBook> {existingAccountBook}
             );
-            balanceOrganizer.OrganizeAccountBookBalances();
-            balanceOrganizer.OrganizePaymentAccountBalances();
+            _balanceOrganizer.OrganizeAccountBookBalances();
+            _balanceOrganizer.OrganizePaymentAccountBalances();
 
             return ObjectMapper.Map<AccountBookDto>(newAccountBook);
         }

@@ -12,14 +12,12 @@ namespace Sirius.PaymentAccounts
     {
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
-        private readonly IPaymentCategoryManager _paymentCategoryManager;
 
         public PaymentAccountManager(IRepository<PaymentAccount, Guid> paymentAccountRepository,
-            IRepository<AccountBook, Guid> accountBookRepository, IPaymentCategoryManager paymentCategoryManager)
+            IRepository<AccountBook, Guid> accountBookRepository)
         {
             _paymentAccountRepository = paymentAccountRepository;
             _accountBookRepository = accountBookRepository;
-            _paymentCategoryManager = paymentCategoryManager;
         }
 
         public async Task CreateAsync(PaymentAccount paymentAccount)
