@@ -6,7 +6,6 @@ using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
-    [AutoMapTo(typeof(HousingPaymentPlan))]
     public class CreateHousingPaymentPlanGroupDto : IShouldNormalize
     {
         public string HousingPaymentPlanGroupName { get; set; }
@@ -14,7 +13,7 @@ namespace Sirius.HousingPaymentPlans.Dto
         public int CountOfMonth { get; set; }
         public Guid DefaultToPaymentAccountId { get; set; }
         public int PaymentDayOfMonth { get; set; }
-        public DateTime StartDate { get; set; }
+        public string StartDateString { get; set; }
         public string Description { get; set; }
         public ResidentOrOwner ResidentOrOwner { get; set; }
         public List<Guid> HousingCategoryIds{ get; set; }

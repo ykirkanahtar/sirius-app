@@ -18,6 +18,7 @@ using System.Linq.Dynamic.Core;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Helper;
 
 namespace Sirius.HousingPaymentPlans
 {
@@ -68,7 +69,7 @@ namespace Sirius.HousingPaymentPlans
                 , housing
                 , paymentCategory.HousingDueForResidentOrOwner.Value
                 , paymentCategory
-                , input.Date
+                , input.HousingPaymentPlanDateString.StringToDateTime()
                 , input.Amount
                 , input.Description
                 , accountBook
@@ -94,7 +95,7 @@ namespace Sirius.HousingPaymentPlans
                 , housing
                 , paymentCategory.HousingDueForResidentOrOwner.Value
                 , paymentCategory
-                , input.Date
+                , input.HousingPaymentPlanDateString.StringToDateTime()
                 , input.Amount
                 , input.Description
                 , HousingPaymentPlanType.HousingDueDefinition
@@ -119,7 +120,7 @@ namespace Sirius.HousingPaymentPlans
             var existingHousingPaymentPlan = await _housingPaymentPlanRepository.GetAsync(input.Id);
 
             var updatedHousingPaymentPlan = await _housingPaymentPlanManager.UpdateAsync(existingHousingPaymentPlan.Id,
-                input.Date, input.Amount,
+                input.HousingPaymentPlanDateString.StringToDateTime(), input.Amount,
                 input.Description);
 
             return ObjectMapper.Map<HousingPaymentPlanDto>(updatedHousingPaymentPlan);

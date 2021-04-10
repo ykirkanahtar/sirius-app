@@ -16,6 +16,7 @@ using Sirius.EntityFrameworkCore;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Helper;
 
 namespace Sirius.PaymentAccounts
 {
@@ -44,7 +45,7 @@ namespace Sirius.PaymentAccounts
             _accountBookPolicy = accountBookPolicy;
             _accountBookManager = accountBookManager;
         }
-        
+
         public async Task<PaymentAccountDto> CreateBankAccountAsync(CreateBankAccountDto input)
         {
             CheckUpdatePermission();
@@ -61,11 +62,12 @@ namespace Sirius.PaymentAccounts
                 , input.TenantIsOwner
                 , input.AllowNegativeBalance
                 , input.TransferAmount
-                , input.FirstTransferDateTime
+                , input.FirstTransferDateTimeString.StringToNullableDateTime()
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
 
-            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
+            await CreateAccountBookAsync(input.TransferAmount,
+                input.FirstTransferDateTimeString.StringToNullableDateTime(), paymentAccount);
 
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
@@ -85,11 +87,12 @@ namespace Sirius.PaymentAccounts
                 , input.TenantIsOwner
                 , input.AllowNegativeBalance
                 , input.TransferAmount
-                , input.FirstTransferDateTime
+                , input.FirstTransferDateTimeString.StringToNullableDateTime()
             );
             await _paymentAccountManager.CreateAsync(paymentAccount);
 
-            await CreateAccountBookAsync(input.TransferAmount, input.FirstTransferDateTime, paymentAccount);
+            await CreateAccountBookAsync(input.TransferAmount,
+                input.FirstTransferDateTimeString.StringToNullableDateTime(), paymentAccount);
 
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }

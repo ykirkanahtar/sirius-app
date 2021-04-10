@@ -4,8 +4,6 @@ import {
   OnInit,
   EventEmitter,
   Output,
-  AfterViewInit,
-  AfterViewChecked,
 } from "@angular/core";
 import { finalize } from "rxjs/operators";
 import { BsModalRef } from "ngx-bootstrap/modal";
@@ -18,9 +16,10 @@ import {
   HousingCategoryServiceProxy,
   BlockServiceProxy,
   ResidentOrOwner,
-  CreateOrUpdateTransferForHousingDueDto} from "@shared/service-proxies/service-proxies";
-import { Moment } from "moment";
+  CreateOrUpdateTransferForHousingDueDto,
+} from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "create-housing-dialog.component.html",
@@ -36,7 +35,8 @@ export class CreateHousingDialogComponent
   dateForDatepicker = moment();
   residentOrOwners: any[];
   residentOrOwnerEnum = ResidentOrOwner;
-  
+  transferForHousingDueDate: Date;
+
   @Output() onSave = new EventEmitter<any>();
 
   constructor(
@@ -83,6 +83,15 @@ export class CreateHousingDialogComponent
 
     const housing = new CreateHousingDto();
     housing.init(this.housing);
+
+    if (
+      this.housing.transferForHousingDue.amount !== undefined &&
+      this.housing.transferForHousingDue.amount != 0
+    ) {
+      housing.transferForHousingDue.transferDateString = CommonFunctions.dateToString(
+        this.transferForHousingDueDate
+      );
+    }
 
     this._housingService
       .create(housing)

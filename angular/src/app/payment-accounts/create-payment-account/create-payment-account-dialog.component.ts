@@ -4,30 +4,33 @@ import {
   OnInit,
   EventEmitter,
   Output,
-  Input
-} from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-import * as _ from 'lodash';
-import { AppComponentBase } from '@shared/app-component-base';
-import { 
-  PaymentAccountDto, 
-  PaymentAccountServiceProxy, 
-  CreateCashAccountDto, 
-  CreateBankAccountDto, 
+  Input,
+} from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef } from "ngx-bootstrap/modal";
+import * as _ from "lodash";
+import { AppComponentBase } from "@shared/app-component-base";
+import {
+  PaymentAccountDto,
+  PaymentAccountServiceProxy,
+  CreateCashAccountDto,
+  CreateBankAccountDto,
   PaymentAccountType,
-} from '@shared/service-proxies/service-proxies';
-import * as moment from 'moment';
+} from "@shared/service-proxies/service-proxies";
+import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
-  templateUrl: 'create-payment-account-dialog.component.html'
+  templateUrl: "create-payment-account-dialog.component.html",
 })
-export class CreatePaymentAccountDialogComponent extends AppComponentBase
+export class CreatePaymentAccountDialogComponent
+  extends AppComponentBase
   implements OnInit {
   saving = false;
   paymentAccount = new PaymentAccountDto();
 
   paymentAccountTypeEnum = PaymentAccountType;
+  firstTransferDateTime: Date;
 
   @Input() paymentAccountType: PaymentAccountType;
   @Output() onSave = new EventEmitter<any>();
@@ -51,6 +54,15 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
       const cashPaymentAccount = new CreateCashAccountDto();
       cashPaymentAccount.init(this.paymentAccount);
 
+      if (
+        this.firstTransferDateTime !== undefined &&
+        this.firstTransferDateTime
+      ) {
+        cashPaymentAccount.firstTransferDateTimeString = CommonFunctions.dateToString(
+          this.firstTransferDateTime
+        );
+      }
+
       this._paymentAccountService
         .createCashAccount(cashPaymentAccount)
         .pipe(
@@ -59,13 +71,22 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
           })
         )
         .subscribe(() => {
-          this.notify.info(this.l('SavedSuccessfully'));
+          this.notify.info(this.l("SavedSuccessfully"));
           this.bsModalRef.hide();
           this.onSave.emit();
         });
     } else if (this.paymentAccountType === PaymentAccountType.BankAccount) {
       const bankAccountPaymentAccount = new CreateBankAccountDto();
       bankAccountPaymentAccount.init(this.paymentAccount);
+
+      if (
+        this.firstTransferDateTime !== undefined &&
+        this.firstTransferDateTime
+      ) {
+        bankAccountPaymentAccount.firstTransferDateTimeString = CommonFunctions.dateToString(
+          this.firstTransferDateTime
+        );
+      }
 
       this._paymentAccountService
         .createBankAccount(bankAccountPaymentAccount)
@@ -75,7 +96,7 @@ export class CreatePaymentAccountDialogComponent extends AppComponentBase
           })
         )
         .subscribe(() => {
-          this.notify.info(this.l('SavedSuccessfully'));
+          this.notify.info(this.l("SavedSuccessfully"));
           this.bsModalRef.hide();
           this.onSave.emit();
         });

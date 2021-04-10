@@ -15,7 +15,7 @@ namespace Sirius.PaymentAccounts.Dto
             DeletedAccountBookFileUrls = new List<string>();
         }
         
-        public DateTime ProcessDateTime { get; set; }
+        public string ProcessDateString { get; set; }
         public Guid PaymentCategoryId { get; set; }
         public Guid? FromPaymentAccountId { get; set; }
 
@@ -23,7 +23,7 @@ namespace Sirius.PaymentAccounts.Dto
 
         public decimal Amount { get; set; }
         public string Description { get; set; }
-        public DateTime? DocumentDateTime { get; set; }
+        public string DocumentDateTimeString { get; set; }
         public string DocumentNumber { get; set; }
         public List<string> NewAccountBookFileUrls { get; set; }
         public List<string> DeletedAccountBookFileUrls { get; set; }

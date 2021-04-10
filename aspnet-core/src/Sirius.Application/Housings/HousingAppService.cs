@@ -23,6 +23,7 @@ using Sirius.People;
 using Sirius.People.Dto;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
+using Sirius.Shared.Helper;
 
 namespace Sirius.Housings
 {
@@ -100,7 +101,7 @@ namespace Sirius.Housings
                             , housing
                             , input.TransferForHousingDue.ResidentOrOwner
                             , null
-                            , input.TransferForHousingDue.Date
+                            , input.TransferForHousingDue.TransferDateString.StringToDateTime()
                             , input.TransferForHousingDue.Amount.GetValueOrDefault()
                             , input.TransferForHousingDue.Description
                             , HousingPaymentPlanType.Transfer
@@ -113,7 +114,7 @@ namespace Sirius.Housings
                             , housing
                             , input.TransferForHousingDue.ResidentOrOwner
                             , null
-                            , input.TransferForHousingDue.Date
+                            , input.TransferForHousingDue.TransferDateString.StringToDateTime()
                             , input.TransferForHousingDue.Amount.GetValueOrDefault()
                             , input.TransferForHousingDue.Description
                             , null
@@ -196,7 +197,7 @@ namespace Sirius.Housings
                             , housing
                             , input.TransferIsForResidentOrOwner
                             , null
-                            , input.TransferDate
+                            , input.TransferDateString.StringToDateTime()
                             , input.TransferAmount.GetValueOrDefault()
                             , input.TransferDescription
                             , HousingPaymentPlanType.Transfer
@@ -209,7 +210,7 @@ namespace Sirius.Housings
                             , housing
                             , input.TransferIsForResidentOrOwner
                             , null
-                            , input.TransferDate
+                            , input.TransferDateString.StringToDateTime()
                             , input.TransferAmount.GetValueOrDefault()
                             , input.TransferDescription
                             , null
@@ -226,7 +227,8 @@ namespace Sirius.Housings
                         input.TransferIsForResidentOrOwner
                         , input.TransferAmount.GetValueOrDefault(),
                         input.TransferIsDebt,
-                        input.TransferDate, input.TransferDescription);
+                        input.TransferDateString.StringToDateTime(), 
+                        input.TransferDescription);
                 }
             }
 
@@ -262,7 +264,7 @@ namespace Sirius.Housings
             {
                 // housingPaymentPlanForTransfer.SetAbsAmount();
                 updateHousingDto.TransferAmount = housingPaymentPlanForTransfer.Amount;
-                updateHousingDto.TransferDate = housingPaymentPlanForTransfer.Date;
+                updateHousingDto.TransferDateString = housingPaymentPlanForTransfer.Date.ToString("yyyyMMdd");
                 updateHousingDto.TransferDescription = housingPaymentPlanForTransfer.Description;
                 updateHousingDto.TransferIsDebt =
                     housingPaymentPlanForTransfer.CreditOrDebt == CreditOrDebt.Debt;

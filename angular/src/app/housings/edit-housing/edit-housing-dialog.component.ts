@@ -18,6 +18,7 @@ import {
   UpdateHousingDto,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "edit-housing-dialog.component.html",
@@ -72,14 +73,13 @@ export class EditHousingDialogComponent
       .subscribe((result: UpdateHousingDto) => {
         this.housing = result;
         if (result.transferAmount && result.transferAmount != 0) {
-          this.transferDate = this.housing.transferDate.toDate();
+          this.transferDate = CommonFunctions.stringToDate(this.housing.transferDateString)
           this.residentOrOwner = this.housing.transferIsForResidentOrOwner === ResidentOrOwner.Resident ?
           ResidentOrOwner.Resident.toString() : 
           ResidentOrOwner.Owner.toString();
         } else {
           this.residentOrOwner = ResidentOrOwner.Resident.toString();
           this.transferDate = moment().toDate();
-
         }
         this.oldTenantIsResidingValue = this.housing.tenantIsResiding;
       });
@@ -99,7 +99,7 @@ export class EditHousingDialogComponent
     this.saving = true;
 
     if (this.housing.transferAmount != 0) {
-      this.housing.transferDate = moment(this.transferDate);
+      this.housing.transferDateString = CommonFunctions.dateToString(this.transferDate);
       this.housing.transferIsForResidentOrOwner = this.residentOrOwner === ResidentOrOwner.Resident.toString() ? 1 : 2;
     }
 

@@ -7630,7 +7630,7 @@ export enum PaymentCategoryType {
 }
 
 export class CreateAccountBookDto implements ICreateAccountBookDto {
-    processDateTime: moment.Moment;
+    processDateString: string | undefined;
     paymentCategoryType: PaymentCategoryType;
     isHousingDue: boolean;
     housingId: string;
@@ -7639,7 +7639,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
+    documentDateTimeString: string | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
     nettingFromHousingDue: boolean;
@@ -7657,7 +7657,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
 
     init(_data?: any) {
         if (_data) {
-            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.processDateString = _data["processDateString"];
             this.paymentCategoryType = _data["paymentCategoryType"];
             this.isHousingDue = _data["isHousingDue"];
             this.housingId = _data["housingId"];
@@ -7666,7 +7666,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
             this.toPaymentAccountId = _data["toPaymentAccountId"];
             this.amount = _data["amount"];
             this.description = _data["description"];
-            this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
+            this.documentDateTimeString = _data["documentDateTimeString"];
             this.documentNumber = _data["documentNumber"];
             if (Array.isArray(_data["accountBookFileUrls"])) {
                 this.accountBookFileUrls = [] as any;
@@ -7688,7 +7688,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["processDateString"] = this.processDateString;
         data["paymentCategoryType"] = this.paymentCategoryType;
         data["isHousingDue"] = this.isHousingDue;
         data["housingId"] = this.housingId;
@@ -7697,7 +7697,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
         data["toPaymentAccountId"] = this.toPaymentAccountId;
         data["amount"] = this.amount;
         data["description"] = this.description;
-        data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
+        data["documentDateTimeString"] = this.documentDateTimeString;
         data["documentNumber"] = this.documentNumber;
         if (Array.isArray(this.accountBookFileUrls)) {
             data["accountBookFileUrls"] = [];
@@ -7719,7 +7719,7 @@ export class CreateAccountBookDto implements ICreateAccountBookDto {
 }
 
 export interface ICreateAccountBookDto {
-    processDateTime: moment.Moment;
+    processDateString: string | undefined;
     paymentCategoryType: PaymentCategoryType;
     isHousingDue: boolean;
     housingId: string;
@@ -7728,7 +7728,7 @@ export interface ICreateAccountBookDto {
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
+    documentDateTimeString: string | undefined;
     documentNumber: string | undefined;
     accountBookFileUrls: string[] | undefined;
     nettingFromHousingDue: boolean;
@@ -7966,13 +7966,13 @@ export interface IAccountBookDto {
 }
 
 export class UpdateAccountBookDto implements IUpdateAccountBookDto {
-    processDateTime: moment.Moment;
+    processDateString: string | undefined;
     paymentCategoryId: string;
     fromPaymentAccountId: string | undefined;
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
+    documentDateTimeString: string | undefined;
     documentNumber: string | undefined;
     newAccountBookFileUrls: string[] | undefined;
     deletedAccountBookFileUrls: string[] | undefined;
@@ -7996,13 +7996,13 @@ export class UpdateAccountBookDto implements IUpdateAccountBookDto {
 
     init(_data?: any) {
         if (_data) {
-            this.processDateTime = _data["processDateTime"] ? moment(_data["processDateTime"].toString()) : <any>undefined;
+            this.processDateString = _data["processDateString"];
             this.paymentCategoryId = _data["paymentCategoryId"];
             this.fromPaymentAccountId = _data["fromPaymentAccountId"];
             this.toPaymentAccountId = _data["toPaymentAccountId"];
             this.amount = _data["amount"];
             this.description = _data["description"];
-            this.documentDateTime = _data["documentDateTime"] ? moment(_data["documentDateTime"].toString()) : <any>undefined;
+            this.documentDateTimeString = _data["documentDateTimeString"];
             this.documentNumber = _data["documentNumber"];
             if (Array.isArray(_data["newAccountBookFileUrls"])) {
                 this.newAccountBookFileUrls = [] as any;
@@ -8034,13 +8034,13 @@ export class UpdateAccountBookDto implements IUpdateAccountBookDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["processDateTime"] = this.processDateTime ? this.processDateTime.toISOString() : <any>undefined;
+        data["processDateString"] = this.processDateString;
         data["paymentCategoryId"] = this.paymentCategoryId;
         data["fromPaymentAccountId"] = this.fromPaymentAccountId;
         data["toPaymentAccountId"] = this.toPaymentAccountId;
         data["amount"] = this.amount;
         data["description"] = this.description;
-        data["documentDateTime"] = this.documentDateTime ? this.documentDateTime.toISOString() : <any>undefined;
+        data["documentDateTimeString"] = this.documentDateTimeString;
         data["documentNumber"] = this.documentNumber;
         if (Array.isArray(this.newAccountBookFileUrls)) {
             data["newAccountBookFileUrls"] = [];
@@ -8072,13 +8072,13 @@ export class UpdateAccountBookDto implements IUpdateAccountBookDto {
 }
 
 export interface IUpdateAccountBookDto {
-    processDateTime: moment.Moment;
+    processDateString: string | undefined;
     paymentCategoryId: string;
     fromPaymentAccountId: string | undefined;
     toPaymentAccountId: string | undefined;
     amount: number;
     description: string | undefined;
-    documentDateTime: moment.Moment | undefined;
+    documentDateTimeString: string | undefined;
     documentNumber: string | undefined;
     newAccountBookFileUrls: string[] | undefined;
     deletedAccountBookFileUrls: string[] | undefined;
@@ -8858,7 +8858,7 @@ export class CreateOrUpdateTransferForHousingDueDto implements ICreateOrUpdateTr
     residentOrOwner: ResidentOrOwner;
     amount: number | undefined;
     isDebt: boolean;
-    date: moment.Moment;
+    transferDateString: string | undefined;
     description: string | undefined;
 
     constructor(data?: ICreateOrUpdateTransferForHousingDueDto) {
@@ -8876,7 +8876,7 @@ export class CreateOrUpdateTransferForHousingDueDto implements ICreateOrUpdateTr
             this.residentOrOwner = _data["residentOrOwner"];
             this.amount = _data["amount"];
             this.isDebt = _data["isDebt"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.transferDateString = _data["transferDateString"];
             this.description = _data["description"];
         }
     }
@@ -8894,7 +8894,7 @@ export class CreateOrUpdateTransferForHousingDueDto implements ICreateOrUpdateTr
         data["residentOrOwner"] = this.residentOrOwner;
         data["amount"] = this.amount;
         data["isDebt"] = this.isDebt;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["transferDateString"] = this.transferDateString;
         data["description"] = this.description;
         return data; 
     }
@@ -8912,7 +8912,7 @@ export interface ICreateOrUpdateTransferForHousingDueDto {
     residentOrOwner: ResidentOrOwner;
     amount: number | undefined;
     isDebt: boolean;
-    date: moment.Moment;
+    transferDateString: string | undefined;
     description: string | undefined;
 }
 
@@ -9666,7 +9666,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
     transferIsForResidentOrOwner: ResidentOrOwner;
     transferAmount: number | undefined;
     transferIsDebt: boolean;
-    transferDate: moment.Moment;
+    transferDateString: string | undefined;
     transferDescription: string | undefined;
 
     constructor(data?: IUpdateHousingDto) {
@@ -9689,7 +9689,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
             this.transferIsForResidentOrOwner = _data["transferIsForResidentOrOwner"];
             this.transferAmount = _data["transferAmount"];
             this.transferIsDebt = _data["transferIsDebt"];
-            this.transferDate = _data["transferDate"] ? moment(_data["transferDate"].toString()) : <any>undefined;
+            this.transferDateString = _data["transferDateString"];
             this.transferDescription = _data["transferDescription"];
         }
     }
@@ -9712,7 +9712,7 @@ export class UpdateHousingDto implements IUpdateHousingDto {
         data["transferIsForResidentOrOwner"] = this.transferIsForResidentOrOwner;
         data["transferAmount"] = this.transferAmount;
         data["transferIsDebt"] = this.transferIsDebt;
-        data["transferDate"] = this.transferDate ? this.transferDate.toISOString() : <any>undefined;
+        data["transferDateString"] = this.transferDateString;
         data["transferDescription"] = this.transferDescription;
         return data; 
     }
@@ -9735,7 +9735,7 @@ export interface IUpdateHousingDto {
     transferIsForResidentOrOwner: ResidentOrOwner;
     transferAmount: number | undefined;
     transferIsDebt: boolean;
-    transferDate: moment.Moment;
+    transferDateString: string | undefined;
     transferDescription: string | undefined;
 }
 
@@ -10214,7 +10214,7 @@ export interface IHousingCategoryDtoPagedResultDto {
 export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPaymentPlanDto {
     housingId: string;
     readonly paymentCategoryId: string;
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
     accountBookId: string;
@@ -10232,7 +10232,7 @@ export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPa
         if (_data) {
             this.housingId = _data["housingId"];
             (<any>this).paymentCategoryId = _data["paymentCategoryId"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.housingPaymentPlanDateString = _data["housingPaymentPlanDateString"];
             this.amount = _data["amount"];
             this.description = _data["description"];
             this.accountBookId = _data["accountBookId"];
@@ -10250,7 +10250,7 @@ export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPa
         data = typeof data === 'object' ? data : {};
         data["housingId"] = this.housingId;
         data["paymentCategoryId"] = this.paymentCategoryId;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["housingPaymentPlanDateString"] = this.housingPaymentPlanDateString;
         data["amount"] = this.amount;
         data["description"] = this.description;
         data["accountBookId"] = this.accountBookId;
@@ -10268,7 +10268,7 @@ export class CreateCreditHousingPaymentPlanDto implements ICreateCreditHousingPa
 export interface ICreateCreditHousingPaymentPlanDto {
     housingId: string;
     paymentCategoryId: string;
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
     accountBookId: string;
@@ -10277,7 +10277,7 @@ export interface ICreateCreditHousingPaymentPlanDto {
 export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymentPlanDto {
     housingId: string;
     readonly paymentCategoryId: string;
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
 
@@ -10294,7 +10294,7 @@ export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymen
         if (_data) {
             this.housingId = _data["housingId"];
             (<any>this).paymentCategoryId = _data["paymentCategoryId"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.housingPaymentPlanDateString = _data["housingPaymentPlanDateString"];
             this.amount = _data["amount"];
             this.description = _data["description"];
         }
@@ -10311,7 +10311,7 @@ export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymen
         data = typeof data === 'object' ? data : {};
         data["housingId"] = this.housingId;
         data["paymentCategoryId"] = this.paymentCategoryId;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["housingPaymentPlanDateString"] = this.housingPaymentPlanDateString;
         data["amount"] = this.amount;
         data["description"] = this.description;
         return data; 
@@ -10328,13 +10328,13 @@ export class CreateDebtHousingPaymentPlanDto implements ICreateDebtHousingPaymen
 export interface ICreateDebtHousingPaymentPlanDto {
     housingId: string;
     paymentCategoryId: string;
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
 }
 
 export class UpdateHousingPaymentPlanDto implements IUpdateHousingPaymentPlanDto {
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
     isDeleted: boolean;
@@ -10357,7 +10357,7 @@ export class UpdateHousingPaymentPlanDto implements IUpdateHousingPaymentPlanDto
 
     init(_data?: any) {
         if (_data) {
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.housingPaymentPlanDateString = _data["housingPaymentPlanDateString"];
             this.amount = _data["amount"];
             this.description = _data["description"];
             this.isDeleted = _data["isDeleted"];
@@ -10380,7 +10380,7 @@ export class UpdateHousingPaymentPlanDto implements IUpdateHousingPaymentPlanDto
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["housingPaymentPlanDateString"] = this.housingPaymentPlanDateString;
         data["amount"] = this.amount;
         data["description"] = this.description;
         data["isDeleted"] = this.isDeleted;
@@ -10403,7 +10403,7 @@ export class UpdateHousingPaymentPlanDto implements IUpdateHousingPaymentPlanDto
 }
 
 export interface IUpdateHousingPaymentPlanDto {
-    date: moment.Moment;
+    housingPaymentPlanDateString: string | undefined;
     amount: number;
     description: string | undefined;
     isDeleted: boolean;
@@ -10477,7 +10477,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     countOfMonth: number;
     defaultToPaymentAccountId: string;
     paymentDayOfMonth: number;
-    startDate: moment.Moment;
+    startDateString: string | undefined;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
     housingCategoryIds: string[] | undefined;
@@ -10498,7 +10498,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
             this.countOfMonth = _data["countOfMonth"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
             this.paymentDayOfMonth = _data["paymentDayOfMonth"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.startDateString = _data["startDateString"];
             this.description = _data["description"];
             this.residentOrOwner = _data["residentOrOwner"];
             if (Array.isArray(_data["housingCategoryIds"])) {
@@ -10523,7 +10523,7 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
         data["countOfMonth"] = this.countOfMonth;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         data["paymentDayOfMonth"] = this.paymentDayOfMonth;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["startDateString"] = this.startDateString;
         data["description"] = this.description;
         data["residentOrOwner"] = this.residentOrOwner;
         if (Array.isArray(this.housingCategoryIds)) {
@@ -10548,7 +10548,7 @@ export interface ICreateHousingPaymentPlanGroupDto {
     countOfMonth: number;
     defaultToPaymentAccountId: string;
     paymentDayOfMonth: number;
-    startDate: moment.Moment;
+    startDateString: string | undefined;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
     housingCategoryIds: string[] | undefined;
@@ -10877,7 +10877,7 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    firstTransferDateTime: moment.Moment | undefined;
+    firstTransferDateTimeString: string | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
 
@@ -10898,7 +10898,7 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
             this.employeeId = _data["employeeId"];
             this.iban = _data["iban"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
+            this.firstTransferDateTimeString = _data["firstTransferDateTimeString"];
             this.transferAmount = _data["transferAmount"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
         }
@@ -10919,7 +10919,7 @@ export class CreateBankAccountDto implements ICreateBankAccountDto {
         data["employeeId"] = this.employeeId;
         data["iban"] = this.iban;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
+        data["firstTransferDateTimeString"] = this.firstTransferDateTimeString;
         data["transferAmount"] = this.transferAmount;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
         return data; 
@@ -10940,7 +10940,7 @@ export interface ICreateBankAccountDto {
     employeeId: string | undefined;
     iban: string | undefined;
     tenantIsOwner: boolean;
-    firstTransferDateTime: moment.Moment | undefined;
+    firstTransferDateTimeString: string | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
 }
@@ -11071,7 +11071,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
-    firstTransferDateTime: moment.Moment | undefined;
+    firstTransferDateTimeString: string | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
 
@@ -11091,7 +11091,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
             this.personId = _data["personId"];
             this.employeeId = _data["employeeId"];
             this.tenantIsOwner = _data["tenantIsOwner"];
-            this.firstTransferDateTime = _data["firstTransferDateTime"] ? moment(_data["firstTransferDateTime"].toString()) : <any>undefined;
+            this.firstTransferDateTimeString = _data["firstTransferDateTimeString"];
             this.transferAmount = _data["transferAmount"];
             this.allowNegativeBalance = _data["allowNegativeBalance"];
         }
@@ -11111,7 +11111,7 @@ export class CreateCashAccountDto implements ICreateCashAccountDto {
         data["personId"] = this.personId;
         data["employeeId"] = this.employeeId;
         data["tenantIsOwner"] = this.tenantIsOwner;
-        data["firstTransferDateTime"] = this.firstTransferDateTime ? this.firstTransferDateTime.toISOString() : <any>undefined;
+        data["firstTransferDateTimeString"] = this.firstTransferDateTimeString;
         data["transferAmount"] = this.transferAmount;
         data["allowNegativeBalance"] = this.allowNegativeBalance;
         return data; 
@@ -11131,7 +11131,7 @@ export interface ICreateCashAccountDto {
     personId: string | undefined;
     employeeId: string | undefined;
     tenantIsOwner: boolean;
-    firstTransferDateTime: moment.Moment | undefined;
+    firstTransferDateTimeString: string | undefined;
     transferAmount: number | undefined;
     allowNegativeBalance: boolean;
 }
@@ -11509,7 +11509,6 @@ export interface ICreatePaymentCategoryDto {
 export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
     id: string;
     paymentCategoryName: string | undefined;
-    isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
 
@@ -11526,7 +11525,6 @@ export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
         if (_data) {
             this.id = _data["id"];
             this.paymentCategoryName = _data["paymentCategoryName"];
-            this.isValidForAllPeriods = _data["isValidForAllPeriods"];
             this.defaultFromPaymentAccountId = _data["defaultFromPaymentAccountId"];
             this.defaultToPaymentAccountId = _data["defaultToPaymentAccountId"];
         }
@@ -11543,7 +11541,6 @@ export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["paymentCategoryName"] = this.paymentCategoryName;
-        data["isValidForAllPeriods"] = this.isValidForAllPeriods;
         data["defaultFromPaymentAccountId"] = this.defaultFromPaymentAccountId;
         data["defaultToPaymentAccountId"] = this.defaultToPaymentAccountId;
         return data; 
@@ -11560,7 +11557,6 @@ export class UpdatePaymentCategoryDto implements IUpdatePaymentCategoryDto {
 export interface IUpdatePaymentCategoryDto {
     id: string;
     paymentCategoryName: string | undefined;
-    isValidForAllPeriods: boolean;
     defaultFromPaymentAccountId: string | undefined;
     defaultToPaymentAccountId: string | undefined;
 }
@@ -11622,8 +11618,8 @@ export interface IPaymentCategoryDtoPagedResultDto {
 
 export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
     paymentCategories: string[] | undefined;
 
     constructor(data?: ICreatePeriodForSiteDto) {
@@ -11638,8 +11634,8 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     init(_data?: any) {
         if (_data) {
             this.name = _data["name"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.startDateString = _data["startDateString"];
+            this.endDateString = _data["endDateString"];
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
@@ -11658,8 +11654,8 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["startDateString"] = this.startDateString;
+        data["endDateString"] = this.endDateString;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
@@ -11678,8 +11674,8 @@ export class CreatePeriodForSiteDto implements ICreatePeriodForSiteDto {
 
 export interface ICreatePeriodForSiteDto {
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
     paymentCategories: string[] | undefined;
 }
 
@@ -11786,8 +11782,8 @@ export interface IPeriodDto {
 export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
     paymentCategories: string[] | undefined;
 
     constructor(data?: ICreatePeriodForBlockDto) {
@@ -11803,8 +11799,8 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
         if (_data) {
             this.blockId = _data["blockId"];
             this.name = _data["name"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.startDateString = _data["startDateString"];
+            this.endDateString = _data["endDateString"];
             if (Array.isArray(_data["paymentCategories"])) {
                 this.paymentCategories = [] as any;
                 for (let item of _data["paymentCategories"])
@@ -11824,8 +11820,8 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
         data = typeof data === 'object' ? data : {};
         data["blockId"] = this.blockId;
         data["name"] = this.name;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["startDateString"] = this.startDateString;
+        data["endDateString"] = this.endDateString;
         if (Array.isArray(this.paymentCategories)) {
             data["paymentCategories"] = [];
             for (let item of this.paymentCategories)
@@ -11845,16 +11841,16 @@ export class CreatePeriodForBlockDto implements ICreatePeriodForBlockDto {
 export interface ICreatePeriodForBlockDto {
     blockId: string;
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
     paymentCategories: string[] | undefined;
 }
 
 export class UpdatePeriodDto implements IUpdatePeriodDto {
     id: string;
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
 
     constructor(data?: IUpdatePeriodDto) {
         if (data) {
@@ -11869,8 +11865,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.startDateString = _data["startDateString"];
+            this.endDateString = _data["endDateString"];
         }
     }
 
@@ -11885,8 +11881,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["startDateString"] = this.startDateString;
+        data["endDateString"] = this.endDateString;
         return data; 
     }
 
@@ -11901,8 +11897,8 @@ export class UpdatePeriodDto implements IUpdatePeriodDto {
 export interface IUpdatePeriodDto {
     id: string;
     name: string | undefined;
-    startDate: moment.Moment;
-    endDate: moment.Moment | undefined;
+    startDateString: string | undefined;
+    endDateString: string | undefined;
 }
 
 export class PeriodDtoPagedResultDto implements IPeriodDtoPagedResultDto {

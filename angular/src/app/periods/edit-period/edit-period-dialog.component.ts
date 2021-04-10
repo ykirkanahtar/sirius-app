@@ -15,6 +15,7 @@ import {
   UpdatePeriodDto,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "edit-period-dialog.component.html",
@@ -43,7 +44,7 @@ export class EditPeriodDialogComponent
       this.period = result;
       this.startDate = this.period.startDate.toDate();
 
-      if(this.period.endDate) {
+      if (this.period.endDate) {
         this.endDate = this.period.endDate.toDate();
       }
     });
@@ -55,10 +56,10 @@ export class EditPeriodDialogComponent
     const period = new UpdatePeriodDto();
     period.init(this.period);
 
-    period.startDate = moment(this.startDate);
+    period.startDateString = CommonFunctions.dateToString(this.startDate);
 
-    if (this.endDate) {
-      period.endDate = moment(this.endDate);
+    if (this.endDate !== undefined && this.endDate) {
+      period.endDateString = CommonFunctions.dateToString(this.endDate);
     }
 
     this._periodService

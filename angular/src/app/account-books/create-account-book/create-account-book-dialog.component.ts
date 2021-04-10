@@ -13,6 +13,7 @@ import { finalize, throwIfEmpty } from "rxjs/operators";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import * as _ from "lodash";
 import { AppComponentBase } from "@shared/app-component-base";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import {
   AccountBookServiceProxy,
   HousingServiceProxy,
@@ -56,6 +57,7 @@ export class CreateAccountBookDialogComponent
   baseUrl: string;
 
   processDate: Date;
+  documentDate: Date;
 
   @Input() lastAccountBookDate: moment.Moment;
   @Input() isHousingDue: boolean;
@@ -139,10 +141,8 @@ export class CreateAccountBookDialogComponent
         this.people = result;
       });
 
-    this.accountBook.processDateTime = this.lastAccountBookDate;
-
-    if (this.accountBook.processDateTime) {
-      this.processDate = this.accountBook.processDateTime.toDate();
+    if (this.lastAccountBookDate) {
+      this.processDate = this.lastAccountBookDate.toDate();
     }
   }
 
@@ -234,7 +234,7 @@ export class CreateAccountBookDialogComponent
           }
         });
 
-        this.getPeopleForHousingDue(paymentCategoryId);
+      this.getPeopleForHousingDue(paymentCategoryId);
     }
   }
 
@@ -285,7 +285,16 @@ export class CreateAccountBookDialogComponent
     this.saveLabel = this.l("Processing");
 
     this.accountBook.accountBookFileUrls = [];
-    this.accountBook.processDateTime = moment(this.processDate);
+
+    this.accountBook.processDateString = CommonFunctions.dateToString(
+      this.processDate
+    );
+
+    if (this.documentDate !== undefined && this.documentDate) {
+      this.accountBook.documentDateTimeString = CommonFunctions.dateToString(
+        this.documentDate
+      );
+    }
 
     for (const fileUrl of this.uploadedFileUrls) {
       this.accountBook.accountBookFileUrls.push(fileUrl);
