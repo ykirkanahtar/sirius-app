@@ -7,26 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sirius.PaymentAccounts
 {
-    public interface IPaymentAccountBalanceOrganizer
-    {
-        List<AccountBook> UpdatingAccountBooks { get; }
-        List<AccountBook> PreviousAccountBooks { get; }
-        List<PaymentAccount> PaymentAccounts { get; }
-
-        Task GetOrganizedAccountBooksAsync(DateTime startDate,
-            List<PaymentAccount> paymentAccounts);
-
-        void OrganizeAccountBookBalances();
-        void OrganizePaymentAccountBalances();
-    }
-
-    public class BalanceOrganizer
+    public class BalanceOrganizer : IBalanceOrganizer
     {
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
 
-        public BalanceOrganizer(IRepository<AccountBook, Guid> accountBookRepository)
+        public BalanceOrganizer(IRepository<AccountBook, Guid> accountBookRepository,
+            IRepository<PaymentAccount, Guid> paymentAccountRepository)
         {
             _accountBookRepository = accountBookRepository;
+            _paymentAccountRepository = paymentAccountRepository;
             UpdatingAccountBooks = new List<AccountBook>();
             PreviousAccountBooks = new List<AccountBook>();
             PaymentAccounts = new List<PaymentAccount>();
@@ -43,15 +33,15 @@ namespace Sirius.PaymentAccounts
             PaymentAccounts = paymentAccounts;
             var paymentAccountIds = paymentAccounts.Select(p => p.Id).ToList();
 
-            createdAccountBooks ??= new List<AccountBook>(); 
-            updatedAccountBooks ??= new List<AccountBook>(); 
-            deletedAccountBooks ??= new List<AccountBook>(); 
+            createdAccountBooks ??= new List<AccountBook>();
+            updatedAccountBooks ??= new List<AccountBook>();
+            deletedAccountBooks ??= new List<AccountBook>();
 
             var deletedAccountBookIds = deletedAccountBooks.Select(p => p.Id).ToList();
             var updatedAccountBookIds = updatedAccountBooks.Select(p => p.Id).ToList();
-            
+
             //UpdatedAccountBooks için, veritabanındaki güncel olmayan kayıtlar sorguya dahil edilmeyip, updatedAccountsBooks kayıtları accountBooks listesine ekleniyor
-            
+
             var accountBooks = await _accountBookRepository.GetAll()
                 .Include(p => p.FromPaymentAccount).Include(p => p.ToPaymentAccount)
                 .Where(p =>
@@ -61,7 +51,7 @@ namespace Sirius.PaymentAccounts
                     deletedAccountBookIds.Contains(p.Id) == false &&
                     updatedAccountBookIds.Contains(p.Id) == false)
                 .ToListAsync();
-            
+
             accountBooks.AddRange(createdAccountBooks);
             accountBooks.AddRange(updatedAccountBooks);
 
@@ -70,7 +60,11 @@ namespace Sirius.PaymentAccounts
                 .ThenBy(p => p.SameDayIndex)
                 .ToList();
 
-            foreach (var paymentAccountId in paymentAccountIds)
+            /*Düzeltilecek aralıkta, tüm ödeme kategorilerinin bir önceki kayıtları olmayabilir,
+             bu yüzden sistemdeki bütüm ödeme kategorilerinin listesi çekiliyor.*/
+            var allPaymentAccountBookIds = await _paymentAccountRepository.GetAll().Select(p => p.Id).ToListAsync(); 
+
+            foreach (var paymentAccountId in allPaymentAccountBookIds)
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
                         p.ProcessDateTime < startDate &&

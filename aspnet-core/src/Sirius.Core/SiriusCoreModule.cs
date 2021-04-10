@@ -1,4 +1,5 @@
-﻿using Abp.Localization;
+﻿using Abp.Dependency;
+using Abp.Localization;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Abp.Timing;
@@ -9,6 +10,7 @@ using Sirius.Authorization.Users;
 using Sirius.Configuration;
 using Sirius.Localization;
 using Sirius.MultiTenancy;
+using Sirius.PaymentAccounts;
 using Sirius.Timing;
 
 namespace Sirius

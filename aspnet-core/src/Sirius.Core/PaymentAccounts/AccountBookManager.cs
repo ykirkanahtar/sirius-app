@@ -23,6 +23,7 @@ namespace Sirius.PaymentAccounts
         private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingManager _housingManager;
+        private readonly IBalanceOrganizer _balanceOrganizer;
 
         public AccountBookManager(IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
@@ -30,7 +31,8 @@ namespace Sirius.PaymentAccounts
             IPaymentAccountManager paymentAccountManager,
             IRepository<AccountBookFile, Guid> accountBookFileRepository,
             IPaymentCategoryManager paymentCategoryManager,
-            IHousingManager housingManager)
+            IHousingManager housingManager, 
+            IBalanceOrganizer balanceOrganizer)
         {
             _accountBookRepository = accountBookRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
@@ -39,6 +41,7 @@ namespace Sirius.PaymentAccounts
             _accountBookFileRepository = accountBookFileRepository;
             _paymentCategoryManager = paymentCategoryManager;
             _housingManager = housingManager;
+            _balanceOrganizer = balanceOrganizer;
         }
 
         public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
@@ -183,11 +186,10 @@ namespace Sirius.PaymentAccounts
 
                 if (paymentAccounts.Any())
                 {
-                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
-                    await balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
                         paymentAccounts, new List<AccountBook> {accountBook}, null, null);
-                    balanceOrganizer.OrganizeAccountBookBalances();
-                    balanceOrganizer.OrganizePaymentAccountBalances();
+                    _balanceOrganizer.OrganizeAccountBookBalances();
+                    _balanceOrganizer.OrganizePaymentAccountBalances();
                 }
             }
 
@@ -420,10 +422,9 @@ namespace Sirius.PaymentAccounts
 
                 if (paymentAccounts.Any())
                 {
-                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
-                    await balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
+                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
                         paymentAccounts, null, new List<AccountBook> {updatedAccountBook}, null);
-                    balanceOrganizer.OrganizeAccountBookBalances();
+                    _balanceOrganizer.OrganizeAccountBookBalances();
                 }
             }
             catch (Exception e)
@@ -482,11 +483,10 @@ namespace Sirius.PaymentAccounts
 
                 if (paymentAccounts.Any())
                 {
-                    var balanceOrganizer = new BalanceOrganizer(_accountBookRepository);
-                    await balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
                         paymentAccounts, null, null, new List<AccountBook> {accountBook});
-                    balanceOrganizer.OrganizeAccountBookBalances();
-                    balanceOrganizer.OrganizePaymentAccountBalances();
+                    _balanceOrganizer.OrganizeAccountBookBalances();
+                    _balanceOrganizer.OrganizePaymentAccountBalances();
                 }
             }
         }
