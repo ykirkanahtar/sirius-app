@@ -13,7 +13,7 @@ namespace Sirius.PaymentAccounts.Dto
         {
             AccountBookFileUrls = new List<string>();
         }
-        public DateTime ProcessDateTime { get; set; }
+        public string ProcessDateString{ get; set; }
         public PaymentCategoryType PaymentCategoryType { get; set; }
         public bool IsHousingDue { get; set; }
         public Guid HousingId { get; set; }
@@ -22,7 +22,7 @@ namespace Sirius.PaymentAccounts.Dto
         public Guid? ToPaymentAccountId { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
-        public DateTime? DocumentDateTime { get; set; }
+        public string DocumentDateTimeString { get; set; }
         public string DocumentNumber { get; set; }
         public List<string> AccountBookFileUrls { get; set; }
         

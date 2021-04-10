@@ -33,14 +33,26 @@ namespace Sirius.PaymentAccounts
         public async Task DeleteAsync(PaymentAccount paymentAccount)
         {
             var accountBooks = await _accountBookRepository.GetAllListAsync(
-                p => p.FromPaymentAccountId == paymentAccount.Id
-                      || p.ToPaymentAccountId == paymentAccount.Id);
+                p => (p.FromPaymentAccountId == paymentAccount.Id
+                      || p.ToPaymentAccountId == paymentAccount.Id) &&
+                     p.AccountBookType != AccountBookType.TransferForPaymentAccount);
+
             if (accountBooks.Count > 0)
             {
                 throw new UserFriendlyException(
                     "Bu ödeme hesabı için bir ya da birden fazla işlem hareketi tanımlıdır. Silmek için önce tanımları kaldırınız.");
             }
+            
+            var transferForPaymentAccounts = await _accountBookRepository.GetAllListAsync(
+                p => (p.FromPaymentAccountId == paymentAccount.Id
+                      || p.ToPaymentAccountId == paymentAccount.Id) &&
+                     p.AccountBookType == AccountBookType.TransferForPaymentAccount);
 
+            foreach (var transferForPaymentAccount in transferForPaymentAccounts)
+            {
+                await _accountBookRepository.DeleteAsync(transferForPaymentAccount);
+            }
+            
             await _paymentAccountRepository.DeleteAsync(paymentAccount);
         }
 

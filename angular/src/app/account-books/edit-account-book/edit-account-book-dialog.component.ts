@@ -31,6 +31,7 @@ import {
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "edit-account-book-dialog.component.html",
@@ -58,6 +59,7 @@ export class EditAccountBookDialogComponent
   showPaymentCategory = false;
 
   processDate: Date;
+  documentDate: Date;
   housingDueBlockAndApartmentText: string;
   nettingHousingText: string;
 
@@ -106,6 +108,10 @@ export class EditAccountBookDialogComponent
       .subscribe((result: AccountBookDto) => {
         this.accountBook = result;
         this.processDate = this.accountBook.processDateTime.toDate();
+
+        if (this.accountBook.documentDateTime) {
+          this.documentDate = this.accountBook.documentDateTime.toDate();
+        }
 
         this._paymentCategoryServiceProxy
           .get(this.accountBook.paymentCategoryId)
@@ -200,10 +206,18 @@ export class EditAccountBookDialogComponent
     this.saving = true;
     this.saveLabel = this.l("Processing");
 
-    this.accountBook.processDateTime = moment(this.processDate);
-    
     const updateAccountBookDto = new UpdateAccountBookDto();
     updateAccountBookDto.init(this.accountBook);
+
+    updateAccountBookDto.processDateString = CommonFunctions.dateToString(
+      this.processDate
+    );
+
+    if (this.documentDate !== undefined && this.documentDate) {
+      updateAccountBookDto.documentDateTimeString = CommonFunctions.dateToString(
+        this.documentDate
+      );
+    }
 
     updateAccountBookDto.newAccountBookFileUrls = [];
 

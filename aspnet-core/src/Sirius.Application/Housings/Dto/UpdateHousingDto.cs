@@ -16,7 +16,7 @@ namespace Sirius.Housings.Dto
         public ResidentOrOwner TransferIsForResidentOrOwner { get; set; }
         public decimal? TransferAmount { get; set; }
         public bool TransferIsDebt { get; set; }
-        public DateTime TransferDate { get; set; }
+        public string TransferDateString { get; set; }
         public string TransferDescription { get; set; }
     }
 }

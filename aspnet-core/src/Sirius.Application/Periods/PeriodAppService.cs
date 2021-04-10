@@ -14,6 +14,7 @@ using Sirius.Housings;
 using Sirius.PaymentCategories;
 using Sirius.Periods.Dto;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Helper;
 
 namespace Sirius.Periods
 {
@@ -45,8 +46,8 @@ namespace Sirius.Periods
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
                 , input.Name
-                , input.StartDate
-                , input.EndDate
+                , input.StartDateString.StringToDateTime()
+                , input.EndDateString.StringToNullableDateTime()
             );
 
             await CreateAsync(period, input.PaymentCategories);
@@ -64,8 +65,8 @@ namespace Sirius.Periods
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
                 , input.Name
-                , input.StartDate
-                , input.EndDate
+                , input.StartDateString.StringToDateTime()
+                , input.EndDateString.StringToNullableDateTime()
                 , block
             );
 
@@ -102,7 +103,8 @@ namespace Sirius.Periods
         {
             CheckUpdatePermission();
             var existingPeriod = await _periodManager.GetAsync(input.Id);
-            var period = Period.Update(existingPeriod, input.Name, input.StartDate, input.EndDate);
+            var period = Period.Update(existingPeriod, input.Name, input.StartDateString.StringToDateTime(),
+                input.EndDateString.StringToNullableDateTime());
             await _periodManager.UpdateAsync(period);
             return ObjectMapper.Map<PeriodDto>(period);
         }

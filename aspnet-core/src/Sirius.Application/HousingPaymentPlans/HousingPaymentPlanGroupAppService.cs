@@ -22,6 +22,7 @@ using Sirius.PaymentAccounts;
 using Sirius.People;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
+using Sirius.Shared.Helper;
 
 namespace Sirius.HousingPaymentPlans
 {
@@ -90,9 +91,11 @@ namespace Sirius.HousingPaymentPlans
                 AbpSession.GetTenantId(),
                 input.HousingPaymentPlanGroupName, paymentCategory, input.AmountPerMonth,
                 input.CountOfMonth, input.PaymentDayOfMonth
-                , input.StartDate, input.Description, input.ResidentOrOwner, housingCategories);
+                , input.StartDateString.StringToDateTime(), input.Description, input.ResidentOrOwner,
+                housingCategories);
 
-            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings, input.StartDate,
+            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings,
+                input.StartDateString.StringToDateTime(),
                 paymentCategory, false, null);
 
             return ObjectMapper.Map<HousingPaymentPlanGroupDto>(housingPaymentPlanGroup);

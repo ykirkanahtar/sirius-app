@@ -4,10 +4,9 @@ using Abp.AutoMapper;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
-    [AutoMapTo(typeof(HousingPaymentPlan))]
     public class UpdateHousingPaymentPlanDto : FullAuditedEntityDto<Guid>
     {
-        public DateTime Date { get; set; }
+        public string HousingPaymentPlanDateString { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
     }

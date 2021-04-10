@@ -21,6 +21,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { SelectItem } from "primeng/api";
 import * as moment from "moment";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
 @Component({
   templateUrl: "create-period-dialog.component.html",
@@ -35,6 +36,7 @@ export class CreatePeriodDialogComponent
   blockItems = [];
   selectedBlock: string;
   startDate: Date;
+  endDate: Date;
 
   paymentCategoriesFilter: SelectItem[] = [];
   selectedPaymentCategoriesFilter: string[] = [];
@@ -73,7 +75,10 @@ export class CreatePeriodDialogComponent
       period.init(this.period);
       period.paymentCategories = this.selectedPaymentCategoriesFilter;
 
-      period.startDate = moment(this.startDate);
+      period.startDateString = CommonFunctions.dateToString(this.startDate);
+      if (this.endDate !== undefined && this.endDate) {
+        period.endDateString = CommonFunctions.dateToString(this.endDate);
+      }
 
       this._periodService
         .createForSite(period)
