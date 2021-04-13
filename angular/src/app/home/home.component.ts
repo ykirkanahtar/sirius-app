@@ -20,10 +20,16 @@ export class HomeComponent extends AppComponentBase implements OnInit {
   lessHousingDuePayersData: any;
 
   basicOptions: any;
+  housingDueStatsOptions: any;
+
   barOptions: any;
   expensesData: any;
+  housingDueStatsData: any;
 
   dashboardDto: DashboardDto;
+
+  assetsClass: string;
+  statsClass: string;
 
   constructor(
     injector: Injector,
@@ -32,11 +38,43 @@ export class HomeComponent extends AppComponentBase implements OnInit {
     super(injector);
   }
 
+  getClassValue(arrayLength: number): number {
+    if (arrayLength < 4) {
+      return arrayLength;
+    } else {
+      return arrayLength / 4;
+    }
+  }
+
   ngOnInit(): void {
     this._dashboardServiceProxy
       .getDashboardData()
       .subscribe((result: DashboardDto) => {
         this.dashboardDto = result;
+
+        if (
+          this.getClassValue(this.dashboardDto.paymentAccounts.length) === 1
+        ) {
+          this.assetsClass = "col-lg-12 col-12";
+        } else if (
+          this.getClassValue(this.dashboardDto.paymentAccounts.length) === 2
+        ) {
+          this.assetsClass = "col-lg-6 col-12";
+        } else if (
+          this.getClassValue(this.dashboardDto.paymentAccounts.length) === 3
+        ) {
+          this.assetsClass = "col-lg-4 col-12";
+        } else if (
+          this.getClassValue(this.dashboardDto.paymentAccounts.length) === 4
+        ) {
+          this.assetsClass = "col-lg-3 col-6";
+        }
+
+        if(this.dashboardDto.totalIncomeAmount > 0) {
+          this.statsClass = "col-lg-4 col-12";
+        } else {
+          this.statsClass = "col-lg-6 col-12";
+        }
 
         this.mostHousingDuePayersData = {
           labels: this.dashboardDto.mostHousingDuePayers.map(
@@ -74,11 +112,36 @@ export class HomeComponent extends AppComponentBase implements OnInit {
           ),
           datasets: [
             {
-              data: this.dashboardDto.expensesData.map(
-                (p) => p.totalAmount
+              data: this.dashboardDto.expensesData.map((p) => p.totalAmount),
+              backgroundColor: this.getRandomColorsArray(
+                this.dashboardDto.expensesData.length
               ),
-              backgroundColor: this.getRandomColorsArray(this.dashboardDto.expensesData.length)
               // hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+            },
+          ],
+        };
+
+        let totalHousingDueDefinition: any[] = [];
+        totalHousingDueDefinition.push(
+          this.dashboardDto.totalHousingDueStatsDto.totalHousingDueDefinition
+        );
+
+        let totalHousingDuePayment: any[] = [];
+        totalHousingDuePayment.push(
+          this.dashboardDto.totalHousingDueStatsDto.totalHousingDuePayment
+        );
+
+        this.housingDueStatsData = {
+          datasets: [
+            {
+              label: this.l("TotalHousingDueDefinitions"),
+              backgroundColor: "#42A5F5",
+              data: totalHousingDueDefinition,
+            },
+            {
+              label: this.l("TotalHousingDuePayments"),
+              backgroundColor: "#FFA726",
+              data: totalHousingDuePayment,
             },
           ],
         };
@@ -97,28 +160,26 @@ export class HomeComponent extends AppComponentBase implements OnInit {
             display: true,
             position: "left",
             id: "y-axis-1",
-            ticks: {
-              beginAtZero: true,
-              steps: 10,
-              stepValue: 5,
-              min: 0,
-              max:
-                this.dashboardDto.mostHousingDuePayers.length > 0
-                  ? Math.max(
-                      this.dashboardDto.mostHousingDuePayers[0]
-                        .totalHousingDueAmount
-                    )
-                  : 0,
-              callback: function (value, index, values) {
-                if (
-                  value !==
-                  this.dashboardDto.mostHousingDuePayers[0]
-                    .totalHousingDueAmount
-                ) {
-                  return values[index];
-                }
-              },
-            },
+            ticks: { min: 0 },
+          },
+        ],
+      },
+    };
+
+    this.housingDueStatsOptions = {
+      responsive: true,
+      tooltips: {
+        mode: "index",
+        intersect: true,
+      },
+      scales: {
+        yAxes: [
+          {
+            type: "linear",
+            display: true,
+            position: "left",
+            id: "y-axis-1",
+            ticks: { min: 0 },
           },
         ],
       },
@@ -135,5 +196,4 @@ export class HomeComponent extends AppComponentBase implements OnInit {
     }
     return colors;
   }
-
 }

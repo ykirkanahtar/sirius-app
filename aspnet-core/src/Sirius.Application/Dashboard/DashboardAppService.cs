@@ -20,7 +20,6 @@ namespace Sirius.Dashboard
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
-        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
@@ -28,7 +27,6 @@ namespace Sirius.Dashboard
 
         public DashboardAppService(IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
-            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Block, Guid> blockRepository, IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<Period, Guid> periodRepository)
@@ -36,7 +34,6 @@ namespace Sirius.Dashboard
             _paymentAccountRepository = paymentAccountRepository;
             _housingRepository = housingRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
-            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _blockRepository = blockRepository;
             _accountBookRepository = accountBookRepository;
@@ -46,6 +43,7 @@ namespace Sirius.Dashboard
         public async Task<DashboardDto> GetDashboardData()
         {
             var dashboardDto = new DashboardDto();
+
             dashboardDto.PaymentAccounts = await _paymentAccountRepository.GetAll().Select(p =>
                 new PaymentAccountDashboardDto
                 {
@@ -58,6 +56,26 @@ namespace Sirius.Dashboard
 
             if (currentPeriod != null)
             {
+                var housingDueDefinitionSum = await
+                    _housingPaymentPlanRepository.GetAll().Where(p =>
+                            p.Date >= currentPeriod.StartDate && p.HousingPaymentPlanType ==
+                            HousingPaymentPlanType.HousingDueDefinition)
+                        .WhereIf(currentPeriod.EndDate.HasValue, p => p.Date <= currentPeriod.EndDate.Value)
+                        .SumAsync(p => p.Amount);
+
+                var housingDuePaymentSum = await
+                    _housingPaymentPlanRepository.GetAll().Where(p =>
+                            p.Date >= currentPeriod.StartDate && p.HousingPaymentPlanType ==
+                            HousingPaymentPlanType.HousingDuePayment)
+                        .WhereIf(currentPeriod.EndDate.HasValue, p => p.Date <= currentPeriod.EndDate.Value)
+                        .SumAsync(p => p.Amount);
+
+                dashboardDto.TotalHousingDueStatsDto = new TotalHousingDueStatsDto
+                {
+                    TotalHousingDueDefinition = housingDueDefinitionSum,
+                    TotalHousingDuePayment = housingDuePaymentSum
+                };
+
                 var housingDueQuery = (from ab in _accountBookRepository.GetAll()
                         join pc in _paymentCategoryRepository.GetAll() on ab.PaymentCategoryId equals pc.Id
                         where pc.PaymentCategoryType == PaymentCategoryType.Income && pc.IsHousingDue &&

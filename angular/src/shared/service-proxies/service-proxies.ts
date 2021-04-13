@@ -8807,7 +8807,6 @@ export interface IHousingDuePayersDashboardDto {
 export class PaymentCategoryDashboardDto implements IPaymentCategoryDashboardDto {
     paymentCategoryName: string | undefined;
     totalAmount: number;
-    randomColorCode: string | undefined;
 
     constructor(data?: IPaymentCategoryDashboardDto) {
         if (data) {
@@ -8822,7 +8821,6 @@ export class PaymentCategoryDashboardDto implements IPaymentCategoryDashboardDto
         if (_data) {
             this.paymentCategoryName = _data["paymentCategoryName"];
             this.totalAmount = _data["totalAmount"];
-            this.randomColorCode = _data["randomColorCode"];
         }
     }
 
@@ -8837,7 +8835,6 @@ export class PaymentCategoryDashboardDto implements IPaymentCategoryDashboardDto
         data = typeof data === 'object' ? data : {};
         data["paymentCategoryName"] = this.paymentCategoryName;
         data["totalAmount"] = this.totalAmount;
-        data["randomColorCode"] = this.randomColorCode;
         return data; 
     }
 
@@ -8852,7 +8849,53 @@ export class PaymentCategoryDashboardDto implements IPaymentCategoryDashboardDto
 export interface IPaymentCategoryDashboardDto {
     paymentCategoryName: string | undefined;
     totalAmount: number;
-    randomColorCode: string | undefined;
+}
+
+export class TotalHousingDueStatsDto implements ITotalHousingDueStatsDto {
+    totalHousingDueDefinition: number;
+    totalHousingDuePayment: number;
+
+    constructor(data?: ITotalHousingDueStatsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalHousingDueDefinition = _data["totalHousingDueDefinition"];
+            this.totalHousingDuePayment = _data["totalHousingDuePayment"];
+        }
+    }
+
+    static fromJS(data: any): TotalHousingDueStatsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TotalHousingDueStatsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalHousingDueDefinition"] = this.totalHousingDueDefinition;
+        data["totalHousingDuePayment"] = this.totalHousingDuePayment;
+        return data; 
+    }
+
+    clone(): TotalHousingDueStatsDto {
+        const json = this.toJSON();
+        let result = new TotalHousingDueStatsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITotalHousingDueStatsDto {
+    totalHousingDueDefinition: number;
+    totalHousingDuePayment: number;
 }
 
 export class DashboardDto implements IDashboardDto {
@@ -8863,6 +8906,7 @@ export class DashboardDto implements IDashboardDto {
     mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     expensesData: PaymentCategoryDashboardDto[] | undefined;
+    totalHousingDueStatsDto: TotalHousingDueStatsDto;
 
     constructor(data?: IDashboardDto) {
         if (data) {
@@ -8898,6 +8942,7 @@ export class DashboardDto implements IDashboardDto {
                 for (let item of _data["expensesData"])
                     this.expensesData.push(PaymentCategoryDashboardDto.fromJS(item));
             }
+            this.totalHousingDueStatsDto = _data["totalHousingDueStatsDto"] ? TotalHousingDueStatsDto.fromJS(_data["totalHousingDueStatsDto"]) : <any>undefined;
         }
     }
 
@@ -8933,6 +8978,7 @@ export class DashboardDto implements IDashboardDto {
             for (let item of this.expensesData)
                 data["expensesData"].push(item.toJSON());
         }
+        data["totalHousingDueStatsDto"] = this.totalHousingDueStatsDto ? this.totalHousingDueStatsDto.toJSON() : <any>undefined;
         return data; 
     }
 
@@ -8952,6 +8998,7 @@ export interface IDashboardDto {
     mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     expensesData: PaymentCategoryDashboardDto[] | undefined;
+    totalHousingDueStatsDto: TotalHousingDueStatsDto;
 }
 
 export class CreateEmployeeDto implements ICreateEmployeeDto {

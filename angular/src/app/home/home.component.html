@@ -17,7 +17,7 @@
           [ngForOf]="dashboardDto.paymentAccounts"
           let-i="index"
         >
-          <div class="col-lg-3 col-6">
+          <div [ngClass]="assetsClass">
             <div class="small-box bg-success">
               <div class="inner">
                 <h5>{{ paymentAccount.paymentAccountName }}</h5>
@@ -44,36 +44,38 @@
   <section class="content px-2">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-3 col-6">
+        <div [ngClass]="statsClass">
           <div class="small-box bg-warning">
             <div class="inner">
-              <h3>{{ dashboardDto.totalHousingDueAmount | currency: 'TL '}}</h3>
-              <p>{{ 'CurrentTotalHousingDueAmount' | localize}}</p>
+              <h3>
+                {{ dashboardDto.totalHousingDueAmount | currency: "TL " }}
+              </h3>
+              <p>{{ "CurrentTotalHousingDueAmount" | localize }}</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-code"></i>
+            </div>
+          </div>
+        </div>
+        <div [ngClass]="statsClass" *ngIf="dashboardDto.totalIncomeAmount > 0">
+          <div class="small-box bg-primary">
+            <div class="inner">
+              <h3>{{ dashboardDto.totalIncomeAmount | currency: "TL " }}</h3>
+              <p>{{ "CurrentTotalIncomeAmount" | localize }}</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-code"></i>
+            </div>
+          </div>
+        </div>
+        <div [ngClass]="statsClass">
+          <div class="small-box bg-primary">
+            <div class="inner">
+              <h3>{{ dashboardDto.totalExpenseAmount | currency: "TL " }}</h3>
+              <p>{{ "CurrentTotalExpenseAmount" | localize }}</p>
             </div>
             <div class="icon">
               <i class="fas fa-tools"></i>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-6" *ngIf="dashboardDto.totalIncomeAmount > 0">
-          <div class="small-box bg-primary">
-            <div class="inner">
-              <h3>{{ dashboardDto.totalIncomeAmount | currency: 'TL '}}</h3>
-              <p>{{ 'CurrentTotalIncomeAmount' | localize}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-code"></i>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-6">
-          <div class="small-box bg-primary">
-            <div class="inner">
-              <h3>{{ dashboardDto.totalExpenseAmount | currency: 'TL '}}</h3>
-              <p>{{ 'CurrentTotalExpenseAmount' | localize}}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-code"></i>
             </div>
           </div>
         </div>
@@ -81,7 +83,25 @@
       <div class="row">
         <div class="col-md-6">
           <div class="card">
-            <h5>{{ 'MostHousingDuePayers' | localize}}</h5>
+            <h5>{{ "HousingDueStats" | localize }}</h5>
+            <p-chart
+              type="bar"
+              [data]="housingDueStatsData"
+              [options]="housingDueStatsOptions"
+            ></p-chart>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <h5>{{ "Expenses" | localize }}</h5>
+            <p-chart type="pie" [data]="expensesData"></p-chart>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <h5>{{ "MostHousingDuePayers" | localize }}</h5>
             <p-chart
               type="bar"
               [data]="mostHousingDuePayersData"
@@ -91,7 +111,7 @@
         </div>
         <div class="col-md-6">
           <div class="card">
-            <h5>{{ 'LessHousingDuePayers' | localize}}</h5>
+            <h5>{{ "LessHousingDuePayers" | localize }}</h5>
             <p-chart
               type="bar"
               [data]="lessHousingDuePayersData"
@@ -100,17 +120,7 @@
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card">
-            <h5>{{ 'Expenses' | localize}}</h5>
-            <p-chart
-              type="pie"
-              [data]="expensesData"
-            ></p-chart>
-          </div>
-        </div>
-      </div>
+      <div class="row"></div>
     </div>
   </section>
 </div>

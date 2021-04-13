@@ -10,6 +10,7 @@ namespace Sirius.Dashboard.Dto
             MostHousingDuePayers = new List<HousingDuePayersDashboardDto>();
             LessHousingDuePayers = new List<HousingDuePayersDashboardDto>();
             ExpensesData = new List<PaymentCategoryDashboardDto>();
+            TotalHousingDueStatsDto = new TotalHousingDueStatsDto();
         }
         
         public List<PaymentAccountDashboardDto> PaymentAccounts { get; set; }
@@ -19,5 +20,6 @@ namespace Sirius.Dashboard.Dto
         public List<HousingDuePayersDashboardDto> MostHousingDuePayers { get; set; }
         public List<HousingDuePayersDashboardDto> LessHousingDuePayers { get; set; }
         public List<PaymentCategoryDashboardDto> ExpensesData { get; set; }
+        public TotalHousingDueStatsDto TotalHousingDueStatsDto { get; set; }
     }
 }
