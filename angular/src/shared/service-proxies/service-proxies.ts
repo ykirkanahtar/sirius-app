@@ -1018,6 +1018,69 @@ export class ConfigurationServiceProxy {
 }
 
 @Injectable()
+export class DashboardServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getDashboardData(): Observable<DashboardDto> {
+        let url_ = this.baseUrl + "/api/services/app/Dashboard/GetDashboardData";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboardData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboardData(<any>response_);
+                } catch (e) {
+                    return <Observable<DashboardDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DashboardDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetDashboardData(response: HttpResponseBase): Observable<DashboardDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DashboardDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<DashboardDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class EmployeeServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -8645,6 +8708,250 @@ export class ChangeUiThemeInput implements IChangeUiThemeInput {
 
 export interface IChangeUiThemeInput {
     theme: string;
+}
+
+export class PaymentAccountDashboardDto implements IPaymentAccountDashboardDto {
+    paymentAccountName: string | undefined;
+    balance: number;
+
+    constructor(data?: IPaymentAccountDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentAccountName = _data["paymentAccountName"];
+            this.balance = _data["balance"];
+        }
+    }
+
+    static fromJS(data: any): PaymentAccountDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentAccountDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentAccountName"] = this.paymentAccountName;
+        data["balance"] = this.balance;
+        return data; 
+    }
+
+    clone(): PaymentAccountDashboardDto {
+        const json = this.toJSON();
+        let result = new PaymentAccountDashboardDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentAccountDashboardDto {
+    paymentAccountName: string | undefined;
+    balance: number;
+}
+
+export class HousingDuePayersDashboardDto implements IHousingDuePayersDashboardDto {
+    housingName: string | undefined;
+    totalHousingDueAmount: number;
+
+    constructor(data?: IHousingDuePayersDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingName = _data["housingName"];
+            this.totalHousingDueAmount = _data["totalHousingDueAmount"];
+        }
+    }
+
+    static fromJS(data: any): HousingDuePayersDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingDuePayersDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingName"] = this.housingName;
+        data["totalHousingDueAmount"] = this.totalHousingDueAmount;
+        return data; 
+    }
+
+    clone(): HousingDuePayersDashboardDto {
+        const json = this.toJSON();
+        let result = new HousingDuePayersDashboardDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingDuePayersDashboardDto {
+    housingName: string | undefined;
+    totalHousingDueAmount: number;
+}
+
+export class PaymentCategoryDashboardDto implements IPaymentCategoryDashboardDto {
+    paymentCategoryName: string | undefined;
+    totalAmount: number;
+    randomColorCode: string | undefined;
+
+    constructor(data?: IPaymentCategoryDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentCategoryName = _data["paymentCategoryName"];
+            this.totalAmount = _data["totalAmount"];
+            this.randomColorCode = _data["randomColorCode"];
+        }
+    }
+
+    static fromJS(data: any): PaymentCategoryDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentCategoryDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentCategoryName"] = this.paymentCategoryName;
+        data["totalAmount"] = this.totalAmount;
+        data["randomColorCode"] = this.randomColorCode;
+        return data; 
+    }
+
+    clone(): PaymentCategoryDashboardDto {
+        const json = this.toJSON();
+        let result = new PaymentCategoryDashboardDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentCategoryDashboardDto {
+    paymentCategoryName: string | undefined;
+    totalAmount: number;
+    randomColorCode: string | undefined;
+}
+
+export class DashboardDto implements IDashboardDto {
+    paymentAccounts: PaymentAccountDashboardDto[] | undefined;
+    totalHousingDueAmount: number;
+    totalIncomeAmount: number;
+    totalExpenseAmount: number;
+    mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
+    lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
+    expensesData: PaymentCategoryDashboardDto[] | undefined;
+
+    constructor(data?: IDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["paymentAccounts"])) {
+                this.paymentAccounts = [] as any;
+                for (let item of _data["paymentAccounts"])
+                    this.paymentAccounts.push(PaymentAccountDashboardDto.fromJS(item));
+            }
+            this.totalHousingDueAmount = _data["totalHousingDueAmount"];
+            this.totalIncomeAmount = _data["totalIncomeAmount"];
+            this.totalExpenseAmount = _data["totalExpenseAmount"];
+            if (Array.isArray(_data["mostHousingDuePayers"])) {
+                this.mostHousingDuePayers = [] as any;
+                for (let item of _data["mostHousingDuePayers"])
+                    this.mostHousingDuePayers.push(HousingDuePayersDashboardDto.fromJS(item));
+            }
+            if (Array.isArray(_data["lessHousingDuePayers"])) {
+                this.lessHousingDuePayers = [] as any;
+                for (let item of _data["lessHousingDuePayers"])
+                    this.lessHousingDuePayers.push(HousingDuePayersDashboardDto.fromJS(item));
+            }
+            if (Array.isArray(_data["expensesData"])) {
+                this.expensesData = [] as any;
+                for (let item of _data["expensesData"])
+                    this.expensesData.push(PaymentCategoryDashboardDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.paymentAccounts)) {
+            data["paymentAccounts"] = [];
+            for (let item of this.paymentAccounts)
+                data["paymentAccounts"].push(item.toJSON());
+        }
+        data["totalHousingDueAmount"] = this.totalHousingDueAmount;
+        data["totalIncomeAmount"] = this.totalIncomeAmount;
+        data["totalExpenseAmount"] = this.totalExpenseAmount;
+        if (Array.isArray(this.mostHousingDuePayers)) {
+            data["mostHousingDuePayers"] = [];
+            for (let item of this.mostHousingDuePayers)
+                data["mostHousingDuePayers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.lessHousingDuePayers)) {
+            data["lessHousingDuePayers"] = [];
+            for (let item of this.lessHousingDuePayers)
+                data["lessHousingDuePayers"].push(item.toJSON());
+        }
+        if (Array.isArray(this.expensesData)) {
+            data["expensesData"] = [];
+            for (let item of this.expensesData)
+                data["expensesData"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): DashboardDto {
+        const json = this.toJSON();
+        let result = new DashboardDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IDashboardDto {
+    paymentAccounts: PaymentAccountDashboardDto[] | undefined;
+    totalHousingDueAmount: number;
+    totalIncomeAmount: number;
+    totalExpenseAmount: number;
+    mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
+    lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
+    expensesData: PaymentCategoryDashboardDto[] | undefined;
 }
 
 export class CreateEmployeeDto implements ICreateEmployeeDto {
