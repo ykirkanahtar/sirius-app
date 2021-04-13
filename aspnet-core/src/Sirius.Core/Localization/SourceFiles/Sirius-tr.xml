@@ -123,6 +123,7 @@
     <text name="Amount">Tutar</text>
     <text name="AmountPerMonth">Tutar/Ay</text>
     <text name="Apartment">Daire</text>
+    <text name="Assets">Varlıklar</text>
     <text name="Balance">Bakiye</text>
     <text name="BankAccount">Banka Hesabı</text>
     <text name="BankingAndInsuranceTransactionTax">BSMV</text>
@@ -171,6 +172,9 @@
     <text name="CreateNewTransferPaymentCategory">Hesaplararası Transfer için Ödeme Kategorisi Ekle</text>
     <text name="Credit">Borç</text>
     <text name="CreditOrDebt">Borç / Alacak</text>
+    <text name="CurrentTotalExpenseAmount">Harcamalar toplamıı</text>
+    <text name="CurrentTotalIncomeAmount">Gelirler toplamıı</text>
+    <text name="CurrentTotalHousingDueAmount">Toplanan aidat</text>
     <text name="Date">Tarih</text>
     <text name="Debt">Alacak</text>
     <text name="DefaultFromPaymentAccount">Varsayılan Giden Hesap</text>
@@ -237,6 +241,7 @@
     <text name="HousingDue">Aidat ödemesi</text>
     <text name="HousingDueDefinition">Aidat tanımı</text>
     <text name="HousingDuePayment">Aidat ödemesi</text>
+    <text name="HousingDueStats">Aidat istatistikleri</text>
     <text name="HousingOwner">Ev Sahibi</text>
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
     <text name="HousingPaymentPlanGroupDeleteWarningMessage">Aidat ödeme planı tanımını kaldırmak istediğinize emin misiniz?</text>
@@ -259,6 +264,8 @@
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
+    <text name="LessHousingDuePayers">En az aidat ödeyenler (ilk 5)</text>
+    <text name="MostHousingDuePayers">En fazla aidat ödeyenler (ilk 5)</text>
     <text name="Netting">Mahsuplaşma</text>
     <text name="NettingFromHousingDue">Mahsuplaşma</text>
     <text name="NettingFromHousingDueDescription">Eğer ödeme, bir konut aidatından düşülecekse yukarıdaki seçeneği seçiniz.</text>
@@ -314,6 +321,7 @@
     <text name="SiteManagement">Site Yönetimi</text>
     <text name="StartDate">Başlangıç Tarihi</text>
     <text name="StartDateShort">Baş. Tarihi</text>
+    <text name="Stats">İstatistikler</text>
     <text name="SuccessfullyDeleted">Başarıyla silindi</text>
     <text name="TenantIsOwner">Site hesabı</text>
     <text name="TenantIsOwnerDescription">Site hesabı seçimi kaldırılısa, bu hesaptaki varlıklar site üzerinde gösterilmez.</text>
@@ -322,6 +330,8 @@
     <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
+    <text name="TotalHousingDueDefinitions">Toplam aidat tanımları</text>
+    <text name="TotalHousingDuePayments">Toplam aidat ödemeleri</text>
     <text name="Transfer">Devir</text>
     <text name="TransferBalance">Devir bakiyesi</text>
     <text name="TransferBetweenAccounts">Hesaplararası transfer</text>

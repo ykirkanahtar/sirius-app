@@ -28,6 +28,7 @@ import * as CustomApiServiceProxies from './custom-service-proxies';
         ApiServiceProxies.BlockServiceProxy,
         ApiServiceProxies.UploadServiceProxy,
         ApiServiceProxies.PeriodServiceProxy,
+        ApiServiceProxies.DashboardServiceProxy,
         CustomApiServiceProxies.CustomUploadServiceProxy,
         { provide: HTTP_INTERCEPTORS, useClass: AbpHttpInterceptor, multi: true }
     ]
