@@ -121,6 +121,7 @@
     <text name="AdvancedFilters">Detaylı Arama</text>
     <text name="AllowNegativeBalance">Eksi bakiyeye izin verilsin mi?</text>
     <text name="Amount">Tutar</text>
+    <text name="AmountPerHousingCategory">Konut Grubuna Göre Tutar Girişi</text>
     <text name="AmountPerMonth">Tutar/Ay</text>
     <text name="Apartment">Daire</text>
     <text name="Assets">Varlıklar</text>
@@ -140,6 +141,7 @@
     <text name="Cash">Nakit</text>
     <text name="CashAccount">Nakit Hesabı</text>
     <text name="ChooseFile">Dosya seçiniz</text>
+    <text name="Close">Kapat</text>
     <text name="ContactText">İletişim</text>
     <text name="CountOfMonth">Ay Sayısı</text>
     <text name="CreateAccountBook">İşletme Defteri oluştur</text>
@@ -233,6 +235,7 @@
     <text name="HousingCategories">Konut Grupları</text>
     <text name="HousingCategoriesMenu">Konut grubu (Menü)</text>
     <text name="HousingCategory">Konut grubu</text>
+    <text name="HousingCategoryAmounts">Konut grubu tutarları</text>
     <text name="HousingCategoryShort">Konut grb.</text>
     <text name="HousingCategoryDeleteWarningMessage">Konut Grubunu silmek istediğinize emin misiniz?</text>
     <text name="HousingCategoryName">Konut Grup Adı</text>

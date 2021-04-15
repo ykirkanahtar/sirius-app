@@ -16,6 +16,7 @@ import {
   HousingPaymentPlanGroupServiceProxy,
   PaymentAccountServiceProxy,
   ResidentOrOwner,
+  PaymentPlanForHousingCategoryDto,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
 import { BsModalRef } from "ngx-bootstrap/modal";
@@ -52,6 +53,16 @@ export class CreateHousingPaymentPlanGroupDialogComponent
       .getHousingCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
         this.housingCategories = result;
+
+        this.input.paymentPlanForHousingCategories = [];
+
+        this.housingCategories.forEach( (currentValue, index) => {
+          let housingPaymentPlanForHousingCategory = new PaymentPlanForHousingCategoryDto();
+          housingPaymentPlanForHousingCategory.housingCategoryId = currentValue.value;
+          housingPaymentPlanForHousingCategory.amountPerMonth = 0;
+          this.input.paymentPlanForHousingCategories.push(housingPaymentPlanForHousingCategory);
+        });
+
       });
 
     this._paymentAccountService
@@ -70,6 +81,10 @@ export class CreateHousingPaymentPlanGroupDialogComponent
         label: this.l(this.residentOrOwnerEnum[ResidentOrOwner.Owner]),
       },
     ];
+  }
+
+  getHousingCategoryName(housingCategoryId: string): string {
+    return this.housingCategories.filter(p => p.value === housingCategoryId).map(p => p.label)[0];
   }
 
   save(): void {

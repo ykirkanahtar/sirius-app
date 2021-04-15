@@ -69,32 +69,31 @@ namespace Sirius.HousingPaymentPlans
         public override async Task<HousingPaymentPlanGroupDto> CreateAsync(CreateHousingPaymentPlanGroupDto input)
         {
             CheckCreatePermission();
-            var housingCategories = new List<HousingCategory>();
+            var housingPaymentPlanGroupHousingCategories = new List<HousingPaymentPlanGroupHousingCategory>();
             var housings = new List<Housing>();
-            foreach (var housingCategoryId in input.HousingCategoryIds)
-            {
-                var housingCategory = await _housingCategoryRepository.GetAsync(housingCategoryId);
-                housingCategories.Add(housingCategory);
-
-                var intHousings =
-                    await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
-                housings.AddRange(intHousings);
-            }
 
             var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
                 input.DefaultToPaymentAccountId, input.ResidentOrOwner);
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
+            var housingPaymentPlanGroupId = SequentialGuidGenerator.Instance.Create();
+            
+            foreach (var paymentPlanForHousingCategory in input.PaymentPlanForHousingCategories)
+            {
+                housingPaymentPlanGroupHousingCategories.Add(HousingPaymentPlanGroupHousingCategory.Create(
+                    housingPaymentPlanGroupId, paymentPlanForHousingCategory.HousingCategoryId,
+                    paymentPlanForHousingCategory.AmountPerMonth));
+            }
 
-            var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(SequentialGuidGenerator.Instance.Create(),
+            var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(housingPaymentPlanGroupId,
                 AbpSession.GetTenantId(),
-                input.HousingPaymentPlanGroupName, paymentCategory, input.AmountPerMonth,
+                input.HousingPaymentPlanGroupName, paymentCategory,
                 input.CountOfMonth, input.PaymentDayOfMonth
                 , input.StartDateString.StringToDateTime(), input.Description, input.ResidentOrOwner,
-                housingCategories);
+                housingPaymentPlanGroupHousingCategories);
 
-            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup, housings,
+            await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup,
                 input.StartDateString.StringToDateTime(),
                 paymentCategory, false, null);
 

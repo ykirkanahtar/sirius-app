@@ -5,8 +5,6 @@ using System.Linq;
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using JetBrains.Annotations;
-using Sirius.Housings;
-using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Enums;
 
@@ -24,7 +22,6 @@ namespace Sirius.HousingPaymentPlans
 
         public string HousingPaymentPlanGroupName { get; private set; }
         public Guid PaymentCategoryId { get; private set; }
-        public decimal AmountPerMonth { get; private set; }
         public int CountOfMonth { get; private set; }
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
@@ -46,18 +43,12 @@ namespace Sirius.HousingPaymentPlans
 
         public static HousingPaymentPlanGroup Create(Guid id,
             int tenantId, [NotNull] string housingPaymentPlanGroupName, 
-            PaymentCategory paymentCategory, decimal amountPerMonth, int countOfMonth, int paymentDayOfMonth,
+            PaymentCategory paymentCategory,  int countOfMonth, int paymentDayOfMonth,
             DateTime startDate, string description, ResidentOrOwner residentOrOwner,
-            List<HousingCategory> housingCategories)
+            List<HousingPaymentPlanGroupHousingCategory> housingPaymentPlanGroupHousingCategories)
         {
-            var housingPaymentPlanGroupHousingCategories = new List<HousingPaymentPlanGroupHousingCategory>();
-            housingCategories.ForEach(p =>
-            {
-                housingPaymentPlanGroupHousingCategories.Add(
-                    HousingPaymentPlanGroupHousingCategory.Create(id, p.Id));
-            });
             return BindEntity(new HousingPaymentPlanGroup(), id, tenantId,
-                housingPaymentPlanGroupName, paymentCategory.Id, amountPerMonth, countOfMonth, paymentDayOfMonth, startDate,
+                housingPaymentPlanGroupName, paymentCategory.Id, countOfMonth, paymentDayOfMonth, startDate,
                 description, residentOrOwner, housingPaymentPlanGroupHousingCategories);
         }
 
@@ -69,7 +60,6 @@ namespace Sirius.HousingPaymentPlans
                 existingHousingPaymentPlanGroup.TenantId,
                 housingPaymentPlanGroupName,
                 existingHousingPaymentPlanGroup.PaymentCategoryId,
-                existingHousingPaymentPlanGroup.AmountPerMonth,
                 existingHousingPaymentPlanGroup.CountOfMonth,
                 existingHousingPaymentPlanGroup.PaymentDayOfMonth,
                 existingHousingPaymentPlanGroup.StartDate,
@@ -80,7 +70,7 @@ namespace Sirius.HousingPaymentPlans
 
         private static HousingPaymentPlanGroup BindEntity(HousingPaymentPlanGroup housingPaymentPlanGroup, Guid id,
             int tenantId, [NotNull] string housingPaymentPlanGroupName, 
-            Guid paymentCategoryId, decimal amountPerMonth, int countOfMonth, int paymentDayOfMonth,
+            Guid paymentCategoryId,  int countOfMonth, int paymentDayOfMonth,
             DateTime startDate, string description, ResidentOrOwner residentOrOwner,
             List<HousingPaymentPlanGroupHousingCategory> housingPaymentPlanGroupHousingCategories)
         {
@@ -90,7 +80,6 @@ namespace Sirius.HousingPaymentPlans
             housingPaymentPlanGroup.TenantId = tenantId;
             housingPaymentPlanGroup.HousingPaymentPlanGroupName = housingPaymentPlanGroupName;
             housingPaymentPlanGroup.PaymentCategoryId = paymentCategoryId;
-            housingPaymentPlanGroup.AmountPerMonth = amountPerMonth;
             housingPaymentPlanGroup.CountOfMonth = countOfMonth;
             housingPaymentPlanGroup.PaymentDayOfMonth = paymentDayOfMonth;
             housingPaymentPlanGroup.StartDate = startDate;

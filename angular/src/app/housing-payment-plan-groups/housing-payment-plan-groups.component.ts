@@ -1,11 +1,11 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { Component, Injector, OnInit, ViewChild } from "@angular/core";
+import { finalize } from "rxjs/operators";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { appModuleAnimation } from "@shared/animations/routerTransition";
 import {
   PagedListingComponentBase,
   PagedRequestDto,
-} from '@shared/paged-listing-component-base';
+} from "@shared/paged-listing-component-base";
 import {
   HousingServiceProxy,
   HousingCategoryServiceProxy,
@@ -15,24 +15,25 @@ import {
   HousingPaymentPlanGroupServiceProxy,
   HousingPaymentPlanGroupDtoPagedResultDto,
   ResidentOrOwner,
-} from '@shared/service-proxies/service-proxies';
-import { LazyLoadEvent, SelectItem } from 'primeng/api';
-import { Table } from 'primeng/table';
-import { CreateHousingPaymentPlanGroupDialogComponent } from './create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component';
-import { EditHousingPaymentPlanGroupDialogComponent } from './edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component';
+} from "@shared/service-proxies/service-proxies";
+import { LazyLoadEvent, SelectItem } from "primeng/api";
+import { Table } from "primeng/table";
+import { CreateHousingPaymentPlanGroupDialogComponent } from "./create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component";
+import { EditHousingPaymentPlanGroupDialogComponent } from "./edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component";
+import { HousingPaymentPlanGroupForHousingCategoryComponent } from "./housing-payment-plan-group-for-housing-categories/housing-payment-plan-group-for-housing-categories.component";
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
 }
 
 @Component({
-  templateUrl: './housing-payment-plan-groups.component.html',
+  templateUrl: "./housing-payment-plan-groups.component.html",
   animations: [appModuleAnimation()],
 })
 export class HousingPaymentPlanGroupsComponent
   extends PagedListingComponentBase<HousingPaymentPlanGroupDto>
   implements OnInit {
-  @ViewChild('dataTable', { static: true }) dataTable: Table;
+  @ViewChild("dataTable", { static: true }) dataTable: Table;
 
   sortingColumn: string;
   advancedFiltersVisible = false;
@@ -67,9 +68,11 @@ export class HousingPaymentPlanGroupsComponent
         this.housingCategoriesFilter = result;
       });
 
-    this._housingService.getHousingLookUp(undefined, undefined).subscribe((result: LookUpDto[]) => {
-      this.housingsFilters = result;
-    });
+    this._housingService
+      .getHousingLookUp(undefined, undefined)
+      .subscribe((result: LookUpDto[]) => {
+        this.housingsFilters = result;
+      });
 
     this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
       this.peopleFilters = result;
@@ -82,8 +85,12 @@ export class HousingPaymentPlanGroupsComponent
     this.showCreateOrEditHousingPaymentPlanGroupDialog();
   }
 
-  editHousingPaymentPlanGroup(housingPaymentPlanGroup: HousingPaymentPlanGroupDto): void {
-    this.showCreateOrEditHousingPaymentPlanGroupDialog(housingPaymentPlanGroup.id);
+  editHousingPaymentPlanGroup(
+    housingPaymentPlanGroup: HousingPaymentPlanGroupDto
+  ): void {
+    this.showCreateOrEditHousingPaymentPlanGroupDialog(
+      housingPaymentPlanGroup.id
+    );
   }
 
   clearFilters(): void {
@@ -126,19 +133,43 @@ export class HousingPaymentPlanGroupsComponent
   protected delete(housingPaymentPlanGroup: HousingPaymentPlanGroupDto): void {
     abp.message.confirm(
       this.l(
-        'HousingPaymentPlanGroupDeleteWarningMessage',
+        "HousingPaymentPlanGroupDeleteWarningMessage",
         housingPaymentPlanGroup.housingPaymentPlanGroupName
       ),
       undefined,
       (result: boolean) => {
         if (result) {
-          this._housingPaymentPlanGroupService.delete(housingPaymentPlanGroup.id).subscribe(() => {
-            abp.notify.success(this.l('SuccessfullyDeleted'));
-            this.refresh();
-          });
+          this._housingPaymentPlanGroupService
+            .delete(housingPaymentPlanGroup.id)
+            .subscribe(() => {
+              abp.notify.success(this.l("SuccessfullyDeleted"));
+              this.refresh();
+            });
         }
       }
     );
+  }
+
+  protected getHousingCategories(housingPaymentPlanGroup: HousingPaymentPlanGroupDto): void {
+    console.log(housingPaymentPlanGroup);
+
+    this._housingCategoryService
+    .getHousingCategoryLookUp()
+    .subscribe((housingCategories: LookUpDto[]) => {
+
+      let housingCategoriesDialog: BsModalRef;
+      housingCategoriesDialog = this._modalService.show(
+        HousingPaymentPlanGroupForHousingCategoryComponent,
+        {
+          class: "modal-lg, modal-xl",
+          initialState: {
+            housingPaymentPlanGroupForHousingCategories: housingPaymentPlanGroup.housingPaymentPlanGroupHousingCategories,
+            housingPaymentPlanGroupName: housingPaymentPlanGroup.housingPaymentPlanGroupName,
+            housingCategories: housingCategories
+          },
+        }
+      );
+    });
   }
 
   private showCreateOrEditHousingPaymentPlanGroupDialog(id?: string): void {
@@ -147,14 +178,14 @@ export class HousingPaymentPlanGroupsComponent
       createOrEditHousingPaymentPlanDialog = this._modalService.show(
         CreateHousingPaymentPlanGroupDialogComponent,
         {
-          class: 'modal-lg',
+          class: "modal-lg",
         }
       );
     } else {
       createOrEditHousingPaymentPlanDialog = this._modalService.show(
         EditHousingPaymentPlanGroupDialogComponent,
         {
-          class: 'modal-lg',
+          class: "modal-lg",
           initialState: {
             id: id,
           },

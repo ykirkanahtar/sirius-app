@@ -9,7 +9,11 @@
           class="col-6 text-right"
           *ngIf="this.permissionHelper.createHousingPaymentPlanGroup()"
         >
-          <a href="javascript:;" class="btn bg-blue" (click)="createHousingPaymentPlanGroup()">
+          <a
+            href="javascript:;"
+            class="btn bg-blue"
+            (click)="createHousingPaymentPlanGroup()"
+          >
             <i class="fa fa-plus-square"></i>
             {{ "Create" | localize }}
           </a>
@@ -157,7 +161,9 @@
                 </th>
                 <th pSortableColumn="housingCategory.housingCategoryName">
                   {{ "HousingCategoryNameShort" | localize }}
-                  <p-sortIcon field="housingCategory.housingCategoryName"></p-sortIcon>
+                  <p-sortIcon
+                    field="housingCategory.housingCategoryName"
+                  ></p-sortIcon>
                 </th>
                 <th pSortableColumn="paymentCategory.paymentCategoryName">
                   {{ "PaymentCategoryNameShort" | localize }}
@@ -167,13 +173,7 @@
                 </th>
                 <th pSortableColumn="residentOrOwner">
                   {{ "ResidentOrOwnerShort" | localize }}
-                  <p-sortIcon
-                    field="residentOrOwner"
-                  ></p-sortIcon>
-                </th>
-                <th pSortableColumn="amountPerMonth">
-                  {{ "AmountPerMonth" | localize }}
-                  <p-sortIcon field="amountPerMonth"></p-sortIcon>
+                  <p-sortIcon field="residentOrOwner"></p-sortIcon>
                 </th>
                 <th pSortableColumn="countOfMonth">
                   {{ "CountOfMonth" | localize }}
@@ -206,27 +206,54 @@
               "
             >
               <tr>
-                <td>{{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}</td>
-                <td>{{ housingPaymentPlanGroup.housingCategoryNames }}</td>
-                <td>{{ housingPaymentPlanGroup.paymentCategory.paymentCategoryName | localize }}</td>
-                <td>{{ residentOrOwnerEnum[housingPaymentPlanGroup.residentOrOwner] | localize }}</td>
-                <td>{{ housingPaymentPlanGroup.amountPerMonth | number: "1.2-2" }}</td>
-                <td>{{ housingPaymentPlanGroup.countOfMonth | number }}</td>
-                <td>{{ housingPaymentPlanGroup.paymentDayOfMonth | number }}</td>
-                <td>{{ housingPaymentPlanGroup.startDate.format("DD-MM-YYYY") }}</td>
                 <td>
+                  {{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}
+                </td>
+                <td>{{ housingPaymentPlanGroup.housingCategoryNames }}</td>
+                <td>
+                  {{
+                    housingPaymentPlanGroup.paymentCategory.paymentCategoryName
+                      | localize
+                  }}
+                </td>
+                <td>
+                  {{
+                    residentOrOwnerEnum[housingPaymentPlanGroup.residentOrOwner]
+                      | localize
+                  }}
+                </td>
+                <td>{{ housingPaymentPlanGroup.countOfMonth | number }}</td>
+                <td>
+                  {{ housingPaymentPlanGroup.paymentDayOfMonth | number }}
+                </td>
+                <td>
+                  {{ housingPaymentPlanGroup.startDate.format("DD-MM-YYYY") }}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm bg-primary mx-2"
+                    (click)="getHousingCategories(housingPaymentPlanGroup)"
+                  >
+                    <i class="fas fa-clipboard-list"></i>
+                    {{ "HousingCategoryAmounts" | localize }}
+                  </button>
                   <button
                     type="button"
                     *ngIf="this.permissionHelper.editHousingPaymentPlanGroup()"
                     class="btn btn-sm bg-secondary mx-2"
-                    (click)="editHousingPaymentPlanGroup(housingPaymentPlanGroup)"
+                    (click)="
+                      editHousingPaymentPlanGroup(housingPaymentPlanGroup)
+                    "
                   >
                     <i class="fas fa-pencil-alt"></i>
                     {{ "Edit" | localize }}
                   </button>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.deleteHousingPaymentPlanGroup()"
+                    *ngIf="
+                      this.permissionHelper.deleteHousingPaymentPlanGroup()
+                    "
                     class="btn btn-sm bg-danger mx-2"
                     (click)="delete(housingPaymentPlanGroup)"
                   >
