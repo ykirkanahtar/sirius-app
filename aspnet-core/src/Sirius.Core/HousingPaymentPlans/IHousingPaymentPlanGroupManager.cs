@@ -9,7 +9,7 @@ namespace Sirius.HousingPaymentPlans
 {
     public interface IHousingPaymentPlanGroupManager : IDomainService
     {
-        Task CreateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup, List<Housing> housings,
+        Task CreateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup,
             DateTime startDate, PaymentCategory paymentCategory, bool transferFromPreviousPeriod,
             DateTime? periodStartDate);
         Task UpdateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup);

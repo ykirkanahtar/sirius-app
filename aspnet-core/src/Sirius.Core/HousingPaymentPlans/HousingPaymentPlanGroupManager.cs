@@ -15,24 +15,28 @@ namespace Sirius.HousingPaymentPlans
     {
         private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
+        private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IHousingManager _housingManager;
-        private readonly IPaymentCategoryManager _paymentCategoryManager;
+        private readonly IRepository<Housing, Guid> _housingRepository;
 
         public HousingPaymentPlanGroupManager(
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
             IHousingManager housingManager,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
-            IHousingPaymentPlanManager housingPaymentPlanManager, IPaymentCategoryManager paymentCategoryManager)
+            IHousingPaymentPlanManager housingPaymentPlanManager
+            , IRepository<HousingCategory, Guid> housingCategoryRepository,
+            IRepository<Housing, Guid> housingRepository)
         {
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _housingManager = housingManager;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _housingPaymentPlanManager = housingPaymentPlanManager;
-            _paymentCategoryManager = paymentCategoryManager;
+            _housingCategoryRepository = housingCategoryRepository;
+            _housingRepository = housingRepository;
         }
 
-        public async Task CreateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup, List<Housing> housings,
+        public async Task CreateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup,
             DateTime startDate, PaymentCategory paymentCategory, bool transferFromPreviousPeriod,
             DateTime? periodStartDate)
         {
@@ -42,82 +46,93 @@ namespace Sirius.HousingPaymentPlans
 
             var housingPaymentPlans = new List<HousingPaymentPlan>();
 
-            foreach (var housing in housings)
+
+            foreach (var housingPaymentPlanGroupHousingCategory in housingPaymentPlanGroup
+                .HousingPaymentPlanGroupHousingCategories)
             {
-                if (transferFromPreviousPeriod && periodStartDate.HasValue)
+                var housingCategory =
+                    await _housingCategoryRepository.GetAsync(housingPaymentPlanGroupHousingCategory.HousingCategoryId);
+                var housings =
+                    await _housingRepository.GetAllListAsync(p => p.HousingCategoryId == housingCategory.Id);
+
+                foreach (var housing in housings)
                 {
-                    if (housing.Balance != 0)
+                    if (transferFromPreviousPeriod && periodStartDate.HasValue)
                     {
-                        // var paymentCategoryForHousingDueTransfer = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
+                        if (housing.Balance != 0)
+                        {
+                            // var paymentCategoryForHousingDueTransfer = await _paymentCategoryManager.GetTransferForRegularHousingDueAsync();
 
-                        var housingPaymentPlanForHousingDueTransfer = housing.Balance > 0 //Site alacaklı ise
-                            ? HousingPaymentPlan.CreateDebt(
-                                SequentialGuidGenerator.Instance.Create()
-                                , housingPaymentPlanGroup.TenantId
-                                , null
-                                , housing
-                                , housingPaymentPlanGroup.ResidentOrOwner
-                                , paymentCategory
-                                , periodStartDate.Value
-                                , housing.Balance
-                                , string.Empty //Description
-                                , HousingPaymentPlanType.Transfer
-                                , null
-                                , null
-                            )
-                            : HousingPaymentPlan.CreateCredit(
-                                SequentialGuidGenerator.Instance.Create()
-                                , housingPaymentPlanGroup.TenantId
-                                , housing
-                                , housingPaymentPlanGroup.ResidentOrOwner
-                                , paymentCategory
-                                , periodStartDate.Value
-                                , housing.Balance
-                                , string.Empty //Description
-                                , null
-                                , HousingPaymentPlanType.Transfer
-                                , null
-                                , null
-                            );
+                            var housingPaymentPlanForHousingDueTransfer = housing.Balance > 0 //Site alacaklı ise
+                                ? HousingPaymentPlan.CreateDebt(
+                                    SequentialGuidGenerator.Instance.Create()
+                                    , housingPaymentPlanGroup.TenantId
+                                    , null
+                                    , housing
+                                    , housingPaymentPlanGroup.ResidentOrOwner
+                                    , paymentCategory
+                                    , periodStartDate.Value
+                                    , housing.Balance
+                                    , string.Empty //Description
+                                    , HousingPaymentPlanType.Transfer
+                                    , null
+                                    , null
+                                )
+                                : HousingPaymentPlan.CreateCredit(
+                                    SequentialGuidGenerator.Instance.Create()
+                                    , housingPaymentPlanGroup.TenantId
+                                    , housing
+                                    , housingPaymentPlanGroup.ResidentOrOwner
+                                    , paymentCategory
+                                    , periodStartDate.Value
+                                    , housing.Balance
+                                    , string.Empty //Description
+                                    , null
+                                    , HousingPaymentPlanType.Transfer
+                                    , null
+                                    , null
+                                );
 
-                        housingPaymentPlans.Add(housingPaymentPlanForHousingDueTransfer);
+                            housingPaymentPlans.Add(housingPaymentPlanForHousingDueTransfer);
+                        }
+                    }
+
+                    var date = newStartDate;
+                    for (var i = 0; i < housingPaymentPlanGroup.CountOfMonth; i++)
+                    {
+                        if (i > 0)
+                        {
+                            var day = housingPaymentPlanGroup.PaymentDayOfMonth;
+                            var month = date.Month == 12 ? 1 : date.Month + 1;
+                            var year = month == 1 ? date.Year + 1 : date.Year;
+                            date = new DateTime(year, month, day);
+                        }
+
+                        var housingPaymentPlan = HousingPaymentPlan.CreateDebt(
+                            SequentialGuidGenerator.Instance.Create()
+                            , housingPaymentPlanGroup.TenantId
+                            , housingPaymentPlanGroup
+                            , housing
+                            , housingPaymentPlanGroup.ResidentOrOwner
+                            , paymentCategory
+                            , date
+                            , housingPaymentPlanGroupHousingCategory.AmountPerMonth
+                            , housingPaymentPlanGroup.Description
+                            , HousingPaymentPlanType.HousingDueDefinition
+                            , null
+                            , null
+                        );
+
+                        housingPaymentPlans.Add(housingPaymentPlan);
                     }
                 }
 
-                var date = newStartDate;
-                for (var i = 0; i < housingPaymentPlanGroup.CountOfMonth; i++)
-                {
-                    if (i > 0)
-                    {
-                        var day = housingPaymentPlanGroup.PaymentDayOfMonth;
-                        var month = date.Month == 12 ? 1 : date.Month + 1;
-                        var year = month == 1 ? date.Year + 1 : date.Year;
-                        date = new DateTime(year, month, day);
-                    }
-
-                    var housingPaymentPlan = HousingPaymentPlan.CreateDebt(
-                        SequentialGuidGenerator.Instance.Create()
-                        , housingPaymentPlanGroup.TenantId
-                        , housingPaymentPlanGroup
-                        , housing
-                        , housingPaymentPlanGroup.ResidentOrOwner
-                        , paymentCategory
-                        , date
-                        , housingPaymentPlanGroup.AmountPerMonth
-                        , housingPaymentPlanGroup.Description
-                        , HousingPaymentPlanType.HousingDueDefinition
-                        , null
-                        , null
-                    );
-
-                    housingPaymentPlans.Add(housingPaymentPlan);
-                }
+                _housingManager.BulkIncreaseBalance(housings,
+                    housingPaymentPlanGroupHousingCategory.AmountPerMonth * housingPaymentPlanGroup.CountOfMonth,
+                    housingPaymentPlanGroup.ResidentOrOwner);
             }
 
             await _housingPaymentPlanManager.BulkCreateAsync(housingPaymentPlans);
-            _housingManager.BulkIncreaseBalance(housings,
-                housingPaymentPlanGroup.AmountPerMonth * housingPaymentPlanGroup.CountOfMonth,
-                housingPaymentPlanGroup.ResidentOrOwner);
         }
 
         public async Task UpdateAsync(HousingPaymentPlanGroup housingPaymentPlanGroup)

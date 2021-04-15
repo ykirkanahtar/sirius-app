@@ -13,14 +13,16 @@ namespace Sirius.HousingPaymentPlans
 
         public int TenantId { get; set; }
         public Guid HousingCategoryId { get; private set; }
+        public decimal AmountPerMonth { get; private set; }
         public Guid HousingPaymentPlanGroupId { get; private set; }
         
-        public static HousingPaymentPlanGroupHousingCategory Create(Guid housingPaymentPlanGroupId, Guid housingCategoryId)
+        public static HousingPaymentPlanGroupHousingCategory Create(Guid housingPaymentPlanGroupId, Guid housingCategoryId, decimal amountPerMonth)
         {
             return new HousingPaymentPlanGroupHousingCategory
             {
                 HousingPaymentPlanGroupId = housingPaymentPlanGroupId, 
-                HousingCategoryId = housingCategoryId
+                HousingCategoryId = housingCategoryId,
+                AmountPerMonth = amountPerMonth
             };
         }
     }

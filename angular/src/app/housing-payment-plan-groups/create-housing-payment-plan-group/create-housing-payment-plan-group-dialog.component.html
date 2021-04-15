@@ -69,32 +69,6 @@
           </div>
         </div>
         <div class="form-group row required">
-          <label class="col-md-3 col-form-label" for="housingCategoryId">
-            {{ "HousingCategories" | localize }}
-          </label>
-          <div class="col-md-9">
-            <p-multiSelect
-              name="housingCategories"
-              [options]="housingCategories"
-              [showToggleAll]="false"
-              [(ngModel)]="input.housingCategoryIds"
-              [virtualScroll]="true"
-              [filter]="true"
-              [itemSize]="34"
-              [defaultLabel]="l('HousingCategory')"
-              class="multiselect-custom-virtual-scroll"
-              [style]="{ minWidth: '100%' }"
-              required
-            >
-              <ng-template let-housingCategory pTemplate="item">
-                <div class="housingCategory-item">
-                  <div>{{ housingCategory.label | localize }}</div>
-                </div>
-              </ng-template>
-            </p-multiSelect>
-          </div>
-        </div>
-        <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="residentOrOwner">
             {{ "ResidentOrOwner" | localize }}
           </label>
@@ -128,24 +102,6 @@
               required
             >
             </p-dropdown>
-          </div>
-        </div>
-        <div class="form-group row required">
-          <label class="col-md-3 col-form-label" for="amountPerMonth">
-            {{ "AmountPerMonth" | localize }}
-          </label>
-          <div class="col-md-9">
-            <p-inputNumber
-              [(ngModel)]="input.amountPerMonth"
-              name="amountPerMonth"
-              id="amountPerMonth"
-              mode="decimal"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
-              [style]="{ width: '100%' }"
-              required
-            >
-            </p-inputNumber>
           </div>
         </div>
         <div class="form-group row required">
@@ -200,6 +156,38 @@
               [control]="descriptionModel"
               [controlEl]="descriptionEl"
             ></abp-validation-summary>
+          </div>
+        </div>
+        <div class="border border-primary p-3">
+          <div class="row">
+            <div class="col-md-12 d-flex justify-content-center">
+              <label>
+                {{ "AmountPerHousingCategory" | localize }}
+              </label>
+            </div>
+          </div>
+          <div
+            class="form-group row"
+            *ngFor="
+              let item of input.paymentPlanForHousingCategories;
+              let index = index
+            "
+          >
+            <label class="col-md-3 col-form-label" for="description">
+              {{ getHousingCategoryName(item.housingCategoryId) }}
+            </label>
+            <div class="col-md-9">
+              <p-inputNumber
+                [(ngModel)]="item.amountPerMonth"
+                name="amountPerMonth"
+                id="amountPerMonth"
+                mode="decimal"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [style]="{ width: '100%' }"
+              >
+              </p-inputNumber>
+            </div>
           </div>
         </div>
       </tab>

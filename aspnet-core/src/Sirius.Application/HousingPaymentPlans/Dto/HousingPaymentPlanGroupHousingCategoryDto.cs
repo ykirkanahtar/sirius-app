@@ -8,7 +8,8 @@ namespace Sirius.HousingPaymentPlans.Dto
     {
         public Guid Id { get; set; }
         public int TenantId { get; set; }
-        public Guid HousingCategoryId { get; private set; }
-        public Guid HousingPaymentPlanGroupId { get; private set; }
+        public Guid HousingCategoryId { get; set; }
+        public Guid HousingPaymentPlanGroupId { get; set; }
+        public decimal AmountPerMonth { get; set; }
     }
 }

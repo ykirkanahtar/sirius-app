@@ -17,7 +17,6 @@ namespace Sirius.HousingPaymentPlans.Dto
 
         public string HousingPaymentPlanGroupName { get; set; }
         public Guid PaymentCategoryId { get; set; }
-        public decimal AmountPerMonth { get; set; }
         public int CountOfMonth { get; set; }
         public int PaymentDayOfMonth { get; set; }
         public DateTime StartDate { get; set; }
