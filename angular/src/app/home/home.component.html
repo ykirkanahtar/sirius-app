@@ -10,7 +10,15 @@
   </section>
   <section class="content px-2">
     <div class="container-fluid">
-      <div class="row">
+      <div
+        class="row"
+        *ngIf="
+          dashboardDto &&
+          dashboardDto.paymentAccounts !== undefined &&
+          dashboardDto.paymentAccounts !== null &&
+          dashboardDto.paymentAccounts
+        "
+      >
         <ng-template
           ngFor
           let-paymentAccount
@@ -43,7 +51,9 @@
   </section>
   <section class="content px-2">
     <div class="container-fluid">
-      <div class="row">
+      <div
+        class="row"
+      >
         <div [ngClass]="statsClass">
           <div class="small-box bg-warning">
             <div class="inner">

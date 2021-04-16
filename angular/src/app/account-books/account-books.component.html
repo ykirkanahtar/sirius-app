@@ -237,6 +237,16 @@
             [lazy]="true"
             [loading]="isTableLoading"
           >
+            <ng-template pTemplate="caption">
+              <div class="p-d-flex">
+                <button class="btn-success mr-2" (click)="exportExcel()" pTooltip="XLS" tooltipPosition="bottom">
+                  <i class="fas fa-file-excel"></i>
+                </button>
+                <button class="btn-danger mr-2" (click)="exportPdf()" pTooltip="PDF" tooltipPosition="bottom">
+                  <i class="fas fa-file-pdf"></i>
+                </button>
+              </div>
+            </ng-template>
             <ng-template pTemplate="header">
               <tr>
                 <th pSortableColumn="ProcessDateTime">

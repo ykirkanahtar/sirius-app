@@ -506,11 +506,9 @@ namespace Sirius.PaymentAccounts
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
-        public async Task<PagedAccountBookResultDto> GetAllListAsync(
-            PagedAccountBookResultRequestDto input)
+        private async Task<IQueryable<AccountBookGetAllOutput>> FilterQueryAsync(IAccountBookGetAllFilter filter)
         {
-            CheckGetAllPermission();
-            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(input.PersonIds);
+            var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(filter.PersonIds);
 
             var query = (from accountBook in _accountBookRepository.GetAll()
                     join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
@@ -543,19 +541,19 @@ namespace Sirius.PaymentAccounts
                         toPaymentAccount,
                         nettingHousing
                     })
-                .WhereIf(input.StartDate.HasValue, p => p.accountBook.ProcessDateTime > input.StartDate.Value)
-                .WhereIf(input.EndDate.HasValue, p => p.accountBook.ProcessDateTime < input.EndDate.Value)
-                .WhereIf(input.HousingIds.Count > 0,
-                    p => input.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
-                .WhereIf(input.PaymentCategoryIds.Count > 0,
-                    p => input.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId ?? Guid.Empty))
+                .WhereIf(filter.StartDate.HasValue, p => p.accountBook.ProcessDateTime > filter.StartDate.Value)
+                .WhereIf(filter.EndDate.HasValue, p => p.accountBook.ProcessDateTime < filter.EndDate.Value)
+                .WhereIf(filter.HousingIds.Count > 0,
+                    p => filter.HousingIds.Contains(p.accountBook.HousingId ?? Guid.Empty))
+                .WhereIf(filter.PaymentCategoryIds.Count > 0,
+                    p => filter.PaymentCategoryIds.Contains(p.accountBook.PaymentCategoryId ?? Guid.Empty))
                 .WhereIf(housingIdsFromPersonFilter.Count > 0,
                     p => housingIdsFromPersonFilter.Select(s => s.Id)
                         .Contains(p.accountBook.HousingId ?? Guid.Empty))
-                .WhereIf(input.FromPaymentAccountIds.Count > 0,
-                    p => input.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
-                .WhereIf(input.ToPaymentAccountIds.Count > 0,
-                    p => input.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
+                .WhereIf(filter.FromPaymentAccountIds.Count > 0,
+                    p => filter.FromPaymentAccountIds.Contains(p.accountBook.FromPaymentAccountId ?? Guid.Empty))
+                .WhereIf(filter.ToPaymentAccountIds.Count > 0,
+                    p => filter.ToPaymentAccountIds.Contains(p.accountBook.ToPaymentAccountId ?? Guid.Empty))
                 .Select(p => new AccountBookGetAllOutput
                 {
                     Id = p.accountBook.Id,
@@ -591,9 +589,18 @@ namespace Sirius.PaymentAccounts
                     AccountBookFiles = p.accountBook.AccountBookFiles.Select(p => p.FileUrl).ToList()
                 });
 
+            return query.OrderBy(filter.Sorting ??
+                                 $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC");
+        }
+
+        public async Task<PagedAccountBookResultDto> GetAllListAsync(
+            PagedAccountBookResultRequestDto input)
+        {
+            CheckGetAllPermission();
+
+            var query = await FilterQueryAsync(input);
+
             var accountBooks = await query
-                .OrderBy(input.Sorting ??
-                         $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC")
                 .PageBy(input)
                 .ToListAsync();
 
@@ -602,6 +609,18 @@ namespace Sirius.PaymentAccounts
                     .FirstOrDefaultAsync();
             return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
                 lastAccountBookDate?.ProcessDateTime);
+        }
+
+        public async Task<List<AccountBookGetAllExportOutput>> GetAllListForExportAsync(
+            AccountBookGetAllFilter input)
+        {
+            CheckGetAllPermission();
+
+            var query = await FilterQueryAsync(input);
+
+            var accountBookGetAll = await query
+                .ToListAsync();
+            return ObjectMapper.Map<List<AccountBookGetAllExportOutput>>(accountBookGetAll);
         }
 
         public async Task<List<LookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(

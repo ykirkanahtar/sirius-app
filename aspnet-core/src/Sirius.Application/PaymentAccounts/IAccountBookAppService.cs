@@ -14,6 +14,9 @@ namespace Sirius.PaymentAccounts
     {
         Task<PagedAccountBookResultDto> GetAllListAsync(PagedAccountBookResultRequestDto input);
 
+        Task<List<AccountBookGetAllExportOutput>> GetAllListForExportAsync(
+            AccountBookGetAllFilter input);
+
         Task<List<LookUpDto>> GetPaymentCategoryLookUpForEditAccountBookAsync(
             Guid accountBookId);
     }

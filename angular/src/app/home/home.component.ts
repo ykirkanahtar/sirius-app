@@ -38,18 +38,11 @@ export class HomeComponent extends AppComponentBase implements OnInit {
     super(injector);
   }
 
-  getClassValue(arrayLength: number): number {
-    if (arrayLength < 4) {
-      return arrayLength;
-    } else {
-      return arrayLength / 4;
-    }
-  }
-
   ngOnInit(): void {
     this._dashboardServiceProxy
       .getDashboardData()
       .subscribe((result: DashboardDto) => {
+
         this.dashboardDto = result;
 
         if (
@@ -184,6 +177,14 @@ export class HomeComponent extends AppComponentBase implements OnInit {
         ],
       },
     };
+  }
+
+  getClassValue(arrayLength: number): number {
+    if (arrayLength < 4) {
+      return arrayLength;
+    } else {
+      return arrayLength / 4;
+    }
   }
 
   getRandomColorsArray(arraySize: number): any[] {

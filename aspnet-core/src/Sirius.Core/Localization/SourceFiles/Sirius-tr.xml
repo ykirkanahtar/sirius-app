@@ -230,6 +230,7 @@
     <text name="From">Giden</text>
     <text name="FromPaymentAccount">Ödeme hesabından</text>
     <text name="FromPaymentAccountBalance">Ödeme Hesabından Bakiye</text>
+    <text name="FromPaymentAccountName">Ödeme hesabından</text>
     <text name="Hirer">Kiracı</text>
     <text name="Housing">Konut</text>
     <text name="HousingCategories">Konut Grupları</text>
@@ -245,6 +246,7 @@
     <text name="HousingDueDefinition">Aidat tanımı</text>
     <text name="HousingDuePayment">Aidat ödemesi</text>
     <text name="HousingDueStats">Aidat istatistikleri</text>
+    <text name="HousingName">Konut</text>
     <text name="HousingOwner">Ev Sahibi</text>
     <text name="HousingPaymentPlan">Aidat Ödeme Planı</text>
     <text name="HousingPaymentPlanGroupDeleteWarningMessage">Aidat ödeme planı tanımını kaldırmak istediğinize emin misiniz?</text>
@@ -333,6 +335,7 @@
     <text name="To">Gelen</text>
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
+    <text name="ToPaymentAccountName">Ödeme hesabına</text>
     <text name="TotalHousingDueDefinitions">Toplam aidat tanımları</text>
     <text name="TotalHousingDuePayments">Toplam aidat ödemeleri</text>
     <text name="Transfer">Devir</text>
