@@ -27,22 +27,15 @@ namespace Sirius.HousingPaymentPlans
             CreateCreditHousingPaymentPlanDto, UpdateHousingPaymentPlanDto>, IHousingPaymentPlanAppService
     {
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
-        private readonly IHousingManager _housingManager;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
-        private readonly IRepository<HousingCategory, Guid> _housingCategoryRepository;
-        private readonly IPaymentCategoryManager _paymentCategoryManager;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public HousingPaymentPlanAppService(IHousingPaymentPlanManager housingPaymentPlanManager,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
-            IRepository<AccountBook, Guid> accountBookRepository,
-            IRepository<HousingCategory, Guid> housingCategoryRepository,
-            IPaymentCategoryManager paymentCategoryManager, IHousingManager housingManager,
-            IUnitOfWorkManager unitOfWorkManager)
+            IRepository<AccountBook, Guid> accountBookRepository)
             : base(housingPaymentPlanRepository)
         {
             _housingPaymentPlanManager = housingPaymentPlanManager;
@@ -50,10 +43,6 @@ namespace Sirius.HousingPaymentPlans
             _housingRepository = housingRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
             _accountBookRepository = accountBookRepository;
-            _housingCategoryRepository = housingCategoryRepository;
-            _paymentCategoryManager = paymentCategoryManager;
-            _housingManager = housingManager;
-            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)
@@ -67,7 +56,7 @@ namespace Sirius.HousingPaymentPlans
                 SequentialGuidGenerator.Instance.Create()
                 , AbpSession.GetTenantId()
                 , housing
-                , paymentCategory.HousingDueForResidentOrOwner.Value
+                , paymentCategory.HousingDueForResidentOrOwner.GetValueOrDefault()
                 , paymentCategory
                 , input.HousingPaymentPlanDateString.StringToDateTime()
                 , input.Amount
@@ -93,7 +82,7 @@ namespace Sirius.HousingPaymentPlans
                 , AbpSession.GetTenantId()
                 , null
                 , housing
-                , paymentCategory.HousingDueForResidentOrOwner.Value
+                , paymentCategory.HousingDueForResidentOrOwner.GetValueOrDefault()
                 , paymentCategory
                 , input.HousingPaymentPlanDateString.StringToDateTime()
                 , input.Amount
@@ -137,25 +126,43 @@ namespace Sirius.HousingPaymentPlans
             PagedHousingPaymentPlanResultRequestDto input)
         {
             CheckGetAllPermission();
-            var query = _housingPaymentPlanRepository.GetAll()
-                .Where(p => p.HousingId == input.HousingId)
-                .Include(p => p.PaymentCategory)
-                .WhereIf(input.StartDateFilter.HasValue && input.EndDateFilter.HasValue,
-                    p => p.Date >= input.StartDateFilter.Value && p.Date <= input.EndDateFilter.Value)
-                .WhereIf(input.CreditOrDebtsFilter.Any(), p => input.CreditOrDebtsFilter.Contains(p.CreditOrDebt))
-                .WhereIf(input.PaymentCategoriesFilter.Any(),
-                    p => input.PaymentCategoriesFilter.Contains(p.PaymentCategoryId ?? Guid.Empty))
-                .WhereIf(input.HousingPaymentPlanTypesFilter.Any(),
-                    p => input.HousingPaymentPlanTypesFilter.Contains(p.HousingPaymentPlanType));
-
+            var query = FilterQuery(input);
 
             var list = await query
-                .OrderBy(input.Sorting ?? "Date")
                 .PageBy(input)
                 .ToListAsync();
 
             return new PagedResultDto<HousingPaymentPlanDto>(query.Count(),
                 ObjectMapper.Map<List<HousingPaymentPlanDto>>(list));
+        }
+
+        private IOrderedQueryable<HousingPaymentPlan> FilterQuery(IHousingPaymentPlanGetAllFilter filter)
+        {
+            var query = _housingPaymentPlanRepository.GetAll()
+                .Where(p => p.HousingId == filter.HousingId)
+                .Include(p => p.PaymentCategory)
+                .WhereIf(filter.StartDateFilter.HasValue && filter.EndDateFilter.HasValue,
+                    p => p.Date >= filter.StartDateFilter.Value && p.Date <= filter.EndDateFilter.Value)
+                .WhereIf(filter.CreditOrDebtsFilter.Any(), p => filter.CreditOrDebtsFilter.Contains(p.CreditOrDebt))
+                .WhereIf(filter.PaymentCategoriesFilter.Any(),
+                    p => filter.PaymentCategoriesFilter.Contains(p.PaymentCategoryId ?? Guid.Empty))
+                .WhereIf(filter.HousingPaymentPlanTypesFilter.Any(),
+                    p => filter.HousingPaymentPlanTypesFilter.Contains(p.HousingPaymentPlanType));
+
+            return query
+                .OrderBy(filter.Sorting ?? nameof(HousingPaymentPlan.Date));
+        }
+
+        public async Task<List<HousingPaymentPlanExportOutput>> GetAllByHousingIdForExportAsync(
+            HousingPaymentPlanGetAllFilter input)
+        {
+            CheckGetAllPermission();
+
+            var query = FilterQuery(input);
+
+            var list = await query
+                .ToListAsync();
+            return ObjectMapper.Map<List<HousingPaymentPlanExportOutput>>(list);
         }
     }
 }

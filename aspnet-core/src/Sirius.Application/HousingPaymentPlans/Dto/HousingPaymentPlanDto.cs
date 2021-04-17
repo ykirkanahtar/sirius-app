@@ -21,8 +21,5 @@ namespace Sirius.HousingPaymentPlans.Dto
         public ResidentOrOwner? FirstHousingDueTransferIsResidentOrOwner { get; private set; } 
         
         public virtual PaymentCategoryDto PaymentCategory { get; set; }
-        
-        //Burayı açınca Angular tarafında circular dependency oluşuyor
-        // public virtual HousingPaymentPlanGroupDto HousingPaymentPlanGroup { get; set; }
     }
 }

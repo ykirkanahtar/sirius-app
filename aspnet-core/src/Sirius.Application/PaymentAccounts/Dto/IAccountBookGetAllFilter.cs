@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Abp.Application.Services.Dto;
 
 namespace Sirius.AccountBooks.Dto
 {
-    public interface IAccountBookGetAllFilter
+    public interface IAccountBookGetAllFilter : ISortedResultRequest
     {
         DateTime? StartDate { get; set; }
         DateTime? EndDate { get; set; }
@@ -12,6 +13,5 @@ namespace Sirius.AccountBooks.Dto
         List<Guid> PersonIds { get; set; }
         List<Guid> FromPaymentAccountIds { get; set; }
         List<Guid> ToPaymentAccountIds { get; set; }
-        string Sorting { get; set; }
     }
 }

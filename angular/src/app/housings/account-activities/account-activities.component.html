@@ -16,7 +16,7 @@
           </label>
           <div class="col-md-9">
             <label class="col-md-3 col-form-label">
-              {{ block.blockName + ' / ' + housing.apartment }}
+              {{ block.blockName + " / " + housing.apartment }}
             </label>
           </div>
         </div>
@@ -24,10 +24,6 @@
         <section class="content px-2">
           <div class="container-fluid">
             <div class="card">
-
-
-
-
               <div class="card-header">
                 <div class="input-group">
                   <div class="input-group-append">
@@ -125,7 +121,9 @@
                             >
                               <ng-template let-paymentCategory pTemplate="item">
                                 <div class="paymentCategory-item">
-                                  <div>{{ paymentCategory.label | localize }}</div>
+                                  <div>
+                                    {{ paymentCategory.label | localize }}
+                                  </div>
                                 </div>
                               </ng-template>
                             </p-multiSelect>
@@ -140,7 +138,9 @@
                               name="housingPaymentPlanTypesFilter"
                               [options]="housingPaymentPlanTypeFilter"
                               [showToggleAll]="false"
-                              [(ngModel)]="selectedHousingPaymentPlanTypesFilter"
+                              [(ngModel)]="
+                                selectedHousingPaymentPlanTypesFilter
+                              "
                               [virtualScroll]="true"
                               [filter]="true"
                               [itemSize]="34"
@@ -148,9 +148,16 @@
                               class="multiselect-custom-virtual-scroll"
                               [style]="{ minWidth: '100%' }"
                             >
-                              <ng-template let-housingPaymentPlanType pTemplate="item">
+                              <ng-template
+                                let-housingPaymentPlanType
+                                pTemplate="item"
+                              >
                                 <div class="housingPaymentPlanType-item">
-                                  <div>{{ housingPaymentPlanType.label | localize }}</div>
+                                  <div>
+                                    {{
+                                      housingPaymentPlanType.label | localize
+                                    }}
+                                  </div>
                                 </div>
                               </ng-template>
                             </p-multiSelect>
@@ -178,9 +185,6 @@
                 </div>
               </div>
 
-
-
-
               <div class="card-body table-responsive p-0">
                 <p-table
                   #dataTable
@@ -192,10 +196,22 @@
                   (onLazyLoad)="getData($event)"
                   [lazy]="true"
                   [loading]="isTableLoading"
-                  [paginator]="true" 
-                  [rows]="10" 
+                  [paginator]="true"
+                  [rows]="10"
                   [totalRecords]="totalRecords"
                 >
+                  <ng-template pTemplate="caption">
+                    <div class="p-d-flex">
+                      <button
+                        class="btn-success mr-2"
+                        (click)="exportExcel()"
+                        pTooltip="XLS"
+                        tooltipPosition="bottom"
+                      >
+                        <i class="fas fa-file-excel"></i>
+                      </button>
+                    </div>
+                  </ng-template>
                   <ng-template pTemplate="header">
                     <tr>
                       <th pSortableColumn="date">
@@ -208,12 +224,14 @@
                       </th>
                       <th pSortableColumn="paymentCategory.paymentCategoryName">
                         {{ "PaymentCategory" | localize }}
-                        <p-sortIcon field="paymentCategory.paymentCategoryName"></p-sortIcon>
+                        <p-sortIcon
+                          field="paymentCategory.paymentCategoryName"
+                        ></p-sortIcon>
                       </th>
                       <th pSortableColumn="housingPaymentPlanType">
                         {{ "HousingPaymentPlanType" | localize }}
                         <p-sortIcon field="housingPaymentPlanType"></p-sortIcon>
-                      </th>                      
+                      </th>
                       <th pSortableColumn="amount">
                         {{ "Amount" | localize }}
                         <p-sortIcon field="amount"></p-sortIcon>
@@ -225,13 +243,27 @@
                       <td>
                         {{ housingPaymentPlan.date.format("DD-MM-YYYY") }}
                       </td>
-                      <td>{{ creditOrDebtEnum[housingPaymentPlan.creditOrDebt] | localize}}</td>
                       <td>
                         {{
-                          housingPaymentPlan.paymentCategory ? (housingPaymentPlan.paymentCategory.paymentCategoryName | localize) : ''
+                          creditOrDebtEnum[housingPaymentPlan.creditOrDebt]
+                            | localize
                         }}
                       </td>
-                      <td>{{ housingPaymentPlanTypeEnum[housingPaymentPlan.housingPaymentPlanType] | localize}}</td>
+                      <td>
+                        {{
+                          housingPaymentPlan.paymentCategory
+                            ? (housingPaymentPlan.paymentCategory
+                                .paymentCategoryName | localize)
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          housingPaymentPlanTypeEnum[
+                            housingPaymentPlan.housingPaymentPlanType
+                          ] | localize
+                        }}
+                      </td>
                       <td>{{ housingPaymentPlan.amount | number: "1.2-2" }}</td>
                     </tr>
                   </ng-template>

@@ -362,7 +362,7 @@ export class AccountBooksComponent
         this.sortingColumn
       )
       .subscribe((result: AccountBookGetAllExportOutput[]) => {
-        CommonFunctions.createExcelFile(result, xlsx, this, "account-books");
+        CommonFunctions.createExcelFile(result, xlsx, this, this.l("AccountBooks"));
       });
   }
 

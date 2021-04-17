@@ -15,5 +15,7 @@ namespace Sirius.HousingPaymentPlans
         Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input);
         Task<PagedResultDto<HousingPaymentPlanDto>> GetAllByHousingIdAsync(
             PagedHousingPaymentPlanResultRequestDto input);
+        Task<List<HousingPaymentPlanExportOutput>> GetAllByHousingIdForExportAsync(
+            HousingPaymentPlanGetAllFilter input);
     }
 }
