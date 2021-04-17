@@ -19,6 +19,7 @@ import {
   CreditOrDebt,
   LookUpDto,
   PaymentCategoryServiceProxy,
+  HousingPaymentPlanExportOutput,
 } from "@shared/service-proxies/service-proxies";
 import { PagedRequestDto } from "@shared/paged-listing-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
@@ -26,7 +27,8 @@ import { Table } from "primeng/table";
 import { LazyLoadEvent, SelectItem } from "primeng/api";
 import { AppComponentBase } from "@shared/app-component-base";
 import * as moment from "moment";
-import { LEADING_TRIVIA_CHARS } from "@angular/compiler/src/render3/view/template";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
+import * as xlsx from "xlsx";
 
 class PagedHousingPaymentPlanResultRequestDto extends PagedRequestDto {
   keyword: string;
@@ -91,17 +93,22 @@ export class AccountActivitiesDialogComponent
     let housingPaymentPlanTypes = Array.from(housingPaymentPlanTypeMap.keys());
 
     for (let i = 0; i < housingPaymentPlanTypes.length; i++) {
-      this.housingPaymentPlanTypeFilter.push({ label: this.l(housingPaymentPlanTypes[i]), value: this.housingPaymentPlanTypeEnum[housingPaymentPlanTypes[i]] });
+      this.housingPaymentPlanTypeFilter.push({
+        label: this.l(housingPaymentPlanTypes[i]),
+        value: this.housingPaymentPlanTypeEnum[housingPaymentPlanTypes[i]],
+      });
     }
 
     let creditOrDebtMap = this.enumToMap(CreditOrDebt);
     let creditOrDebts = Array.from(creditOrDebtMap.keys());
 
     for (let i = 0; i < creditOrDebts.length; i++) {
-      this.creditOrDebtsFilter.push({ label: this.l(creditOrDebts[i]), value: this.creditOrDebtEnum[creditOrDebts[i]] });
+      this.creditOrDebtsFilter.push({
+        label: this.l(creditOrDebts[i]),
+        value: this.creditOrDebtEnum[creditOrDebts[i]],
+      });
     }
-      //enum işlemleri
-
+    //enum işlemleri
 
     this._paymentCategoryService
       .getHousingDueLookUp()
@@ -122,16 +129,15 @@ export class AccountActivitiesDialogComponent
   enumToMap(enumeration: any): Map<string, string | number> {
     const map = new Map<string, string | number>();
     for (let key in enumeration) {
-        //TypeScript does not allow enum keys to be numeric
-        if (!isNaN(Number(key))) continue;
-  
-        const val = enumeration[key] as string | number;
-  
-        //TypeScript does not allow enum value to be null or undefined
-        if (val !== undefined && val !== null)
-            map.set(key, val);
+      //TypeScript does not allow enum keys to be numeric
+      if (!isNaN(Number(key))) continue;
+
+      const val = enumeration[key] as string | number;
+
+      //TypeScript does not allow enum value to be null or undefined
+      if (val !== undefined && val !== null) map.set(key, val);
     }
-  
+
     return map;
   }
 
@@ -171,4 +177,21 @@ export class AccountActivitiesDialogComponent
         this.isTableLoading = false;
       });
   }
+
+  exportExcel() {
+    this._housingPaymentPlanService
+      .getAllByHousingIdForExport(
+        this.id,
+        this.startDateFilter,
+        this.endDateFilter,
+        this.selectedPaymentCategoriesFilter,
+        this.selectedCreditOrDebtFilter,
+        this.selectedHousingPaymentPlanTypesFilter,
+        this.sortingColumn
+      )
+      .subscribe((result: HousingPaymentPlanExportOutput[]) => {
+        CommonFunctions.createExcelFile(result, xlsx, this, this.l("HousingPaymentPlan"));
+      });
+  }
 }
+

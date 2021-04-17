@@ -5,7 +5,7 @@ import {
   OnInit,
   ViewChild,
 } from "@angular/core";
-import { finalize } from "rxjs/operators";
+import { finalize, map } from "rxjs/operators";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import {
@@ -25,6 +25,7 @@ import {
   PaymentCategoryDto,
   PaymentCategoryType,
   AccountBookType,
+  AccountBookGetAllExportOutput,
 } from "@shared/service-proxies/service-proxies";
 import { CreateAccountBookDialogComponent } from "./create-account-book/create-account-book-dialog.component";
 import { Table } from "primeng/table";
@@ -32,6 +33,8 @@ import { LazyLoadEvent, SelectItem } from "primeng/api";
 import * as moment from "moment";
 import { EditAccountBookDialogComponent } from "./edit-account-book/edit-account-book-dialog.component";
 import { MenuItem } from "primeng/api";
+import { CommonFunctions } from "@shared/helpers/CommonFunctions";
+import * as xlsx from "xlsx";
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
@@ -48,6 +51,9 @@ export class AccountBooksComponent
 
   sortingColumn: string;
   advancedFiltersVisible = false;
+
+  cols: any[];
+  exportColumns: any[];
 
   menuItems: MenuItem[] = [];
   menuLimit: number = 10;
@@ -118,9 +124,11 @@ export class AccountBooksComponent
         this.paymentCategoriesFilter = result;
       });
 
-    this._housingService.getHousingLookUp(undefined, undefined).subscribe((result: LookUpDto[]) => {
-      this.housingsFilters = result;
-    });
+    this._housingService
+      .getHousingLookUp(undefined, undefined)
+      .subscribe((result: LookUpDto[]) => {
+        this.housingsFilters = result;
+      });
 
     this._personService.getPersonLookUp().subscribe((result: LookUpDto[]) => {
       this.peopleFilters = result;
@@ -145,7 +153,7 @@ export class AccountBooksComponent
         if (paymentCategories.length > this.menuLimit) {
           let incomeMenuItem: MenuItem;
           incomeMenuItem = {
-            label: this.l("HousingDue") + ' & ' + this.l("Income"),
+            label: this.l("HousingDue") + " & " + this.l("Income"),
             icon: "pi pi-arrow-left",
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
@@ -212,11 +220,15 @@ export class AccountBooksComponent
 
           let transferPaymentCategories = paymentCategories.filter(
             (p) =>
-              p.paymentCategoryType === PaymentCategoryType.TransferBetweenAccounts
+              p.paymentCategoryType ===
+              PaymentCategoryType.TransferBetweenAccounts
           );
 
           if (transferPaymentCategories.length > 0) {
-            this.createMenuItem(transferPaymentCategories, this.l("TransferBetweenAccounts"));
+            this.createMenuItem(
+              transferPaymentCategories,
+              this.l("TransferBetweenAccounts")
+            );
           }
         }
       });
@@ -334,6 +346,23 @@ export class AccountBooksComponent
         this.accountBooks = result.items;
         this.lastAccountBookProcessDate = result.lastAccountBookDate;
         this.showPaging(result, pageNumber);
+      });
+  }
+
+  exportExcel() {
+    this._accountBooksService
+      .getAllListForExport(
+        this.startDateFilter,
+        this.endDateFilter,
+        this.selectedPaymentCategoriesFilter,
+        this.selectedHousingsFilters,
+        this.selectedPeopleFilters,
+        this.selectedFromPaymentAccountsFilter,
+        this.selectedToPaymentAccountsFilter,
+        this.sortingColumn
+      )
+      .subscribe((result: AccountBookGetAllExportOutput[]) => {
+        CommonFunctions.createExcelFile(result, xlsx, this, this.l("AccountBooks"));
       });
   }
 

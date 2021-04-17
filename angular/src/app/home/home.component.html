@@ -1,126 +1,139 @@
 ﻿<div [@routerTransition]>
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <h1>{{ "Assets" | localize }}</h1>
+  <div [hidden]="isProcessing">
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <h1>{{ "Assets" | localize }}</h1>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-  <section class="content px-2">
-    <div class="container-fluid">
-      <div class="row">
-        <ng-template
-          ngFor
-          let-paymentAccount
-          [ngForOf]="dashboardDto.paymentAccounts"
-          let-i="index"
+    </section>
+    <section class="content px-2">
+      <div class="container-fluid">
+        <div
+          class="row"
+          *ngIf="
+            dashboardDto &&
+            dashboardDto.paymentAccounts !== undefined &&
+            dashboardDto.paymentAccounts !== null &&
+            dashboardDto.paymentAccounts
+          "
         >
-          <div [ngClass]="assetsClass">
-            <div class="small-box bg-success">
+          <ng-template
+            ngFor
+            let-paymentAccount
+            [ngForOf]="dashboardDto.paymentAccounts"
+            let-i="index"
+          >
+            <div [ngClass]="assetsClass">
+              <div class="small-box bg-success">
+                <div class="inner">
+                  <h5>{{ paymentAccount.paymentAccountName }}</h5>
+                  <p>{{ paymentAccount.balance | currency: "TL " }}</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-bank"></i>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </section>
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <h1>{{ "Stats" | localize }}</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="content px-2">
+      <div class="container-fluid">
+        <div class="row">
+          <div [ngClass]="statsClass">
+            <div class="small-box bg-warning">
               <div class="inner">
-                <h5>{{ paymentAccount.paymentAccountName }}</h5>
-                <p>{{ paymentAccount.balance | currency: "TL " }}</p>
+                <h3>
+                  {{ dashboardDto.totalHousingDueAmount | currency: "TL " }}
+                </h3>
+                <p>{{ "CurrentTotalHousingDueAmount" | localize }}</p>
               </div>
               <div class="icon">
-                <i class="fas fa-bank"></i>
+                <i class="fas fa-code"></i>
               </div>
             </div>
           </div>
-        </ng-template>
+          <div
+            [ngClass]="statsClass"
+            *ngIf="dashboardDto.totalIncomeAmount > 0"
+          >
+            <div class="small-box bg-primary">
+              <div class="inner">
+                <h3>{{ dashboardDto.totalIncomeAmount | currency: "TL " }}</h3>
+                <p>{{ "CurrentTotalIncomeAmount" | localize }}</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-code"></i>
+              </div>
+            </div>
+          </div>
+          <div [ngClass]="statsClass">
+            <div class="small-box bg-primary">
+              <div class="inner">
+                <h3>{{ dashboardDto.totalExpenseAmount | currency: "TL " }}</h3>
+                <p>{{ "CurrentTotalExpenseAmount" | localize }}</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-tools"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "HousingDueStats" | localize }}</h5>
+              <p-chart
+                type="bar"
+                [data]="housingDueStatsData"
+                [options]="housingDueStatsOptions"
+              ></p-chart>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "Expenses" | localize }}</h5>
+              <p-chart type="pie" [data]="expensesData"></p-chart>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "MostHousingDuePayers" | localize }}</h5>
+              <p-chart
+                type="bar"
+                [data]="mostHousingDuePayersData"
+                [options]="barOptions"
+              ></p-chart>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "LessHousingDuePayers" | localize }}</h5>
+              <p-chart
+                type="bar"
+                [data]="lessHousingDuePayersData"
+                [options]="barOptions"
+              ></p-chart>
+            </div>
+          </div>
+        </div>
+        <div class="row"></div>
       </div>
-    </div>
-  </section>
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <h1>{{ "Stats" | localize }}</h1>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="content px-2">
-    <div class="container-fluid">
-      <div class="row">
-        <div [ngClass]="statsClass">
-          <div class="small-box bg-warning">
-            <div class="inner">
-              <h3>
-                {{ dashboardDto.totalHousingDueAmount | currency: "TL " }}
-              </h3>
-              <p>{{ "CurrentTotalHousingDueAmount" | localize }}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-code"></i>
-            </div>
-          </div>
-        </div>
-        <div [ngClass]="statsClass" *ngIf="dashboardDto.totalIncomeAmount > 0">
-          <div class="small-box bg-primary">
-            <div class="inner">
-              <h3>{{ dashboardDto.totalIncomeAmount | currency: "TL " }}</h3>
-              <p>{{ "CurrentTotalIncomeAmount" | localize }}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-code"></i>
-            </div>
-          </div>
-        </div>
-        <div [ngClass]="statsClass">
-          <div class="small-box bg-primary">
-            <div class="inner">
-              <h3>{{ dashboardDto.totalExpenseAmount | currency: "TL " }}</h3>
-              <p>{{ "CurrentTotalExpenseAmount" | localize }}</p>
-            </div>
-            <div class="icon">
-              <i class="fas fa-tools"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card">
-            <h5>{{ "HousingDueStats" | localize }}</h5>
-            <p-chart
-              type="bar"
-              [data]="housingDueStatsData"
-              [options]="housingDueStatsOptions"
-            ></p-chart>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card">
-            <h5>{{ "Expenses" | localize }}</h5>
-            <p-chart type="pie" [data]="expensesData"></p-chart>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card">
-            <h5>{{ "MostHousingDuePayers" | localize }}</h5>
-            <p-chart
-              type="bar"
-              [data]="mostHousingDuePayersData"
-              [options]="barOptions"
-            ></p-chart>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card">
-            <h5>{{ "LessHousingDuePayers" | localize }}</h5>
-            <p-chart
-              type="bar"
-              [data]="lessHousingDuePayersData"
-              [options]="barOptions"
-            ></p-chart>
-          </div>
-        </div>
-      </div>
-      <div class="row"></div>
-    </div>
-  </section>
+    </section>
+  </div>
 </div>
