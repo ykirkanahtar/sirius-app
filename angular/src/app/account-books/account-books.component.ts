@@ -33,11 +33,8 @@ import { LazyLoadEvent, SelectItem } from "primeng/api";
 import * as moment from "moment";
 import { EditAccountBookDialogComponent } from "./edit-account-book/edit-account-book-dialog.component";
 import { MenuItem } from "primeng/api";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 import * as xlsx from "xlsx";
-import { Subject } from "rxjs";
 
 class PagedAccountBooksRequestDto extends PagedRequestDto {
   keyword: string;
@@ -120,7 +117,6 @@ export class AccountBooksComponent
 
   ngOnInit(): void {
     this.createMenu();
-    this.createExportColumns();
 
     this._paymentCategoryService
       .getLookUp(false)
@@ -350,49 +346,6 @@ export class AccountBooksComponent
         this.accountBooks = result.items;
         this.lastAccountBookProcessDate = result.lastAccountBookDate;
         this.showPaging(result, pageNumber);
-      });
-  }
-
-  createExportColumns() {
-    this.cols = [
-      { field: "ProcessDateTime", header: this.l("ProcessDateTime") },
-      { field: "PaymentCategoryName", header: this.l("PaymentCategoryName") },
-      { field: "HousingName", header: this.l("Housing") },
-      { field: "Amount", header: this.l("Amount") },
-      { field: "FromPaymentAccountName", header: this.l("FromPaymentAccount") },
-      {
-        field: "FromPaymentAccountBalance",
-        header: this.l("FromPaymentAccountBalance"),
-      },
-      { field: "ToPaymentAccountName", header: this.l("ToPaymentAccount") },
-      {
-        field: "ToPaymentAccountBalance",
-        header: this.l("ToPaymentAccountBalance"),
-      },
-    ];
-
-    this.exportColumns = this.cols.map((col) => ({
-      title: col.header,
-      dataKey: col.field,
-    }));
-  }
-
-  exportPdf() {
-    this._accountBooksService
-      .getAllListForExport(
-        this.startDateFilter,
-        this.endDateFilter,
-        this.selectedPaymentCategoriesFilter,
-        this.selectedHousingsFilters,
-        this.selectedPeopleFilters,
-        this.selectedFromPaymentAccountsFilter,
-        this.selectedToPaymentAccountsFilter,
-        this.sortingColumn
-      )
-      .subscribe((result: AccountBookGetAllExportOutput[]) => {
-        const doc = new jsPDF("p", "pt");
-        doc["autoTable"](this.exportColumns, result);
-        doc.save("account-books.pdf");
       });
   }
 
