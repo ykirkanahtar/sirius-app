@@ -16,7 +16,9 @@ import {
   HousingPaymentPlanGroupServiceProxy,
   PaymentAccountServiceProxy,
   ResidentOrOwner,
-  PaymentPlanForHousingCategoryDto,
+  HousingPaymentPlanGroupForHousingCategoryDto,
+  HousingServiceProxy,
+  HousingPaymentPlanGroupForHousingDto,
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
 import { BsModalRef } from "ngx-bootstrap/modal";
@@ -31,10 +33,14 @@ export class CreateHousingPaymentPlanGroupDialogComponent
   saving = false;
   input = new CreateHousingPaymentPlanGroupDto();
   housingCategories: LookUpDto[];
+  housings: LookUpDto[];
+  selectedHousings: string[];
+  amountPerMonthForHousing: number;
   paymentAccounts: LookUpDto[];
   residentOrOwners: any[];
   residentOrOwnerEnum = ResidentOrOwner;
   startDate: Date;
+  showCategory: boolean;
 
   @Output() onSave = new EventEmitter<any>();
 
@@ -43,27 +49,38 @@ export class CreateHousingPaymentPlanGroupDialogComponent
     private _housingPaymentPlanGroupService: HousingPaymentPlanGroupServiceProxy,
     private _housingCategoryService: HousingCategoryServiceProxy,
     private _paymentAccountService: PaymentAccountServiceProxy,
+    private _housingService: HousingServiceProxy,
     public bsModalRef: BsModalRef
   ) {
     super(injector);
   }
 
   ngOnInit(): void {
-    this._housingCategoryService
-      .getHousingCategoryLookUp()
-      .subscribe((result: LookUpDto[]) => {
-        this.housingCategories = result;
+    if (this.showCategory) {
+      this._housingCategoryService
+        .getHousingCategoryLookUp()
+        .subscribe((result: LookUpDto[]) => {
+          this.housingCategories = result;
 
-        this.input.paymentPlanForHousingCategories = [];
+          this.input.housingPaymentPlanGroupForHousingCategories = [];
 
-        this.housingCategories.forEach( (currentValue, index) => {
-          let housingPaymentPlanForHousingCategory = new PaymentPlanForHousingCategoryDto();
-          housingPaymentPlanForHousingCategory.housingCategoryId = currentValue.value;
-          housingPaymentPlanForHousingCategory.amountPerMonth = 0;
-          this.input.paymentPlanForHousingCategories.push(housingPaymentPlanForHousingCategory);
+          this.housingCategories.forEach((currentValue, index) => {
+            let housingPaymentPlanForHousingCategory = new HousingPaymentPlanGroupForHousingCategoryDto();
+            housingPaymentPlanForHousingCategory.housingCategoryId =
+              currentValue.value;
+            housingPaymentPlanForHousingCategory.amountPerMonth = 0;
+            this.input.housingPaymentPlanGroupForHousingCategories.push(
+              housingPaymentPlanForHousingCategory
+            );
+          });
         });
-
-      });
+    } else {
+      this._housingService
+        .getHousingLookUp(undefined, undefined)
+        .subscribe((result: LookUpDto[]) => {
+          this.housings = result;
+        });
+    }
 
     this._paymentAccountService
       .getPaymentAccountLookUp()
@@ -84,13 +101,28 @@ export class CreateHousingPaymentPlanGroupDialogComponent
   }
 
   getHousingCategoryName(housingCategoryId: string): string {
-    return this.housingCategories.filter(p => p.value === housingCategoryId).map(p => p.label)[0];
+    return this.housingCategories
+      .filter((p) => p.value === housingCategoryId)
+      .map((p) => p.label)[0];
   }
 
   save(): void {
     this.saving = true;
 
     this.input.startDateString = CommonFunctions.dateToString(this.startDate);
+
+    if(this.showCategory === false) {
+      this.input.housingPaymentPlanGroupForHousings = [];
+
+      this.selectedHousings.forEach((currentValue, index) => {
+        let housingPaymentPlanForHousing = new HousingPaymentPlanGroupForHousingDto();
+        housingPaymentPlanForHousing.housingId = currentValue;
+        housingPaymentPlanForHousing.amountPerMonth = this.amountPerMonthForHousing;
+        this.input.housingPaymentPlanGroupForHousings.push(
+          housingPaymentPlanForHousing
+        );
+      });
+    }
 
     this._housingPaymentPlanGroupService
       .create(this.input)

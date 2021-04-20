@@ -23,11 +23,17 @@ namespace Sirius.HousingPaymentPlans.Dto
         public string Description { get; set; }
         public ResidentOrOwner ResidentOrOwner { get; set; }
         public string HousingCategoryNames { get; set; }
+        public string HousingNames { get; set; }
 
         public virtual HousingCategoryDto HousingCategory { get; set; }
 
         public virtual PaymentCategoryDto PaymentCategory { get; set; }
         public virtual ICollection<HousingPaymentPlanGroupHousingCategoryDto> HousingPaymentPlanGroupHousingCategories
+        {
+            get;
+            set;
+        }
+        public virtual ICollection<HousingPaymentPlanGroupHousingDto> HousingPaymentPlanGroupHousings
         {
             get;
             set;

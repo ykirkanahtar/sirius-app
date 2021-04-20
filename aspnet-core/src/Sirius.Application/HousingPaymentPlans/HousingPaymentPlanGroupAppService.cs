@@ -6,18 +6,13 @@ using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
-using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
-using Abp.Timing;
 using Microsoft.EntityFrameworkCore;
 using Sirius.HousingPaymentPlans.Dto;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
 using System.Linq.Dynamic.Core;
-using Abp.Extensions;
-using Abp.UI;
-using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
 using Sirius.People;
 using Sirius.Shared.Dtos;
@@ -70,7 +65,7 @@ namespace Sirius.HousingPaymentPlans
         {
             CheckCreatePermission();
             var housingPaymentPlanGroupHousingCategories = new List<HousingPaymentPlanGroupHousingCategory>();
-            var housings = new List<Housing>();
+            var housingPaymentPlanGroupHousings = new List<HousingPaymentPlanGroupHousing>();
 
             var paymentCategory = PaymentCategory.CreateHousingDue(SequentialGuidGenerator.Instance.Create(),
                 AbpSession.GetTenantId(), input.HousingPaymentPlanGroupName, /*input.HousingDueType,*/
@@ -78,12 +73,19 @@ namespace Sirius.HousingPaymentPlans
 
             await _paymentCategoryManager.CreateAsync(paymentCategory);
             var housingPaymentPlanGroupId = SequentialGuidGenerator.Instance.Create();
-            
-            foreach (var paymentPlanForHousingCategory in input.PaymentPlanForHousingCategories)
+
+            foreach (var paymentPlanForHousingCategory in input.HousingPaymentPlanGroupForHousingCategories)
             {
                 housingPaymentPlanGroupHousingCategories.Add(HousingPaymentPlanGroupHousingCategory.Create(
                     housingPaymentPlanGroupId, paymentPlanForHousingCategory.HousingCategoryId,
                     paymentPlanForHousingCategory.AmountPerMonth));
+            }
+
+            foreach (var paymentPlanForHousing in input.HousingPaymentPlanGroupForHousings)
+            {
+                housingPaymentPlanGroupHousings.Add(HousingPaymentPlanGroupHousing.Create(
+                    housingPaymentPlanGroupId, paymentPlanForHousing.HousingId,
+                    paymentPlanForHousing.AmountPerMonth));
             }
 
             var housingPaymentPlanGroup = HousingPaymentPlanGroup.Create(housingPaymentPlanGroupId,
@@ -91,7 +93,8 @@ namespace Sirius.HousingPaymentPlans
                 input.HousingPaymentPlanGroupName, paymentCategory,
                 input.CountOfMonth, input.PaymentDayOfMonth
                 , input.StartDateString.StringToDateTime(), input.Description, input.ResidentOrOwner,
-                housingPaymentPlanGroupHousingCategories);
+                housingPaymentPlanGroupHousingCategories,
+                housingPaymentPlanGroupHousings);
 
             await _housingPaymentPlanGroupManager.CreateAsync(housingPaymentPlanGroup,
                 input.StartDateString.StringToDateTime(),
@@ -156,6 +159,7 @@ namespace Sirius.HousingPaymentPlans
 
             var query = (from housingPaymentPlanGroup in _housingPaymentPlanGroupRepository.GetAll()
                         .Include(p => p.HousingPaymentPlanGroupHousingCategories)
+                        .Include(p => p.HousingPaymentPlanGroupHousings)
                         .Include(p => p.PaymentCategory)
                     join paymentCategory in _paymentCategoryRepository.GetAll() on housingPaymentPlanGroup
                         .PaymentCategoryId equals paymentCategory.Id
@@ -198,6 +202,8 @@ namespace Sirius.HousingPaymentPlans
                 ObjectMapper.Map<List<HousingPaymentPlanGroupDto>>(housingPaymentPlanGroups);
 
             var allHousingCategories = await _housingCategoryRepository.GetAll().ToListAsync();
+            var allHousings = await _housingRepository.GetAll().Include(p => p.Block).ToListAsync();
+
             foreach (var housingPaymentPlanGroupDto in housingPaymentPlanGroupsDto)
             {
                 var housingCategories = allHousingCategories.Where(p =>
@@ -206,6 +212,13 @@ namespace Sirius.HousingPaymentPlans
 
                 housingPaymentPlanGroupDto.HousingCategoryNames = string.Join(", ",
                     housingCategories.Select(p => p.HousingCategoryName).ToArray());
+
+                var housings = allHousings.Where(p => housingPaymentPlanGroupDto.HousingPaymentPlanGroupHousings
+                    .Select(p => p.HousingId)
+                    .ToList().Contains(p.Id)).ToList();
+
+                housingPaymentPlanGroupDto.HousingNames = string.Join(", ",
+                    housings.Select(p => p.Block.BlockName + "-" + p.Apartment).ToArray());
             }
 
             return new PagedResultDto<HousingPaymentPlanGroupDto>(list.Count(), housingPaymentPlanGroupsDto);

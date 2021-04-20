@@ -11112,11 +11112,58 @@ export interface IHousingPaymentPlanExportOutput {
     amount: number;
 }
 
-export class PaymentPlanForHousingCategoryDto implements IPaymentPlanForHousingCategoryDto {
+export class HousingPaymentPlanGroupForHousingDto implements IHousingPaymentPlanGroupForHousingDto {
+    housingId: string;
+    amountPerMonth: number;
+
+    constructor(data?: IHousingPaymentPlanGroupForHousingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.amountPerMonth = _data["amountPerMonth"];
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanGroupForHousingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanGroupForHousingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["amountPerMonth"] = this.amountPerMonth;
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanGroupForHousingDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanGroupForHousingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanGroupForHousingDto {
+    housingId: string;
+    amountPerMonth: number;
+}
+
+export class HousingPaymentPlanGroupForHousingCategoryDto implements IHousingPaymentPlanGroupForHousingCategoryDto {
     housingCategoryId: string;
     amountPerMonth: number;
 
-    constructor(data?: IPaymentPlanForHousingCategoryDto) {
+    constructor(data?: IHousingPaymentPlanGroupForHousingCategoryDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -11132,9 +11179,9 @@ export class PaymentPlanForHousingCategoryDto implements IPaymentPlanForHousingC
         }
     }
 
-    static fromJS(data: any): PaymentPlanForHousingCategoryDto {
+    static fromJS(data: any): HousingPaymentPlanGroupForHousingCategoryDto {
         data = typeof data === 'object' ? data : {};
-        let result = new PaymentPlanForHousingCategoryDto();
+        let result = new HousingPaymentPlanGroupForHousingCategoryDto();
         result.init(data);
         return result;
     }
@@ -11146,15 +11193,15 @@ export class PaymentPlanForHousingCategoryDto implements IPaymentPlanForHousingC
         return data; 
     }
 
-    clone(): PaymentPlanForHousingCategoryDto {
+    clone(): HousingPaymentPlanGroupForHousingCategoryDto {
         const json = this.toJSON();
-        let result = new PaymentPlanForHousingCategoryDto();
+        let result = new HousingPaymentPlanGroupForHousingCategoryDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IPaymentPlanForHousingCategoryDto {
+export interface IHousingPaymentPlanGroupForHousingCategoryDto {
     housingCategoryId: string;
     amountPerMonth: number;
 }
@@ -11167,7 +11214,8 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
     startDateString: string | undefined;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
-    paymentPlanForHousingCategories: PaymentPlanForHousingCategoryDto[] | undefined;
+    housingPaymentPlanGroupForHousings: HousingPaymentPlanGroupForHousingDto[] | undefined;
+    housingPaymentPlanGroupForHousingCategories: HousingPaymentPlanGroupForHousingCategoryDto[] | undefined;
 
     constructor(data?: ICreateHousingPaymentPlanGroupDto) {
         if (data) {
@@ -11187,10 +11235,15 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
             this.startDateString = _data["startDateString"];
             this.description = _data["description"];
             this.residentOrOwner = _data["residentOrOwner"];
-            if (Array.isArray(_data["paymentPlanForHousingCategories"])) {
-                this.paymentPlanForHousingCategories = [] as any;
-                for (let item of _data["paymentPlanForHousingCategories"])
-                    this.paymentPlanForHousingCategories.push(PaymentPlanForHousingCategoryDto.fromJS(item));
+            if (Array.isArray(_data["housingPaymentPlanGroupForHousings"])) {
+                this.housingPaymentPlanGroupForHousings = [] as any;
+                for (let item of _data["housingPaymentPlanGroupForHousings"])
+                    this.housingPaymentPlanGroupForHousings.push(HousingPaymentPlanGroupForHousingDto.fromJS(item));
+            }
+            if (Array.isArray(_data["housingPaymentPlanGroupForHousingCategories"])) {
+                this.housingPaymentPlanGroupForHousingCategories = [] as any;
+                for (let item of _data["housingPaymentPlanGroupForHousingCategories"])
+                    this.housingPaymentPlanGroupForHousingCategories.push(HousingPaymentPlanGroupForHousingCategoryDto.fromJS(item));
             }
         }
     }
@@ -11211,10 +11264,15 @@ export class CreateHousingPaymentPlanGroupDto implements ICreateHousingPaymentPl
         data["startDateString"] = this.startDateString;
         data["description"] = this.description;
         data["residentOrOwner"] = this.residentOrOwner;
-        if (Array.isArray(this.paymentPlanForHousingCategories)) {
-            data["paymentPlanForHousingCategories"] = [];
-            for (let item of this.paymentPlanForHousingCategories)
-                data["paymentPlanForHousingCategories"].push(item.toJSON());
+        if (Array.isArray(this.housingPaymentPlanGroupForHousings)) {
+            data["housingPaymentPlanGroupForHousings"] = [];
+            for (let item of this.housingPaymentPlanGroupForHousings)
+                data["housingPaymentPlanGroupForHousings"].push(item.toJSON());
+        }
+        if (Array.isArray(this.housingPaymentPlanGroupForHousingCategories)) {
+            data["housingPaymentPlanGroupForHousingCategories"] = [];
+            for (let item of this.housingPaymentPlanGroupForHousingCategories)
+                data["housingPaymentPlanGroupForHousingCategories"].push(item.toJSON());
         }
         return data; 
     }
@@ -11235,7 +11293,8 @@ export interface ICreateHousingPaymentPlanGroupDto {
     startDateString: string | undefined;
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
-    paymentPlanForHousingCategories: PaymentPlanForHousingCategoryDto[] | undefined;
+    housingPaymentPlanGroupForHousings: HousingPaymentPlanGroupForHousingDto[] | undefined;
+    housingPaymentPlanGroupForHousingCategories: HousingPaymentPlanGroupForHousingCategoryDto[] | undefined;
 }
 
 export class HousingPaymentPlanGroupHousingCategoryDto implements IHousingPaymentPlanGroupHousingCategoryDto {
@@ -11297,6 +11356,65 @@ export interface IHousingPaymentPlanGroupHousingCategoryDto {
     amountPerMonth: number;
 }
 
+export class HousingPaymentPlanGroupHousingDto implements IHousingPaymentPlanGroupHousingDto {
+    id: string;
+    tenantId: number;
+    housingId: string;
+    housingPaymentPlanGroupId: string;
+    amountPerMonth: number;
+
+    constructor(data?: IHousingPaymentPlanGroupHousingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tenantId = _data["tenantId"];
+            this.housingId = _data["housingId"];
+            this.housingPaymentPlanGroupId = _data["housingPaymentPlanGroupId"];
+            this.amountPerMonth = _data["amountPerMonth"];
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanGroupHousingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanGroupHousingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tenantId"] = this.tenantId;
+        data["housingId"] = this.housingId;
+        data["housingPaymentPlanGroupId"] = this.housingPaymentPlanGroupId;
+        data["amountPerMonth"] = this.amountPerMonth;
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanGroupHousingDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanGroupHousingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanGroupHousingDto {
+    id: string;
+    tenantId: number;
+    housingId: string;
+    housingPaymentPlanGroupId: string;
+    amountPerMonth: number;
+}
+
 export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     housingPaymentPlanGroupName: string | undefined;
     paymentCategoryId: string;
@@ -11306,9 +11424,11 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
     housingCategoryNames: string | undefined;
+    housingNames: string | undefined;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
     housingPaymentPlanGroupHousingCategories: HousingPaymentPlanGroupHousingCategoryDto[] | undefined;
+    housingPaymentPlanGroupHousings: HousingPaymentPlanGroupHousingDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -11337,12 +11457,18 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
             this.description = _data["description"];
             this.residentOrOwner = _data["residentOrOwner"];
             this.housingCategoryNames = _data["housingCategoryNames"];
+            this.housingNames = _data["housingNames"];
             this.housingCategory = _data["housingCategory"] ? HousingCategoryDto.fromJS(_data["housingCategory"]) : <any>undefined;
             this.paymentCategory = _data["paymentCategory"] ? PaymentCategoryDto.fromJS(_data["paymentCategory"]) : <any>undefined;
             if (Array.isArray(_data["housingPaymentPlanGroupHousingCategories"])) {
                 this.housingPaymentPlanGroupHousingCategories = [] as any;
                 for (let item of _data["housingPaymentPlanGroupHousingCategories"])
                     this.housingPaymentPlanGroupHousingCategories.push(HousingPaymentPlanGroupHousingCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["housingPaymentPlanGroupHousings"])) {
+                this.housingPaymentPlanGroupHousings = [] as any;
+                for (let item of _data["housingPaymentPlanGroupHousings"])
+                    this.housingPaymentPlanGroupHousings.push(HousingPaymentPlanGroupHousingDto.fromJS(item));
             }
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
@@ -11372,12 +11498,18 @@ export class HousingPaymentPlanGroupDto implements IHousingPaymentPlanGroupDto {
         data["description"] = this.description;
         data["residentOrOwner"] = this.residentOrOwner;
         data["housingCategoryNames"] = this.housingCategoryNames;
+        data["housingNames"] = this.housingNames;
         data["housingCategory"] = this.housingCategory ? this.housingCategory.toJSON() : <any>undefined;
         data["paymentCategory"] = this.paymentCategory ? this.paymentCategory.toJSON() : <any>undefined;
         if (Array.isArray(this.housingPaymentPlanGroupHousingCategories)) {
             data["housingPaymentPlanGroupHousingCategories"] = [];
             for (let item of this.housingPaymentPlanGroupHousingCategories)
                 data["housingPaymentPlanGroupHousingCategories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.housingPaymentPlanGroupHousings)) {
+            data["housingPaymentPlanGroupHousings"] = [];
+            for (let item of this.housingPaymentPlanGroupHousings)
+                data["housingPaymentPlanGroupHousings"].push(item.toJSON());
         }
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
@@ -11407,9 +11539,11 @@ export interface IHousingPaymentPlanGroupDto {
     description: string | undefined;
     residentOrOwner: ResidentOrOwner;
     housingCategoryNames: string | undefined;
+    housingNames: string | undefined;
     housingCategory: HousingCategoryDto;
     paymentCategory: PaymentCategoryDto;
     housingPaymentPlanGroupHousingCategories: HousingPaymentPlanGroupHousingCategoryDto[] | undefined;
+    housingPaymentPlanGroupHousings: HousingPaymentPlanGroupHousingDto[] | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

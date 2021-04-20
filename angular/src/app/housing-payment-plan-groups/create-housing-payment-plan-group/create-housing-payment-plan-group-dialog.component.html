@@ -158,7 +158,7 @@
             ></abp-validation-summary>
           </div>
         </div>
-        <div class="border border-primary p-3">
+        <div class="border border-primary p-3" *ngIf="showCategory">
           <div class="row">
             <div class="col-md-12 d-flex justify-content-center">
               <label>
@@ -169,7 +169,7 @@
           <div
             class="form-group row"
             *ngFor="
-              let item of input.paymentPlanForHousingCategories;
+              let item of input.housingPaymentPlanGroupForHousingCategories;
               let index = index
             "
           >
@@ -188,6 +188,50 @@
               >
               </p-inputNumber>
             </div>
+          </div>
+        </div>
+        <div class="form-group row required" *ngIf="showCategory === false">
+          <label class="col-md-3 col-form-label" for="housings">
+            {{ "Housing" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-multiSelect
+              name="housings"
+              [options]="housings"
+              [showToggleAll]="false"
+              [(ngModel)]="selectedHousings"
+              [virtualScroll]="true"
+              [filter]="true"
+              [itemSize]="34"
+              [defaultLabel]="l('Housing')"
+              class="multiselect-custom-virtual-scroll"
+              [style]="{ minWidth: '100%' }"
+              required
+            >
+              <ng-template let-housing pTemplate="item">
+                <div class="housing-item">
+                  <div>{{ housing.label }}</div>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </div>
+        </div>
+        <div class="form-group row required" *ngIf="showCategory === false">
+          <label class="col-md-3 col-form-label" for="housings">
+            {{ "AmountPerMonth" | localize }}
+          </label>
+          <div class="col-md-9">
+            <p-inputNumber
+              [(ngModel)]="amountPerMonthForHousing"
+              name="amountPerMonthForHousing"
+              id="amountPerMonthForHousing"
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [style]="{ width: '100%' }"
+              required
+            >
+            </p-inputNumber>
           </div>
         </div>
       </tab>

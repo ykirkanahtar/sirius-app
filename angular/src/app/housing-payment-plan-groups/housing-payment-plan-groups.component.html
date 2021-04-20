@@ -5,18 +5,21 @@
         <div class="col-6">
           <h1>{{ "HousingPaymentPlanGroups" | localize }}</h1>
         </div>
+
+        <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
+
         <div
           class="col-6 text-right"
           *ngIf="this.permissionHelper.createHousingPaymentPlanGroup()"
         >
-          <a
-            href="javascript:;"
+          <button
+            type="button"
             class="btn bg-blue"
-            (click)="createHousingPaymentPlanGroup()"
-          >
-            <i class="fa fa-plus-square"></i>
-            {{ "Create" | localize }}
-          </a>
+            pButton
+            icon="fa fa-arrow-down"
+            [label]="'Create' | localize"
+            (click)="menu.toggle($event)"
+          ></button>
         </div>
       </div>
     </div>
@@ -159,12 +162,12 @@
                   {{ "HousingPaymentPlanGroupNameShort" | localize }}
                   <p-sortIcon field="housingPaymentPlanGroupName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="housingCategory.housingCategoryName">
+                <th>
                   {{ "HousingCategoryNameShort" | localize }}
-                  <p-sortIcon
-                    field="housingCategory.housingCategoryName"
-                  ></p-sortIcon>
                 </th>
+                <th>
+                  {{ "Housing" | localize }}
+                </th>                
                 <th pSortableColumn="paymentCategory.paymentCategoryName">
                   {{ "PaymentCategoryNameShort" | localize }}
                   <p-sortIcon
@@ -210,6 +213,7 @@
                   {{ housingPaymentPlanGroup.housingPaymentPlanGroupName }}
                 </td>
                 <td>{{ housingPaymentPlanGroup.housingCategoryNames }}</td>
+                <td>{{ housingPaymentPlanGroup.housingNames }}</td>
                 <td>
                   {{
                     housingPaymentPlanGroup.paymentCategory.paymentCategoryName
@@ -233,10 +237,10 @@
                   <button
                     type="button"
                     class="btn btn-sm bg-primary mx-2"
-                    (click)="getHousingCategories(housingPaymentPlanGroup)"
+                    (click)="getAmountsModal(housingPaymentPlanGroup)"
                   >
                     <i class="fas fa-clipboard-list"></i>
-                    {{ "HousingCategoryAmounts" | localize }}
+                    {{ "Amounts" | localize }}
                   </button>
                   <button
                     type="button"

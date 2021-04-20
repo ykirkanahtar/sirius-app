@@ -123,6 +123,7 @@
     <text name="Amount">Tutar</text>
     <text name="AmountPerHousingCategory">Konut Grubuna Göre Tutar Girişi</text>
     <text name="AmountPerMonth">Tutar/Ay</text>
+    <text name="Amounts">Tutarlar</text>
     <text name="Apartment">Daire</text>
     <text name="Assets">Varlıklar</text>
     <text name="Balance">Bakiye</text>
@@ -138,6 +139,8 @@
     <text name="Blocks">Blok / Apartman</text>
     <text name="BlocksMenu">Blok / Apartman (Menü)</text>
     <text name="BonusPayment">İkramiye ödemesi</text>
+    <text name="ByHousing">Konuta göre</text>
+    <text name="ByHousingCategory">Konut türüne göre</text>
     <text name="Cash">Nakit</text>
     <text name="CashAccount">Nakit Hesabı</text>
     <text name="ChooseFile">Dosya seçiniz</text>
