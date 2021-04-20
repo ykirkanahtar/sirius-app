@@ -1,24 +1,18 @@
 using System;
 using System.Collections.Generic;
-using Abp.AutoMapper;
-using Abp.Runtime.Validation;
+using Castle.Components.DictionaryAdapter;
 using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans.Dto
 {
-    public class PaymentPlanForHousingCategoryDto : IShouldNormalize
-    {
-        public Guid HousingCategoryId { get; set; }
-        public decimal AmountPerMonth { get; set; }
-
-        public void Normalize()
-        {
-            AmountPerMonth = Math.Abs(AmountPerMonth);
-        }
-    }
-
     public class CreateHousingPaymentPlanGroupDto
     {
+        public CreateHousingPaymentPlanGroupDto()
+        {
+            HousingPaymentPlanGroupForHousings = new List<HousingPaymentPlanGroupForHousingDto>();
+            HousingPaymentPlanGroupForHousingCategories =
+                new EditableList<HousingPaymentPlanGroupForHousingCategoryDto>();
+        }
         public string HousingPaymentPlanGroupName { get; set; }
         public int CountOfMonth { get; set; }
         public Guid DefaultToPaymentAccountId { get; set; }
@@ -27,6 +21,12 @@ namespace Sirius.HousingPaymentPlans.Dto
         public string Description { get; set; }
         public ResidentOrOwner ResidentOrOwner { get; set; }
 
-        public List<PaymentPlanForHousingCategoryDto> PaymentPlanForHousingCategories { get; set; }
+        public List<HousingPaymentPlanGroupForHousingDto> HousingPaymentPlanGroupForHousings { get; set; }
+
+        public List<HousingPaymentPlanGroupForHousingCategoryDto> HousingPaymentPlanGroupForHousingCategories
+        {
+            get;
+            set;
+        }
     }
 }

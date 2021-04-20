@@ -85,7 +85,7 @@ import { HousingCategoriesComponent } from "./housing-categories/housing-categor
 import { HousingPaymentPlanGroupsComponent } from "./housing-payment-plan-groups/housing-payment-plan-groups.component";
 import { CreateHousingPaymentPlanGroupDialogComponent } from "./housing-payment-plan-groups/create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component";
 import { EditHousingPaymentPlanGroupDialogComponent } from "./housing-payment-plan-groups/edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component";
-import { HousingPaymentPlanGroupForHousingCategoryComponent } from "./housing-payment-plan-groups/housing-payment-plan-group-for-housing-categories/housing-payment-plan-group-for-housing-categories.component";
+import { HousingPaymentPlanGroupAmountsComponent } from "./housing-payment-plan-groups/housing-payment-plan-group-amounts/housing-payment-plan-group-amounts.component";
 import { PeriodsComponent } from "./periods/periods.component";
 import { CreatePeriodDialogComponent } from "./periods/create-period/create-period-dialog.component";
 import { EditPeriodDialogComponent } from "./periods/edit-period/edit-period-dialog.component";
@@ -151,7 +151,7 @@ import { trLocale } from "ngx-bootstrap/locale";
     HousingPaymentPlanGroupsComponent,
     CreateHousingPaymentPlanGroupDialogComponent,
     EditHousingPaymentPlanGroupDialogComponent,
-    HousingPaymentPlanGroupForHousingCategoryComponent,
+    HousingPaymentPlanGroupAmountsComponent,
     CreateAccountBookDialogComponent,
     EditAccountBookDialogComponent,
     PeriodsComponent,

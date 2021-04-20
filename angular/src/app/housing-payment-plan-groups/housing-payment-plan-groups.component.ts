@@ -20,7 +20,8 @@ import { LazyLoadEvent, SelectItem } from "primeng/api";
 import { Table } from "primeng/table";
 import { CreateHousingPaymentPlanGroupDialogComponent } from "./create-housing-payment-plan-group/create-housing-payment-plan-group-dialog.component";
 import { EditHousingPaymentPlanGroupDialogComponent } from "./edit-housing-payment-plan-group/edit-housing-payment-plan-group-dialog.component";
-import { HousingPaymentPlanGroupForHousingCategoryComponent } from "./housing-payment-plan-group-for-housing-categories/housing-payment-plan-group-for-housing-categories.component";
+import { HousingPaymentPlanGroupAmountsComponent } from "./housing-payment-plan-group-amounts/housing-payment-plan-group-amounts.component";
+import { MenuItem as PrimeNgMenuItem } from "primeng/api";
 
 class PagedHousingsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -34,6 +35,8 @@ export class HousingPaymentPlanGroupsComponent
   extends PagedListingComponentBase<HousingPaymentPlanGroupDto>
   implements OnInit {
   @ViewChild("dataTable", { static: true }) dataTable: Table;
+
+  menuItems: PrimeNgMenuItem[];
 
   sortingColumn: string;
   advancedFiltersVisible = false;
@@ -62,6 +65,23 @@ export class HousingPaymentPlanGroupsComponent
   }
 
   ngOnInit(): void {
+    this.menuItems = [
+      {
+        label: this.l("ByHousingCategory"),
+        icon: "pi pi-money-bill",
+        command: () => {
+          this.createHousingPaymentPlanGroup(true);
+        },
+      },
+      {
+        label: this.l("ByHousing"),
+        icon: "pi pi-home",
+        command: () => {
+          this.createHousingPaymentPlanGroup(false);
+        },
+      },
+    ];
+
     this._housingCategoryService
       .getHousingCategoryLookUp()
       .subscribe((result: LookUpDto[]) => {
@@ -81,14 +101,15 @@ export class HousingPaymentPlanGroupsComponent
     this.getDataPage(1);
   }
 
-  createHousingPaymentPlanGroup(): void {
-    this.showCreateOrEditHousingPaymentPlanGroupDialog();
+  createHousingPaymentPlanGroup(showCategory: boolean): void {
+    this.showCreateOrEditHousingPaymentPlanGroupDialog(showCategory);
   }
 
   editHousingPaymentPlanGroup(
     housingPaymentPlanGroup: HousingPaymentPlanGroupDto
   ): void {
     this.showCreateOrEditHousingPaymentPlanGroupDialog(
+      true,
       housingPaymentPlanGroup.id
     );
   }
@@ -150,35 +171,45 @@ export class HousingPaymentPlanGroupsComponent
     );
   }
 
-  protected getHousingCategories(housingPaymentPlanGroup: HousingPaymentPlanGroupDto): void {
-    console.log(housingPaymentPlanGroup);
-
+  protected getAmountsModal(
+    housingPaymentPlanGroup: HousingPaymentPlanGroupDto
+  ): void {
     this._housingCategoryService
-    .getHousingCategoryLookUp()
-    .subscribe((housingCategories: LookUpDto[]) => {
-
-      let housingCategoriesDialog: BsModalRef;
-      housingCategoriesDialog = this._modalService.show(
-        HousingPaymentPlanGroupForHousingCategoryComponent,
-        {
-          class: "modal-lg, modal-xl",
-          initialState: {
-            housingPaymentPlanGroupForHousingCategories: housingPaymentPlanGroup.housingPaymentPlanGroupHousingCategories,
-            housingPaymentPlanGroupName: housingPaymentPlanGroup.housingPaymentPlanGroupName,
-            housingCategories: housingCategories
-          },
-        }
-      );
-    });
+      .getHousingCategoryLookUp()
+      .subscribe((housingCategories: LookUpDto[]) => {
+        let housingCategoriesDialog: BsModalRef;
+        housingCategoriesDialog = this._modalService.show(
+          HousingPaymentPlanGroupAmountsComponent,
+          {
+            class: "modal-lg, modal-xl",
+            initialState: {
+              housingPaymentPlanGroupForHousingCategories:
+                housingPaymentPlanGroup.housingPaymentPlanGroupHousingCategories,
+              housingPaymentPlanGroupName:
+                housingPaymentPlanGroup.housingPaymentPlanGroupName,
+              housingCategories: housingCategories,
+              housingPaymentPlanGroupForHousings:
+                housingPaymentPlanGroup.housingPaymentPlanGroupHousings,
+              housings: this.housingsFilters
+            },
+          }
+        );
+      });
   }
 
-  private showCreateOrEditHousingPaymentPlanGroupDialog(id?: string): void {
+  private showCreateOrEditHousingPaymentPlanGroupDialog(
+    showCategory: boolean,
+    id?: string
+  ): void {
     let createOrEditHousingPaymentPlanDialog: BsModalRef;
     if (!id) {
       createOrEditHousingPaymentPlanDialog = this._modalService.show(
         CreateHousingPaymentPlanGroupDialogComponent,
         {
           class: "modal-lg",
+          initialState: {
+            showCategory: showCategory,
+          },
         }
       );
     } else {
