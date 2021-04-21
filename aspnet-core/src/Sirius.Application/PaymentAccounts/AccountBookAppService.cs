@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Abp.Localization;
 using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
-using Azure.Storage.Blobs.Models;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
 using Sirius.EntityFrameworkCore.Repositories;
@@ -22,11 +20,9 @@ using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
-using Sirius.PaymentCategories.Dto;
 using Sirius.Periods;
 using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
-using Sirius.Shared.Enums;
 using Sirius.Shared.Helper;
 
 namespace Sirius.PaymentAccounts

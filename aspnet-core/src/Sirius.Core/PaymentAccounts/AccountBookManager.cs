@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
+using Sirius.Periods;
 using Sirius.Shared.Enums;
 
 namespace Sirius.PaymentAccounts
@@ -24,6 +25,7 @@ namespace Sirius.PaymentAccounts
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingManager _housingManager;
         private readonly IBalanceOrganizer _balanceOrganizer;
+        private readonly IPeriodManager _periodManager;
 
         public AccountBookManager(IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
@@ -32,7 +34,8 @@ namespace Sirius.PaymentAccounts
             IRepository<AccountBookFile, Guid> accountBookFileRepository,
             IPaymentCategoryManager paymentCategoryManager,
             IHousingManager housingManager,
-            IBalanceOrganizer balanceOrganizer)
+            IBalanceOrganizer balanceOrganizer,
+            IPeriodManager periodManager)
         {
             _accountBookRepository = accountBookRepository;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
@@ -42,6 +45,7 @@ namespace Sirius.PaymentAccounts
             _paymentCategoryManager = paymentCategoryManager;
             _housingManager = housingManager;
             _balanceOrganizer = balanceOrganizer;
+            _periodManager = periodManager;
         }
 
         public async Task CreateForHousingDueAsync(AccountBook accountBook, Housing housing,
@@ -94,6 +98,18 @@ namespace Sirius.PaymentAccounts
             {
                 throw new UserFriendlyException(
                     "Gelen hesap, giden hesap ya da mahsuplaşmadan en az biri seçilmelidir.");
+            }
+
+            if (accountBook.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
+                accountBook.AccountBookType != AccountBookType.TransferForPaymentAccountToNextPeriod)
+            {
+                var activePeriod = await _periodManager.GetActivePeriod();
+                if (accountBook.ProcessDateTime < activePeriod.StartDate ||
+                    (activePeriod.EndDate.HasValue && accountBook.ProcessDateTime > activePeriod.EndDate.Value))
+                {
+                    throw new UserFriendlyException(
+                        "İşletme defteri kaydı aktif dönem tarihleri içerisinde olmalıdır.");
+                }
             }
 
             if (accountBook.SameDayIndex > 0 == false)
@@ -299,7 +315,7 @@ namespace Sirius.PaymentAccounts
             {
                 await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan, true);
             }
-            
+
             await _accountBookRepository.DeleteAsync(accountBook);
 
             if (organizeBalances)
