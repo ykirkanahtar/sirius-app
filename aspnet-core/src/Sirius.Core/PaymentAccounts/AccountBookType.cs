@@ -4,7 +4,9 @@ namespace Sirius.PaymentAccounts
     {
         HousingDue = 1,
         OtherPaymentWithNettingForHousingDue = 2,
-        TransferForPaymentAccount = 3,
+        FirstTransferForPaymentAccount = 3,
         Other = 4,
+        TransferForPaymentAccountToNextPeriod = 5,
+        TransferForPaymentAccountFromPreviousPeriod = 6
     }
 }

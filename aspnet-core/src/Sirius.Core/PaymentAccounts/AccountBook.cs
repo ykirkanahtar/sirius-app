@@ -40,6 +40,7 @@ namespace Sirius.PaymentAccounts
         public decimal? ToPaymentAccountCurrentBalance { get; private set; }
         public AccountBookType AccountBookType { get; private set; }
         public int SameDayIndex { get; internal set; }
+        public Guid PeriodId { get; private set; }
         public DateTime CreationTime { get; set; }
         public long? CreatorUserId { get; set; }
         public DateTime? LastModificationTime { get; set; }
@@ -65,6 +66,7 @@ namespace Sirius.PaymentAccounts
             IAccountBookPolicy accountBookPolicy,
             Guid id,
             int tenantId,
+            Guid periodId,
             DateTime processDateTime,
             Guid paymentCategoryId,
             Guid housingId,
@@ -74,7 +76,7 @@ namespace Sirius.PaymentAccounts
             ICollection<AccountBookFile> accountBookFiles,
             long creatorUserId)
         {
-            return await BindEntityAsync(accountBookPolicy, false, id, tenantId,
+            return await BindEntityAsync(accountBookPolicy, false, id, tenantId, periodId,
                 AccountBookType.HousingDue,
                 processDateTime,
                 paymentCategoryId, housingId, false, null, null, null,
@@ -82,10 +84,11 @@ namespace Sirius.PaymentAccounts
                 null, null);
         }
 
-        public static async Task<AccountBook> CreateForPaymentAccountTransferAsync( //Ödeme hesabı devir hareketi için
+        public static async Task<AccountBook> CreateFirstTransferForPaymentAccountAsync( //Ödeme hesabı ilk devir hareketi için
             IAccountBookPolicy accountBookPolicy,
             Guid id,
             int tenantId,
+            Guid periodId,
             DateTime processDateTime,
             PaymentAccount toPaymentAccount,
             decimal amount,
@@ -93,8 +96,48 @@ namespace Sirius.PaymentAccounts
             ICollection<AccountBookFile> accountBookFiles,
             long creatorUserId)
         {
-            return await BindEntityAsync(accountBookPolicy, false, id, tenantId,
-                AccountBookType.TransferForPaymentAccount,
+            return await BindEntityAsync(accountBookPolicy, false, id, tenantId, periodId,
+                AccountBookType.FirstTransferForPaymentAccount,
+                processDateTime,
+                null, null, false, null, null, null,
+                toPaymentAccount, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
+                null, null);
+        }
+        
+        public static async Task<AccountBook> CreateTransferToNextPeriodForPaymentAccountAsync( 
+            IAccountBookPolicy accountBookPolicy,
+            Guid id,
+            int tenantId,
+            Guid periodId,
+            DateTime processDateTime,
+            PaymentAccount toPaymentAccount,
+            decimal amount,
+            string description,
+            ICollection<AccountBookFile> accountBookFiles,
+            long creatorUserId)
+        {
+            return await BindEntityAsync(accountBookPolicy, false, id, tenantId, periodId,
+                AccountBookType.TransferForPaymentAccountToNextPeriod,
+                processDateTime,
+                null, null, false, null, null, null,
+                toPaymentAccount, amount * -1, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
+                null, null);
+        }
+        
+        public static async Task<AccountBook> CreateTransferFromPreviousPeriodForPaymentAccountAsync( 
+            IAccountBookPolicy accountBookPolicy,
+            Guid id,
+            int tenantId,
+            Guid periodId,
+            DateTime processDateTime,
+            PaymentAccount toPaymentAccount,
+            decimal amount,
+            string description,
+            ICollection<AccountBookFile> accountBookFiles,
+            long creatorUserId)
+        {
+            return await BindEntityAsync(accountBookPolicy, false, id, tenantId, periodId,
+                AccountBookType.TransferForPaymentAccountFromPreviousPeriod,
                 processDateTime,
                 null, null, false, null, null, null,
                 toPaymentAccount, amount, description, null, null, accountBookFiles, DateTime.UtcNow, creatorUserId,
@@ -105,6 +148,7 @@ namespace Sirius.PaymentAccounts
             IAccountBookPolicy accountBookPolicy,
             Guid id,
             int tenantId,
+            Guid periodId,
             AccountBookType accountBookType,
             DateTime processDateTime,
             Guid paymentCategoryId,
@@ -121,7 +165,7 @@ namespace Sirius.PaymentAccounts
             ICollection<AccountBookFile> accountBookFiles,
             long creatorUserId)
         {
-            return await BindEntityAsync(accountBookPolicy, false, id, tenantId,
+            return await BindEntityAsync(accountBookPolicy, false, id, tenantId, periodId,
                 accountBookType,
                 processDateTime,
                 paymentCategoryId, housingId, nettingHousing, housingIdForNetting ,paymentCategoryIdForNetting,
@@ -157,6 +201,7 @@ namespace Sirius.PaymentAccounts
 
             return await BindEntityAsync(accountBookPolicy, true, existingAccountBook.Id,
                 existingAccountBook.TenantId,
+                existingAccountBook.PeriodId,
                 existingAccountBook.AccountBookType,
                 processDateTime,
                 paymentCategory.Id,
@@ -175,6 +220,7 @@ namespace Sirius.PaymentAccounts
             bool isUpdate,
             Guid id,
             int tenantId,
+            Guid periodId,
             AccountBookType accountBookType,
             DateTime processDateTime,
             Guid? paymentCategoryId,
@@ -200,6 +246,7 @@ namespace Sirius.PaymentAccounts
 
             accountBook.Id = id;
             accountBook.TenantId = tenantId;
+            accountBook.PeriodId = periodId;
             accountBook.AccountBookType = accountBookType;
             accountBook.ProcessDateTime = processDateTime.Date + new TimeSpan(0, 0, 0);
             accountBook.DocumentDateTime = documentDateTime;
@@ -235,7 +282,7 @@ namespace Sirius.PaymentAccounts
                 accountBook.LastModifierUserId = modifierUserId.Value;
             }
 
-            if (accountBookType == AccountBookType.TransferForPaymentAccount)
+            if (accountBookType == AccountBookType.FirstTransferForPaymentAccount)
             {
                 await accountBookPolicy.CheckForTransferForPaymentAccountAsync(accountBook, toPaymentAccount);
                 accountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, amount);
@@ -266,6 +313,21 @@ namespace Sirius.PaymentAccounts
             }
 
             FromPaymentAccountCurrentBalance = balance;
+        }
+
+        public void SetSameDayIndexManually(int index)
+        {
+            SameDayIndex = index;
+        }
+
+        public void SetFromPaymentAccountCurrentBalance(decimal? balance)
+        {
+            FromPaymentAccountCurrentBalance = balance;
+        }
+        
+        public void SetToPaymentAccountCurrentBalance(decimal? balance)
+        {
+            ToPaymentAccountCurrentBalance = balance;
         }
 
         public async Task SetSameDayIndexAsync(IRepository<AccountBook, Guid> accountBookRepository)

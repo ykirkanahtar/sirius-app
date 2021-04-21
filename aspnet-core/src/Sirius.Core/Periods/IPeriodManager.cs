@@ -8,7 +8,8 @@ namespace Sirius.Periods
     public interface IPeriodManager : IDomainService
     {
         Task<Period> GetAsync(Guid id);
-        Task CreateAsync(Period period);
+        Task CreateAsync(Period period, long sessionUserId);
         Task UpdateAsync(Period period);
+        Task<Period> GetActivePeriod(bool nullCheck = true);
     }
 }

@@ -77,7 +77,11 @@ namespace Sirius.Periods
 
         private async Task CreateAsync(Period period, List<Guid> paymentCategories)
         {
-            await _periodManager.CreateAsync(period);
+            await _periodManager.CreateAsync(period, AbpSession.UserId.GetValueOrDefault());
+            //Devir hareketleri ekleniyor
+            
+            
+            //
             await SetPassivePaymentCategoriesAsync(paymentCategories);
         }
 
