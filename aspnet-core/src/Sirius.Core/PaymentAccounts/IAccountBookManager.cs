@@ -17,12 +17,10 @@ namespace Sirius.PaymentAccounts
             [CanBeNull] PaymentAccount fromPaymentAccount, [CanBeNull] PaymentAccount toPaymentAccount,
             PaymentCategory paymentCategoryForNetting,
             bool organizeBalances);
-
-        Task CreateForPaymentAccountTransferAsync(AccountBook accountBook, PaymentAccount toPaymentAccount,
+        Task CreateTransferForPaymentAccountAsync(AccountBook accountBook, PaymentAccount toPaymentAccount,
             bool organizeBalances);
 
         Task CreateAsync(AccountBook accountBook,
-            AccountBookType accountBookType,
             [CanBeNull] PaymentAccount fromPaymentAccount,
             [CanBeNull] PaymentAccount toPaymentAccount,
             [CanBeNull] Housing housing,
@@ -34,5 +32,6 @@ namespace Sirius.PaymentAccounts
         Task DeleteAsync(AccountBook accountBook, bool organizeBalances);
         Task<AccountBook> GetAsync(Guid id);
         Task<AccountBookFile> GetAccountBookFileByUrlAsync(string url);
+        Task<int> GetSameDayIndexAsync(DateTime processDateTime);
     }
 }

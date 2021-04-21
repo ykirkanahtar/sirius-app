@@ -35,7 +35,7 @@ namespace Sirius.PaymentAccounts
             var accountBooks = await _accountBookRepository.GetAllListAsync(
                 p => (p.FromPaymentAccountId == paymentAccount.Id
                       || p.ToPaymentAccountId == paymentAccount.Id) &&
-                     p.AccountBookType != AccountBookType.TransferForPaymentAccount);
+                     p.AccountBookType != AccountBookType.FirstTransferForPaymentAccount);
 
             if (accountBooks.Count > 0)
             {
@@ -46,7 +46,7 @@ namespace Sirius.PaymentAccounts
             var transferForPaymentAccounts = await _accountBookRepository.GetAllListAsync(
                 p => (p.FromPaymentAccountId == paymentAccount.Id
                       || p.ToPaymentAccountId == paymentAccount.Id) &&
-                     p.AccountBookType == AccountBookType.TransferForPaymentAccount);
+                     p.AccountBookType == AccountBookType.FirstTransferForPaymentAccount);
 
             foreach (var transferForPaymentAccount in transferForPaymentAccounts)
             {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Abp.Localization;
 using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
-using Azure.Storage.Blobs.Models;
 using Microsoft.EntityFrameworkCore;
 using Sirius.AccountBooks.Dto;
 using Sirius.EntityFrameworkCore.Repositories;
@@ -22,10 +20,9 @@ using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
-using Sirius.PaymentCategories.Dto;
+using Sirius.Periods;
 using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
-using Sirius.Shared.Enums;
 using Sirius.Shared.Helper;
 
 namespace Sirius.PaymentAccounts
@@ -50,6 +47,7 @@ namespace Sirius.PaymentAccounts
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly ILocalizationSource _localizationSource;
         private readonly IBalanceOrganizer _balanceOrganizer;
+        private readonly IPeriodManager _periodManager;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -66,7 +64,7 @@ namespace Sirius.PaymentAccounts
             IHousingPaymentPlanManager housingPaymentPlanManager,
             ILocalizationManager localizationManager,
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
-            IBalanceOrganizer balanceOrganizer)
+            IBalanceOrganizer balanceOrganizer, IPeriodManager periodManager)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -84,6 +82,7 @@ namespace Sirius.PaymentAccounts
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _balanceOrganizer = balanceOrganizer;
+            _periodManager = periodManager;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -141,10 +140,13 @@ namespace Sirius.PaymentAccounts
                 accountBookFiles.Add(entity);
             }
 
+            var activePeriod = await _periodManager.GetActivePeriod();
+
             var accountBook = await AccountBook.CreateHousingDueAsync(
                 _accountBookPolicy
                 , accountBookGuid
                 , AbpSession.GetTenantId()
+                , activePeriod.Id
                 , input.ProcessDateString.StringToDateTime()
                 , housingDuePaymentCategory.Id
                 , input.HousingId
@@ -202,10 +204,13 @@ namespace Sirius.PaymentAccounts
                 ? AccountBookType.OtherPaymentWithNettingForHousingDue
                 : AccountBookType.Other;
 
+            var activePeriod = await _periodManager.GetActivePeriod();
+
             var accountBook = await AccountBook.CreateAsync(
                 _accountBookPolicy
                 , accountBookGuid
                 , AbpSession.GetTenantId()
+                , activePeriod.Id
                 , accountBookType
                 , input.ProcessDateString.StringToDateTime()
                 , input.PaymentCategoryId
@@ -243,7 +248,7 @@ namespace Sirius.PaymentAccounts
             }
             else
             {
-                await _accountBookManager.CreateAsync(accountBook, accountBookType,
+                await _accountBookManager.CreateAsync(accountBook,
                     input.FromPaymentAccountId.HasValue ? fromPaymentAccount : null,
                     input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null, null, null, organizeBalances);
             }
@@ -566,9 +571,7 @@ namespace Sirius.PaymentAccounts
                     PaymentCategoryName =
                         p.paymentCategory != null
                             ? p.paymentCategory.PaymentCategoryName
-                            : p.accountBook.AccountBookType == AccountBookType.TransferForPaymentAccount
-                                ? "Ödeme hesabı devir"
-                                : string.Empty,
+                            : GetAccountTypeNameForGetAll(p.accountBook.AccountBookType),
                     HousingName = p.housing != null
                         ? p.block.BlockName + "-" + p.housing.Apartment
                         : string.Empty,
@@ -591,6 +594,17 @@ namespace Sirius.PaymentAccounts
 
             return query.OrderBy(filter.Sorting ??
                                  $"{nameof(AccountBookDto.ProcessDateTime)} DESC, {nameof(AccountBookDto.SameDayIndex)} DESC");
+        }
+
+        private static string GetAccountTypeNameForGetAll(AccountBookType accountBookType)
+        {
+            return accountBookType switch
+            {
+                AccountBookType.FirstTransferForPaymentAccount => "Ödeme Hesabı İlk Devir",
+                AccountBookType.TransferForPaymentAccountToNextPeriod => "Sonraki döneme devir",
+                AccountBookType.TransferForPaymentAccountFromPreviousPeriod => "Önceki dönemden devir",
+                _ => string.Empty
+            };
         }
 
         public async Task<PagedAccountBookResultDto> GetAllListAsync(

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
+using Sirius.Periods;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Helper;
 
@@ -27,22 +28,21 @@ namespace Sirius.PaymentAccounts
         private readonly IPaymentAccountManager _paymentAccountManager;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IAccountBookManager _accountBookManager;
-        private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IAccountBookPolicy _accountBookPolicy;
-
+        private readonly IPeriodManager _periodManager;
         public PaymentAccountAppService(
             IPaymentAccountManager paymentAccountManager,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
-            IPaymentCategoryManager paymentCategoryManager,
-            IAccountBookPolicy accountBookPolicy)
+            IAccountBookPolicy accountBookPolicy, 
+            IPeriodManager periodManager)
             : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
             _paymentAccountRepository = paymentAccountRepository;
             _accountBookManager = accountBookManager;
-            _paymentCategoryManager = paymentCategoryManager;
             _accountBookPolicy = accountBookPolicy;
+            _periodManager = periodManager;
             _accountBookManager = accountBookManager;
         }
 
@@ -152,10 +152,13 @@ namespace Sirius.PaymentAccounts
         {
             if (transferAmount.HasValue && transferProcessDateTime.HasValue)
             {
-                var accountBook = await AccountBook.CreateForPaymentAccountTransferAsync(
+                var activePeriod = await _periodManager.GetActivePeriod();
+
+                var accountBook = await AccountBook.CreateFirstTransferForPaymentAccountAsync(
                     _accountBookPolicy
                     , SequentialGuidGenerator.Instance.Create()
                     , AbpSession.GetTenantId()
+                    , activePeriod.Id
                     , transferProcessDateTime.Value
                     , paymentAccount
                     , transferAmount.Value
@@ -164,7 +167,7 @@ namespace Sirius.PaymentAccounts
                     , AbpSession.GetUserId()
                 );
 
-                await _accountBookManager.CreateForPaymentAccountTransferAsync(accountBook, paymentAccount, true);
+                await _accountBookManager.CreateTransferForPaymentAccountAsync(accountBook, paymentAccount, true);
             }
         }
     }
