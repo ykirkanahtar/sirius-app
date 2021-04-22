@@ -15,10 +15,6 @@ namespace Sirius
 
         public ApplicationAutoMapperProfile()
         {
-            var iocManager = IocManager.Instance;
-            var localizationManager = iocManager.Resolve<ILocalizationManager>();
-            var localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
-            
             CreateMap<AccountBookGetAllOutput, AccountBookGetAllExportOutput>()
                 .ForMember(x => x.ProcessDateTime,
                     opt => opt.MapFrom(src =>
@@ -30,9 +26,9 @@ namespace Sirius
                 .ForMember(x => x.PaymentCategory,
                     opt => opt.MapFrom(src => src.PaymentCategory.PaymentCategoryName))
                 .ForMember(x => x.CreditOrDebt,
-                    opt => opt.MapFrom(src => localizationSource.GetString(src.CreditOrDebt.ToString())))
+                    opt => opt.MapFrom(src => src.CreditOrDebt.ToString()))
                 .ForMember(x => x.HousingPaymentPlanType,
-                    opt => opt.MapFrom(src => localizationSource.GetString(src.HousingPaymentPlanType.ToString())));
+                    opt => opt.MapFrom(src => src.HousingPaymentPlanType.ToString()));
         }
     }
 }

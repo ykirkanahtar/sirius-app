@@ -15,8 +15,11 @@ using Sirius.Housings;
 using Sirius.PaymentCategories;
 using Sirius.Shared.Enums;
 using System.Linq.Dynamic.Core;
+using Abp.Localization;
+using Abp.Localization.Sources;
 using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
+using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Helper;
 
@@ -31,11 +34,14 @@ namespace Sirius.HousingPaymentPlans
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
+        private readonly ILocalizationSource _localizationSource;
 
         public HousingPaymentPlanAppService(IHousingPaymentPlanManager housingPaymentPlanManager,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
-            IRepository<AccountBook, Guid> accountBookRepository)
+            IRepository<AccountBook, Guid> accountBookRepository,
+            ILocalizationManager localizationManager
+        )
             : base(housingPaymentPlanRepository)
         {
             _housingPaymentPlanManager = housingPaymentPlanManager;
@@ -43,6 +49,7 @@ namespace Sirius.HousingPaymentPlans
             _housingRepository = housingRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
             _accountBookRepository = accountBookRepository;
+            _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
         public async Task<HousingPaymentPlanDto> CreateCreditPaymentAsync(CreateCreditHousingPaymentPlanDto input)
@@ -162,7 +169,20 @@ namespace Sirius.HousingPaymentPlans
 
             var list = await query
                 .ToListAsync();
-            return ObjectMapper.Map<List<HousingPaymentPlanExportOutput>>(list);
+            var exportList = ObjectMapper.Map<List<HousingPaymentPlanExportOutput>>(list);
+            
+            var localizedCreditOrDebtNames = EnumHelper.GetLocalizedEnumNames(typeof(CreditOrDebt), _localizationSource);
+            var localizedHousingPaymentPlanTypeNames = EnumHelper.GetLocalizedEnumNames(typeof(HousingPaymentPlanType), _localizationSource);
+
+            exportList.ForEach(p =>
+            {
+                p.CreditOrDebt = localizedCreditOrDebtNames.Where(x => x.Key == p.CreditOrDebt).Select(x => x.Value)
+                    .SingleOrDefault();
+                p.HousingPaymentPlanType = localizedHousingPaymentPlanTypeNames.Where(x => x.Key == p.HousingPaymentPlanType).Select(x => x.Value)
+                    .SingleOrDefault();
+            });
+
+            return exportList;
         }
     }
 }
