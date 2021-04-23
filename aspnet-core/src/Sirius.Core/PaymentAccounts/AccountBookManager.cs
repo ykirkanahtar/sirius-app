@@ -337,7 +337,9 @@ namespace Sirius.PaymentAccounts
 
                 if (paymentAccounts.Any())
                 {
-                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                    var activePeriod = await _periodManager.GetActivePeriod();
+                    
+                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(activePeriod.StartDate,
                         paymentAccounts, null, null, new List<AccountBook> {accountBook});
                     _balanceOrganizer.OrganizeAccountBookBalances();
                     _balanceOrganizer.OrganizePaymentAccountBalances();

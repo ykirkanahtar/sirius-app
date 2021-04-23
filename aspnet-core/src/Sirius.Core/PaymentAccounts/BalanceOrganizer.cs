@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
+using Abp.Linq.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sirius.PaymentAccounts
@@ -18,11 +19,13 @@ namespace Sirius.PaymentAccounts
             _accountBookRepository = accountBookRepository;
             _paymentAccountRepository = paymentAccountRepository;
             UpdatingAccountBooks = new List<AccountBook>();
+            DeletingAccountBooks = new List<AccountBook>();
             PreviousAccountBooks = new List<AccountBook>();
             PaymentAccounts = new List<PaymentAccount>();
         }
 
         public List<AccountBook> UpdatingAccountBooks { get; private set; }
+        public List<AccountBook> DeletingAccountBooks { get; private set; }
         public List<AccountBook> PreviousAccountBooks { get; private set; }
         public List<PaymentAccount> PaymentAccounts { get; private set; }
 
@@ -55,6 +58,11 @@ namespace Sirius.PaymentAccounts
             accountBooks.AddRange(createdAccountBooks);
             accountBooks.AddRange(updatedAccountBooks);
 
+            if (deletedAccountBooks.Any())
+            {
+                DeletingAccountBooks = deletedAccountBooks;
+            }
+
             UpdatingAccountBooks = accountBooks
                 .OrderBy(p => p.ProcessDateTime)
                 .ThenBy(p => p.SameDayIndex)
@@ -62,14 +70,21 @@ namespace Sirius.PaymentAccounts
 
             /*Düzeltilecek aralıkta, tüm ödeme kategorilerinin bir önceki kayıtları olmayabilir,
              bu yüzden sistemdeki bütüm ödeme kategorilerinin listesi çekiliyor.*/
-            var allPaymentAccountBookIds = await _paymentAccountRepository.GetAll().Select(p => p.Id).ToListAsync(); 
+            var allPaymentAccountBookIds = await _paymentAccountRepository.GetAll().Select(p => p.Id).ToListAsync();
 
             foreach (var paymentAccountId in allPaymentAccountBookIds)
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
+                        PreviousAccountBooks.Select(x => x.Id).Contains(p.Id) == false &&
                         p.ProcessDateTime < startDate &&
                         (p.FromPaymentAccountId == paymentAccountId ||
-                         p.ToPaymentAccountId == paymentAccountId))
+                         p.ToPaymentAccountId == paymentAccountId) &&
+                        p.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
+                        p.AccountBookType != AccountBookType.TransferForPaymentAccountToNextPeriod)
+                    .WhereIf(updatedAccountBooks.Any(),
+                        p => updatedAccountBooks.Select(x => x.Id).Contains(p.Id) == false)
+                    .WhereIf(deletedAccountBooks.Any(),
+                        p => deletedAccountBooks.Select(x => x.Id).Contains(p.Id) == false)
                     .OrderByDescending(p => p.ProcessDateTime)
                     .ThenByDescending(p => p.SameDayIndex)
                     .FirstOrDefaultAsync();
