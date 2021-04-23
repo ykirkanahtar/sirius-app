@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp;
 using Abp.Domain.Repositories;
@@ -121,7 +122,7 @@ namespace Sirius.HousingPaymentPlans
             var housingPaymentPlans = new List<HousingPaymentPlan>();
 
             foreach (var housingPaymentPlanGroupHousingCategory in housingPaymentPlanGroup
-                .HousingPaymentPlanGroupHousingCategories)
+                .HousingPaymentPlanGroupHousingCategories.Where(p => p.AmountPerMonth != 0))
             {
                 var housingCategory =
                     await _housingCategoryRepository.GetAsync(housingPaymentPlanGroupHousingCategory.HousingCategoryId);
@@ -141,7 +142,7 @@ namespace Sirius.HousingPaymentPlans
             }
 
             foreach (var housingPaymentPlanGroupHousing in housingPaymentPlanGroup
-                .HousingPaymentPlanGroupHousings)
+                .HousingPaymentPlanGroupHousings.Where(p => p.AmountPerMonth != 0))
             {
                 var housing = await _housingRepository.GetAsync(housingPaymentPlanGroupHousing.HousingId);
 
