@@ -272,7 +272,9 @@
     <text name="IsTenant">Kiracı</text>
     <text name="IsValidForAllPeriods">Tüm dönemler için geçerli</text>
     <text name="LastName">Soyad</text>
+    <text name="LessHousingDueBalances">En az aidat borcu olanlar (ilk 5)</text>
     <text name="LessHousingDuePayers">En az aidat ödeyenler (ilk 5)</text>
+    <text name="MostHousingDueBalances">En fazla aidat borcu olanlar (ilk 5)</text>
     <text name="MostHousingDuePayers">En fazla aidat ödeyenler (ilk 5)</text>
     <text name="Netting">Mahsuplaşma</text>
     <text name="NettingFromHousingDue">Mahsuplaşma</text>

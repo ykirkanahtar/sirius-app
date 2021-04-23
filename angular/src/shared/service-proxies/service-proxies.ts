@@ -7959,8 +7959,10 @@ export interface ICreateAccountBookDto {
 export enum AccountBookType {
     HousingDue = 1,
     OtherPaymentWithNettingForHousingDue = 2,
-    TransferForPaymentAccount = 3,
+    FirstTransferForPaymentAccount = 3,
     Other = 4,
+    TransferForPaymentAccountToNextPeriod = 5,
+    TransferForPaymentAccountFromPreviousPeriod = 6,
 }
 
 export class AccountBookFileDto implements IAccountBookFileDto {
@@ -8985,6 +8987,57 @@ export interface IPaymentAccountDashboardDto {
     balance: number;
 }
 
+export class HousingDueBalancesDashboardDto implements IHousingDueBalancesDashboardDto {
+    housingId: string;
+    housingName: string | undefined;
+    balance: number;
+
+    constructor(data?: IHousingDueBalancesDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.housingId = _data["housingId"];
+            this.housingName = _data["housingName"];
+            this.balance = _data["balance"];
+        }
+    }
+
+    static fromJS(data: any): HousingDueBalancesDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingDueBalancesDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["housingId"] = this.housingId;
+        data["housingName"] = this.housingName;
+        data["balance"] = this.balance;
+        return data; 
+    }
+
+    clone(): HousingDueBalancesDashboardDto {
+        const json = this.toJSON();
+        let result = new HousingDueBalancesDashboardDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingDueBalancesDashboardDto {
+    housingId: string;
+    housingName: string | undefined;
+    balance: number;
+}
+
 export class HousingDuePayersDashboardDto implements IHousingDuePayersDashboardDto {
     housingName: string | undefined;
     totalHousingDueAmount: number;
@@ -9131,6 +9184,8 @@ export class DashboardDto implements IDashboardDto {
     totalHousingDueAmount: number;
     totalIncomeAmount: number;
     totalExpenseAmount: number;
+    mostHousingDueBalances: HousingDueBalancesDashboardDto[] | undefined;
+    lessHousingDueBalances: HousingDueBalancesDashboardDto[] | undefined;
     mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     expensesData: PaymentCategoryDashboardDto[] | undefined;
@@ -9155,6 +9210,16 @@ export class DashboardDto implements IDashboardDto {
             this.totalHousingDueAmount = _data["totalHousingDueAmount"];
             this.totalIncomeAmount = _data["totalIncomeAmount"];
             this.totalExpenseAmount = _data["totalExpenseAmount"];
+            if (Array.isArray(_data["mostHousingDueBalances"])) {
+                this.mostHousingDueBalances = [] as any;
+                for (let item of _data["mostHousingDueBalances"])
+                    this.mostHousingDueBalances.push(HousingDueBalancesDashboardDto.fromJS(item));
+            }
+            if (Array.isArray(_data["lessHousingDueBalances"])) {
+                this.lessHousingDueBalances = [] as any;
+                for (let item of _data["lessHousingDueBalances"])
+                    this.lessHousingDueBalances.push(HousingDueBalancesDashboardDto.fromJS(item));
+            }
             if (Array.isArray(_data["mostHousingDuePayers"])) {
                 this.mostHousingDuePayers = [] as any;
                 for (let item of _data["mostHousingDuePayers"])
@@ -9191,6 +9256,16 @@ export class DashboardDto implements IDashboardDto {
         data["totalHousingDueAmount"] = this.totalHousingDueAmount;
         data["totalIncomeAmount"] = this.totalIncomeAmount;
         data["totalExpenseAmount"] = this.totalExpenseAmount;
+        if (Array.isArray(this.mostHousingDueBalances)) {
+            data["mostHousingDueBalances"] = [];
+            for (let item of this.mostHousingDueBalances)
+                data["mostHousingDueBalances"].push(item.toJSON());
+        }
+        if (Array.isArray(this.lessHousingDueBalances)) {
+            data["lessHousingDueBalances"] = [];
+            for (let item of this.lessHousingDueBalances)
+                data["lessHousingDueBalances"].push(item.toJSON());
+        }
         if (Array.isArray(this.mostHousingDuePayers)) {
             data["mostHousingDuePayers"] = [];
             for (let item of this.mostHousingDuePayers)
@@ -9223,6 +9298,8 @@ export interface IDashboardDto {
     totalHousingDueAmount: number;
     totalIncomeAmount: number;
     totalExpenseAmount: number;
+    mostHousingDueBalances: HousingDueBalancesDashboardDto[] | undefined;
+    lessHousingDueBalances: HousingDueBalancesDashboardDto[] | undefined;
     mostHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     lessHousingDuePayers: HousingDuePayersDashboardDto[] | undefined;
     expensesData: PaymentCategoryDashboardDto[] | undefined;

@@ -103,10 +103,11 @@ namespace Sirius.Dashboard
 
                 var housingsWithBlock = from h in _housingRepository.GetAll()
                     join b in _blockRepository.GetAll() on h.BlockId equals b.Id
-                    select new
+                    select new HousingDueBalancesDashboardDto
                     {
                         HousingId = h.Id,
-                        HousingName = b.BlockName + " " + h.Apartment
+                        HousingName = b.BlockName + " " + h.Apartment,
+                        Balance = h.Balance
                     };
 
                 var housingDuePayersQuery = from h in housingsWithBlock
@@ -132,6 +133,14 @@ namespace Sirius.Dashboard
                         TotalAmount = p.Sum(x => x.ab.Amount),
                         PaymentCategoryName = p.Key.PaymentCategoryName
                     });
+
+                dashboardDto.MostHousingDueBalances =
+                    await housingsWithBlock.OrderByDescending(p => p.Balance).Take(5)
+                        .ToListAsync();
+
+                dashboardDto.LessHousingDueBalances =
+                    await housingsWithBlock.OrderBy(p => p.Balance).Take(5)
+                        .ToListAsync();
 
                 dashboardDto.MostHousingDuePayers =
                     await housingDuePayersQuery.OrderByDescending(p => p.TotalHousingDueAmount).Take(5)

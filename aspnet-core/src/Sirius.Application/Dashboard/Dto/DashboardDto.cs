@@ -17,6 +17,8 @@ namespace Sirius.Dashboard.Dto
         public decimal TotalHousingDueAmount { get; set; }
         public decimal TotalIncomeAmount { get; set; }
         public decimal TotalExpenseAmount { get; set; }
+        public List<HousingDueBalancesDashboardDto> MostHousingDueBalances { get; set; }
+        public List<HousingDueBalancesDashboardDto> LessHousingDueBalances { get; set; }
         public List<HousingDuePayersDashboardDto> MostHousingDuePayers { get; set; }
         public List<HousingDuePayersDashboardDto> LessHousingDuePayers { get; set; }
         public List<PaymentCategoryDashboardDto> ExpensesData { get; set; }
