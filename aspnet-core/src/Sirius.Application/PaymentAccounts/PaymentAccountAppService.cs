@@ -26,16 +26,21 @@ namespace Sirius.PaymentAccounts
             CreateCashAccountDto, UpdatePaymentAccountDto>, IPaymentAccountAppService
     {
         private readonly IPaymentAccountManager _paymentAccountManager;
+        private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IAccountBookManager _accountBookManager;
         private readonly IAccountBookPolicy _accountBookPolicy;
         private readonly IPeriodManager _periodManager;
+        private readonly IBalanceOrganizer _balanceOrganizer;
+
         public PaymentAccountAppService(
             IPaymentAccountManager paymentAccountManager,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
-            IAccountBookPolicy accountBookPolicy, 
-            IPeriodManager periodManager)
+            IAccountBookPolicy accountBookPolicy,
+            IPeriodManager periodManager,
+            IBalanceOrganizer balanceOrganizer,
+            IRepository<AccountBook, Guid> accountBookRepository)
             : base(paymentAccountRepository)
         {
             _paymentAccountManager = paymentAccountManager;
@@ -43,6 +48,8 @@ namespace Sirius.PaymentAccounts
             _accountBookManager = accountBookManager;
             _accountBookPolicy = accountBookPolicy;
             _periodManager = periodManager;
+            _balanceOrganizer = balanceOrganizer;
+            _accountBookRepository = accountBookRepository;
             _accountBookManager = accountBookManager;
         }
 
@@ -110,6 +117,17 @@ namespace Sirius.PaymentAccounts
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
                 input.PersonId, input.EmployeeId, input.TenantIsOwner, existingPaymentAccount.Balance,
                 input.AllowNegativeBalance, input.Iban);
+
+            var activePeriod = await _periodManager.GetActivePeriod();
+            var firstAccountBookInActivePeriod =
+                await _accountBookRepository.FirstOrDefaultAsync(p => p.PeriodId == activePeriod.Id);
+
+            await _balanceOrganizer.GetOrganizedAccountBooksAsync(
+                activePeriod.StartDate,
+                new List<PaymentAccount> {paymentAccount},
+                new List<AccountBook> {firstAccountBookInActivePeriod}, null, null);
+            _balanceOrganizer.OrganizeAccountBookBalances();
+
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
         }
