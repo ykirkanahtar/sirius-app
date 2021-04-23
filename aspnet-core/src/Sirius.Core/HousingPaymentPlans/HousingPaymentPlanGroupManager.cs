@@ -20,6 +20,7 @@ namespace Sirius.HousingPaymentPlans
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IHousingManager _housingManager;
         private readonly IRepository<Housing, Guid> _housingRepository;
+        private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
 
         public HousingPaymentPlanGroupManager(
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
@@ -27,7 +28,8 @@ namespace Sirius.HousingPaymentPlans
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IHousingPaymentPlanManager housingPaymentPlanManager
             , IRepository<HousingCategory, Guid> housingCategoryRepository,
-            IRepository<Housing, Guid> housingRepository)
+            IRepository<Housing, Guid> housingRepository,
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository)
         {
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _housingManager = housingManager;
@@ -35,6 +37,7 @@ namespace Sirius.HousingPaymentPlans
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _housingCategoryRepository = housingCategoryRepository;
             _housingRepository = housingRepository;
+            _paymentCategoryRepository = paymentCategoryRepository;
         }
 
         private void CreateForHousing(HousingPaymentPlanGroup housingPaymentPlanGroup,
@@ -173,6 +176,10 @@ namespace Sirius.HousingPaymentPlans
             {
                 await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan);
             }
+
+            var paymentCategory = await _paymentCategoryRepository.GetAsync(housingPaymentPlanGroup.PaymentCategoryId);
+
+            await _paymentCategoryRepository.DeleteAsync(paymentCategory);
 
             await _housingPaymentPlanGroupRepository.DeleteAsync(housingPaymentPlanGroup);
         }
