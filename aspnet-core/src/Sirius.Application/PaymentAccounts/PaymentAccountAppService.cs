@@ -127,6 +127,7 @@ namespace Sirius.PaymentAccounts
                 new List<PaymentAccount> {paymentAccount},
                 new List<AccountBook> {firstAccountBookInActivePeriod}, null, null);
             _balanceOrganizer.OrganizeAccountBookBalances();
+            _balanceOrganizer.OrganizePaymentAccountBalances();
 
             await _paymentAccountManager.UpdateAsync(paymentAccount);
             return ObjectMapper.Map<PaymentAccountDto>(paymentAccount);
