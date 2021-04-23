@@ -97,9 +97,8 @@
             <div class="card">
               <h5>{{ "HousingDueStats" | localize }}</h5>
               <p-chart
-                type="bar"
+                type="pie"
                 [data]="housingDueStatsData"
-                [options]="housingDueStatsOptions"
               ></p-chart>
             </div>
           </div>
@@ -107,6 +106,28 @@
             <div class="card">
               <h5>{{ "Expenses" | localize }}</h5>
               <p-chart type="pie" [data]="expensesData"></p-chart>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "MostHousingDueBalances" | localize }}</h5>
+              <p-chart
+                type="bar"
+                [data]="mostHousingDueBalancesData"
+                [options]="barOptions"
+              ></p-chart>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <h5>{{ "LessHousingDueBalances" | localize }}</h5>
+              <p-chart
+                type="bar"
+                [data]="lessHousingDueBalancesData"
+                [options]="barOptions"
+              ></p-chart>
             </div>
           </div>
         </div>

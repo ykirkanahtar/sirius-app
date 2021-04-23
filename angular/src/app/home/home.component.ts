@@ -19,8 +19,10 @@ export class HomeComponent extends AppComponentBase implements OnInit {
   mostHousingDuePayersData: any;
   lessHousingDuePayersData: any;
 
+  mostHousingDueBalancesData: any;
+  lessHousingDueBalancesData: any;
+
   basicOptions: any;
-  housingDueStatsOptions: any;
 
   barOptions: any;
   expensesData: any;
@@ -31,7 +33,7 @@ export class HomeComponent extends AppComponentBase implements OnInit {
   assetsClass: string;
   statsClass: string;
 
-  isProcessing:boolean = true;
+  isProcessing: boolean = true;
 
   constructor(
     injector: Injector,
@@ -63,11 +65,41 @@ export class HomeComponent extends AppComponentBase implements OnInit {
           this.assetsClass = "col-lg-3 col-6";
         }
 
-        if(this.dashboardDto.totalIncomeAmount > 0) {
+        if (this.dashboardDto.totalIncomeAmount > 0) {
           this.statsClass = "col-lg-4 col-12";
         } else {
           this.statsClass = "col-lg-6 col-12";
         }
+
+        this.mostHousingDueBalancesData = {
+          labels: this.dashboardDto.mostHousingDueBalances.map(
+            (p) => p.housingName
+          ),
+          datasets: [
+            {
+              label: this.l("MostHousingDueBalances"),
+              backgroundColor: "#42A5F5",
+              data: this.dashboardDto.mostHousingDueBalances.map(
+                (p) => p.balance
+              ),
+            },
+          ],
+        };
+
+        this.lessHousingDueBalancesData = {
+          labels: this.dashboardDto.lessHousingDueBalances.map(
+            (p) => p.housingName
+          ),
+          datasets: [
+            {
+              label: this.l("LessHousingDueBalances"),
+              backgroundColor: "#FFA726",
+              data: this.dashboardDto.lessHousingDueBalances.map(
+                (p) => p.balance
+              ),
+            },
+          ],
+        };
 
         this.mostHousingDuePayersData = {
           labels: this.dashboardDto.mostHousingDuePayers.map(
@@ -125,42 +157,23 @@ export class HomeComponent extends AppComponentBase implements OnInit {
         );
 
         this.housingDueStatsData = {
+          labels: [
+            this.l("TotalHousingDueDefinitions"),
+            this.l("TotalHousingDuePayments"),
+          ],
           datasets: [
             {
-              label: this.l("TotalHousingDueDefinitions"),
-              backgroundColor: "#42A5F5",
-              data: totalHousingDueDefinition,
-            },
-            {
-              label: this.l("TotalHousingDuePayments"),
-              backgroundColor: "#FFA726",
-              data: totalHousingDuePayment,
+              data: [totalHousingDueDefinition, totalHousingDuePayment],
+              backgroundColor: ["#36A2EB", "#FFCE56"],
+              hoverBackgroundColor: ["#36A2EB", "#FFCE56"],
             },
           ],
         };
+
         this.isProcessing = false;
       });
 
     this.barOptions = {
-      responsive: true,
-      tooltips: {
-        mode: "index",
-        intersect: true,
-      },
-      scales: {
-        yAxes: [
-          {
-            type: "linear",
-            display: true,
-            position: "left",
-            id: "y-axis-1",
-            ticks: { min: 0 },
-          },
-        ],
-      },
-    };
-
-    this.housingDueStatsOptions = {
       responsive: true,
       tooltips: {
         mode: "index",
