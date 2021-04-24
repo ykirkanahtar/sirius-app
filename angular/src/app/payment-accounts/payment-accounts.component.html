@@ -5,7 +5,7 @@
         <div class="col-6">
           <h1>{{ "PaymentAccounts" | localize }}</h1>
         </div>
-        
+
         <p-menu #menu [popup]="true" [model]="items"></p-menu>
 
         <div
@@ -51,12 +51,19 @@
                 <th pSortableColumn="Balance">
                   {{ "Balance" | localize }}
                   <p-sortIcon field="Balance"></p-sortIcon>
-                </th>               
+                </th>
                 <th pSortableColumn="TenantIsOwner">
                   {{ "TenantIsOwner" | localize }}
                   <p-sortIcon field="TenantIsOwner"></p-sortIcon>
                 </th>
-                <th>{{ "Actions" | localize }}</th>
+                <th
+                  *ngIf="
+                    this.permissionHelper.editPaymentAccount() ||
+                    this.permissionHelper.deletePaymentAccount()
+                  "
+                >
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template
@@ -82,7 +89,7 @@
                       | localize
                   }}
                 </td>
-                <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>             
+                <td>{{ paymentAccount.balance | number: "1.2-2" }}</td>
                 <td>
                   {{ (paymentAccount.tenantIsOwner ? "Yes" : "No") | localize }}
                 </td>

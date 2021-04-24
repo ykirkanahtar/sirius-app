@@ -11,9 +11,10 @@ namespace Sirius.Authorization.Roles
         {
             public const string Admin = "Admin";
             public const string SiteManagement = "SiteManagement";
-            public const string BlockManagement = "BlockManagement";
-            public const string HousingOwner = "HousingOwner";
-            public const string HousingTenant = "HousingTenant";
+            public const string SiteAuditor = "SiteAuditor";
+            // public const string BlockManagement = "BlockManagement";
+            // public const string HousingOwner = "HousingOwner";
+            // public const string HousingTenant = "HousingTenant";
         }
     }
 }

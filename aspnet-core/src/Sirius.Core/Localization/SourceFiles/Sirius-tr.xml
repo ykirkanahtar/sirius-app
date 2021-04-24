@@ -328,6 +328,7 @@
     <text name="SalaryPayment">Maaş ödemesi</text>
     <text name="SelectDate">Tarih Seçiniz</text>
     <text name="SelectHousingPaymentPlans">Konut ödeme planı gir</text>
+    <text name="SiteAuditor">Site Denetleyici</text>
     <text name="SiteManagement">Site Yönetimi</text>
     <text name="StartDate">Başlangıç Tarihi</text>
     <text name="StartDateShort">Baş. Tarihi</text>

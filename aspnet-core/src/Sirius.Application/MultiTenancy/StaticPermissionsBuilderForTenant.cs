@@ -37,36 +37,36 @@ namespace Sirius.MultiTenancy
                 context.SaveChanges();
             }
 
-            var blockManagementRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
-                r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.BlockManagement);
-            if (blockManagementRole == null)
-            {
-                blockManagementRole = context.Roles
-                    .Add(new Role(tenantId, StaticRoleNames.Tenants.BlockManagement,
-                            StaticRoleNames.Tenants.BlockManagement)
-                        {IsStatic = true}).Entity;
-                context.SaveChanges();
-            }
-
-            var housingOwnerRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
-                r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.HousingOwner);
-            if (housingOwnerRole == null)
-            {
-                housingOwnerRole = context.Roles
-                    .Add(new Role(tenantId, StaticRoleNames.Tenants.HousingOwner, StaticRoleNames.Tenants.HousingOwner)
-                        {IsStatic = true}).Entity;
-                context.SaveChanges();
-            }
-
-            var housingTenantRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
-                r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.HousingTenant);
-            if (housingTenantRole == null)
-            {
-                housingTenantRole = context.Roles
-                    .Add(new Role(tenantId, StaticRoleNames.Tenants.HousingTenant,
-                        StaticRoleNames.Tenants.HousingTenant) {IsStatic = true}).Entity;
-                context.SaveChanges();
-            }
+            // var blockManagementRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
+            //     r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.BlockManagement);
+            // if (blockManagementRole == null)
+            // {
+            //     blockManagementRole = context.Roles
+            //         .Add(new Role(tenantId, StaticRoleNames.Tenants.BlockManagement,
+            //                 StaticRoleNames.Tenants.BlockManagement)
+            //             {IsStatic = true}).Entity;
+            //     context.SaveChanges();
+            // }
+            //
+            // var housingOwnerRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
+            //     r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.HousingOwner);
+            // if (housingOwnerRole == null)
+            // {
+            //     housingOwnerRole = context.Roles
+            //         .Add(new Role(tenantId, StaticRoleNames.Tenants.HousingOwner, StaticRoleNames.Tenants.HousingOwner)
+            //             {IsStatic = true}).Entity;
+            //     context.SaveChanges();
+            // }
+            //
+            // var housingTenantRole = context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
+            //     r.TenantId == tenantId && r.Name == StaticRoleNames.Tenants.HousingTenant);
+            // if (housingTenantRole == null)
+            // {
+            //     housingTenantRole = context.Roles
+            //         .Add(new Role(tenantId, StaticRoleNames.Tenants.HousingTenant,
+            //             StaticRoleNames.Tenants.HousingTenant) {IsStatic = true}).Entity;
+            //     context.SaveChanges();
+            // }
 
             var customPermissions = new List<Permission>()
             {
@@ -119,7 +119,7 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_CreatePerson),
                 new Permission(PermissionNames.Pages_EditPerson),
                 new Permission(PermissionNames.Pages_DeletePerson),
-                
+
                 new Permission(PermissionNames.Pages_PeriodsForSite),
                 new Permission(PermissionNames.Pages_PeriodsForBlock),
                 new Permission(PermissionNames.Pages_CreatePeriodForBlock),
@@ -131,14 +131,19 @@ namespace Sirius.MultiTenancy
 
             if (customPermissions.Any())
             {
+                var adminPermissionNames = context.RolePermissions
+                    .Where(p => p.RoleId == adminRole.Id && p.TenantId == tenantId && p.IsGranted).Select(p => p.Name)
+                    .ToList();
+
                 context.Permissions.AddRange(
-                    customPermissions.Select(permission => new RolePermissionSetting
-                    {
-                        TenantId = tenantId,
-                        Name = permission.Name,
-                        IsGranted = true,
-                        RoleId = adminRole.Id
-                    })
+                    customPermissions.Where(p => adminPermissionNames.Contains(p.Name) == false).Select(permission =>
+                        new RolePermissionSetting
+                        {
+                            TenantId = tenantId,
+                            Name = permission.Name,
+                            IsGranted = true,
+                            RoleId = adminRole.Id
+                        })
                 );
             }
 
@@ -193,91 +198,99 @@ namespace Sirius.MultiTenancy
                 new Permission(PermissionNames.Pages_CreatePerson),
                 new Permission(PermissionNames.Pages_EditPerson),
                 new Permission(PermissionNames.Pages_DeletePerson),
-                
+
                 new Permission(PermissionNames.Pages_PeriodsForSite),
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
-                
+
                 new Permission(PermissionNames.Pages_Users),
             };
 
             if (siteManagementPermissions.Any())
             {
+                var existingSiteManagementPermissionNames = context.RolePermissions
+                    .Where(p => p.RoleId == siteManagementRole.Id && p.TenantId == tenantId && p.IsGranted)
+                    .Select(p => p.Name)
+                    .ToList();
+
                 context.Permissions.AddRange(
-                    siteManagementPermissions.Select(permission => new RolePermissionSetting
-                    {
-                        TenantId = tenantId,
-                        Name = permission.Name,
-                        IsGranted = true,
-                        RoleId = siteManagementRole.Id
-                    })
+                    siteManagementPermissions
+                        .Where(p => existingSiteManagementPermissionNames.Contains(p.Name) == false).Select(
+                            permission => new RolePermissionSetting
+                            {
+                                TenantId = tenantId,
+                                Name = permission.Name,
+                                IsGranted = true,
+                                RoleId = siteManagementRole.Id
+                            })
                 );
             }
 
             //BlockManagement roles
-            var blockManagementPermissions = new List<Permission>()
-            {
-                new Permission(PermissionNames.Pages_AccountBooks),
-                new Permission(PermissionNames.Pages_Housings),
-                new Permission(PermissionNames.Pages_PaymentAccounts),
-                new Permission(PermissionNames.Pages_Employees),
-                new Permission(PermissionNames.Pages_People),
-                new Permission(PermissionNames.Pages_PaymentCategories),
-                new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
-                new Permission(PermissionNames.Pages_FinancialOperations),
-                new Permission(PermissionNames.Pages_PeriodsForBlock),
-                new Permission(PermissionNames.Pages_CreatePeriodForBlock),
-            };
-
-            if (blockManagementPermissions.Any())
-            {
-                context.Permissions.AddRange(
-                    blockManagementPermissions.Select(permission => new RolePermissionSetting
-                    {
-                        TenantId = tenantId,
-                        Name = permission.Name,
-                        IsGranted = true,
-                        RoleId = blockManagementRole.Id
-                    })
-                );
-            }
+            // var blockManagementPermissions = new List<Permission>()
+            // {
+            //     new Permission(PermissionNames.Pages_AccountBooks),
+            //     new Permission(PermissionNames.Pages_Housings),
+            //     new Permission(PermissionNames.Pages_PaymentAccounts),
+            //     new Permission(PermissionNames.Pages_Employees),
+            //     new Permission(PermissionNames.Pages_People),
+            //     new Permission(PermissionNames.Pages_PaymentCategories),
+            //     new Permission(PermissionNames.Pages_HousingPaymentPlanGroups),
+            //     new Permission(PermissionNames.Pages_FinancialOperations),
+            //     new Permission(PermissionNames.Pages_PeriodsForBlock),
+            //     new Permission(PermissionNames.Pages_CreatePeriodForBlock),
+            // };
+            //
+            // if (blockManagementPermissions.Any())
+            // {
+            //     context.Permissions.AddRange(
+            //         blockManagementPermissions.Select(permission => new RolePermissionSetting
+            //         {
+            //             TenantId = tenantId,
+            //             Name = permission.Name,
+            //             IsGranted = true,
+            //             RoleId = blockManagementRole.Id
+            //         })
+            //     );
+            // }
 
             //HousingOwner roles
-            var housingOwnerPermissions = new List<Permission>()
-            {
-            };
-
-            if (housingOwnerPermissions.Any())
-            {
-                context.Permissions.AddRange(
-                    housingOwnerPermissions.Select(permission => new RolePermissionSetting
-                    {
-                        TenantId = tenantId,
-                        Name = permission.Name,
-                        IsGranted = true,
-                        RoleId = housingOwnerRole.Id
-                    })
-                );
-            }
-
-            //HousingTenant roles
-            var housingTenantPermissions = new List<Permission>()
-            {
-            };
-
-            if (housingTenantPermissions.Any())
-            {
-                context.Permissions.AddRange(
-                    housingTenantPermissions.Select(permission => new RolePermissionSetting
-                    {
-                        TenantId = tenantId,
-                        Name = permission.Name,
-                        IsGranted = true,
-                        RoleId = housingTenantRole.Id
-                    })
-                );
-            }
+            
+            // var housingOwnerPermissions = new List<Permission>()
+            // {
+            // };
+            //
+            // if (housingOwnerPermissions.Any())
+            // {
+            //     context.Permissions.AddRange(
+            //         housingOwnerPermissions.Select(permission => new RolePermissionSetting
+            //         {
+            //             TenantId = tenantId,
+            //             Name = permission.Name,
+            //             IsGranted = true,
+            //             RoleId = housingOwnerRole.Id
+            //         })
+            //     );
+            // }
+            //
+            // //HousingTenant roles
+            // var housingTenantPermissions = new List<Permission>()
+            // {
+            // };
+            //
+            // if (housingTenantPermissions.Any())
+            // {
+            //     context.Permissions.AddRange(
+            //         housingTenantPermissions.Select(permission => new RolePermissionSetting
+            //         {
+            //             TenantId = tenantId,
+            //             Name = permission.Name,
+            //             IsGranted = true,
+            //             RoleId = housingTenantRole.Id
+            //         })
+            //     );
+            // }
 
             context.SaveChanges();
         }
