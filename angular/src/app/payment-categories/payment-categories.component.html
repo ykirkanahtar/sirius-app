@@ -115,7 +115,14 @@
                   {{ "IsHousingDue" | localize }}
                   <p-sortIcon field="IsHousingDue"></p-sortIcon>
                 </th>
-                <th>{{ "Actions" | localize }}</th>
+                <th
+                  *ngIf="
+                    this.permissionHelper.editPaymentCategory() ||
+                    this.permissionHelper.deletePaymentCategory()
+                  "
+                >
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template
@@ -136,7 +143,7 @@
               <tr>
                 <td>{{ paymentCategory.paymentCategoryName | localize }}</td>
                 <td>
-                  {{ (paymentCategory.isValidForAllPeriods) | localize}}
+                  {{ paymentCategory.isValidForAllPeriods | localize }}
                 </td>
                 <td>
                   {{ paymentCategory.defaultFromPaymentAccountName | localize }}
@@ -145,7 +152,7 @@
                   {{ paymentCategory.defaultToPaymentAccountName | localize }}
                 </td>
                 <td>
-                  {{ (paymentCategory.isHousingDue) | localize}}
+                  {{ paymentCategory.isHousingDue | localize }}
                 </td>
                 <td>
                   <button

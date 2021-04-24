@@ -98,7 +98,15 @@
                   {{ "HousingCategoryName" | localize }}
                   <p-sortIcon field="HousingCategoryName"></p-sortIcon>
                 </th>
-                <th style="width: 40%">{{ "Actions" | localize }}</th>
+                <th
+                  style="width: 200px"
+                  *ngIf="
+                    this.permissionHelper.editHousingCategory() ||
+                    this.permissionHelper.deleteHousingCategory()
+                  "
+                >
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template

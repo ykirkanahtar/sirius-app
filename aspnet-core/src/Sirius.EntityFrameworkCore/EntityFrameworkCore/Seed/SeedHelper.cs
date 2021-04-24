@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Abp.Dependency;
@@ -27,6 +28,12 @@ namespace Sirius.EntityFrameworkCore.Seed
             // Default tenant seed (in host database).
             new DefaultTenantBuilder(context).Create();
             new TenantRoleAndUserBuilder(context, 1).Create();
+
+            var allTenants = context.Tenants.Where(p => p.Id != 1).ToList();
+            foreach (var tenant in allTenants)
+            {
+                new TenantRoleAndUserBuilder(context, tenant.Id).Create();
+            }
         }
 
         private static void WithDbContext<TDbContext>(IIocResolver iocResolver, Action<TDbContext> contextAction)

@@ -71,65 +71,73 @@ export class HomeComponent extends AppComponentBase implements OnInit {
           this.statsClass = "col-lg-6 col-12";
         }
 
-        this.mostHousingDueBalancesData = {
-          labels: this.dashboardDto.mostHousingDueBalances.map(
-            (p) => p.housingName
-          ),
-          datasets: [
-            {
-              label: this.l("MostHousingDueBalances"),
-              backgroundColor: "#42A5F5",
-              data: this.dashboardDto.mostHousingDueBalances.map(
-                (p) => p.balance
-              ),
-            },
-          ],
-        };
+        if (this.dashboardDto.mostHousingDueBalances !== undefined) {
+          this.mostHousingDueBalancesData = {
+            labels: this.dashboardDto.mostHousingDueBalances.map(
+              (p) => p.housingName
+            ),
+            datasets: [
+              {
+                label: this.l("MostHousingDueBalances"),
+                backgroundColor: "#42A5F5",
+                data: this.dashboardDto.mostHousingDueBalances.map(
+                  (p) => p.balance
+                ),
+              },
+            ],
+          };
+        }
 
-        this.lessHousingDueBalancesData = {
-          labels: this.dashboardDto.lessHousingDueBalances.map(
-            (p) => p.housingName
-          ),
-          datasets: [
-            {
-              label: this.l("LessHousingDueBalances"),
-              backgroundColor: "#FFA726",
-              data: this.dashboardDto.lessHousingDueBalances.map(
-                (p) => p.balance
-              ),
-            },
-          ],
-        };
+        if (this.dashboardDto.lessHousingDueBalances !== undefined) {
+          this.lessHousingDueBalancesData = {
+            labels: this.dashboardDto.lessHousingDueBalances.map(
+              (p) => p.housingName
+            ),
+            datasets: [
+              {
+                label: this.l("LessHousingDueBalances"),
+                backgroundColor: "#FFA726",
+                data: this.dashboardDto.lessHousingDueBalances.map(
+                  (p) => p.balance
+                ),
+              },
+            ],
+          };
+        }
 
-        this.mostHousingDuePayersData = {
-          labels: this.dashboardDto.mostHousingDuePayers.map(
-            (p) => p.housingName
-          ),
-          datasets: [
-            {
-              label: this.l("MostHousingDuePayers"),
-              backgroundColor: "#42A5F5",
-              data: this.dashboardDto.mostHousingDuePayers.map(
-                (p) => p.totalHousingDueAmount
-              ),
-            },
-          ],
-        };
+        if (this.dashboardDto.mostHousingDuePayers !== undefined) {
+          this.mostHousingDuePayersData = {
+            labels: this.dashboardDto.mostHousingDuePayers.map(
+              (p) => p.housingName
+            ),
+            datasets: [
+              {
+                label: this.l("MostHousingDuePayers"),
+                backgroundColor: "#42A5F5",
+                data: this.dashboardDto.mostHousingDuePayers.map(
+                  (p) => p.totalHousingDueAmount
+                ),
+              },
+            ],
+          };
+        }
 
-        this.lessHousingDuePayersData = {
-          labels: this.dashboardDto.lessHousingDuePayers.map(
-            (p) => p.housingName
-          ),
-          datasets: [
-            {
-              label: this.l("LessHousingDuePayers"),
-              backgroundColor: "#FFA726",
-              data: this.dashboardDto.lessHousingDuePayers.map(
-                (p) => p.totalHousingDueAmount
-              ),
-            },
-          ],
-        };
+        if (this.lessHousingDuePayersData !== undefined) {
+          this.lessHousingDuePayersData = {
+            labels: this.dashboardDto.lessHousingDuePayers.map(
+              (p) => p.housingName
+            ),
+            datasets: [
+              {
+                label: this.l("LessHousingDuePayers"),
+                backgroundColor: "#FFA726",
+                data: this.dashboardDto.lessHousingDuePayers.map(
+                  (p) => p.totalHousingDueAmount
+                ),
+              },
+            ],
+          };
+        }
 
         this.expensesData = {
           labels: this.dashboardDto.expensesData.map(

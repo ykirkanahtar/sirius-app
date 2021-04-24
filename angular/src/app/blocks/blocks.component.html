@@ -38,7 +38,15 @@
                   {{ "BlockName" | localize }}
                   <p-sortIcon field="BlockName"></p-sortIcon>
                 </th>
-                <th style="width: 200px">{{ "Actions" | localize }}</th>
+                <th
+                  style="width: 200px"
+                  *ngIf="
+                    this.permissionHelper.editBlock() ||
+                    this.permissionHelper.deleteBlock()
+                  "
+                >
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template

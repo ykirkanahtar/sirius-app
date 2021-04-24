@@ -147,7 +147,14 @@
                   {{ "Phone2" | localize }}
                   <p-sortIcon field="Phone2"></p-sortIcon>
                 </th>
-                <th>{{ "Actions" | localize }}</th>
+                <th
+                  *ngIf="
+                    this.permissionHelper.editPerson() ||
+                    this.permissionHelper.deletePerson()
+                  "
+                >
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template

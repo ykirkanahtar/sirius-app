@@ -7,9 +7,21 @@
         </div>
         <div
           class="col-6 text-right"
-          *ngIf="periodType === PeriodTypeEnum.Site ? this.permissionHelper.createPeriodForSite() : this.permissionHelper.createPeriodForBlock()"
+          *ngIf="
+            periodType === PeriodTypeEnum.Site
+              ? this.permissionHelper.createPeriodForSite()
+              : this.permissionHelper.createPeriodForBlock()
+          "
         >
-          <a href="javascript:;" class="btn bg-blue" (click)="periodType === PeriodTypeEnum.Site ? createPeriodForSite() : createPeriodForBlock()">
+          <a
+            href="javascript:;"
+            class="btn bg-blue"
+            (click)="
+              periodType === PeriodTypeEnum.Site
+                ? createPeriodForSite()
+                : createPeriodForBlock()
+            "
+          >
             <i class="fa fa-plus-square"></i>
             {{ "Create" | localize }}
           </a>
@@ -97,7 +109,7 @@
                 <th pSortableColumn="Name">
                   {{ "Name" | localize }}
                   <p-sortIcon field="Name"></p-sortIcon>
-                </th>               
+                </th>
                 <th pSortableColumn="StartDate">
                   {{ "StartDate" | localize }}
                   <p-sortIcon field="StartDate"></p-sortIcon>
@@ -110,7 +122,9 @@
                   {{ "IsActive" | localize }}
                   <p-sortIcon field="IsActive"></p-sortIcon>
                 </th>
-                <th>{{ "Actions" | localize }}</th>
+                <th *ngIf="this.permissionHelper.editPeriod()">
+                  {{ "Actions" | localize }}
+                </th>
               </tr>
             </ng-template>
             <ng-template
@@ -140,7 +154,7 @@
                 <td>
                   <button
                     type="button"
-                    *ngIf="this.permissionHelper.editPerson()"
+                    *ngIf="this.permissionHelper.editPeriod()"
                     class="btn btn-sm bg-secondary"
                     (click)="editPeriod(period)"
                   >
