@@ -10,7 +10,7 @@ import {
   Input,
 } from "@angular/core";
 import { finalize, throwIfEmpty } from "rxjs/operators";
-import { BsModalRef } from "ngx-bootstrap/modal";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import * as _ from "lodash";
 import { AppComponentBase } from "@shared/app-component-base";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
@@ -25,17 +25,24 @@ import {
   API_BASE_URL,
   PaymentCategoryDto,
   PaymentCategoryType,
+  CreateInventoryDto,
+  InventoryTypeServiceProxy,
+  QuantityType,
+  InventoryTypeDto,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
+import { SelectItem } from "primeng/api";
+import { CreateInventoryDialogComponent } from "@app/inventories/create-inventory/create-inventory-dialog.component";
 
 @Component({
   templateUrl: "create-account-book-dialog.component.html",
 })
 export class CreateAccountBookDialogComponent
   extends AppComponentBase
-  implements OnInit {
+  implements OnInit
+{
   saving = false;
   saveLabel = this.l("Save");
   accountBook = new CreateAccountBookDto();
@@ -49,6 +56,9 @@ export class CreateAccountBookDialogComponent
   peopleForHousingDue: LookUpDto[];
   paymentCategory: PaymentCategoryDto;
   definedPaymentCategory: boolean = false;
+  createInventory: CreateInventoryDto = new CreateInventoryDto();
+  inventoryTypes: SelectItem[] = [];
+  quantityTypes: SelectItem[] = [];
 
   paymentCategoryType?: PaymentCategoryType;
   PaymentCategoryTypeEnum = PaymentCategoryType;
@@ -73,8 +83,11 @@ export class CreateAccountBookDialogComponent
     private _paymentCategoryServiceProxy: PaymentCategoryServiceProxy,
     private _personServiceProxy: PersonServiceProxy,
     private _uploadServiceProxy: CustomUploadServiceProxy,
+    private _inventoryTypeService: InventoryTypeServiceProxy,
+    private _modalService: BsModalService,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
+    public inventoryModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
   ) {
     super(injector);
@@ -144,6 +157,31 @@ export class CreateAccountBookDialogComponent
     if (this.lastAccountBookDate) {
       this.processDate = this.lastAccountBookDate.toDate();
     }
+
+    if (
+      (this.accountBook.isHousingDue === undefined ||
+        this.accountBook.isHousingDue === false) &&
+      this.paymentCategoryType === PaymentCategoryType.Expense
+    ) {
+      this._inventoryTypeService
+        .getLookUp()
+        .subscribe((result: LookUpDto[]) => {
+          this.inventoryTypes = result;
+
+          this.inventoryTypes.forEach((item) => {
+            this._inventoryTypeService
+              .get(item.value)
+              .subscribe((result: InventoryTypeDto) => {
+                this.quantityTypes.push({
+                  value: result.id,
+                  label: result.quantityType.toString(),
+                });
+              });
+          });
+        });
+
+      this.accountBook.inventories = [];
+    }
   }
 
   isFromPaymentAccountRequired(): boolean {
@@ -191,7 +229,8 @@ export class CreateAccountBookDialogComponent
         .subscribe((result: LookUpDto[]) => {
           this.housingsForNetting = result;
           if (this.housingsForNetting.length === 1) {
-            this.accountBook.housingIdForNetting = this.housingsForNetting[0].value;
+            this.accountBook.housingIdForNetting =
+              this.housingsForNetting[0].value;
             this.onSelectedHousingForNettingChange(this.housingsForNetting);
           }
         });
@@ -207,10 +246,17 @@ export class CreateAccountBookDialogComponent
         .subscribe((result: LookUpDto[]) => {
           this.paymentCategoriesForNetting = result;
           if (this.housings.length === 1) {
-            this.accountBook.paymentCategoryIdForNetting = this.paymentCategoriesForNetting[0].value;
+            this.accountBook.paymentCategoryIdForNetting =
+              this.paymentCategoriesForNetting[0].value;
           }
         });
     }
+  }
+
+  onSelectedInventoryTypeChange(event) {
+    var selectedInventoryType = event.value;
+
+    //Todo quantity type'ı çek
   }
 
   getPeopleForHousingDue(paymentCategoryId: string) {
@@ -278,6 +324,58 @@ export class CreateAccountBookDialogComponent
         this.saveLabel = this.l("Save");
       });
     }
+  }
+
+  addToInventories() {
+    this.inventoryModalRef = this._modalService.show(
+      CreateInventoryDialogComponent,
+      {
+        class: "modal-lg",
+      }
+    );
+
+    this.inventoryModalRef.content.onlyAddToList = true;
+    this.inventoryModalRef.content.event.subscribe((res) => {
+      this.accountBook.inventories.push(res.data);
+    });
+  }
+
+  getInventoryTypeName(inventoryTypeId: string): string {
+    let label = "";
+    this.inventoryTypes.forEach((item) => {
+      if (item.value == inventoryTypeId) {
+        label = item.label;
+      }
+    });
+    return label;
+  }
+
+  getInventoryQuantityTypeName(inventoryTypeId: string): string {
+    let label = "";
+    this.quantityTypes.forEach((item) => {
+      if (item.value == inventoryTypeId) {
+        label = item.label;
+      }
+    });
+    return QuantityType[label];
+  }
+
+  removeInventory(inventory: CreateInventoryDto) {
+    abp.message.confirm(
+      this.l("DeleteWarningMessage"),
+      undefined,
+      (result: boolean) => {
+        if (result) {
+          const index = this.accountBook.inventories.indexOf(
+            inventory,
+            0
+          );
+          if (index > -1) {
+            this.accountBook.inventories.splice(index, 1);
+          }
+        }
+      }
+    );
   }
 
   save(): void {

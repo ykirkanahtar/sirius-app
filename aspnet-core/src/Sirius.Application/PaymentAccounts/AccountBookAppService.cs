@@ -18,6 +18,8 @@ using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.FileServices;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
+using Sirius.Inventories;
+using Sirius.Inventories.Dto;
 using Sirius.PaymentAccounts.Dto;
 using Sirius.PaymentCategories;
 using Sirius.Periods;
@@ -48,6 +50,8 @@ namespace Sirius.PaymentAccounts
         private readonly ILocalizationSource _localizationSource;
         private readonly IBalanceOrganizer _balanceOrganizer;
         private readonly IPeriodManager _periodManager;
+        private readonly IInventoryAppService _inventoryAppService;
+        private readonly IRepository<Inventory, Guid> _inventoryRepository;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -64,7 +68,8 @@ namespace Sirius.PaymentAccounts
             IHousingPaymentPlanManager housingPaymentPlanManager,
             ILocalizationManager localizationManager,
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
-            IBalanceOrganizer balanceOrganizer, IPeriodManager periodManager)
+            IBalanceOrganizer balanceOrganizer, IPeriodManager periodManager, IInventoryAppService inventoryAppService,
+            IRepository<Inventory, Guid> inventoryRepository)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -83,6 +88,8 @@ namespace Sirius.PaymentAccounts
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _balanceOrganizer = balanceOrganizer;
             _periodManager = periodManager;
+            _inventoryAppService = inventoryAppService;
+            _inventoryRepository = inventoryRepository;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -253,6 +260,17 @@ namespace Sirius.PaymentAccounts
                     input.ToPaymentAccountId.HasValue ? toPaymentAccount : null, null, null, null, organizeBalances);
             }
 
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            if (input.Inventories.Any())
+            {
+                foreach (var createInventoryDto in input.Inventories)
+                {
+                    createInventoryDto.AccountBookId = accountBook.Id;
+                    await _inventoryAppService.CreateAsync(createInventoryDto);
+                }
+            }
+
             return accountBook;
         }
 
@@ -290,7 +308,7 @@ namespace Sirius.PaymentAccounts
                     Amount = input.Amount,
                     Description = input.Description,
                     PaymentCategoryId = input.PaymentCategoryId,
-                    AccountBookFileUrls = accountBookFileUrls
+                    AccountBookFileUrls = accountBookFileUrls,
                 };
 
                 newAccountBook = await CreateHousingDueAsync(createHousingDueAccountBookDto, false);
@@ -311,7 +329,8 @@ namespace Sirius.PaymentAccounts
                     DocumentNumber = input.DocumentNumber,
                     AccountBookFileUrls = accountBookFileUrls,
                     NettingFromHousingDue = existingAccountBook.NettingHousing,
-                    HousingIdForNetting = existingAccountBook.HousingIdForNetting
+                    HousingIdForNetting = existingAccountBook.HousingIdForNetting,
+                    Inventories = input.Inventories
                 };
 
                 await _accountBookManager.DeleteAsync(existingAccountBook, false);
@@ -471,6 +490,9 @@ namespace Sirius.PaymentAccounts
                 deletedAccountBookFiles.Add(deletedAccountBookFile);
             }
 
+            var previousInventories = await _inventoryRepository.GetAll()
+                .Where(p => p.AccountBookId == existingAccountBook.Id).ToListAsync();
+
             var accountBook = await AccountBook.UpdateAsync(
                 _accountBookPolicy
                 , existingAccountBook
@@ -488,6 +510,57 @@ namespace Sirius.PaymentAccounts
             );
             await _accountBookManager.UpdateAsync(existingAccountBookForCheck, accountBook);
 
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            if (input.Inventories.Any() || previousInventories.Any())
+            {
+                //new or updated inventories
+                foreach (var createInventoryDto in input.Inventories)
+                {
+                    var existingInventory = previousInventories.SingleOrDefault(p => p.InventoryTypeId ==
+                        createInventoryDto.InventoryTypeId &&
+                        p.SerialNumber ==
+                        createInventoryDto.SerialNumber);
+
+                    if (existingInventory != null)
+                    {
+                        if (existingInventory.Quantity != createInventoryDto.Quantity ||
+                            existingInventory.Description != createInventoryDto.Description)
+                        {
+                            var updateInventoryDto = new UpdateInventoryDto
+                            {
+                                InventoryTypeId = existingInventory.InventoryTypeId,
+                                Id = existingInventory.Id,
+                                SerialNumber = existingInventory.SerialNumber,
+                                AccountBookId = existingInventory.AccountBookId,
+                                Quantity = createInventoryDto.Quantity,
+                                Description = createInventoryDto.Description
+                            };
+                            await _inventoryAppService.UpdateAsync(updateInventoryDto);
+                        }
+                    }
+                    else
+                    {
+                        createInventoryDto.AccountBookId = accountBook.Id;
+                        await _inventoryAppService.CreateAsync(createInventoryDto);
+                    }
+                }
+
+                //deleted inventories
+                foreach (var previousInventory in previousInventories)
+                {
+                    var missingInventories = input.Inventories.Where(p => p.InventoryTypeId ==
+                                                                          previousInventory.InventoryTypeId &&
+                                                                          p.SerialNumber ==
+                                                                          previousInventory.SerialNumber).ToList();
+
+                    if (missingInventories.Any() == false)
+                    {
+                        await _inventoryAppService.DeleteByIdAsync(previousInventory.Id);
+                    }
+                }
+            }
+
             return ObjectMapper.Map<AccountBookDto>(accountBook);
         }
 
@@ -496,6 +569,16 @@ namespace Sirius.PaymentAccounts
             CheckDeletePermission();
             var accountBook = await _accountBookManager.GetAsync(input.Id);
             await _accountBookManager.DeleteAsync(accountBook, true);
+
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            var deletedInventories =
+                await _inventoryRepository.GetAll().Where(p => p.AccountBookId == input.Id).ToListAsync();
+
+            foreach (var deletedInventory in deletedInventories)
+            {
+                await _inventoryAppService.DeleteByIdAsync(deletedInventory.Id);
+            }
 
             //ToDo transaction commit olduktan sonra azure'dan silinen ilgili dosyaları sil. 
             //Committen sonra silinmesi gerekeceği için bu katmanda sil.
@@ -506,6 +589,7 @@ namespace Sirius.PaymentAccounts
             CheckGetPermission();
             var accountBook = await _accountBookRepository.GetAll().Where(p => p.Id == input.Id)
                 .Include(p => p.AccountBookFiles)
+                .Include(p => p.Inventories).ThenInclude(p => p.InventoryType)
                 .SingleAsync();
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);

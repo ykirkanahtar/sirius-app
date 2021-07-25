@@ -234,6 +234,16 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
+                
+                new Permission(PermissionNames.Pages_Inventories),
+                new Permission(PermissionNames.Pages_CreateInventory),
+                new Permission(PermissionNames.Pages_EditInventory),
+                new Permission(PermissionNames.Pages_DeleteInventory),
+                
+                new Permission(PermissionNames.Pages_InventoryTypes),
+                new Permission(PermissionNames.Pages_CreateInventoryType),
+                new Permission(PermissionNames.Pages_EditInventoryType),
+                new Permission(PermissionNames.Pages_DeleteInventoryType),
 
                 new Permission(PermissionNames.Pages_Users),
             };
@@ -265,6 +275,10 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_People),
 
                 new Permission(PermissionNames.Pages_PeriodsForSite),
+                
+                new Permission(PermissionNames.Pages_Inventories),
+
+                new Permission(PermissionNames.Pages_InventoryTypes),
 
                 new Permission(PermissionNames.Pages_Users),
             };
@@ -331,6 +345,16 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
+                
+                new Permission(PermissionNames.Pages_Inventories),
+                new Permission(PermissionNames.Pages_CreateInventory),
+                new Permission(PermissionNames.Pages_EditInventory),
+                new Permission(PermissionNames.Pages_DeleteInventory),
+                
+                new Permission(PermissionNames.Pages_InventoryTypes),
+                new Permission(PermissionNames.Pages_CreateInventoryType),
+                new Permission(PermissionNames.Pages_EditInventoryType),
+                new Permission(PermissionNames.Pages_DeleteInventoryType),
             };
         }
     }

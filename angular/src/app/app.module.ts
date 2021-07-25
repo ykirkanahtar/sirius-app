@@ -89,6 +89,14 @@ import { HousingPaymentPlanGroupAmountsComponent } from "./housing-payment-plan-
 import { PeriodsComponent } from "./periods/periods.component";
 import { CreatePeriodDialogComponent } from "./periods/create-period/create-period-dialog.component";
 import { EditPeriodDialogComponent } from "./periods/edit-period/edit-period-dialog.component";
+import { InventoryTypesComponent } from "./inventory-types/inventory-types.component";
+import { InventoriesComponent } from './inventories/inventories.component';
+import { CreateInventoryTypeDialogComponent } from "./inventory-types/create-inventory-type/create-inventory-type-dialog.component";
+import { EditInventoryTypeDialogComponent } from "./inventory-types/edit-inventory-type/edit-inventory-type-dialog.component";
+import { CreateInventoryDialogComponent } from "./inventories/create-inventory/create-inventory-dialog.component";
+import { EditInventoryDialogComponent } from "./inventories/edit-inventory/edit-inventory-dialog.component";
+
+
 import { defineLocale } from "ngx-bootstrap/chronos";
 import { trLocale } from "ngx-bootstrap/locale";
 
@@ -157,6 +165,12 @@ import { trLocale } from "ngx-bootstrap/locale";
     PeriodsComponent,
     CreatePeriodDialogComponent,
     EditPeriodDialogComponent,
+    InventoryTypesComponent,
+    InventoriesComponent,
+    CreateInventoryTypeDialogComponent,
+    EditInventoryTypeDialogComponent,
+    CreateInventoryDialogComponent,
+    EditInventoryDialogComponent
   ],
   imports: [
     CommonModule,

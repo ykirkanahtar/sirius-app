@@ -64,5 +64,15 @@
         public const string Pages_CreatePeriodForBlock = "Pages.CreatePeriodForBlock";
         public const string Pages_EditPeriod = "Pages.EditPeriod";
         public const string Pages_DeletePeriod = "Pages.DeletePeriod";
+        
+        public const string Pages_InventoryTypes = "Pages.InventoryTypes";
+        public const string Pages_CreateInventoryType = "Pages.CreateInventoryType";
+        public const string Pages_EditInventoryType = ".Pages.EditInventoryType";
+        public const string Pages_DeleteInventoryType = "Pages.DeleteInventoryType";
+        
+        public const string Pages_Inventories = "Pages.Inventories";
+        public const string Pages_CreateInventory = "Pages.CreateInventory";
+        public const string Pages_EditInventory = ".Pages.EditInventory";
+        public const string Pages_DeleteInventory = "Pages.DeleteInventory";
     }
 }

@@ -27,6 +27,8 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_FinancialOperations, L("FinancialOperationsMenu"));
             context.CreatePermission(PermissionNames.Pages_PeriodsForSite, L("PeriodsForSiteMenu"));
             context.CreatePermission(PermissionNames.Pages_PeriodsForBlock, L("PeriodsForBlockMenu"));
+            context.CreatePermission(PermissionNames.Pages_InventoryTypes, L("InventoryTypesMenu"));
+            context.CreatePermission(PermissionNames.Pages_Inventories, L("InventoriesMenu"));
 
             context.CreatePermission(PermissionNames.Pages_CreateAccountBook, L("CreateAccountBook"));
             context.CreatePermission(PermissionNames.Pages_EditAccountBook, L("EditAccountBook"));
@@ -69,6 +71,14 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_CreatePeriodForSite, L("CreatePeriodForSite"));
             context.CreatePermission(PermissionNames.Pages_EditPeriod, L("EditPeriod"));
             context.CreatePermission(PermissionNames.Pages_DeletePeriod, L("DeletePeriod"));
+            
+            context.CreatePermission(PermissionNames.Pages_CreateInventoryType, L("CreateInventoryType"));
+            context.CreatePermission(PermissionNames.Pages_EditInventoryType, L("EditInventoryType"));
+            context.CreatePermission(PermissionNames.Pages_DeleteInventoryType, L("DeleteInventoryType"));
+            
+            context.CreatePermission(PermissionNames.Pages_CreateInventory, L("CreateInventory"));
+            context.CreatePermission(PermissionNames.Pages_EditInventory, L("EditInventory"));
+            context.CreatePermission(PermissionNames.Pages_DeleteInventory, L("DeleteInventory"));
         }
 
         private static ILocalizableString L(string name)

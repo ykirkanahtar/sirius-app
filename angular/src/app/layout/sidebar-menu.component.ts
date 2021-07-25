@@ -69,6 +69,12 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         'Pages.Employees'
       ),
       new MenuItem(
+        this.l('InventoriesMenu'),
+        '/app/inventories',
+        'fas fa-tools',
+        'Pages.PeriodsForSite'
+      ),
+      new MenuItem(
         this.l('FinancialOperations'),
         '',
         'fas fa-wallet',
@@ -121,6 +127,12 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             this.l('PeriodsForSiteMenu'),
             '/app/site-periods',
             'far fa-clock',
+            'Pages.PeriodsForSite'
+          ),
+          new MenuItem(
+            this.l('InventoryTypesMenu'),
+            '/app/inventory-types',
+            'fas fa-cart-plus',
             'Pages.PeriodsForSite'
           ),
           // new MenuItem(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Abp.Runtime.Validation;
+using Sirius.Inventories.Dto;
 
 namespace Sirius.PaymentAccounts.Dto
 {
@@ -13,6 +14,7 @@ namespace Sirius.PaymentAccounts.Dto
         {
             NewAccountBookFileUrls = new List<string>();
             DeletedAccountBookFileUrls = new List<string>();
+            Inventories = new List<CreateInventoryDto>();
         }
         
         public string ProcessDateString { get; set; }
@@ -27,6 +29,7 @@ namespace Sirius.PaymentAccounts.Dto
         public string DocumentNumber { get; set; }
         public List<string> NewAccountBookFileUrls { get; set; }
         public List<string> DeletedAccountBookFileUrls { get; set; }
+        public List<CreateInventoryDto> Inventories { get; set; }
 
         public void Normalize()
         {
