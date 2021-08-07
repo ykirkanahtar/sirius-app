@@ -13,6 +13,7 @@ import { AppComponentBase } from "@shared/app-component-base";
 import {
   CreateInventoryDto,
   InventoryServiceProxy,
+  InventoryTypeDto,
   InventoryTypeServiceProxy,
   LookUpDto,
   QuantityType,
@@ -35,7 +36,7 @@ export class CreateInventoryDialogComponent
 
   @Input() onlyAddToList: boolean;
   @Output() onSave = new EventEmitter<any>();
-  public event:EventEmitter<any> = new EventEmitter<any>();
+  public event: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(
     injector: Injector,
@@ -59,8 +60,12 @@ export class CreateInventoryDialogComponent
   }
 
   addToList() {
-    this.event.emit({ data: this.input, res: 200 });
-    this.bsModalRef.hide();
+    this._inventoryTypeService
+      .get(this.input.inventoryTypeId)
+      .subscribe((result: InventoryTypeDto) => {
+        this.event.emit({ data: this.input, inventoryType: result, res: 200 });
+        this.bsModalRef.hide();
+      });
   }
 
   save(): void {

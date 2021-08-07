@@ -53,6 +53,7 @@ export class EditAccountBookDialogComponent
   paymentCategory = new PaymentCategoryDto();
   PaymentCategoryTypeEnum = PaymentCategoryType;
   AccountBookTypeEnum = AccountBookType;
+  QuantityTypeEnum = QuantityType;
   inventoryTypes: SelectItem[] = [];
   quantityTypes: SelectItem[] = [];
   
@@ -117,7 +118,6 @@ export class EditAccountBookDialogComponent
     this._accountBookServiceProxy
       .get(this.id)
       .subscribe((result: AccountBookDto) => {
-        console.log(result);
         this.accountBook = result;
         this.processDate = this.accountBook.processDateTime.toDate();
 
@@ -224,8 +224,20 @@ export class EditAccountBookDialogComponent
 
     this.inventoryModalRef.content.onlyAddToList = true;
     this.inventoryModalRef.content.event.subscribe((res) => {
-      this.accountBook.inventories.push(res.data);
+      const inventory = res.data;
+      inventory.inventoryType = res.inventoryType;
+      this.accountBook.inventories.push(inventory);
     });
+  }
+
+  getInventoryTypeName(inventoryTypeId: string): string {
+    let label = "";
+    this.inventoryTypes.forEach((item) => {
+      if (item.value == inventoryTypeId) {
+        label = item.label;
+      }
+    });
+    return label;
   }
 
   getInventoryQuantityTypeName(inventoryTypeId: string): string {

@@ -589,7 +589,8 @@ namespace Sirius.PaymentAccounts
             CheckGetPermission();
             var accountBook = await _accountBookRepository.GetAll().Where(p => p.Id == input.Id)
                 .Include(p => p.AccountBookFiles)
-                .Include(p => p.Inventories).ThenInclude(p => p.InventoryType)
+                .Include(p => p.Inventories)
+                .ThenInclude(p => p.InventoryType)
                 .SingleAsync();
 
             return ObjectMapper.Map<AccountBookDto>(accountBook);

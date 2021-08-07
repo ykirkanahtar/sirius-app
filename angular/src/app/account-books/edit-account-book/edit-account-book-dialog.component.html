@@ -327,8 +327,10 @@
       <tab
       [heading]="'Inventory' | localize"
       class="pt-3 px-2"
-      *ngIf="accountBook.accountBookType === AccountBookTypeEnum.Other"
-    >
+      *ngIf="
+      this.accountBook.accountBookType !== AccountBookTypeEnum.HousingDue &&
+      this.paymentCategory.paymentCategoryType === PaymentCategoryTypeEnum.Expense
+    "    >
       <section class="content px-2">
         <div class="container-fluid">
           <div class="card">
@@ -370,7 +372,7 @@
                   <ng-template pTemplate="body" let-record>
                     <tr>
                       <td>
-                        {{ getInventoryTypeName(record.inventoryTypeId) }}
+                        {{ record.inventoryType.inventoryTypeName }}
                       </td>
                       <td>{{ record.serialNumber }}</td>
                       <td>
@@ -378,7 +380,7 @@
                       </td>
                       <td>
                         {{
-                          getInventoryQuantityTypeName(record.inventoryTypeId)
+                          QuantityTypeEnum[record.inventoryType.quantityType]
                             | localize
                         }}
                       </td>
