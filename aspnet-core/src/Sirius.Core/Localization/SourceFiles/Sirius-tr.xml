@@ -226,7 +226,7 @@
     <text name="EditPeriod">Dönem düzenle</text>
     <text name="EditPerson">Kişi düzenle</text>
     <text name="EftFee">Eft masrafı</text>  
-    <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>InventoryTypeDeleteWarningMessage
+    <text name="EmployeeDeleteWarningMessage">Çalışanı silmek istediğinize emin misiniz?</text>
     <text name="Employees">Çalışanlar</text>
     <text name="EmployeesMenu">Çalışanlar (Menü)</text>
     <text name="EndDate">Bitiş Tarihi</text>
@@ -279,7 +279,7 @@
     <text name="Inventories">Demirbaşlar</text>
     <text name="InventoriesMenu">Demirbaşlar</text>
     <text name="Inventory">Demirbaş</text>
-    <text name="InventoryDeleteWarningMessage">Demirbaşı silmek istediğinize emin misiniz?</text>
+    <text name="InventoryDeleteWarningMessage">Demirbaşı silmek istediğinize emin misiniz? Not: Sadece işletme defterine kayıtlı olmayan demirbaşlar silinecektir.</text>
     <text name="InventoryType">Demirbaş Türü</text>
     <text name="InventoryTypeDeleteWarningMessage">Demirbaş türünü silmek istediğinize emin misiniz?</text>
     <text name="InventoryTypeName">Demirbaş Türü</text>
@@ -339,6 +339,7 @@
     <text name="Processing">İşlem sürüyor...</text>
     <text name="Quantity">Miktar</text>
     <text name="QuantityType">Miktar Türü</text>
+    <text name="QuantityWithAccountBook">İşl. Deft. Kayıtlı Miktar</text>
     <text name="RefundHousingDue">Aidat iadesi</text>
     <text name="RegularHousingDue">Olağan aidat ödemesi</text>
     <text name="RegularHousingDueName">Olağan aidat ödeme ismi</text>

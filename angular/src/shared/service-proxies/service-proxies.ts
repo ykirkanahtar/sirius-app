@@ -3849,6 +3849,66 @@ export class InventoryServiceProxy {
     }
 
     /**
+     * @param inventoryTypeId (optional) 
+     * @param quantity (optional) 
+     * @param serialNumber (optional) 
+     * @return Success
+     */
+    deleteFromInventoryPage(inventoryTypeId: string | undefined, quantity: number | undefined, serialNumber: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Inventory/DeleteFromInventoryPage?";
+        if (inventoryTypeId === null)
+            throw new Error("The parameter 'inventoryTypeId' cannot be null.");
+        else if (inventoryTypeId !== undefined)
+            url_ += "InventoryTypeId=" + encodeURIComponent("" + inventoryTypeId) + "&";
+        if (quantity === null)
+            throw new Error("The parameter 'quantity' cannot be null.");
+        else if (quantity !== undefined)
+            url_ += "Quantity=" + encodeURIComponent("" + quantity) + "&";
+        if (serialNumber !== undefined)
+            url_ += "SerialNumber=" + encodeURIComponent("" + serialNumber) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteFromInventoryPage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteFromInventoryPage(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDeleteFromInventoryPage(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -12867,9 +12927,11 @@ export interface IUpdateInventoryDto {
 }
 
 export class InventoryGetAllDto implements IInventoryGetAllDto {
+    inventoryTypeId: string;
     inventoryTypeName: string | undefined;
     serialNumber: string | undefined;
     quantity: number;
+    quantityWithAccountBook: number;
     quantityTypeName: QuantityType;
     accountBookIds: string[] | undefined;
 
@@ -12884,9 +12946,11 @@ export class InventoryGetAllDto implements IInventoryGetAllDto {
 
     init(_data?: any) {
         if (_data) {
+            this.inventoryTypeId = _data["inventoryTypeId"];
             this.inventoryTypeName = _data["inventoryTypeName"];
             this.serialNumber = _data["serialNumber"];
             this.quantity = _data["quantity"];
+            this.quantityWithAccountBook = _data["quantityWithAccountBook"];
             this.quantityTypeName = _data["quantityTypeName"];
             if (Array.isArray(_data["accountBookIds"])) {
                 this.accountBookIds = [] as any;
@@ -12905,9 +12969,11 @@ export class InventoryGetAllDto implements IInventoryGetAllDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["inventoryTypeId"] = this.inventoryTypeId;
         data["inventoryTypeName"] = this.inventoryTypeName;
         data["serialNumber"] = this.serialNumber;
         data["quantity"] = this.quantity;
+        data["quantityWithAccountBook"] = this.quantityWithAccountBook;
         data["quantityTypeName"] = this.quantityTypeName;
         if (Array.isArray(this.accountBookIds)) {
             data["accountBookIds"] = [];
@@ -12926,9 +12992,11 @@ export class InventoryGetAllDto implements IInventoryGetAllDto {
 }
 
 export interface IInventoryGetAllDto {
+    inventoryTypeId: string;
     inventoryTypeName: string | undefined;
     serialNumber: string | undefined;
     quantity: number;
+    quantityWithAccountBook: number;
     quantityTypeName: QuantityType;
     accountBookIds: string[] | undefined;
 }

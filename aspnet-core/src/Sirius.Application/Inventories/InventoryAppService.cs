@@ -39,8 +39,10 @@ namespace Sirius.Inventories
         public override async Task<InventoryDto> CreateAsync(CreateInventoryDto input)
         {
             //Check existing invetories
-            var existingInventories = await _inventoryRepository.GetAll().Where(p =>
+            var existingInventories = await _inventoryRepository.GetAll()
+                .Where(p =>
                     p.InventoryTypeId == input.InventoryTypeId &&
+                    string.IsNullOrWhiteSpace(input.SerialNumber) == false &&
                     p.SerialNumber == input.SerialNumber)
                 .WhereIf(input.AccountBookId.HasValue, p => p.AccountBookId.Value == input.AccountBookId.Value)
                 .ToListAsync();
@@ -81,6 +83,21 @@ namespace Sirius.Inventories
                 await _accountBookRepository.GetAsync(input.AccountBookId.Value);
             }
 
+            //Check existing invetories
+            var existingInventories = await _inventoryRepository.GetAll()
+                .Where(p => p.Id != input.Id &&
+                            p.InventoryTypeId == input.InventoryTypeId &&
+                            string.IsNullOrWhiteSpace(input.SerialNumber) == false &&
+                            p.SerialNumber == input.SerialNumber)
+                .WhereIf(input.AccountBookId.HasValue, p => p.AccountBookId.Value == input.AccountBookId.Value)
+                .ToListAsync();
+
+            if (existingInventories.Any())
+            {
+                throw new UserFriendlyException(
+                    "Bu seri numarasına ait bir ürün bu işletme defteri kaydı için eklenmiş");
+            }
+
             var inventory = Inventory.Update(existingInventory, inventoryType.Id, input.AccountBookId,
                 input.Quantity, input.SerialNumber, input.Description);
 
@@ -88,13 +105,33 @@ namespace Sirius.Inventories
             return ObjectMapper.Map<InventoryDto>(inventory);
         }
 
-        public override async Task DeleteAsync(EntityDto<Guid> input)
+        public async Task DeleteFromInventoryPage(DeleteInventoryDto input)
         {
-            var block = await _inventoryManager.GetAsync(input.Id);
-            await _inventoryManager.DeleteAsync(block);
+            var deletingInventories = await _inventoryRepository.GetAll()
+                .Where(p => p.AccountBookId.HasValue == false &&
+                            p.InventoryTypeId == input.InventoryTypeId)
+                .WhereIf(string.IsNullOrEmpty(input.SerialNumber) == false,
+                    p => p.SerialNumber == input.SerialNumber)
+                .ToListAsync();
+
+            var totalQuantity = deletingInventories.Sum(p => p.Quantity);
+
+            foreach (var deletingInventory in deletingInventories)
+            {
+                totalQuantity -= deletingInventory.Quantity;
+                if (totalQuantity >= 0)
+                {
+                    await _inventoryManager.DeleteAsync(deletingInventory);
+                }
+            }
         }
-        
-        public  async Task DeleteByIdAsync(Guid id)
+
+        public override Task DeleteAsync(EntityDto<Guid> input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task DeleteByIdAsync(Guid id)
         {
             var block = await _inventoryManager.GetAsync(id);
             await _inventoryManager.DeleteAsync(block);
@@ -113,16 +150,22 @@ namespace Sirius.Inventories
 
             var inventoriesQuery = (from q in await baseQuery.ToListAsync()
                 group q by new
-                    {q.inventory.SerialNumber, q.inventoryType.InventoryTypeName, q.inventoryType.QuantityType}
+                {
+                    q.inventory.SerialNumber, InventoryTypeId = q.inventoryType.Id, q.inventoryType.InventoryTypeName,
+                    q.inventoryType.QuantityType
+                }
                 into g
                 select new InventoryGetAllDto
                 {
+                    InventoryTypeId = g.Key.InventoryTypeId,
                     InventoryTypeName = g.Key.InventoryTypeName,
                     QuantityTypeName = g.Key.QuantityType,
                     SerialNumber = g.Key.SerialNumber,
                     Quantity = g.Sum(s => s.inventory.Quantity),
-                    AccountBookIds = g.Where(p => p.inventory.AccountBookId != null)
-                        .Select(p => p.inventory.AccountBookId).ToList()
+                    AccountBookIds = g.Where(p => p.inventory.AccountBookId.HasValue)
+                        .Select(p => p.inventory.AccountBookId).ToList(),
+                    QuantityWithAccountBook =
+                        g.Where(p => p.inventory.AccountBookId.HasValue).Sum(p => p.inventory.Quantity)
                 }).AsQueryable();
 
             var inventories = inventoriesQuery

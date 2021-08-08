@@ -50,6 +50,10 @@
                     {{ "Quantity" | localize }}
                     <p-sortIcon field="quantity"></p-sortIcon>
                   </th>
+                  <th pSortableColumn="quantityWithAccountBook">
+                    {{ "QuantityWithAccountBook" | localize }}
+                    <p-sortIcon field="quantityWithAccountBook"></p-sortIcon>
+                  </th>
                   <th pSortableColumn="quantityTypeName">
                     {{ "QuantityType" | localize }}
                     <p-sortIcon field="quantityTypeName"></p-sortIcon>
@@ -87,6 +91,9 @@
                     {{ record.quantity }}
                   </td>
                   <td>
+                    {{ record.quantityWithAccountBook }}
+                  </td>
+                  <td>
                     {{ QuantityType[record.quantityTypeName] | localize }}
                   </td>
                   <td>
@@ -101,9 +108,10 @@
                     </button>
                     <button
                       type="button"
-                      *ngIf="this.permissionHelper.deleteInventory()"
+                      *ngIf="this.permissionHelper.deleteInventory() &&
+                      record.quantity > record.quantityWithAccountBook"
                       class="btn btn-sm bg-danger mx-2"
-                      (click)="delete(inventory)"
+                      (click)="deleteByGroup(record)"
                     >
                       <i class="fas fa-trash"></i>
                       {{ "Delete" | localize }}
