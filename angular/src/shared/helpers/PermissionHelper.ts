@@ -137,5 +137,30 @@ export class PermissionHelper {
     deletePeriod(): boolean {
         return this._permissionCheckerService.isGranted('Pages.DeletePeriod');
     }
+
+
+    createInventoryType(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.CreateInventoryType');
+    }
+
+    editInventoryType(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.EditInventoryType');
+    }
+
+    deleteInventoryType(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.DeleteInventoryType');
+    }
+
+    createInventory(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.CreateInventory');
+    }
+
+    editInventory(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.EditInventory');
+    }
+
+    deleteInventory(): boolean {
+        return this._permissionCheckerService.isGranted('Pages.DeleteInventory');
+    }
 }
 

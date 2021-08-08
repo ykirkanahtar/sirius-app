@@ -10,7 +10,7 @@ import {
   Input,
 } from "@angular/core";
 import { finalize } from "rxjs/operators";
-import { BsModalRef } from "ngx-bootstrap/modal";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import * as _ from "lodash";
 import { AppComponentBase } from "@shared/app-component-base";
 import {
@@ -27,11 +27,17 @@ import {
   HousingServiceProxy,
   PaymentCategoryDto,
   PaymentCategoryType,
+  AccountBookType,
+  CreateInventoryDto,
+  InventoryDto,
+  QuantityType,
 } from "@shared/service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
 import { CustomUploadServiceProxy } from "@shared/service-proxies/custom-service-proxies";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
+import { CreateInventoryDialogComponent } from "@app/inventories/create-inventory/create-inventory-dialog.component";
+import { SelectItem } from "primeng/api";
 
 @Component({
   templateUrl: "edit-account-book-dialog.component.html",
@@ -46,7 +52,11 @@ export class EditAccountBookDialogComponent
   accountBook = new AccountBookDto();
   paymentCategory = new PaymentCategoryDto();
   PaymentCategoryTypeEnum = PaymentCategoryType;
-
+  AccountBookTypeEnum = AccountBookType;
+  QuantityTypeEnum = QuantityType;
+  inventoryTypes: SelectItem[] = [];
+  quantityTypes: SelectItem[] = [];
+  
   paymentAccounts: LookUpDto[];
   paymentCategories: LookUpDto[] = [];
   people: LookUpDto[];
@@ -97,6 +107,8 @@ export class EditAccountBookDialogComponent
     private _housingServiceProxy: HousingServiceProxy,
     private http: HttpClient,
     public bsModalRef: BsModalRef,
+    private _modalService: BsModalService,
+    public inventoryModalRef: BsModalRef,
     @Optional() @Inject(API_BASE_URL) baseUrl?: string
   ) {
     super(injector);
@@ -196,6 +208,60 @@ export class EditAccountBookDialogComponent
           if (index !== -1) {
             this.accountBook.accountBookFiles.splice(index, 1);
             this.deletedFileUrls.push(accountBookFile.fileUrl);
+          }
+        }
+      }
+    );
+  }
+
+  addToInventories() {
+    this.inventoryModalRef = this._modalService.show(
+      CreateInventoryDialogComponent,
+      {
+        class: "modal-lg",
+      }
+    );
+
+    this.inventoryModalRef.content.onlyAddToList = true;
+    this.inventoryModalRef.content.event.subscribe((res) => {
+      const inventory = res.data;
+      inventory.inventoryType = res.inventoryType;
+      this.accountBook.inventories.push(inventory);
+    });
+  }
+
+  getInventoryTypeName(inventoryTypeId: string): string {
+    let label = "";
+    this.inventoryTypes.forEach((item) => {
+      if (item.value == inventoryTypeId) {
+        label = item.label;
+      }
+    });
+    return label;
+  }
+
+  getInventoryQuantityTypeName(inventoryTypeId: string): string {
+    let label = "";
+    this.quantityTypes.forEach((item) => {
+      if (item.value == inventoryTypeId) {
+        label = item.label;
+      }
+    });
+    return QuantityType[label];
+  }
+
+  removeInventory(inventory: InventoryDto) {
+    abp.message.confirm(
+      this.l("DeleteWarningMessage"),
+      undefined,
+      (result: boolean) => {
+        if (result) {
+          const index = this.accountBook.inventories.indexOf(
+            inventory,
+            0
+          );
+          if (index > -1) {
+            this.accountBook.inventories.splice(index, 1);
           }
         }
       }

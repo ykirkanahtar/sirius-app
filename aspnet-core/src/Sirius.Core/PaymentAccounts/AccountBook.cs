@@ -10,6 +10,7 @@ using Abp.UI;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Sirius.Housings;
+using Sirius.Inventories;
 using Sirius.PaymentCategories;
 
 namespace Sirius.PaymentAccounts
@@ -57,6 +58,8 @@ namespace Sirius.PaymentAccounts
 
         public virtual ICollection<AccountBookFile> AccountBookFiles { get; private set; }
 
+        public virtual ICollection<Inventory> Inventories { get; private set; }
+        
         public static AccountBook ShallowCopy(AccountBook accountBook)
         {
             return (AccountBook) accountBook.MemberwiseClone();

@@ -6,6 +6,7 @@ using Sirius.MultiTenancy;
 using Sirius.Employees;
 using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
+using Sirius.Inventories;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.People;
@@ -29,6 +30,8 @@ namespace Sirius.EntityFrameworkCore
         public virtual DbSet<HousingPerson> HousingPeople { get; set; }
         public virtual DbSet<Block> Blocks { get; set; }
         public virtual DbSet<Period> Periods { get; set; }
+        public virtual DbSet<InventoryType> InventoryTypes { get; set; }
+        public virtual DbSet<Inventory> Inventories { get; set; }
 
         public SiriusDbContext(DbContextOptions<SiriusDbContext> options)
             : base(options)

@@ -157,7 +157,7 @@ export class AccountBooksComponent
             icon: "pi pi-arrow-left",
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
-                PaymentCategoryType.Income
+                PaymentCategoryType.Income, true
               );
             },
           };
@@ -169,7 +169,7 @@ export class AccountBooksComponent
             icon: "pi pi-arrow-right",
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
-                PaymentCategoryType.Expense
+                PaymentCategoryType.Expense, false
               );
             },
           };
@@ -181,7 +181,7 @@ export class AccountBooksComponent
             icon: "pi pi-sort-alt",
             command: () => {
               this.showCreateAccountBookDialogForPaymentCategoryType(
-                PaymentCategoryType.TransferBetweenAccounts
+                PaymentCategoryType.TransferBetweenAccounts, false
               );
             },
           };
@@ -251,6 +251,7 @@ export class AccountBooksComponent
         command: () => {
           this.showCreateAccountBookDialogForPaymentCategoryType(
             groupedPaymentCategories[index].paymentCategoryType,
+            groupedPaymentCategories[index].isHousingDue,
             groupedPaymentCategories[index]
           );
         },
@@ -383,6 +384,7 @@ export class AccountBooksComponent
 
   private showCreateAccountBookDialogForPaymentCategoryType(
     paymentCategoryType: PaymentCategoryType,
+    isHousingDue: boolean,
     paymentCategory?: PaymentCategoryDto
   ): void {
     let createAccountBookDialog: BsModalRef;
@@ -395,6 +397,7 @@ export class AccountBooksComponent
           lastAccountBookDate: this.lastAccountBookProcessDate,
           paymentCategoryType: paymentCategoryType,
           paymentCategory: paymentCategory,
+          isHousingDue: isHousingDue
         },
       }
     );

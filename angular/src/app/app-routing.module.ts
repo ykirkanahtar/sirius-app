@@ -18,6 +18,8 @@ import { PaymentCategoriesComponent } from './payment-categories/payment-categor
 import { HousingCategoriesComponent } from './housing-categories/housing-categories.component';
 import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups/housing-payment-plan-groups.component';
 import { PeriodsComponent } from './periods/periods.component';
+import { InventoryTypesComponent } from './inventory-types/inventory-types.component';
+import { InventoriesComponent } from './inventories/inventories.component';
 
 @NgModule({
   imports: [
@@ -89,6 +91,18 @@ import { PeriodsComponent } from './periods/periods.component';
             path: 'site-periods',
             component: PeriodsComponent,
             data: { permission: 'Pages.PeriodsForSite' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'inventory-types',
+            component: InventoryTypesComponent,
+            data: { permission: 'Pages.InventoryTypes' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'inventories',
+            component: InventoriesComponent,
+            data: { permission: 'Pages.Inventories' },
             canActivate: [AppRouteGuard],
           },
           // {

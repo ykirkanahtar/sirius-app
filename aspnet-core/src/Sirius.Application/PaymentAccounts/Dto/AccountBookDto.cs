@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using Abp.AutoMapper;
 using Sirius.Housings.Dto;
+using Sirius.Inventories.Dto;
 using Sirius.PaymentCategories.Dto;
 
 namespace Sirius.PaymentAccounts.Dto
@@ -27,5 +28,6 @@ namespace Sirius.PaymentAccounts.Dto
         public int SameDayIndex { get; set; }
 
         public virtual List<AccountBookFileDto> AccountBookFiles { get; set; }
+        public virtual List<InventoryDto> Inventories { get; set; }
     }
 }

@@ -20,7 +20,6 @@ import {
   HousingServiceProxy,
   HousingPaymentPlanGroupForHousingDto,
 } from "@shared/service-proxies/service-proxies";
-import * as moment from "moment";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { CommonFunctions } from "@shared/helpers/CommonFunctions";
 
