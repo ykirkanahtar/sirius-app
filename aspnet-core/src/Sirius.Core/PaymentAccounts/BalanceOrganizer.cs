@@ -29,7 +29,7 @@ namespace Sirius.PaymentAccounts
         public List<AccountBook> PreviousAccountBooks { get; private set; }
         public List<PaymentAccount> PaymentAccounts { get; private set; }
 
-        public async Task GetOrganizedAccountBooksAsync(DateTime startDate,
+        public async Task GetOrganizedAccountBooksAsync(DateTime startDate, int sameDayIndex,
             List<PaymentAccount> paymentAccounts, List<AccountBook> createdAccountBooks,
             List<AccountBook> updatedAccountBooks, List<AccountBook> deletedAccountBooks)
         {
@@ -48,12 +48,13 @@ namespace Sirius.PaymentAccounts
             var accountBooks = await _accountBookRepository.GetAll()
                 .Include(p => p.FromPaymentAccount).Include(p => p.ToPaymentAccount)
                 .Where(p =>
-                    p.ProcessDateTime >= startDate &&
-                    (paymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty) ||
-                     paymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty)) &&
-                    deletedAccountBookIds.Contains(p.Id) == false &&
-                    updatedAccountBookIds.Contains(p.Id) == false)
-                .ToListAsync();
+                    (p.ProcessDateTime > startDate ||
+                     (p.ProcessDateTime == startDate && p.SameDayIndex > sameDayIndex)) &&
+                     (paymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty) ||
+                      paymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty)) &&
+                     deletedAccountBookIds.Contains(p.Id) == false &&
+                     updatedAccountBookIds.Contains(p.Id) == false)
+                    .ToListAsync();
 
             accountBooks.AddRange(createdAccountBooks);
             accountBooks.AddRange(updatedAccountBooks);
@@ -76,7 +77,8 @@ namespace Sirius.PaymentAccounts
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
                         PreviousAccountBooks.Select(x => x.Id).Contains(p.Id) == false &&
-                        p.ProcessDateTime < startDate &&
+                        (p.ProcessDateTime < startDate ||
+                         (p.ProcessDateTime == startDate && p.SameDayIndex < sameDayIndex)) &&
                         (p.FromPaymentAccountId == paymentAccountId ||
                          p.ToPaymentAccountId == paymentAccountId) &&
                         p.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
