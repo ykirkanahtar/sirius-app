@@ -123,7 +123,7 @@ namespace Sirius.PaymentAccounts
                 await _accountBookRepository.FirstOrDefaultAsync(p => p.PeriodId == activePeriod.Id);
 
             await _balanceOrganizer.GetOrganizedAccountBooksAsync(
-                activePeriod.StartDate,
+                activePeriod.StartDate, int.MaxValue,
                 new List<PaymentAccount> {paymentAccount},
                 new List<AccountBook> {firstAccountBookInActivePeriod}, null, null);
             _balanceOrganizer.OrganizeAccountBookBalances();

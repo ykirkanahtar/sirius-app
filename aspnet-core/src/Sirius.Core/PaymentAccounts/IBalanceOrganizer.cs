@@ -11,7 +11,7 @@ namespace Sirius.PaymentAccounts
         List<AccountBook> PreviousAccountBooks { get; }
         List<PaymentAccount> PaymentAccounts { get; }
 
-        Task GetOrganizedAccountBooksAsync(DateTime startDate,
+        Task GetOrganizedAccountBooksAsync(DateTime startDate, int sameDayIndex,
             List<PaymentAccount> paymentAccounts, List<AccountBook> createdAccountBooks,
             List<AccountBook> updatedAccountBooks, List<AccountBook> deletedAccountBooks);
 

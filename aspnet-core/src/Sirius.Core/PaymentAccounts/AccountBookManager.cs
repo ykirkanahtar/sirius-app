@@ -215,7 +215,8 @@ namespace Sirius.PaymentAccounts
                 if (paymentAccounts.Any())
                 {
                     await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
-                        paymentAccounts, new List<AccountBook> {accountBook}, null, null);
+                        accountBook.SameDayIndex,
+                        paymentAccounts, new List<AccountBook> { accountBook }, null, null);
                     _balanceOrganizer.OrganizeAccountBookBalances();
                     _balanceOrganizer.OrganizePaymentAccountBalances();
                 }
@@ -295,7 +296,8 @@ namespace Sirius.PaymentAccounts
                 if (paymentAccounts.Any())
                 {
                     await _balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
-                        paymentAccounts, null, new List<AccountBook> {updatedAccountBook}, null);
+                        updatedAccountBook.SameDayIndex,
+                        paymentAccounts, null, new List<AccountBook> { updatedAccountBook }, null);
                     _balanceOrganizer.OrganizeAccountBookBalances();
                 }
             }
@@ -338,9 +340,9 @@ namespace Sirius.PaymentAccounts
                 if (paymentAccounts.Any())
                 {
                     var activePeriod = await _periodManager.GetActivePeriod();
-                    
-                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(activePeriod.StartDate,
-                        paymentAccounts, null, null, new List<AccountBook> {accountBook});
+
+                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(activePeriod.StartDate, 0,
+                        paymentAccounts, null, null, new List<AccountBook> { accountBook });
                     _balanceOrganizer.OrganizeAccountBookBalances();
                     _balanceOrganizer.OrganizePaymentAccountBalances();
                 }

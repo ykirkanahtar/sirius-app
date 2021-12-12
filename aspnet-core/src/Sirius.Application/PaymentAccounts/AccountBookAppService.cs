@@ -374,6 +374,9 @@ namespace Sirius.PaymentAccounts
                 processDateTime < existingAccountBook.ProcessDateTime
                     ? processDateTime
                     : existingAccountBook.ProcessDateTime,
+                processDateTime < existingAccountBook.ProcessDateTime
+                    ? int.MaxValue
+                    : existingAccountBook.SameDayIndex,
                 paymentAccounts,
                 new List<AccountBook> {newAccountBook},
                 null,
