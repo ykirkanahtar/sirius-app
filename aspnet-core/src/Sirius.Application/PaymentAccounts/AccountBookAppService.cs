@@ -423,7 +423,7 @@ namespace Sirius.PaymentAccounts
                             (p.FromPaymentAccountId == existingAccountBook.ToPaymentAccountId
                              || p.ToPaymentAccountId == existingAccountBook.ToPaymentAccountId)
                         ) &&
-                        p.ProcessDateTime > oldDate && p.ProcessDateTime < newDate
+                        (p.ProcessDateTime >= oldDate && p.ProcessDateTime <= newDate)
                     select p;
 
                 if (accountBooksBetweenTwoDates.Any())
