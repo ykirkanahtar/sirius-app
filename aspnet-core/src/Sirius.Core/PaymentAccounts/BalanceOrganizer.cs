@@ -50,11 +50,11 @@ namespace Sirius.PaymentAccounts
                 .Where(p =>
                     (p.ProcessDateTime > startDate ||
                      (p.ProcessDateTime == startDate && p.SameDayIndex > sameDayIndex)) &&
-                     (paymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty) ||
-                      paymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty)) &&
-                     deletedAccountBookIds.Contains(p.Id) == false &&
-                     updatedAccountBookIds.Contains(p.Id) == false)
-                    .ToListAsync();
+                    (paymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty) ||
+                     paymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty)) &&
+                    deletedAccountBookIds.Contains(p.Id) == false &&
+                    updatedAccountBookIds.Contains(p.Id) == false)
+                .ToListAsync();
 
             accountBooks.AddRange(createdAccountBooks);
             accountBooks.AddRange(updatedAccountBooks);
@@ -102,10 +102,21 @@ namespace Sirius.PaymentAccounts
             var allAccountBooks = UpdatingAccountBooks.Union(PreviousAccountBooks).OrderBy(p => p.ProcessDateTime)
                 .ThenBy(p => p.SameDayIndex).ToList();
 
+            var lastAccountBookHasDeleted = false;
+
+            //Eğer silinen hareket en son hareket ise UpdatingAccountBooks'ta kayıt olmaz bu yüzden aşağıdaki kod ile silinen hareketin bakiyesi düşülecek
+            if (UpdatingAccountBooks.Any() == false && DeletingAccountBooks.Any())
+            {
+                lastAccountBookHasDeleted = true;
+                UpdatingAccountBooks = DeletingAccountBooks.ToList();
+            }
+
             foreach (var updatingAccountBook in UpdatingAccountBooks)
             {
                 var fromPaymentAccount = updatingAccountBook.FromPaymentAccount;
                 var toPaymentAccount = updatingAccountBook.ToPaymentAccount;
+
+                var updatingAmount = lastAccountBookHasDeleted == false ? updatingAccountBook.Amount : 0;
 
                 if (fromPaymentAccount != null)
                 {
@@ -121,16 +132,16 @@ namespace Sirius.PaymentAccounts
                         .FirstOrDefault();
 
                     if (previousAccountBook == null
-                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+                       ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
                     {
                         updatingAccountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount,
-                            updatingAccountBook.Amount);
+                            updatingAmount);
                     }
                     else
                     {
                         var newBalance = previousAccountBook.FromPaymentAccountId == fromPaymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - updatingAccountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - updatingAccountBook.Amount;
+                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) - updatingAmount
+                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) - updatingAmount;
                         updatingAccountBook.SetFromPaymentAccountCurrentBalance(fromPaymentAccount, newBalance);
                     }
                 }
@@ -149,16 +160,16 @@ namespace Sirius.PaymentAccounts
                         .FirstOrDefault();
 
                     if (previousAccountBook == null
-                    ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
+                       ) //Kaydedilen ödeme hesap hareketi ilk hesap hareketi ise, ödeme tutarı bakiyeniin üstüne yazılıyor
                     {
                         updatingAccountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount,
-                            updatingAccountBook.Amount);
+                            updatingAmount);
                     }
                     else
                     {
                         var newBalance = previousAccountBook.FromPaymentAccountId == toPaymentAccount.Id
-                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + updatingAccountBook.Amount
-                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + updatingAccountBook.Amount;
+                            ? (previousAccountBook.FromPaymentAccountCurrentBalance ?? 0) + updatingAmount
+                            : (previousAccountBook.ToPaymentAccountCurrentBalance ?? 0) + updatingAmount;
                         updatingAccountBook.SetToPaymentAccountCurrentBalance(toPaymentAccount, newBalance);
                     }
                 }
