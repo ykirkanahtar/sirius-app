@@ -10,7 +10,11 @@
         public const string Pages_Roles = "Pages.Roles";
         public const string Pages_Definitions = "Pages.Definitions";
         public const string Pages_FinancialOperations = "Pages.FinancialOperations";
+        public const string Pages_Reports = "Pages.Reports";
         public const string Pages_Administration = "Pages.Administration";
+        
+        public const string Pages_HousingDueReport = "Pages.HousingDueReport";
+
 
         public const string Pages_AccountBooks = "Pages.AccountBooks";
         public const string Pages_CreateAccountBook = "Pages.CreateAccountBook";

@@ -257,6 +257,7 @@
     <text name="HousingDue">Aidat ödemesi</text>
     <text name="HousingDueDefinition">Aidat tanımı</text>
     <text name="HousingDuePayment">Aidat ödemesi</text>
+    <text name="HousingDueReport">Aidat Raporu</text>
     <text name="HousingDueStats">Aidat istatistikleri</text>
     <text name="HousingName">Konut</text>
     <text name="HousingOwner">Ev Sahibi</text>
@@ -345,6 +346,7 @@
     <text name="RegularHousingDueName">Olağan aidat ödeme ismi</text>
     <text name="Remove">Kaldır</text>
     <text name="RemovePerson">Kişi tanımını kaldır</text>
+    <text name="Reports">Raporlar</text>
     <text name="Resident">Malik</text>
     <text name="ResidentBalance">Malik Hesabı Bakiye</text>
     <text name="ResidentBalanceShort">Malik Bakiye</text>

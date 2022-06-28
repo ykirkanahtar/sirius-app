@@ -95,6 +95,7 @@ import { CreateInventoryTypeDialogComponent } from "./inventory-types/create-inv
 import { EditInventoryTypeDialogComponent } from "./inventory-types/edit-inventory-type/edit-inventory-type-dialog.component";
 import { CreateInventoryDialogComponent } from "./inventories/create-inventory/create-inventory-dialog.component";
 import { EditInventoryDialogComponent } from "./inventories/edit-inventory/edit-inventory-dialog.component";
+import { HousingDueReportComponent } from "./reports/housing-due-report.component";
 
 
 import { defineLocale } from "ngx-bootstrap/chronos";
@@ -170,7 +171,8 @@ import { trLocale } from "ngx-bootstrap/locale";
     CreateInventoryTypeDialogComponent,
     EditInventoryTypeDialogComponent,
     CreateInventoryDialogComponent,
-    EditInventoryDialogComponent
+    EditInventoryDialogComponent,
+    HousingDueReportComponent
   ],
   imports: [
     CommonModule,

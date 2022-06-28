@@ -29,7 +29,10 @@ namespace Sirius.Authorization
             context.CreatePermission(PermissionNames.Pages_PeriodsForBlock, L("PeriodsForBlockMenu"));
             context.CreatePermission(PermissionNames.Pages_InventoryTypes, L("InventoryTypesMenu"));
             context.CreatePermission(PermissionNames.Pages_Inventories, L("InventoriesMenu"));
-
+            context.CreatePermission(PermissionNames.Pages_Reports, L("ReportsMenu"));
+            
+            context.CreatePermission(PermissionNames.Pages_HousingDueReport, L("HousingDueReport"));
+            
             context.CreatePermission(PermissionNames.Pages_CreateAccountBook, L("CreateAccountBook"));
             context.CreatePermission(PermissionNames.Pages_EditAccountBook, L("EditAccountBook"));
             context.CreatePermission(PermissionNames.Pages_DeleteAccountBook, L("DeleteAccountBook"));

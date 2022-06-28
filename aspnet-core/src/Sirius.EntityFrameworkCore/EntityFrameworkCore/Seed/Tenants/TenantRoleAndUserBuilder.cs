@@ -44,7 +44,7 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
             {
                 adminRole = _context.Roles
                     .Add(new Role(_tenantId, StaticRoleNames.Tenants.Admin, StaticRoleNames.Tenants.Admin)
-                        {IsStatic = true}).Entity;
+                        { IsStatic = true }).Entity;
                 _context.SaveChanges();
             }
 
@@ -107,10 +107,10 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 siteManagementRole = _context.Roles
                     .Add(new Role(_tenantId, StaticRoleNames.Tenants.SiteManagement,
                             StaticRoleNames.Tenants.SiteManagement)
-                        {IsStatic = true}).Entity;
+                        { IsStatic = true }).Entity;
                 _context.SaveChanges();
             }
-            
+
             if (GetSiteManagementPermissions().Any())
             {
                 var grantedPermissions = _context.Permissions.IgnoreQueryFilters()
@@ -118,11 +118,11 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                     .Where(p => p.TenantId == _tenantId && p.RoleId == siteManagementRole.Id)
                     .Select(p => p.Name)
                     .ToList();
-            
+
                 var permissions = GetSiteManagementPermissions()
                     .Where(p => !grantedPermissions.Contains(p.Name))
                     .ToList();
-            
+
                 if (permissions.Any())
                 {
                     _context.Permissions.AddRange(
@@ -137,7 +137,7 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                     _context.SaveChanges();
                 }
             }
-            
+
             var siteAuditorRole = _context.Roles.IgnoreQueryFilters().FirstOrDefault(r =>
                 r.TenantId == _tenantId && r.Name == StaticRoleNames.Tenants.SiteAuditor);
             if (siteAuditorRole == null)
@@ -145,7 +145,7 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 siteAuditorRole = _context.Roles
                     .Add(new Role(_tenantId, StaticRoleNames.Tenants.SiteAuditor,
                             StaticRoleNames.Tenants.SiteAuditor)
-                        {IsStatic = true}).Entity;
+                        { IsStatic = true }).Entity;
                 _context.SaveChanges();
             }
 
@@ -183,6 +183,9 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
             {
                 new Permission(PermissionNames.Pages_Definitions),
                 new Permission(PermissionNames.Pages_FinancialOperations),
+                new Permission(PermissionNames.Pages_Reports),
+
+                new Permission(PermissionNames.Pages_HousingDueReport),
 
                 new Permission(PermissionNames.Pages_AccountBooks),
                 new Permission(PermissionNames.Pages_CreateAccountBook),
@@ -234,12 +237,12 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
-                
+
                 new Permission(PermissionNames.Pages_Inventories),
                 new Permission(PermissionNames.Pages_CreateInventory),
                 new Permission(PermissionNames.Pages_EditInventory),
                 new Permission(PermissionNames.Pages_DeleteInventory),
-                
+
                 new Permission(PermissionNames.Pages_InventoryTypes),
                 new Permission(PermissionNames.Pages_CreateInventoryType),
                 new Permission(PermissionNames.Pages_EditInventoryType),
@@ -255,11 +258,14 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
             {
                 new Permission(PermissionNames.Pages_Definitions),
                 new Permission(PermissionNames.Pages_FinancialOperations),
+                new Permission(PermissionNames.Pages_Reports),
 
+                new Permission(PermissionNames.Pages_HousingDueReport),
+                
                 new Permission(PermissionNames.Pages_AccountBooks),
-                
+
                 new Permission(PermissionNames.Pages_Blocks),
-                
+
                 new Permission(PermissionNames.Pages_Employees),
 
                 new Permission(PermissionNames.Pages_HousingCategories),
@@ -275,7 +281,7 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_People),
 
                 new Permission(PermissionNames.Pages_PeriodsForSite),
-                
+
                 new Permission(PermissionNames.Pages_Inventories),
 
                 new Permission(PermissionNames.Pages_InventoryTypes),
@@ -292,7 +298,10 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_Administration),
                 new Permission(PermissionNames.Pages_Definitions),
                 new Permission(PermissionNames.Pages_FinancialOperations),
+                new Permission(PermissionNames.Pages_Reports),
 
+                new Permission(PermissionNames.Pages_HousingDueReport),
+                
                 new Permission(PermissionNames.Pages_AccountBooks),
                 new Permission(PermissionNames.Pages_CreateAccountBook),
                 new Permission(PermissionNames.Pages_EditAccountBook),
@@ -345,12 +354,12 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreatePeriodForSite),
                 new Permission(PermissionNames.Pages_EditPeriod),
                 new Permission(PermissionNames.Pages_DeletePeriod),
-                
+
                 new Permission(PermissionNames.Pages_Inventories),
                 new Permission(PermissionNames.Pages_CreateInventory),
                 new Permission(PermissionNames.Pages_EditInventory),
                 new Permission(PermissionNames.Pages_DeleteInventory),
-                
+
                 new Permission(PermissionNames.Pages_InventoryTypes),
                 new Permission(PermissionNames.Pages_CreateInventoryType),
                 new Permission(PermissionNames.Pages_EditInventoryType),

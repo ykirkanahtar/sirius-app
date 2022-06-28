@@ -20,6 +20,7 @@ import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups
 import { PeriodsComponent } from './periods/periods.component';
 import { InventoryTypesComponent } from './inventory-types/inventory-types.component';
 import { InventoriesComponent } from './inventories/inventories.component';
+import { HousingDueReportComponent } from './reports/housing-due-report.component';
 
 @NgModule({
   imports: [
@@ -91,6 +92,12 @@ import { InventoriesComponent } from './inventories/inventories.component';
             path: 'site-periods',
             component: PeriodsComponent,
             data: { permission: 'Pages.PeriodsForSite' },
+            canActivate: [AppRouteGuard],
+          },
+          {
+            path: 'reports/housing-due-report',
+            component: HousingDueReportComponent,
+            data: { permission: 'Pages.HousingDueReports' },
             canActivate: [AppRouteGuard],
           },
           {
