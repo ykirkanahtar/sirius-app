@@ -144,7 +144,6 @@ namespace Sirius.Periods
 
                     await _balanceOrganizer.GetOrganizedAccountBooksAsync(
                         accountBookTransferForOldPeriod.ProcessDateTime, accountBookTransferForOldPeriod.SameDayIndex,
-                        new List<PaymentAccount> { paymentAccount },
                         new List<AccountBook> { accountBookTransferForOldPeriod }, null, null);
                     _balanceOrganizer.OrganizeAccountBookBalances();
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Sirius.Periods;
 
 namespace Sirius.PaymentAccounts
 {
@@ -12,29 +13,28 @@ namespace Sirius.PaymentAccounts
     {
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
+        private readonly IPeriodManager _periodManager;
 
         public BalanceOrganizer(IRepository<AccountBook, Guid> accountBookRepository,
-            IRepository<PaymentAccount, Guid> paymentAccountRepository)
+            IRepository<PaymentAccount, Guid> paymentAccountRepository, IPeriodManager periodManager)
         {
             _accountBookRepository = accountBookRepository;
             _paymentAccountRepository = paymentAccountRepository;
+            _periodManager = periodManager;
             UpdatingAccountBooks = new List<AccountBook>();
             DeletingAccountBooks = new List<AccountBook>();
             PreviousAccountBooks = new List<AccountBook>();
-            PaymentAccounts = new List<PaymentAccount>();
         }
 
         public List<AccountBook> UpdatingAccountBooks { get; private set; }
         public List<AccountBook> DeletingAccountBooks { get; private set; }
         public List<AccountBook> PreviousAccountBooks { get; private set; }
-        public List<PaymentAccount> PaymentAccounts { get; private set; }
 
         public async Task GetOrganizedAccountBooksAsync(DateTime startDate, int sameDayIndex,
-            List<PaymentAccount> paymentAccounts, List<AccountBook> createdAccountBooks,
-            List<AccountBook> updatedAccountBooks, List<AccountBook> deletedAccountBooks)
+            List<AccountBook> createdAccountBooks, List<AccountBook> updatedAccountBooks,
+            List<AccountBook> deletedAccountBooks)
         {
-            PaymentAccounts = paymentAccounts;
-            var paymentAccountIds = paymentAccounts.Select(p => p.Id).ToList();
+            var activePeriod = await _periodManager.GetActivePeriod();
 
             createdAccountBooks ??= new List<AccountBook>();
             updatedAccountBooks ??= new List<AccountBook>();
@@ -48,10 +48,8 @@ namespace Sirius.PaymentAccounts
             var accountBooks = await _accountBookRepository.GetAll()
                 .Include(p => p.FromPaymentAccount).Include(p => p.ToPaymentAccount)
                 .Where(p =>
-                    (p.ProcessDateTime > startDate ||
-                     (p.ProcessDateTime == startDate && p.SameDayIndex > sameDayIndex)) &&
-                    (paymentAccountIds.Contains(p.FromPaymentAccountId ?? Guid.Empty) ||
-                     paymentAccountIds.Contains(p.ToPaymentAccountId ?? Guid.Empty)) &&
+                    p.PeriodId == activePeriod.Id &&
+                    (p.ProcessDateTime >= startDate) &&
                     deletedAccountBookIds.Contains(p.Id) == false &&
                     updatedAccountBookIds.Contains(p.Id) == false)
                 .ToListAsync();
@@ -76,13 +74,13 @@ namespace Sirius.PaymentAccounts
             foreach (var paymentAccountId in allPaymentAccountBookIds)
             {
                 var previousAccountBook = await _accountBookRepository.GetAll().Where(p =>
+                        p.PeriodId == activePeriod.Id &&
                         PreviousAccountBooks.Select(x => x.Id).Contains(p.Id) == false &&
+                        UpdatingAccountBooks.Select(x => x.Id).Contains(p.Id) == false &&
                         (p.ProcessDateTime < startDate ||
                          (p.ProcessDateTime == startDate && p.SameDayIndex < sameDayIndex)) &&
                         (p.FromPaymentAccountId == paymentAccountId ||
-                         p.ToPaymentAccountId == paymentAccountId) &&
-                        p.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
-                        p.AccountBookType != AccountBookType.TransferForPaymentAccountToNextPeriod)
+                         p.ToPaymentAccountId == paymentAccountId))
                     .WhereIf(updatedAccountBooks.Any(),
                         p => updatedAccountBooks.Select(x => x.Id).Contains(p.Id) == false)
                     .WhereIf(deletedAccountBooks.Any(),
@@ -176,9 +174,10 @@ namespace Sirius.PaymentAccounts
             }
         }
 
-        public void OrganizePaymentAccountBalances()
+        public async Task OrganizePaymentAccountBalancesAsync()
         {
-            foreach (var paymentAccount in PaymentAccounts)
+            var paymentAccounts = await _paymentAccountRepository.GetAllListAsync();
+            foreach (var paymentAccount in paymentAccounts)
             {
                 var lastAccountBookForFromPaymentAccount = UpdatingAccountBooks
                     .Where(p => p.FromPaymentAccountId == paymentAccount.Id)
@@ -203,12 +202,14 @@ namespace Sirius.PaymentAccounts
                                 ? lastAccountBookForFromPaymentAccount.FromPaymentAccountCurrentBalance ?? 0
                                 : lastAccountBookForToPaymentAccount.ToPaymentAccountCurrentBalance ?? 0);
                     }
-
-                    paymentAccount.SetBalance(
-                        lastAccountBookForFromPaymentAccount.ProcessDateTime >
-                        lastAccountBookForToPaymentAccount.ProcessDateTime
-                            ? lastAccountBookForFromPaymentAccount.FromPaymentAccountCurrentBalance ?? 0
-                            : lastAccountBookForToPaymentAccount.ToPaymentAccountCurrentBalance ?? 0);
+                    else
+                    {
+                        paymentAccount.SetBalance(
+                            lastAccountBookForFromPaymentAccount.ProcessDateTime >
+                            lastAccountBookForToPaymentAccount.ProcessDateTime
+                                ? lastAccountBookForFromPaymentAccount.FromPaymentAccountCurrentBalance ?? 0
+                                : lastAccountBookForToPaymentAccount.ToPaymentAccountCurrentBalance ?? 0);
+                    }
                 }
 
                 if (lastAccountBookForFromPaymentAccount != null && lastAccountBookForToPaymentAccount == null)

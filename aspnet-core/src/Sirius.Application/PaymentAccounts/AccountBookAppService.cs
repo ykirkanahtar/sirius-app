@@ -235,7 +235,7 @@ namespace Sirius.PaymentAccounts
                 , AbpSession.GetUserId());
 
             if (input.NettingFromHousingDue && input.HousingIdForNetting.HasValue
-            ) //Mahsuplaşma kaydı gerçekleştiriyor
+               ) //Mahsuplaşma kaydı gerçekleştiriyor
             {
                 if (input.FromPaymentAccountId.HasValue && fromPaymentAccount.TenantIsOwner)
                 {
@@ -338,38 +338,6 @@ namespace Sirius.PaymentAccounts
             }
 
             //Organize Balances
-            var paymentAccounts = new List<PaymentAccount>();
-
-            if (input.FromPaymentAccountId.HasValue)
-            {
-                var inputFromPaymentAccount =
-                    await _paymentAccountRepository.GetAsync(input.FromPaymentAccountId.GetValueOrDefault());
-                paymentAccounts.Add(inputFromPaymentAccount);
-            }
-
-            if (input.ToPaymentAccountId.HasValue)
-            {
-                var inputToPaymentAccount =
-                    await _paymentAccountRepository.GetAsync(input.ToPaymentAccountId.GetValueOrDefault());
-                paymentAccounts.Add(inputToPaymentAccount);
-            }
-
-            if (existingAccountBook.FromPaymentAccountId.HasValue)
-            {
-                var existingAccountBookFromPaymentAccount =
-                    await _paymentAccountRepository.GetAsync(existingAccountBook.FromPaymentAccountId
-                        .GetValueOrDefault());
-                paymentAccounts.Add(existingAccountBookFromPaymentAccount);
-            }
-
-            if (existingAccountBook.ToPaymentAccountId.HasValue)
-            {
-                var existingAccountBookToPaymentAccount =
-                    await _paymentAccountRepository.GetAsync(existingAccountBook.ToPaymentAccountId
-                        .GetValueOrDefault());
-                paymentAccounts.Add(existingAccountBookToPaymentAccount);
-            }
-
             await _balanceOrganizer.GetOrganizedAccountBooksAsync(
                 processDateTime < existingAccountBook.ProcessDateTime
                     ? processDateTime
@@ -377,13 +345,12 @@ namespace Sirius.PaymentAccounts
                 processDateTime < existingAccountBook.ProcessDateTime
                     ? int.MaxValue
                     : existingAccountBook.SameDayIndex,
-                paymentAccounts,
-                new List<AccountBook> {newAccountBook},
+                new List<AccountBook> { newAccountBook },
                 null,
-                new List<AccountBook> {existingAccountBook}
+                new List<AccountBook> { existingAccountBook }
             );
             _balanceOrganizer.OrganizeAccountBookBalances();
-            _balanceOrganizer.OrganizePaymentAccountBalances();
+            await _balanceOrganizer.OrganizePaymentAccountBalancesAsync();
 
             return ObjectMapper.Map<AccountBookDto>(newAccountBook);
         }
