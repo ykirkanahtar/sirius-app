@@ -201,25 +201,10 @@ namespace Sirius.PaymentAccounts
 
             if (organizeBalances)
             {
-                var paymentAccounts = new List<PaymentAccount>();
-                if (fromPaymentAccount != null)
-                {
-                    paymentAccounts.Add(fromPaymentAccount);
-                }
-
-                if (toPaymentAccount != null)
-                {
-                    paymentAccounts.Add(toPaymentAccount);
-                }
-
-                if (paymentAccounts.Any())
-                {
-                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
-                        accountBook.SameDayIndex,
-                        paymentAccounts, new List<AccountBook> { accountBook }, null, null);
-                    _balanceOrganizer.OrganizeAccountBookBalances();
-                    _balanceOrganizer.OrganizePaymentAccountBalances();
-                }
+                await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                    accountBook.SameDayIndex, new List<AccountBook> { accountBook }, null, null);
+                _balanceOrganizer.OrganizeAccountBookBalances();
+                await _balanceOrganizer.OrganizePaymentAccountBalancesAsync();
             }
         }
 
@@ -277,29 +262,9 @@ namespace Sirius.PaymentAccounts
 
                 await _accountBookRepository.UpdateAsync(updatedAccountBook);
 
-                var paymentAccounts = new List<PaymentAccount>();
-
-                if (updatedAccountBook.FromPaymentAccountId.HasValue)
-                {
-                    var fromPaymentAccount =
-                        await _paymentAccountManager.GetAsync(updatedAccountBook.FromPaymentAccountId.Value);
-                    paymentAccounts.Add(fromPaymentAccount);
-                }
-
-                if (updatedAccountBook.ToPaymentAccountId.HasValue)
-                {
-                    var toPaymentAccount =
-                        await _paymentAccountManager.GetAsync(updatedAccountBook.ToPaymentAccountId.Value);
-                    paymentAccounts.Add(toPaymentAccount);
-                }
-
-                if (paymentAccounts.Any())
-                {
-                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
-                        updatedAccountBook.SameDayIndex,
-                        paymentAccounts, null, new List<AccountBook> { updatedAccountBook }, null);
-                    _balanceOrganizer.OrganizeAccountBookBalances();
-                }
+                await _balanceOrganizer.GetOrganizedAccountBooksAsync(updatedAccountBook.ProcessDateTime,
+                    updatedAccountBook.SameDayIndex, null, new List<AccountBook> { updatedAccountBook }, null);
+                _balanceOrganizer.OrganizeAccountBookBalances();
             }
             catch (Exception e)
             {
@@ -322,28 +287,10 @@ namespace Sirius.PaymentAccounts
 
             if (organizeBalances)
             {
-                var paymentAccounts = new List<PaymentAccount>();
-
-                if (accountBook.FromPaymentAccountId.HasValue)
-                {
-                    var fromPaymentAccount =
-                        await _paymentAccountManager.GetAsync(accountBook.FromPaymentAccountId.Value);
-                    paymentAccounts.Add(fromPaymentAccount);
-                }
-
-                if (accountBook.ToPaymentAccountId.HasValue)
-                {
-                    var toPaymentAccount = await _paymentAccountManager.GetAsync(accountBook.ToPaymentAccountId.Value);
-                    paymentAccounts.Add(toPaymentAccount);
-                }
-
-                if (paymentAccounts.Any())
-                {
-                    await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime, accountBook.SameDayIndex,
-                        paymentAccounts, null, null, new List<AccountBook> { accountBook });
-                    _balanceOrganizer.OrganizeAccountBookBalances();
-                    _balanceOrganizer.OrganizePaymentAccountBalances();
-                }
+                await _balanceOrganizer.GetOrganizedAccountBooksAsync(accountBook.ProcessDateTime,
+                    accountBook.SameDayIndex, null, null, new List<AccountBook> { accountBook });
+                _balanceOrganizer.OrganizeAccountBookBalances();
+                await _balanceOrganizer.OrganizePaymentAccountBalancesAsync();
             }
         }
 
