@@ -76,12 +76,12 @@ namespace Sirius.Dashboard
                     TotalHousingDuePayment = housingDuePaymentSum
                 };
 
-                var housingDueQuery = (from ab in _accountBookRepository.GetAll()
-                        join pc in _paymentCategoryRepository.GetAll() on ab.PaymentCategoryId equals pc.Id
-                        where pc.PaymentCategoryType == PaymentCategoryType.Income && pc.IsHousingDue &&
-                              ab.ProcessDateTime >= currentPeriod.StartDate
-                        select ab)
-                    .WhereIf(currentPeriod.EndDate.HasValue, p => p.ProcessDateTime <= currentPeriod.EndDate.Value);
+                var housingDueQuery = from ab in _accountBookRepository.GetAll()
+                    join p in _periodRepository.GetAll() on ab.PeriodId equals p.Id
+                    where p.IsActive &&
+                          (ab.AccountBookType == AccountBookType.HousingDue || ab.AccountBookType ==
+                              AccountBookType.OtherPaymentWithNettingForHousingDue)
+                    select ab;
 
                 var incomeQuery = (from ab in _accountBookRepository.GetAll()
                         join pc in _paymentCategoryRepository.GetAll() on ab.PaymentCategoryId equals pc.Id
@@ -94,7 +94,7 @@ namespace Sirius.Dashboard
                         join pc in _paymentCategoryRepository.GetAll() on ab.PaymentCategoryId equals pc.Id
                         where pc.PaymentCategoryType == PaymentCategoryType.Expense &&
                               ab.ProcessDateTime >= currentPeriod.StartDate
-                        select new {ab, pc})
+                        select new { ab, pc })
                     .WhereIf(currentPeriod.EndDate.HasValue, p => p.ab.ProcessDateTime <= currentPeriod.EndDate.Value);
 
                 dashboardDto.TotalHousingDueAmount = await housingDueQuery.SumAsync(p => p.Amount);
@@ -119,7 +119,7 @@ namespace Sirius.Dashboard
                         h.HousingName
                     }
                     into grouped
-                    group grouped by new {grouped.HousingName}
+                    group grouped by new { grouped.HousingName }
                     into housingNameGrouped
                     select new HousingDuePayersDashboardDto
                     {
@@ -127,7 +127,7 @@ namespace Sirius.Dashboard
                         HousingName = housingNameGrouped.Key.HousingName
                     };
 
-                var expensesDataQuery = expenseQuery.GroupBy(x => new {x.pc.PaymentCategoryName})
+                var expensesDataQuery = expenseQuery.GroupBy(x => new { x.pc.PaymentCategoryName })
                     .Select(p => new PaymentCategoryDashboardDto
                     {
                         TotalAmount = p.Sum(x => x.ab.Amount),
