@@ -20,6 +20,7 @@ import { HousingPaymentPlanGroupsComponent } from './housing-payment-plan-groups
 import { PeriodsComponent } from './periods/periods.component';
 import { InventoryTypesComponent } from './inventory-types/inventory-types.component';
 import { InventoriesComponent } from './inventories/inventories.component';
+import { FinancialStatementsComponent } from './reports/financial-statements.component';
 
 @NgModule({
   imports: [
@@ -105,6 +106,12 @@ import { InventoriesComponent } from './inventories/inventories.component';
             data: { permission: 'Pages.Inventories' },
             canActivate: [AppRouteGuard],
           },
+          {
+            path: 'financial-statements',
+            component: FinancialStatementsComponent,
+            data: { permission: 'Pages.FinancialStatements' },
+            canActivate: [AppRouteGuard],
+          },
           // {
           //   path: 'create-period',
           //   component: CreatePeriodComponent,
@@ -116,7 +123,7 @@ import { InventoriesComponent } from './inventories/inventories.component';
           //   component: PeriodsComponent,
           //   data: { permission: 'Pages.PeriodsForBlock' },
           //   canActivate: [AppRouteGuard],
-          // },          
+          // },
           {
             path: 'users',
             component: UsersComponent,

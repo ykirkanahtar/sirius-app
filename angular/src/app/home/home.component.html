@@ -57,7 +57,7 @@
             <div class="small-box bg-warning">
               <div class="inner">
                 <h3>
-                  {{ dashboardDto.totalHousingDueAmount | currency: "TL " }}
+                  {{ getTotalHousingDueAmount() }}
                 </h3>
                 <p>{{ "CurrentTotalHousingDueAmount" | localize }}</p>
               </div>
@@ -72,7 +72,7 @@
           >
             <div class="small-box bg-primary">
               <div class="inner">
-                <h3>{{ dashboardDto.totalIncomeAmount | currency: "TL " }}</h3>
+                <h3>{{ getTotalIncomeAmount() }}</h3>
                 <p>{{ "CurrentTotalIncomeAmount" | localize }}</p>
               </div>
               <div class="icon">
@@ -83,7 +83,7 @@
           <div [ngClass]="statsClass">
             <div class="small-box bg-primary">
               <div class="inner">
-                <h3>{{ dashboardDto.totalExpenseAmount | currency: "TL " }}</h3>
+                <h3>{{ getTotalExpenseAmount() }}</h3>
                 <p>{{ "CurrentTotalExpenseAmount" | localize }}</p>
               </div>
               <div class="icon">

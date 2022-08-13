@@ -1,0 +1,151 @@
+<div [@routerTransition]>
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <h1>{{ "FinancialStatements" | localize }}</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content px-2">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="input-group">
+                        <div class="input-group-append">
+                            <button
+                                    type="button"
+                                    class="btn bg-blue"
+                                    (click)="advancedFiltersVisible = !advancedFiltersVisible"
+                            >
+                                {{ "AdvancedFilters" | localize }}
+                                <i
+                                        class="fas"
+                                        [class.fa-angle-up]="advancedFiltersVisible"
+                                        [class.fa-angle-down]="!advancedFiltersVisible"
+                                ></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+                        <div class="card-body">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                {{ "Block" | localize }}
+                                            </label>
+                                            <p-dropdown
+                                                    id="blockFilter"
+                                                    name="blockFilter"
+                                                    [placeholder]="'PleaseSelect' | localize"
+                                                    [options]="blockItems"
+                                                    [(ngModel)]="blockIdFilter"
+                                                    [filter]="true"
+                                                    [style]="{ width: '100%' }"
+                                                    [showClear]="true"
+                                            >
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <button
+                                    type="button"
+                                    class="btn bg-blue"
+                                    (click)="getDataPage(1)"
+                            >
+                                {{ "Search" | localize }}
+                            </button>
+                            <button
+                                    type="button"
+                                    class="btn btn-default float-right"
+                                    (click)="clearFilters()"
+                            >
+                                {{ "Clear" | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <div>
+                        <br>
+                        <br>
+
+                        <ng-template ngFor let-title [ngForOf]="content.title" let-i="index">
+                            <div class="report-center-title bold-text">{{title}}</div>
+                        </ng-template>
+                        <br>
+                        <br>	
+
+                        <div class="report-left-text bold-text">{{content.incomesTitle}}</div>
+                        <ul>
+                            <li class="list-item" *ngFor="let income of content.incomes;" >
+                                <span class="report-list-left-text">{{income.description}}</span> 
+                                <span class="report-float-right-text bold-text">{{income.amount}}</span>
+                                <div style="clear:both;"></div>
+                            </li>
+                        </ul>
+
+                        <br>
+
+                        <div *ngIf="content.incomes.length > 1">
+                            <div class="report-float-right-text bold-text">{{content.incomeTotal.amount}}</div>
+                            <div class="report-center-text bold-text">{{content.incomeTotal.description}}</div>
+                            <br>
+                        </div>
+
+                        <ng-template ngFor let-initialAmount [ngForOf]="content.initialAmounts" let-i="index">
+                            <span class="report-float-left-text bol-text">{{initialAmount.description}}</span> 
+                            <span class="report-float-right-text bold-text">{{initialAmount.amount}}</span>
+                            <div style="clear:both;"></div>                        
+                        </ng-template>
+            
+                        <br>
+
+                        <div class="report-float-right-text bold-text">{{content.incomeTotalWithInitialAmounts.amount}}</div>
+                        <div class="report-center-text bold-text"><b>{{content.incomeTotalWithInitialAmounts.description}}</b></div>
+                        
+                        <br>
+                        <br>	
+                        
+                        <div class="report-left-text bold-text">{{content.expensesTitle}}</div>
+                        <ul>
+                            <li class="list-item" *ngFor="let expense of content.expenses;" >
+                                <span class="report-list-left-text">{{expense.description}}</span> 
+                                <span class="report-float-right-text bold-text">{{expense.amount}}</span>
+                                <div style="clear:both;"></div>
+                            </li>
+                        </ul>
+
+                        <br>
+
+                        <div class="report-float-right-text bold-text">{{content.expenseTotal.amount}}</div>
+                        <div class="report-center-text bold-text">{{content.expenseTotal.description}}</div>
+
+                        <br>
+
+                        <ng-template ngFor let-finallyAmount [ngForOf]="content.finallyAmounts" let-i="index">
+                            <span class="report-float-left-text bol-text">{{finallyAmount.description}}</span> 
+                            <span class="report-float-right-text bold-text">{{finallyAmount.amount}}</span>
+                            <div style="clear:both;"></div>                        
+                        </ng-template>
+
+                        <br>
+            
+                        <div class="report-float-right-text bold-text">{{content.expenseTotalWithFinallyAmounts.amount}}</div>
+                        <div class="report-center-text bold-text"><b>{{content.expenseTotalWithFinallyAmounts.description}}</b></div>
+
+                        <br>
+                        <br>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

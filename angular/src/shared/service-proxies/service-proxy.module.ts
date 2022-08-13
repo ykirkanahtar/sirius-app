@@ -28,7 +28,7 @@ import * as CustomApiServiceProxies from './custom-service-proxies';
         ApiServiceProxies.BlockServiceProxy,
         ApiServiceProxies.UploadServiceProxy,
         ApiServiceProxies.PeriodServiceProxy,
-        ApiServiceProxies.DashboardServiceProxy,
+        ApiServiceProxies.ReportServiceProxy,
         ApiServiceProxies.InventoryTypeServiceProxy,
         ApiServiceProxies.InventoryServiceProxy,
         CustomApiServiceProxies.CustomUploadServiceProxy,

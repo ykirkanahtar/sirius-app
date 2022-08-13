@@ -2,10 +2,12 @@ using System.Threading.Tasks;
 using Abp.Application.Services;
 using Sirius.Dashboard.Dto;
 
-namespace Sirius.Dashboard
+namespace Sirius.Reports
 {
-    public interface IDashboardAppService : IApplicationService
+    public interface IReportAppService : IApplicationService
     {
         Task<DashboardDto> GetDashboardData();
+
+        Task<FinancialStatementDto> GetFinancialStatement();
     }
 }

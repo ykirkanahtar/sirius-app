@@ -233,11 +233,16 @@
     <text name="ExistingFiles">Varolan Dosyalar</text>
     <text name="Expense">Gider</text>
     <text name="Expenses">Giderler</text>
+    <text name="ExpensesTotal">Giderler Toplamı</text>
     <text name="ExpensePaymentCategory">Gider Kalemi</text>
     <text name="false">Hayır</text>
     <text name="File(s)IsUploading">Dosya(lar) karşıya yükleniyor...</text>
     <text name="FinancialOperations">Finansal İşlemler</text>
     <text name="FinancialOperationsMenu">Finansal İşlemler (Menü)</text>
+    <text name="FinancialStatements">Bilanço</text>
+    <text name="FinancialStatementsTitle">Bilanço ve Hesap Özeti</text>
+    <text name="FinancialStatementsInitialBalanceText">Dönem başı {0} bakiye ({1})</text>
+    <text name="FinancialStatementsFinallyBalanceText">Dönem sonu {0} bakiye ({1})</text>
     <text name="FirstName">Ad</text>
     <text name="From">Giden</text>
     <text name="FromPaymentAccount">Ödeme hesabından</text>
@@ -275,6 +280,7 @@
     <text name="Images">Görseller</text>
     <text name="Income">Gelir</text>
     <text name="Incomes">Gelirler</text>
+    <text name="IncomesTotal">Gelirler Toplamı</text>
     <text name="IncomePaymentCategory">Gelir Kalemi</text>
     <text name="Inventories">Demirbaşlar</text>
     <text name="InventoriesMenu">Demirbaşlar</text>
@@ -345,6 +351,7 @@
     <text name="RegularHousingDueName">Olağan aidat ödeme ismi</text>
     <text name="Remove">Kaldır</text>
     <text name="RemovePerson">Kişi tanımını kaldır</text>
+    <text name="Reports">Raporlar</text>
     <text name="Resident">Malik</text>
     <text name="ResidentBalance">Malik Hesabı Bakiye</text>
     <text name="ResidentBalanceShort">Malik Bakiye</text>
@@ -368,6 +375,7 @@
     <text name="ToPaymentAccount">Ödeme hesabına</text>
     <text name="ToPaymentAccountBalance">Ödeme Hesabına Bakiye</text>
     <text name="ToPaymentAccountName">Ödeme hesabına</text>
+    <text name="Total">Toplam</text>
     <text name="TotalHousingDueDefinitions">Toplam aidat tanımları</text>
     <text name="TotalHousingDuePayments">Toplam aidat ödemeleri</text>
     <text name="Transfer">Devir</text>

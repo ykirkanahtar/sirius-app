@@ -74,5 +74,10 @@
         public const string Pages_CreateInventory = "Pages.CreateInventory";
         public const string Pages_EditInventory = ".Pages.EditInventory";
         public const string Pages_DeleteInventory = "Pages.DeleteInventory";
+        
+        public const string Pages_Reports = "Pages.Reports";
+        public const string Pages_FinancialStatements = "Pages.FinancialStatements";
+
+
     }
 }

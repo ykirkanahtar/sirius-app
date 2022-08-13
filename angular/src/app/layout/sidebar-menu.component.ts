@@ -105,6 +105,19 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             'Pages.Housings'
           )
         ]),
+        new MenuItem(
+            this.l('Reports'),
+            '',
+            'fas fa-chart-line',
+            'Pages.Reports',
+            [
+                new MenuItem(
+                    this.l('FinancialStatements'),
+                    '/app/financial-statements',
+                    'fas fa-money-bill',
+                    'Pages.FinancialStatements'
+                )
+            ]),
       new MenuItem(
         this.l('Definitions'),
         '',
