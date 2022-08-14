@@ -187,10 +187,35 @@ namespace Sirius.Reports
                     PaymentCategory = pc
                 };
 
-            var housingDues = await accountBooksQuery
+            var incomes = await accountBooksQuery
                 .Where(p => p.AccountBook.AccountBookType == AccountBookType.HousingDue ||
-                            p.AccountBook.AccountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue)
-                .SumAsync(p => p.AccountBook.Amount);
+                             p.AccountBook.AccountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue ||
+                             (p.AccountBook.AccountBookType == AccountBookType.Other &&
+                              p.PaymentCategory.PaymentCategoryType == PaymentCategoryType.Income))
+                    .ToListAsync();
+
+            var housingDueTotal = incomes.Where(p => p.AccountBook.AccountBookType == AccountBookType.HousingDue ||
+                                                     p.AccountBook.AccountBookType ==
+                                                     AccountBookType.OtherPaymentWithNettingForHousingDue)
+                .Sum(p => p.AccountBook.Amount);
+
+            var otherIncomes = (from ab in incomes
+                    where
+                        ab.PaymentCategory != null &&
+                        (ab.AccountBook.AccountBookType != AccountBookType.HousingDue &&
+                         ab.AccountBook.AccountBookType != AccountBookType.OtherPaymentWithNettingForHousingDue)
+                    group ab by new
+                    {
+                        PaymentCategoryId = ab.PaymentCategory.Id,
+                        ab.PaymentCategory.PaymentCategoryName
+                    }
+                    into grp
+                    select new
+                    {
+                        grp.Key.PaymentCategoryName,
+                        Amount = grp.Sum(p => p.AccountBook.Amount)
+                    })
+                .ToList();
 
             var transfersFromPrevPeriod = await (accountBooksQuery
                     .Where(p => p.AccountBook.AccountBookType ==
@@ -205,7 +230,7 @@ namespace Sirius.Reports
             var sumOfTransfersFromPrevPeriod = transfersFromPrevPeriod
                 .Sum(p => p.Balance);
 
-            var totalIncomes = housingDues + sumOfTransfersFromPrevPeriod;
+            var totalIncomes = housingDueTotal + otherIncomes.Sum(p => p.Amount) + sumOfTransfersFromPrevPeriod;
 
             var expenses = await (from ab in accountBooksQuery
                     where
@@ -275,17 +300,24 @@ namespace Sirius.Reports
                 $"Bankaya ödenen {activePeriod.StartDate.Year}-{activePeriod.EndDate.Value.Year} aidatlar";
 
             var financialStatement = new FinancialStatementDto();
-            financialStatement.Title.Add(tenant.Name.ToUpperInvariant());
-            financialStatement.Title.Add(L("FinancialStatementsTitle").ToUpperInvariant());
+            financialStatement.Title.Add(tenant.Name.ToUpper());
+            financialStatement.Title.Add(L("FinancialStatementsTitle").ToUpper());
 
             financialStatement.Title.Add(
-                $"{startDateText.ToUpperInvariant()} - {endDateText.ToUpperInvariant()}");
+                $"{startDateText.ToUpper()} - {endDateText.ToUpper()}");
 
-            financialStatement.IncomesTitle = L("Incomes").ToUpperInvariant();
+            financialStatement.IncomesTitle = L("Incomes").ToUpper();
 
-            financialStatement.Incomes.Add(new ReportLine(housingDueText, SetAmount(housingDues)));
+            financialStatement.Incomes.Add(new ReportLine(housingDueText, SetAmount(housingDueTotal)));
 
-            financialStatement.IncomeTotal = new ReportLine(L("IncomesTotal"), SetAmount(housingDues));
+            otherIncomes.ForEach(item =>
+            {
+                financialStatement.Incomes.Add(new ReportLine(item.PaymentCategoryName,
+                    SetAmount(item.Amount)));
+            });
+
+            financialStatement.IncomeTotal = new ReportLine(L("IncomesTotal").ToUpper(),
+                SetAmount(housingDueTotal + otherIncomes.Sum(p => p.Amount)));
 
             transfersFromPrevPeriod.ForEach(item =>
             {
@@ -295,9 +327,9 @@ namespace Sirius.Reports
             });
 
             financialStatement.IncomeTotalWithInitialAmounts =
-                new ReportLine(L("Total"), SetAmount(totalIncomes));
+                new ReportLine(L("Total").ToUpper(), SetAmount(totalIncomes));
 
-            financialStatement.ExpensesTitle = L("Expenses").ToUpperInvariant();
+            financialStatement.ExpensesTitle = L("Expenses").ToUpper();
 
             expenses.ForEach(item =>
             {
@@ -305,7 +337,7 @@ namespace Sirius.Reports
                     SetAmount(item.Amount)));
             });
 
-            financialStatement.ExpenseTotal = new ReportLine(L("ExpensesTotal"), SetAmount(sumOfExpenses));
+            financialStatement.ExpenseTotal = new ReportLine(L("ExpensesTotal").ToUpper(), SetAmount(sumOfExpenses));
 
             foreach (var paymentAccountBalance in paymentAccountBalances)
             {
@@ -315,7 +347,7 @@ namespace Sirius.Reports
             }
 
             financialStatement.ExpenseTotalWithFinallyAmounts =
-                new ReportLine(L("Total"), SetAmount(expenseTotalWithFinallyAmount));
+                new ReportLine(L("Total").ToUpper(), SetAmount(expenseTotalWithFinallyAmount));
 
             return financialStatement;
         }

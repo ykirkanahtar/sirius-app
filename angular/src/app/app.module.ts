@@ -77,6 +77,7 @@ import { DialogModule } from "primeng/dialog";
 import { InputNumberModule } from "primeng/inputnumber";
 import { MenuModule } from "primeng/menu";
 import { ChartModule } from 'primeng/chart';
+import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor';
 
 // tslint:disable-next-line: max-line-length
 import {CreateHousingCategoryDialogComponent} from './housing-categories/create-housing-category/create-housing-category-dialog.component';
@@ -206,6 +207,7 @@ import {trLocale} from 'ngx-bootstrap/locale';
         DialogModule,
         MenuModule,
         ChartModule,
+        RichTextEditorAllModule
     ],
     providers: [],
     entryComponents: [
