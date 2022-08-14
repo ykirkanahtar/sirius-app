@@ -148,8 +148,10 @@ namespace Sirius.HousingPaymentPlans
             var query = _housingPaymentPlanRepository.GetAll()
                 .Where(p => p.HousingId == filter.HousingId)
                 .Include(p => p.PaymentCategory)
-                .WhereIf(filter.StartDateFilter.HasValue && filter.EndDateFilter.HasValue,
-                    p => p.Date >= filter.StartDateFilter.Value && p.Date <= filter.EndDateFilter.Value)
+                .WhereIf(filter.StartDateFilter.HasValue,
+                    p => p.Date >= filter.StartDateFilter.Value)
+                .WhereIf(filter.EndDateFilter.HasValue,
+                    p => p.Date <= filter.EndDateFilter.Value)
                 .WhereIf(filter.CreditOrDebtsFilter.Any(), p => filter.CreditOrDebtsFilter.Contains(p.CreditOrDebt))
                 .WhereIf(filter.PaymentCategoriesFilter.Any(),
                     p => filter.PaymentCategoriesFilter.Contains(p.PaymentCategoryId ?? Guid.Empty))

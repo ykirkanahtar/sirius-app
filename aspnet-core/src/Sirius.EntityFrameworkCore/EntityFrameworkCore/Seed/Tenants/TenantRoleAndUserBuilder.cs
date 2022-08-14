@@ -244,6 +244,9 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreateInventoryType),
                 new Permission(PermissionNames.Pages_EditInventoryType),
                 new Permission(PermissionNames.Pages_DeleteInventoryType),
+                
+                new Permission(PermissionNames.Pages_Reports),
+                new Permission(PermissionNames.Pages_FinancialStatements),
 
                 new Permission(PermissionNames.Pages_Users),
             };
@@ -280,6 +283,10 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
 
                 new Permission(PermissionNames.Pages_InventoryTypes),
 
+                new Permission(PermissionNames.Pages_Reports),
+                
+                new Permission(PermissionNames.Pages_FinancialStatements),
+                
                 new Permission(PermissionNames.Pages_Users),
             };
         }
@@ -355,6 +362,9 @@ namespace Sirius.EntityFrameworkCore.Seed.Tenants
                 new Permission(PermissionNames.Pages_CreateInventoryType),
                 new Permission(PermissionNames.Pages_EditInventoryType),
                 new Permission(PermissionNames.Pages_DeleteInventoryType),
+                
+                new Permission(PermissionNames.Pages_Reports),
+                new Permission(PermissionNames.Pages_FinancialStatements),
             };
         }
     }
