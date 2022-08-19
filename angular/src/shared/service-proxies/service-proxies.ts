@@ -10427,6 +10427,8 @@ export enum HousingPaymentPlanType {
     HousingDuePayment = 2,
     Transfer = 3,
     Netting = 4,
+    TransferForHousingDuePaymentToNextPeriod = 5,
+    TransferForHousingDuePaymentFromPreviousPeriod = 6,
 }
 
 export class PaymentCategoryDto implements IPaymentCategoryDto {

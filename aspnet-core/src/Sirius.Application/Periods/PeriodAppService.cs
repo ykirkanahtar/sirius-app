@@ -8,14 +8,19 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
+using Abp.Localization;
+using Abp.Localization.Sources;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using Sirius.HousingPaymentPlans;
 using Sirius.Housings;
 using Sirius.PaymentAccounts;
 using Sirius.PaymentCategories;
 using Sirius.Periods.Dto;
+using Sirius.Shared.Constants;
 using Sirius.Shared.Dtos;
+using Sirius.Shared.Enums;
 using Sirius.Shared.Helper;
 
 namespace Sirius.Periods
@@ -34,13 +39,19 @@ namespace Sirius.Periods
         private readonly IRepository<PaymentAccount, Guid> _paymentAccountRepository;
         private readonly IAccountBookPolicy _accountBookPolicy;
         private readonly IBalanceOrganizer _balanceOrganizer;
+        private readonly IRepository<Housing, Guid> _housingRepository;
+        private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
 
-        public PeriodAppService(IRepository<Period, Guid> periodRepository, IPeriodManager periodManager,
-            IBlockManager blockManager, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
+        public PeriodAppService(IRepository<Period, Guid> periodRepository,
+            IPeriodManager periodManager,
+            IBlockManager blockManager,
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<AccountBook, Guid> accountBookRepository,
             IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IAccountBookManager accountBookManager,
-            IAccountBookPolicy accountBookPolicy, IBalanceOrganizer balanceOrganizer) : base(
+            IAccountBookPolicy accountBookPolicy,
+            IBalanceOrganizer balanceOrganizer,
+            IRepository<Housing, Guid> housingRepository, IHousingPaymentPlanManager housingPaymentPlanManager) : base(
             periodRepository)
         {
             _periodRepository = periodRepository;
@@ -52,6 +63,10 @@ namespace Sirius.Periods
             _accountBookManager = accountBookManager;
             _accountBookPolicy = accountBookPolicy;
             _balanceOrganizer = balanceOrganizer;
+            _housingRepository = housingRepository;
+            _housingPaymentPlanManager = housingPaymentPlanManager;
+            
+            LocalizationSourceName = SiriusConsts.LocalizationSourceName;
         }
 
         public async Task<PeriodDto> CreateForSiteAsync(CreatePeriodForSiteDto input)
@@ -111,10 +126,178 @@ namespace Sirius.Periods
             }
 
             var activePeriod = await _periodManager.GetActivePeriod(false);
-
+            
             if (activePeriod != null) //Önceki dönemden devir işlemleri yapılıyor
             {
-                var paymentAccounts = await _paymentAccountRepository.GetAll().Where(p => p.Balance != 0).ToListAsync();
+                var housings = await _housingRepository.GetAllListAsync();
+
+                foreach (var housing in housings)
+                {
+                    if (housing.OwnerBalance != 0)
+                    {
+                        if (housing.OwnerBalance < 0)
+                        {
+                            var transferToNextPeriod = HousingPaymentPlan.CreateDebt(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , null
+                                , housing
+                                , ResidentOrOwner.Owner
+                                , null
+                                , period.StartDate
+                                , housing.OwnerBalance
+                                , L("TransferToNextPeriod")
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentToNextPeriod
+                                , null
+                                , null
+                                , activePeriod.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferToNextPeriod);
+
+                            var transferFromPreviousPeriod = HousingPaymentPlan.CreateCredit(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , housing
+                                , ResidentOrOwner.Owner
+                                , null
+                                , period.StartDate
+                                , housing.OwnerBalance
+                                , L("TransferFromPreviousPeriod")
+                                , null
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentFromPreviousPeriod
+                                , null
+                                , null
+                                , period.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferFromPreviousPeriod);
+                        }
+
+                        if (housing.OwnerBalance > 0)
+                        {
+                            var transferToNextPeriod = HousingPaymentPlan.CreateCredit(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , housing
+                                , ResidentOrOwner.Owner
+                                , null
+                                , period.StartDate
+                                , housing.OwnerBalance
+                                , L("TransferToNextPeriod")
+                                , null
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentToNextPeriod
+                                , null
+                                , null
+                                , activePeriod.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferToNextPeriod);
+
+                            var transferFromPreviousPeriod = HousingPaymentPlan.CreateDebt(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , null
+                                , housing
+                                , ResidentOrOwner.Owner
+                                , null
+                                , period.StartDate
+                                , housing.OwnerBalance
+                                , L("TransferFromPreviousPeriod")
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentFromPreviousPeriod
+                                , null
+                                , null
+                                , period.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferFromPreviousPeriod);
+                        }
+                    }
+
+                    if (housing.ResidentBalance != 0)
+                    {
+                        if (housing.ResidentBalance < 0)
+                        {
+                            var transferToNextPeriod = HousingPaymentPlan.CreateDebt(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , null
+                                , housing
+                                , ResidentOrOwner.Resident
+                                , null
+                                , period.StartDate
+                                , housing.ResidentBalance
+                                , L("TransferToNextPeriod")
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentToNextPeriod
+                                , null
+                                , null
+                                , activePeriod.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferToNextPeriod);
+
+                            var transferFromPreviousPeriod = HousingPaymentPlan.CreateCredit(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , housing
+                                , ResidentOrOwner.Resident
+                                , null
+                                , period.StartDate
+                                , housing.ResidentBalance
+                                , L("TransferFromPreviousPeriod")
+                                , null
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentFromPreviousPeriod
+                                , null
+                                , null
+                                , period.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferFromPreviousPeriod);
+                        }
+
+                        if (housing.ResidentBalance > 0)
+                        {
+                            var transferToNextPeriod = HousingPaymentPlan.CreateCredit(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , housing
+                                , ResidentOrOwner.Resident
+                                , null
+                                , period.StartDate
+                                , housing.ResidentBalance
+                                , L("TransferToNextPeriod")
+                                , null
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentToNextPeriod
+                                , null
+                                , null
+                                , activePeriod.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferToNextPeriod);
+
+                            var transferFromPreviousPeriod = HousingPaymentPlan.CreateDebt(
+                                SequentialGuidGenerator.Instance.Create()
+                                , AbpSession.GetTenantId()
+                                , null
+                                , housing
+                                , ResidentOrOwner.Resident
+                                , null
+                                , period.StartDate
+                                , housing.ResidentBalance
+                                , L("TransferFromPreviousPeriod")
+                                , HousingPaymentPlanType.TransferForHousingDuePaymentFromPreviousPeriod
+                                , null
+                                , null
+                                , period.Id
+                            );
+
+                            await _housingPaymentPlanManager.CreateAsync(transferFromPreviousPeriod);
+                        }
+                    }
+                }
+
+                var paymentAccounts =
+                    await _paymentAccountRepository.GetAll().Where(p => p.Balance != 0).ToListAsync();
                 foreach (var paymentAccount in paymentAccounts)
                 {
                     var balance = paymentAccount.Balance;
@@ -130,8 +313,7 @@ namespace Sirius.Periods
                             , period.StartDate
                             , paymentAccount
                             , balance
-                            , "Sonraki döneme devir"
-                            , new List<AccountBookFile>()
+                            , L("TransferToNextPeriod")
                             , AbpSession.GetUserId()
                         );
 
@@ -156,12 +338,11 @@ namespace Sirius.Periods
                             , period.StartDate
                             , paymentAccount
                             , balance
-                            , "Önceki dönemden devir"
-                            , new List<AccountBookFile>()
+                            , L("TransferFromPreviousPeriod")
                             , AbpSession.GetUserId()
                         );
 
-                    newIndex = newIndex + 1;
+                    newIndex += 1;
                     accountBookTransferForNewPeriod.SetSameDayIndexManually(newIndex);
                     accountBookTransferForNewPeriod.SetToPaymentAccountCurrentBalance(balance);
 

@@ -100,10 +100,11 @@ namespace Sirius.PaymentAccounts
                     "Gelen hesap, giden hesap ya da mahsuplaşmadan en az biri seçilmelidir.");
             }
 
+            var activePeriod = await _periodManager.GetActivePeriod();
+
             if (accountBook.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
                 accountBook.AccountBookType != AccountBookType.TransferForPaymentAccountToNextPeriod)
             {
-                var activePeriod = await _periodManager.GetActivePeriod();
                 if (accountBook.ProcessDateTime < activePeriod.StartDate ||
                     (activePeriod.EndDate.HasValue && accountBook.ProcessDateTime > activePeriod.EndDate.Value))
                 {
@@ -175,6 +176,7 @@ namespace Sirius.PaymentAccounts
                     , HousingPaymentPlanType.HousingDuePayment
                     , null
                     , null
+                    , activePeriod.Id
                 ));
             }
 
@@ -196,6 +198,7 @@ namespace Sirius.PaymentAccounts
                     , HousingPaymentPlanType.Netting
                     , null
                     , null
+                    , activePeriod.Id
                 ));
             }
 

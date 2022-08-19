@@ -54,7 +54,9 @@ namespace Sirius.PaymentAccounts
                     updatedAccountBookIds.Contains(p.Id) == false)
                 .ToListAsync();
 
-            accountBooks.AddRange(createdAccountBooks);
+            accountBooks.AddRange(createdAccountBooks.Where(p =>
+                p.AccountBookType != AccountBookType.TransferForPaymentAccountFromPreviousPeriod &&
+                p.AccountBookType != AccountBookType.TransferForPaymentAccountToNextPeriod).ToList());
             accountBooks.AddRange(updatedAccountBooks);
 
             if (deletedAccountBooks.Any())

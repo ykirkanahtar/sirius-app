@@ -6,8 +6,10 @@ using Abp;
 using Abp.Domain.Repositories;
 using Abp.Timing;
 using Abp.UI;
+using Microsoft.EntityFrameworkCore;
 using Sirius.Housings;
 using Sirius.PaymentCategories;
+using Sirius.Periods;
 using Sirius.Shared.Enums;
 
 namespace Sirius.HousingPaymentPlans
@@ -21,6 +23,7 @@ namespace Sirius.HousingPaymentPlans
         private readonly IHousingManager _housingManager;
         private readonly IRepository<Housing, Guid> _housingRepository;
         private readonly IRepository<PaymentCategory, Guid> _paymentCategoryRepository;
+        private readonly IPeriodManager _periodManager;
 
         public HousingPaymentPlanGroupManager(
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
@@ -29,7 +32,8 @@ namespace Sirius.HousingPaymentPlans
             IHousingPaymentPlanManager housingPaymentPlanManager
             , IRepository<HousingCategory, Guid> housingCategoryRepository,
             IRepository<Housing, Guid> housingRepository,
-            IRepository<PaymentCategory, Guid> paymentCategoryRepository)
+            IRepository<PaymentCategory, Guid> paymentCategoryRepository, 
+            IPeriodManager periodManager)
         {
             _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
             _housingManager = housingManager;
@@ -38,11 +42,13 @@ namespace Sirius.HousingPaymentPlans
             _housingCategoryRepository = housingCategoryRepository;
             _housingRepository = housingRepository;
             _paymentCategoryRepository = paymentCategoryRepository;
+            _periodManager = periodManager;
         }
 
         private void CreateForHousing(HousingPaymentPlanGroup housingPaymentPlanGroup,
             List<HousingPaymentPlan> housingPaymentPlans, Housing housing, PaymentCategory paymentCategory,
-            bool transferFromPreviousPeriod, DateTime? periodStartDate, decimal amountPerMonth, DateTime newStartDate)
+            bool transferFromPreviousPeriod, Guid periodId, DateTime? periodStartDate, decimal amountPerMonth,
+            DateTime newStartDate)
         {
             if (transferFromPreviousPeriod && periodStartDate.HasValue)
             {
@@ -64,6 +70,7 @@ namespace Sirius.HousingPaymentPlans
                             , HousingPaymentPlanType.Transfer
                             , null
                             , null
+                            , periodId
                         )
                         : HousingPaymentPlan.CreateCredit(
                             SequentialGuidGenerator.Instance.Create()
@@ -78,6 +85,7 @@ namespace Sirius.HousingPaymentPlans
                             , HousingPaymentPlanType.Transfer
                             , null
                             , null
+                            , periodId
                         );
 
                     housingPaymentPlans.Add(housingPaymentPlanForHousingDueTransfer);
@@ -108,6 +116,7 @@ namespace Sirius.HousingPaymentPlans
                     , HousingPaymentPlanType.HousingDueDefinition
                     , null
                     , null
+                    , periodId
                 );
 
                 housingPaymentPlans.Add(housingPaymentPlan);
@@ -118,6 +127,8 @@ namespace Sirius.HousingPaymentPlans
             DateTime startDate, PaymentCategory paymentCategory, bool transferFromPreviousPeriod,
             DateTime? periodStartDate)
         {
+            var activePeriod = await _periodManager.GetActivePeriod();
+
             var newStartDate = GetStartDate(startDate, housingPaymentPlanGroup.PaymentDayOfMonth);
 
             await _housingPaymentPlanGroupRepository.InsertAsync(housingPaymentPlanGroup);
@@ -125,7 +136,7 @@ namespace Sirius.HousingPaymentPlans
             var housingPaymentPlans = new List<HousingPaymentPlan>();
 
             foreach (var housingPaymentPlanGroupHousingCategory in housingPaymentPlanGroup
-                .HousingPaymentPlanGroupHousingCategories.Where(p => p.AmountPerMonth != 0))
+                         .HousingPaymentPlanGroupHousingCategories.Where(p => p.AmountPerMonth != 0))
             {
                 var housingCategory =
                     await _housingCategoryRepository.GetAsync(housingPaymentPlanGroupHousingCategory.HousingCategoryId);
@@ -135,7 +146,7 @@ namespace Sirius.HousingPaymentPlans
                 foreach (var housing in housings)
                 {
                     CreateForHousing(housingPaymentPlanGroup, housingPaymentPlans, housing, paymentCategory,
-                        transferFromPreviousPeriod, periodStartDate,
+                        transferFromPreviousPeriod, activePeriod.Id, periodStartDate,
                         housingPaymentPlanGroupHousingCategory.AmountPerMonth, newStartDate);
                 }
 
@@ -145,12 +156,12 @@ namespace Sirius.HousingPaymentPlans
             }
 
             foreach (var housingPaymentPlanGroupHousing in housingPaymentPlanGroup
-                .HousingPaymentPlanGroupHousings.Where(p => p.AmountPerMonth != 0))
+                         .HousingPaymentPlanGroupHousings.Where(p => p.AmountPerMonth != 0))
             {
                 var housing = await _housingRepository.GetAsync(housingPaymentPlanGroupHousing.HousingId);
 
                 CreateForHousing(housingPaymentPlanGroup, housingPaymentPlans, housing, paymentCategory,
-                    transferFromPreviousPeriod, periodStartDate,
+                    transferFromPreviousPeriod, activePeriod.Id, periodStartDate,
                     housingPaymentPlanGroupHousing.AmountPerMonth, newStartDate);
 
                 await _housingManager.IncreaseBalance(housing,

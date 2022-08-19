@@ -21,6 +21,7 @@ using Sirius.Housings.Dto;
 using Sirius.PaymentCategories;
 using Sirius.People;
 using Sirius.People.Dto;
+using Sirius.Periods;
 using Sirius.Shared.Dtos;
 using Sirius.Shared.Enums;
 using Sirius.Shared.Helper;
@@ -43,15 +44,14 @@ namespace Sirius.Housings
         private readonly IPaymentCategoryManager _paymentCategoryManager;
         private readonly IHousingPaymentPlanManager _housingPaymentPlanManager;
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
-        private readonly IRepository<HousingPaymentPlanGroup, Guid> _housingPaymentPlanGroupRepository;
+        private readonly IPeriodManager _periodManager;
 
         public HousingAppService(IHousingManager housingManager, IHousingRepository housingRepository,
             IRepository<HousingCategory, Guid> housingCategoryRepository, IPersonManager personManager,
             IRepository<Person, Guid> personRepository, IRepository<HousingPerson, Guid> housingPersonRepository,
             IRepository<Block, Guid> blockRepository, IHousingPolicy housingPolicy,
             IPaymentCategoryManager paymentCategoryManager, IHousingPaymentPlanManager housingPaymentPlanManager,
-            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
-            IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository)
+            IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository, IPeriodManager periodManager)
             : base(housingRepository)
         {
             _housingManager = housingManager;
@@ -65,7 +65,7 @@ namespace Sirius.Housings
             _paymentCategoryManager = paymentCategoryManager;
             _housingPaymentPlanManager = housingPaymentPlanManager;
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
-            _housingPaymentPlanGroupRepository = housingPaymentPlanGroupRepository;
+            _periodManager = periodManager;
         }
 
         public override async Task<HousingDto> CreateAsync(CreateHousingDto input)
@@ -75,6 +75,7 @@ namespace Sirius.Housings
                 CheckCreatePermission();
                 var housingCategory = await _housingCategoryRepository.GetAsync(input.HousingCategoryId);
                 var block = await _blockRepository.GetAsync(input.BlockId);
+                var activePeriod = await _periodManager.GetActivePeriod();
 
                 var housing = await Housing.CreateAsync(_housingPolicy, SequentialGuidGenerator.Instance.Create(),
                     AbpSession.GetTenantId(),
@@ -107,6 +108,7 @@ namespace Sirius.Housings
                             , HousingPaymentPlanType.Transfer
                             , null
                             , input.TransferForHousingDue.ResidentOrOwner
+                            , activePeriod.Id
                         )
                         : HousingPaymentPlan.CreateCredit(
                             SequentialGuidGenerator.Instance.Create()
@@ -121,6 +123,7 @@ namespace Sirius.Housings
                             , HousingPaymentPlanType.Transfer
                             , null
                             , input.TransferForHousingDue.ResidentOrOwner
+                            , activePeriod.Id
                         );
 
                     await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -146,6 +149,8 @@ namespace Sirius.Housings
 
             var housing = await Housing.UpdateAsync(_housingPolicy, existingHousing, block, input.Apartment,
                 housingCategory, input.TenantIsResiding);
+
+            var activePeriod = await _periodManager.GetActivePeriod();
 
             //Eğer kiralık seçeneği kaldırılırsa, kiracı olarak işaretlenen kişiler de siliniyor
             if (oldTenantIsResidingValue && housing.TenantIsResiding == false)
@@ -203,6 +208,7 @@ namespace Sirius.Housings
                             , HousingPaymentPlanType.Transfer
                             , null
                             , input.TransferIsForResidentOrOwner
+                            , activePeriod.Id
                         )
                         : HousingPaymentPlan.CreateCredit(
                             SequentialGuidGenerator.Instance.Create()
@@ -217,6 +223,7 @@ namespace Sirius.Housings
                             , HousingPaymentPlanType.Transfer
                             , null
                             , input.TransferIsForResidentOrOwner
+                            , activePeriod.Id
                         );
 
                     await _housingPaymentPlanManager.CreateAsync(housingPaymentPlan);
@@ -227,7 +234,7 @@ namespace Sirius.Housings
                         input.TransferIsForResidentOrOwner
                         , input.TransferAmount.GetValueOrDefault(),
                         input.TransferIsDebt,
-                        input.TransferDateString.StringToDateTime(), 
+                        input.TransferDateString.StringToDateTime(),
                         input.TransferDescription);
                 }
             }
@@ -287,7 +294,7 @@ namespace Sirius.Housings
                     from housingPerson in g1.DefaultIfEmpty()
                     join person in _personRepository.GetAll() on housingPerson.PersonId equals person.Id into g2
                     from person in g2.DefaultIfEmpty()
-                    select new {housing, housingPerson, person})
+                    select new { housing, housingPerson, person })
                 .WhereIf(input.HousingIds.Count > 0, p => input.HousingIds.Contains(p.housing.Id))
                 .WhereIf(input.HousingCategoryIds.Count > 0,
                     p => input.HousingCategoryIds.Contains(p.housing.HousingCategoryId))
