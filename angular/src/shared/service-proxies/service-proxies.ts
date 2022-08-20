@@ -372,6 +372,7 @@ export class AccountBookServiceProxy {
     }
 
     /**
+     * @param periodId (optional) 
      * @param startDate (optional) 
      * @param endDate (optional) 
      * @param paymentCategoryIds (optional) 
@@ -384,8 +385,10 @@ export class AccountBookServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllList(startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedAccountBookResultDto> {
+    getAllList(periodId: string | null | undefined, startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedAccountBookResultDto> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/GetAllList?";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDate !== undefined)
             url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&";
         if (endDate !== undefined)
@@ -457,6 +460,7 @@ export class AccountBookServiceProxy {
     }
 
     /**
+     * @param periodId (optional) 
      * @param startDate (optional) 
      * @param endDate (optional) 
      * @param paymentCategoryIds (optional) 
@@ -467,8 +471,10 @@ export class AccountBookServiceProxy {
      * @param sorting (optional) 
      * @return Success
      */
-    getAllListForExport(startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined): Observable<AccountBookGetAllExportOutput[]> {
+    getAllListForExport(periodId: string | null | undefined, startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined): Observable<AccountBookGetAllExportOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/GetAllListForExport?";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDate !== undefined)
             url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&";
         if (endDate !== undefined)
@@ -596,6 +602,7 @@ export class AccountBookServiceProxy {
     }
 
     /**
+     * @param periodId (optional) 
      * @param startDate (optional) 
      * @param endDate (optional) 
      * @param paymentCategoryIds (optional) 
@@ -608,8 +615,10 @@ export class AccountBookServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AccountBookDtoPagedResultDto> {
+    getAll(periodId: string | null | undefined, startDate: moment.Moment | null | undefined, endDate: moment.Moment | null | undefined, paymentCategoryIds: string[] | null | undefined, housingIds: string[] | null | undefined, personIds: string[] | null | undefined, fromPaymentAccountIds: string[] | null | undefined, toPaymentAccountIds: string[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AccountBookDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/AccountBook/GetAll?";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDate !== undefined)
             url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toJSON() : "") + "&";
         if (endDate !== undefined)
@@ -2945,6 +2954,7 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
+     * @param periodId (optional) 
      * @param startDateFilter (optional) 
      * @param endDateFilter (optional) 
      * @param paymentCategoriesFilter (optional) 
@@ -2955,12 +2965,14 @@ export class HousingPaymentPlanServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllByHousingId(housingId: string | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAllByHousingId(housingId: string | undefined, periodId: string | null | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedHousingPaymentPlanResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAllByHousingId?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDateFilter !== undefined)
             url_ += "StartDateFilter=" + encodeURIComponent(startDateFilter ? "" + startDateFilter.toJSON() : "") + "&";
         if (endDateFilter !== undefined)
@@ -2998,14 +3010,14 @@ export class HousingPaymentPlanServiceProxy {
                 try {
                     return this.processGetAllByHousingId(<any>response_);
                 } catch (e) {
-                    return <Observable<HousingPaymentPlanDtoPagedResultDto>><any>_observableThrow(e);
+                    return <Observable<PagedHousingPaymentPlanResultDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<HousingPaymentPlanDtoPagedResultDto>><any>_observableThrow(response_);
+                return <Observable<PagedHousingPaymentPlanResultDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAllByHousingId(response: HttpResponseBase): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    protected processGetAllByHousingId(response: HttpResponseBase): Observable<PagedHousingPaymentPlanResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3016,7 +3028,7 @@ export class HousingPaymentPlanServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = HousingPaymentPlanDtoPagedResultDto.fromJS(resultData200);
+            result200 = PagedHousingPaymentPlanResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3024,11 +3036,12 @@ export class HousingPaymentPlanServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<HousingPaymentPlanDtoPagedResultDto>(<any>null);
+        return _observableOf<PagedHousingPaymentPlanResultDto>(<any>null);
     }
 
     /**
      * @param housingId (optional) 
+     * @param periodId (optional) 
      * @param startDateFilter (optional) 
      * @param endDateFilter (optional) 
      * @param paymentCategoriesFilter (optional) 
@@ -3037,12 +3050,14 @@ export class HousingPaymentPlanServiceProxy {
      * @param sorting (optional) 
      * @return Success
      */
-    getAllByHousingIdForExport(housingId: string | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined): Observable<HousingPaymentPlanExportOutput[]> {
+    getAllByHousingIdForExport(housingId: string | undefined, periodId: string | null | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined): Observable<HousingPaymentPlanExportOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAllByHousingIdForExport?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDateFilter !== undefined)
             url_ += "StartDateFilter=" + encodeURIComponent(startDateFilter ? "" + startDateFilter.toJSON() : "") + "&";
         if (endDateFilter !== undefined)
@@ -3163,6 +3178,7 @@ export class HousingPaymentPlanServiceProxy {
 
     /**
      * @param housingId (optional) 
+     * @param periodId (optional) 
      * @param startDateFilter (optional) 
      * @param endDateFilter (optional) 
      * @param paymentCategoriesFilter (optional) 
@@ -3173,12 +3189,14 @@ export class HousingPaymentPlanServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(housingId: string | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
+    getAll(housingId: string | undefined, periodId: string | null | undefined, startDateFilter: moment.Moment | null | undefined, endDateFilter: moment.Moment | null | undefined, paymentCategoriesFilter: string[] | null | undefined, creditOrDebtsFilter: CreditOrDebt[] | null | undefined, housingPaymentPlanTypesFilter: HousingPaymentPlanType[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<HousingPaymentPlanDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HousingPaymentPlan/GetAll?";
         if (housingId === null)
             throw new Error("The parameter 'housingId' cannot be null.");
         else if (housingId !== undefined)
             url_ += "HousingId=" + encodeURIComponent("" + housingId) + "&";
+        if (periodId !== undefined)
+            url_ += "PeriodId=" + encodeURIComponent("" + periodId) + "&";
         if (startDateFilter !== undefined)
             url_ += "StartDateFilter=" + encodeURIComponent(startDateFilter ? "" + startDateFilter.toJSON() : "") + "&";
         if (endDateFilter !== undefined)
@@ -9595,6 +9613,7 @@ export interface IAccountBookGetAllOutput {
 }
 
 export class PagedAccountBookResultDto implements IPagedAccountBookResultDto {
+    readonly balance: number;
     readonly lastAccountBookDate: moment.Moment | undefined;
     totalCount: number;
     items: AccountBookGetAllOutput[] | undefined;
@@ -9610,6 +9629,7 @@ export class PagedAccountBookResultDto implements IPagedAccountBookResultDto {
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).balance = _data["balance"];
             (<any>this).lastAccountBookDate = _data["lastAccountBookDate"] ? moment(_data["lastAccountBookDate"].toString()) : <any>undefined;
             this.totalCount = _data["totalCount"];
             if (Array.isArray(_data["items"])) {
@@ -9629,6 +9649,7 @@ export class PagedAccountBookResultDto implements IPagedAccountBookResultDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["balance"] = this.balance;
         data["lastAccountBookDate"] = this.lastAccountBookDate ? this.lastAccountBookDate.toISOString() : <any>undefined;
         data["totalCount"] = this.totalCount;
         if (Array.isArray(this.items)) {
@@ -9648,6 +9669,7 @@ export class PagedAccountBookResultDto implements IPagedAccountBookResultDto {
 }
 
 export interface IPagedAccountBookResultDto {
+    balance: number;
     lastAccountBookDate: moment.Moment | undefined;
     totalCount: number;
     items: AccountBookGetAllOutput[] | undefined;
@@ -11860,11 +11882,14 @@ export interface IUpdateHousingPaymentPlanDto {
     id: string;
 }
 
-export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanDtoPagedResultDto {
+export class PagedHousingPaymentPlanResultDto implements IPagedHousingPaymentPlanResultDto {
+    readonly balance: number;
+    readonly creditBalance: number;
+    readonly debtBalance: number;
     totalCount: number;
     items: HousingPaymentPlanDto[] | undefined;
 
-    constructor(data?: IHousingPaymentPlanDtoPagedResultDto) {
+    constructor(data?: IPagedHousingPaymentPlanResultDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -11875,6 +11900,9 @@ export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanD
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).balance = _data["balance"];
+            (<any>this).creditBalance = _data["creditBalance"];
+            (<any>this).debtBalance = _data["debtBalance"];
             this.totalCount = _data["totalCount"];
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
@@ -11884,15 +11912,18 @@ export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanD
         }
     }
 
-    static fromJS(data: any): HousingPaymentPlanDtoPagedResultDto {
+    static fromJS(data: any): PagedHousingPaymentPlanResultDto {
         data = typeof data === 'object' ? data : {};
-        let result = new HousingPaymentPlanDtoPagedResultDto();
+        let result = new PagedHousingPaymentPlanResultDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["balance"] = this.balance;
+        data["creditBalance"] = this.creditBalance;
+        data["debtBalance"] = this.debtBalance;
         data["totalCount"] = this.totalCount;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -11902,15 +11933,18 @@ export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanD
         return data; 
     }
 
-    clone(): HousingPaymentPlanDtoPagedResultDto {
+    clone(): PagedHousingPaymentPlanResultDto {
         const json = this.toJSON();
-        let result = new HousingPaymentPlanDtoPagedResultDto();
+        let result = new PagedHousingPaymentPlanResultDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IHousingPaymentPlanDtoPagedResultDto {
+export interface IPagedHousingPaymentPlanResultDto {
+    balance: number;
+    creditBalance: number;
+    debtBalance: number;
     totalCount: number;
     items: HousingPaymentPlanDto[] | undefined;
 }
@@ -11972,6 +12006,61 @@ export interface IHousingPaymentPlanExportOutput {
     paymentCategory: string | undefined;
     housingPaymentPlanType: string | undefined;
     amount: number;
+}
+
+export class HousingPaymentPlanDtoPagedResultDto implements IHousingPaymentPlanDtoPagedResultDto {
+    totalCount: number;
+    items: HousingPaymentPlanDto[] | undefined;
+
+    constructor(data?: IHousingPaymentPlanDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(HousingPaymentPlanDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): HousingPaymentPlanDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new HousingPaymentPlanDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): HousingPaymentPlanDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new HousingPaymentPlanDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHousingPaymentPlanDtoPagedResultDto {
+    totalCount: number;
+    items: HousingPaymentPlanDto[] | undefined;
 }
 
 export class HousingPaymentPlanGroupForHousingDto implements IHousingPaymentPlanGroupForHousingDto {

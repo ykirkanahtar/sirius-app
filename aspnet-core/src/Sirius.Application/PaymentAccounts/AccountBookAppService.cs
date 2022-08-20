@@ -52,6 +52,7 @@ namespace Sirius.PaymentAccounts
         private readonly IPeriodManager _periodManager;
         private readonly IInventoryAppService _inventoryAppService;
         private readonly IRepository<Inventory, Guid> _inventoryRepository;
+        private readonly IRepository<Period, Guid> _periodRepository;
 
         public AccountBookAppService(IAccountBookManager accountBookManager,
             IRepository<AccountBook, Guid> accountBookRepository,
@@ -69,7 +70,7 @@ namespace Sirius.PaymentAccounts
             ILocalizationManager localizationManager,
             IRepository<HousingPaymentPlanGroup, Guid> housingPaymentPlanGroupRepository,
             IBalanceOrganizer balanceOrganizer, IPeriodManager periodManager, IInventoryAppService inventoryAppService,
-            IRepository<Inventory, Guid> inventoryRepository)
+            IRepository<Inventory, Guid> inventoryRepository, IRepository<Period, Guid> periodRepository)
             : base(accountBookRepository)
         {
             _accountBookManager = accountBookManager;
@@ -90,6 +91,7 @@ namespace Sirius.PaymentAccounts
             _periodManager = periodManager;
             _inventoryAppService = inventoryAppService;
             _inventoryRepository = inventoryRepository;
+            _periodRepository = periodRepository;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -571,6 +573,7 @@ namespace Sirius.PaymentAccounts
             var housingIdsFromPersonFilter = await _housingManager.GetHousingsFromPersonIds(filter.PersonIds);
 
             var query = (from accountBook in _accountBookRepository.GetAll()
+                    join period in _periodRepository.GetAll() on accountBook.PeriodId equals period.Id
                     join paymentCategory in _paymentCategoryRepository.GetAll() on accountBook.PaymentCategoryId
                         equals paymentCategory.Id into nullablePaymentCategory
                     from paymentCategory in nullablePaymentCategory.DefaultIfEmpty()
@@ -594,6 +597,7 @@ namespace Sirius.PaymentAccounts
                     select new
                     {
                         accountBook,
+                        period,
                         paymentCategory,
                         housing,
                         block,
@@ -601,6 +605,8 @@ namespace Sirius.PaymentAccounts
                         toPaymentAccount,
                         nettingHousing
                     })
+                .WhereIf(filter.PeriodId.HasValue, p => p.period.Id == filter.PeriodId)
+                .WhereIf(filter.PeriodId.HasValue == false, p => p.period.IsActive)
                 .WhereIf(filter.StartDate.HasValue, p => p.accountBook.ProcessDateTime > filter.StartDate.Value)
                 .WhereIf(filter.EndDate.HasValue, p => p.accountBook.ProcessDateTime < filter.EndDate.Value)
                 .WhereIf(filter.HousingIds.Count > 0,
@@ -669,6 +675,8 @@ namespace Sirius.PaymentAccounts
 
             var query = await FilterQueryAsync(input);
 
+            var balance = query.Sum(p => p.Amount);
+
             var accountBooks = await query
                 .PageBy(input)
                 .ToListAsync();
@@ -676,7 +684,11 @@ namespace Sirius.PaymentAccounts
             var lastAccountBookDate =
                 await _accountBookRepository.GetAll().OrderByDescending(p => p.ProcessDateTime)
                     .FirstOrDefaultAsync();
-            return new PagedAccountBookResultDto(await query.CountAsync(), accountBooks,
+
+            return new PagedAccountBookResultDto(
+                await query.CountAsync(),
+                accountBooks,
+                balance,
                 lastAccountBookDate?.ProcessDateTime);
         }
 

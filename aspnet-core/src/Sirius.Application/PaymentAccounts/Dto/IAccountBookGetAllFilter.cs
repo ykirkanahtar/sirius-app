@@ -6,6 +6,7 @@ namespace Sirius.AccountBooks.Dto
 {
     public interface IAccountBookGetAllFilter : ISortedResultRequest
     {
+        Guid? PeriodId { get; set; }
         DateTime? StartDate { get; set; }
         DateTime? EndDate { get; set; }
         List<Guid> PaymentCategoryIds { get; set; }

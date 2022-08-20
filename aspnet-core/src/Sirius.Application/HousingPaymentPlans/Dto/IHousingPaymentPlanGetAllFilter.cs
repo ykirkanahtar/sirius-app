@@ -8,6 +8,7 @@ namespace Sirius.HousingPaymentPlans.Dto
     public interface IHousingPaymentPlanGetAllFilter : ISortedResultRequest
     {
         Guid HousingId { get; set; }
+        Guid? PeriodId { get; set; }
         DateTime? StartDateFilter { get; set; }
         DateTime? EndDateFilter { get; set; }
         List<Guid> PaymentCategoriesFilter { get; set; }

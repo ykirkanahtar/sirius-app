@@ -6,7 +6,6 @@ using Abp;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
-using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +16,9 @@ using Sirius.Shared.Enums;
 using System.Linq.Dynamic.Core;
 using Abp.Localization;
 using Abp.Localization.Sources;
-using Sirius.EntityFrameworkCore.Repositories;
 using Sirius.PaymentAccounts;
 using Sirius.Periods;
 using Sirius.Shared.Constants;
-using Sirius.Shared.Dtos;
 using Sirius.Shared.Helper;
 
 namespace Sirius.HousingPaymentPlans
@@ -37,13 +34,14 @@ namespace Sirius.HousingPaymentPlans
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
         private readonly ILocalizationSource _localizationSource;
         private readonly IPeriodManager _periodManager;
+        private readonly IRepository<Period, Guid> _periodRepository;
 
         public HousingPaymentPlanAppService(IHousingPaymentPlanManager housingPaymentPlanManager,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<AccountBook, Guid> accountBookRepository,
             ILocalizationManager localizationManager,
-            IPeriodManager periodManager)
+            IPeriodManager periodManager, IRepository<Period, Guid> periodRepository)
             : base(housingPaymentPlanRepository)
         {
             _housingPaymentPlanManager = housingPaymentPlanManager;
@@ -52,6 +50,7 @@ namespace Sirius.HousingPaymentPlans
             _paymentCategoryRepository = paymentCategoryRepository;
             _accountBookRepository = accountBookRepository;
             _periodManager = periodManager;
+            _periodRepository = periodRepository;
             _localizationSource = localizationManager.GetSource(AppConstants.LocalizationSourceName);
         }
 
@@ -136,23 +135,38 @@ namespace Sirius.HousingPaymentPlans
             await _housingPaymentPlanManager.DeleteAsync(housingPaymentPlan);
         }
 
-        public async Task<PagedResultDto<HousingPaymentPlanDto>> GetAllByHousingIdAsync(
+        public async Task<PagedHousingPaymentPlanResultDto> GetAllByHousingIdAsync(
             PagedHousingPaymentPlanResultRequestDto input)
         {
             CheckGetAllPermission();
             var query = FilterQuery(input);
 
-            var list = await query
-                .PageBy(input)
-                .ToListAsync();
+            var creditBalance = await query.Where(p => p.CreditOrDebt == CreditOrDebt.Credit).SumAsync(p => p.Amount);
+            var debtBalance = await query.Where(p => p.CreditOrDebt == CreditOrDebt.Debt).SumAsync(p => p.Amount);
 
-            return new PagedResultDto<HousingPaymentPlanDto>(query.Count(),
-                ObjectMapper.Map<List<HousingPaymentPlanDto>>(list));
+            var balance = debtBalance - creditBalance;
+
+            var items = ObjectMapper.Map<List<HousingPaymentPlanDto>>(await query
+                .PageBy(input)
+                .ToListAsync());
+
+            return new PagedHousingPaymentPlanResultDto(query.Count(),
+                items,
+                balance,
+                creditBalance,
+                debtBalance);
         }
 
         private IOrderedQueryable<HousingPaymentPlan> FilterQuery(IHousingPaymentPlanGetAllFilter filter)
         {
-            var query = _housingPaymentPlanRepository.GetAll()
+            var joinQuery = from h in _housingPaymentPlanRepository.GetAll()
+                join p in _periodRepository.GetAll() on h.PeriodId equals p.Id
+                select new { HousingPaymentPlan = h, Period = p };
+
+            var query = joinQuery
+                .WhereIf(filter.PeriodId.HasValue, p => p.Period.Id == filter.PeriodId.Value)
+                .WhereIf(filter.PeriodId.HasValue == false, p => p.Period.IsActive)
+                .Select(p => p.HousingPaymentPlan)
                 .Where(p => p.HousingId == filter.HousingId)
                 .Include(p => p.PaymentCategory)
                 .WhereIf(filter.StartDateFilter.HasValue,
@@ -164,7 +178,7 @@ namespace Sirius.HousingPaymentPlans
                     p => filter.PaymentCategoriesFilter.Contains(p.PaymentCategoryId ?? Guid.Empty))
                 .WhereIf(filter.HousingPaymentPlanTypesFilter.Any(),
                     p => filter.HousingPaymentPlanTypesFilter.Contains(p.HousingPaymentPlanType));
-            
+
             return query
                 .OrderBy(filter.Sorting ?? $"{nameof(HousingPaymentPlan.Date)} DESC");
         }

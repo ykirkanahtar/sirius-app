@@ -13,6 +13,7 @@ namespace Sirius.HousingPaymentPlans.Dto
             HousingPaymentPlanTypesFilter = new List<HousingPaymentPlanType>();
         }
         public Guid HousingId { get; set; }
+        public Guid? PeriodId { get; set; }
         public DateTime? StartDateFilter { get; set; }
         public DateTime? EndDateFilter { get; set; }
         public List<Guid> PaymentCategoriesFilter { get; set; }

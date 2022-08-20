@@ -316,7 +316,7 @@
                   >
                 </td>
                 <td>{{ accountBook.housingName }}</td>
-                <td>{{ accountBook.amount | number: "1.2-2" }}</td>
+                <td class="text-right">{{ accountBook.amount | number: "1.2-2" }}</td>
                 <td>
                   <span *ngIf="accountBook.fromPaymentAccountName.length > 0">
                     {{ accountBook.fromPaymentAccountName }} /
@@ -367,6 +367,13 @@
                     {{ "Delete" | localize }}
                   </button>
                 </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                  <td colspan="3"></td>
+                  <td class="text-right">{{ balance | number: "1.2-2" }}</td>
+                  <td colspan="4"></td>
               </tr>
             </ng-template>
           </p-table>
