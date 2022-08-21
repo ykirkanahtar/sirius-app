@@ -382,9 +382,13 @@
     <text name="TransferBalance">Devir bakiyesi</text>
     <text name="TransferBetweenAccounts">Hesaplararası transfer</text>
     <text name="TransferDate">Devir tarihi</text>
+    <text name="TransferForHousingDuePaymentFromPreviousPeriod">Önceki dönemden devir</text>
+    <text name="TransferForHousingDuePaymentToNextPeriod">Sonraki döneme devir</text>
     <text name="TransferForPaymentAccount">Ödeme hesabı devir</text>
     <text name="TransferForRegularHousingDue">Aidat hesabı devir</text>
     <text name="TransferFromThePreviousPeriod">Devir</text>
+    <text name="TransferFromPreviousPeriod">Önceki dönemden devir</text>
+    <text name="TransferToNextPeriod">Sonraki döneme devir</text>
     <text name="true">Evet</text>
     <text name="UncheckTenantIsResidingText">Kiracı oturuyor seçeneği kaldırılırsa, bu konut için kiracı olarak tanımlanmış kişi tanımları da silinir.</text>
     <text name="UpdateNewPaymentCategory">Ödeme Kategorisini Güncelle</text>

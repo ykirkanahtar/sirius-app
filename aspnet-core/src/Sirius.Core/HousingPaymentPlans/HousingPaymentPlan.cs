@@ -29,8 +29,9 @@ namespace Sirius.HousingPaymentPlans
         public string Description { get; private set; }
         public Guid? AccountBookId { get; private set; }
         public Guid? TransferFromPaymentCategoryId { get; private set; }
-        public ResidentOrOwner? FirstHousingDueTransferIsResidentOrOwner { get; private set; } 
-        
+        public ResidentOrOwner? FirstHousingDueTransferIsResidentOrOwner { get; private set; }
+        public Guid PeriodId { get; private set; }
+
         [ForeignKey(nameof(PaymentCategoryId))]
         public virtual PaymentCategory PaymentCategory { get; protected set; }
 
@@ -38,28 +39,33 @@ namespace Sirius.HousingPaymentPlans
         public virtual PaymentCategory TransferFromPaymentCategory { get; protected set; }
 
         public static HousingPaymentPlan CreateDebt(Guid id, int tenantId,
-            [CanBeNull] HousingPaymentPlanGroup housingPaymentPlanGroup, Housing housing, ResidentOrOwner residentOrOwner,
+            [CanBeNull] HousingPaymentPlanGroup housingPaymentPlanGroup, Housing housing,
+            ResidentOrOwner residentOrOwner,
             [CanBeNull] PaymentCategory paymentCategory, DateTime date, decimal amount, string description,
             HousingPaymentPlanType housingPaymentPlanType,
             [CanBeNull] PaymentCategory transferFromPaymentCategory,
-            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner) //tanımlanacak aidatlar
+            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner,
+            Guid periodId) //tanımlanacak aidatlar
         {
             return BindEntity(new HousingPaymentPlan(), id, tenantId, housingPaymentPlanGroup?.Id,
                 CreditOrDebt.Debt, housing.Id, residentOrOwner, paymentCategory?.Id, date, amount, description, null,
-                housingPaymentPlanType, transferFromPaymentCategory?.Id, firstHousingDueTransferIsResidentOrOwner);
+                housingPaymentPlanType, transferFromPaymentCategory?.Id, firstHousingDueTransferIsResidentOrOwner,
+                periodId);
         }
 
-        public static HousingPaymentPlan CreateCredit(Guid id, int tenantId, 
-            Housing housing, ResidentOrOwner residentOrOwner, [CanBeNull] PaymentCategory paymentCategory, DateTime date, decimal amount,
+        public static HousingPaymentPlan CreateCredit(Guid id, int tenantId,
+            Housing housing, ResidentOrOwner residentOrOwner, [CanBeNull] PaymentCategory paymentCategory,
+            DateTime date, decimal amount,
             string description,
             [CanBeNull] AccountBook accountBook, HousingPaymentPlanType housingPaymentPlanType,
             [CanBeNull] PaymentCategory transferFromPaymentCategory,
-            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner) //tahsil edilen aidatlar
+            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner,
+            Guid periodId) //tahsil edilen aidatlar
         {
             return BindEntity(new HousingPaymentPlan(), id, tenantId, null,
                 CreditOrDebt.Credit, housing.Id, residentOrOwner,
                 paymentCategory?.Id, date, amount, description, accountBook?.Id, housingPaymentPlanType,
-                transferFromPaymentCategory?.Id, firstHousingDueTransferIsResidentOrOwner);
+                transferFromPaymentCategory?.Id, firstHousingDueTransferIsResidentOrOwner, periodId);
         }
 
         internal static HousingPaymentPlan Update(HousingPaymentPlan existingHousingPaymentPlan, DateTime date,
@@ -67,32 +73,37 @@ namespace Sirius.HousingPaymentPlans
         {
             return BindEntity(existingHousingPaymentPlan, existingHousingPaymentPlan.Id,
                 existingHousingPaymentPlan.TenantId, existingHousingPaymentPlan.HousingPaymentPlanGroupId,
-                existingHousingPaymentPlan.CreditOrDebt, existingHousingPaymentPlan.HousingId, existingHousingPaymentPlan.ResidentOrOwner,
+                existingHousingPaymentPlan.CreditOrDebt, existingHousingPaymentPlan.HousingId,
+                existingHousingPaymentPlan.ResidentOrOwner,
                 existingHousingPaymentPlan.PaymentCategoryId, date, amount,
                 description, existingHousingPaymentPlan.AccountBookId,
                 existingHousingPaymentPlan.HousingPaymentPlanType,
-                existingHousingPaymentPlan.TransferFromPaymentCategoryId, 
-                existingHousingPaymentPlan.FirstHousingDueTransferIsResidentOrOwner);
+                existingHousingPaymentPlan.TransferFromPaymentCategoryId,
+                existingHousingPaymentPlan.FirstHousingDueTransferIsResidentOrOwner,
+                existingHousingPaymentPlan.PeriodId);
         }
 
-        public static HousingPaymentPlan UpdateForFirstHousingDueTransfer(HousingPaymentPlan existingHousingPaymentPlan, 
+        public static HousingPaymentPlan UpdateForFirstHousingDueTransfer(HousingPaymentPlan existingHousingPaymentPlan,
             ResidentOrOwner residentOrOwner, decimal amount, bool isDebt, DateTime date, string description)
         {
             return BindEntity(existingHousingPaymentPlan, existingHousingPaymentPlan.Id,
                 existingHousingPaymentPlan.TenantId, existingHousingPaymentPlan.HousingPaymentPlanGroupId,
-                isDebt  ? CreditOrDebt.Debt : CreditOrDebt.Credit, existingHousingPaymentPlan.HousingId, residentOrOwner,
+                isDebt ? CreditOrDebt.Debt : CreditOrDebt.Credit, existingHousingPaymentPlan.HousingId, residentOrOwner,
                 existingHousingPaymentPlan.PaymentCategoryId, date, amount,
                 description, existingHousingPaymentPlan.AccountBookId,
                 existingHousingPaymentPlan.HousingPaymentPlanType,
-                existingHousingPaymentPlan.TransferFromPaymentCategoryId, 
-                residentOrOwner);
+                existingHousingPaymentPlan.TransferFromPaymentCategoryId,
+                residentOrOwner,
+                existingHousingPaymentPlan.PeriodId);
         }
 
         private static HousingPaymentPlan BindEntity(HousingPaymentPlan housingPaymentPlan, Guid id, int tenantId,
-            Guid? housingPaymentPlanGroupId, CreditOrDebt creditOrDebt, Guid housingId, ResidentOrOwner residentOrOwner, Guid? paymentCategoryId,
+            Guid? housingPaymentPlanGroupId, CreditOrDebt creditOrDebt, Guid housingId, ResidentOrOwner residentOrOwner,
+            Guid? paymentCategoryId,
             DateTime date, decimal amount, string description, Guid? accountBookId,
-            HousingPaymentPlanType housingPaymentPlanType, Guid? transferFromPaymentCategoryId, 
-            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner)
+            HousingPaymentPlanType housingPaymentPlanType, Guid? transferFromPaymentCategoryId,
+            ResidentOrOwner? firstHousingDueTransferIsResidentOrOwner,
+            Guid periodId)
         {
             housingPaymentPlan ??= new HousingPaymentPlan();
 
@@ -110,7 +121,8 @@ namespace Sirius.HousingPaymentPlans
             housingPaymentPlan.HousingPaymentPlanType = housingPaymentPlanType;
             housingPaymentPlan.TransferFromPaymentCategoryId = transferFromPaymentCategoryId;
             housingPaymentPlan.FirstHousingDueTransferIsResidentOrOwner = firstHousingDueTransferIsResidentOrOwner;
-            
+            housingPaymentPlan.PeriodId = periodId;
+
             return housingPaymentPlan;
         }
 

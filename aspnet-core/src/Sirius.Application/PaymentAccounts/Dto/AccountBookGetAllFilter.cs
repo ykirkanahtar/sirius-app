@@ -13,6 +13,8 @@ namespace Sirius.AccountBooks.Dto
             FromPaymentAccountIds = new List<Guid>();
             ToPaymentAccountIds = new List<Guid>();
         }
+
+        public Guid? PeriodId { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<Guid> PaymentCategoryIds { get; set; }

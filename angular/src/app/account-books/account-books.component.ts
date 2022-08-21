@@ -84,6 +84,8 @@ export class AccountBooksComponent
   display: boolean = false;
   closeDialog: boolean = false;
 
+  balance: number = 0;
+
   responsiveOptions2: any[] = [
     {
       breakpoint: "1500px",
@@ -327,6 +329,7 @@ export class AccountBooksComponent
   ): void {
     this._accountBooksService
       .getAllList(
+        undefined,
         this.startDateFilter,
         this.endDateFilter,
         this.selectedPaymentCategoriesFilter,
@@ -345,6 +348,7 @@ export class AccountBooksComponent
       )
       .subscribe((result: PagedAccountBookResultDto) => {
         this.accountBooks = result.items;
+        this.balance = result.balance;
         this.lastAccountBookProcessDate = result.lastAccountBookDate;
         this.showPaging(result, pageNumber);
       });
@@ -353,6 +357,7 @@ export class AccountBooksComponent
   exportExcel() {
     this._accountBooksService
       .getAllListForExport(
+        undefined,
         this.startDateFilter,
         this.endDateFilter,
         this.selectedPaymentCategoriesFilter,

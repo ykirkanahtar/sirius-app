@@ -20,6 +20,7 @@ import {
   LookUpDto,
   PaymentCategoryServiceProxy,
   HousingPaymentPlanExportOutput,
+  PagedHousingPaymentPlanResultDto,
 } from "@shared/service-proxies/service-proxies";
 import { PagedRequestDto } from "@shared/paged-listing-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
@@ -49,6 +50,7 @@ export class AccountActivitiesDialogComponent
   skipCount: number;
   maxResultCount: number;
   totalRecords: number;
+  balance: number;
   isTableLoading: boolean = false;
 
   housingPaymentPlans: HousingPaymentPlanDto[] = [];
@@ -72,6 +74,9 @@ export class AccountActivitiesDialogComponent
   startDateFilter: moment.Moment;
   endDateFilter: moment.Moment;
 
+  data: any;
+  barOptions: any;
+
   constructor(
     injector: Injector,
     private _housingService: HousingServiceProxy,
@@ -83,6 +88,26 @@ export class AccountActivitiesDialogComponent
   }
 
   ngOnInit(): void {
+
+    this.barOptions = {
+      responsive: true,
+      tooltips: {
+        mode: 'index',
+        intersect: true,
+      },
+      scales: {
+        yAxes: [
+          {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            id: 'y-axis-1',
+            ticks: { min: 0 },
+          },
+        ],
+      },
+    };
+
     this._housingService.get(this.id).subscribe((result: HousingDto) => {
       this.housing = result;
       this.block = this.housing.block;
@@ -162,6 +187,7 @@ export class AccountActivitiesDialogComponent
     this._housingPaymentPlanService
       .getAllByHousingId(
         this.id,
+        undefined,
         this.startDateFilter,
         this.endDateFilter,
         this.selectedPaymentCategoriesFilter,
@@ -171,17 +197,42 @@ export class AccountActivitiesDialogComponent
         this.skipCount,
         this.maxResultCount
       )
-      .subscribe((result: HousingPaymentPlanDtoPagedResultDto) => {
+      .subscribe((result: PagedHousingPaymentPlanResultDto) => {
         this.housingPaymentPlans = result.items;
+
+        this.data = {
+          labels: ['Aidatlar'],
+          datasets: [
+              {
+                label: 'Aidat tanımı',
+                backgroundColor: '#9CCC65',
+                borderColor: '#7CB342',
+                data: [result.debtBalance]
+              },
+              {
+                  label: 'Aidat ödemesi',
+                  backgroundColor: '#42A5F5',
+                  borderColor: '#1E88E5',
+                  data: [result.creditBalance]
+              }
+          ]
+        };
+
+        this.balance = result.balance;
         this.totalRecords = result.totalCount;
         this.isTableLoading = false;
       });
+  }
+
+  getAmount(amount: number, creditOrDebt: CreditOrDebt): number {
+    return creditOrDebt == CreditOrDebt.Credit ? amount * -1 : amount;
   }
 
   exportExcel() {
     this._housingPaymentPlanService
       .getAllByHousingIdForExport(
         this.id,
+        undefined,
         this.startDateFilter,
         this.endDateFilter,
         this.selectedPaymentCategoriesFilter,
