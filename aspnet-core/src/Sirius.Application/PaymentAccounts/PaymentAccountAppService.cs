@@ -10,6 +10,7 @@ using Abp.Domain.Repositories;
 using Abp.EntityFrameworkCore;
 using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
+using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sirius.EntityFrameworkCore;
@@ -116,7 +117,7 @@ namespace Sirius.PaymentAccounts
             var existingPaymentAccount = await _paymentAccountRepository.GetAsync(input.Id);
             var paymentAccount = PaymentAccount.Update(existingPaymentAccount, input.AccountName, input.Description,
                 input.PersonId, input.EmployeeId, input.TenantIsOwner, existingPaymentAccount.Balance,
-                input.AllowNegativeBalance, input.Iban);
+                input.AllowNegativeBalance, input.IsActive, input.Iban);
 
             var activePeriod = await _periodManager.GetActivePeriod();
             var firstAccountBookInActivePeriod =
@@ -144,7 +145,7 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
 
-            var query = _paymentAccountRepository.GetAll();
+            var query = _paymentAccountRepository.GetAll().Where(p => p.IsActive);
 
             var paymentAccounts = await query.OrderBy(input.Sorting ?? $"{nameof(PaymentAccountDto.AccountName)}")
                 .PageBy(input)
@@ -158,7 +159,9 @@ namespace Sirius.PaymentAccounts
         {
             CheckGetAllPermission();
 
-            var paymentAccounts = await _paymentAccountRepository.GetAll().OrderBy(p => p.AccountName).ToListAsync();
+            var paymentAccounts = await _paymentAccountRepository.GetAll()
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.AccountName).ToListAsync();
 
             return
                 (from l in paymentAccounts

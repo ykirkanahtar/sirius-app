@@ -19,5 +19,6 @@ namespace Sirius.PaymentAccounts.Dto
         public DateTime? FirstTransferDateTime { get; set; }
         public decimal? TransferAmount { get; set; }
         public bool AllowNegativeBalance { get; set; }
+        public bool IsActive { get; set; }
     }
 }
