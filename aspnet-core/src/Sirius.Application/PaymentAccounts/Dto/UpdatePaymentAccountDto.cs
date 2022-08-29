@@ -14,5 +14,6 @@ namespace Sirius.PaymentAccounts.Dto
         public string Iban { get; set; }
         public bool TenantIsOwner { get; set; }
         public bool AllowNegativeBalance { get; set; }
+        public bool IsActive { get; set; }
     }
 }
