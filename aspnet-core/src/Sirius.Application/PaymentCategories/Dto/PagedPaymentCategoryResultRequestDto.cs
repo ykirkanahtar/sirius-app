@@ -5,5 +5,6 @@ namespace Sirius.PaymentCategories.Dto
     public class PagedPaymentCategoryResultRequestDto : PagedAndSortedResultRequestDto
     {
         public string PaymentCategoryName { get; set; }
+        public bool IsPassive { get; set; }
     }
 }

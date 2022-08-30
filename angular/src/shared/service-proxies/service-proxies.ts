@@ -5255,15 +5255,20 @@ export class PaymentCategoryServiceProxy {
 
     /**
      * @param paymentCategoryName (optional) 
+     * @param isPassive (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(paymentCategoryName: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PaymentCategoryDtoPagedResultDto> {
+    getAll(paymentCategoryName: string | null | undefined, isPassive: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PaymentCategoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/PaymentCategory/GetAll?";
         if (paymentCategoryName !== undefined)
             url_ += "PaymentCategoryName=" + encodeURIComponent("" + paymentCategoryName) + "&";
+        if (isPassive === null)
+            throw new Error("The parameter 'isPassive' cannot be null.");
+        else if (isPassive !== undefined)
+            url_ += "IsPassive=" + encodeURIComponent("" + isPassive) + "&";
         if (sorting !== undefined)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -10462,6 +10467,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
     paymentCategoryType: PaymentCategoryType;
     defaultFromPaymentAccountName: string | undefined;
     defaultToPaymentAccountName: string | undefined;
+    isActive: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -10490,6 +10496,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
             this.paymentCategoryType = _data["paymentCategoryType"];
             this.defaultFromPaymentAccountName = _data["defaultFromPaymentAccountName"];
             this.defaultToPaymentAccountName = _data["defaultToPaymentAccountName"];
+            this.isActive = _data["isActive"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -10518,6 +10525,7 @@ export class PaymentCategoryDto implements IPaymentCategoryDto {
         data["paymentCategoryType"] = this.paymentCategoryType;
         data["defaultFromPaymentAccountName"] = this.defaultFromPaymentAccountName;
         data["defaultToPaymentAccountName"] = this.defaultToPaymentAccountName;
+        data["isActive"] = this.isActive;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -10546,6 +10554,7 @@ export interface IPaymentCategoryDto {
     paymentCategoryType: PaymentCategoryType;
     defaultFromPaymentAccountName: string | undefined;
     defaultToPaymentAccountName: string | undefined;
+    isActive: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

@@ -20,5 +20,6 @@ namespace Sirius.PaymentCategories.Dto
         
         public string DefaultFromPaymentAccountName { get; set; }
         public string DefaultToPaymentAccountName { get; set; }
+        public bool IsActive { get; set; }
     }
 }

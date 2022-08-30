@@ -40,6 +40,7 @@ export class PaymentCategoriesComponent
 
   paymentCategoriesFilter: string[] = [];
   selectedPaymentCategoryFilter: string;
+  isPassive: boolean;
 
   constructor(
     injector: Injector,
@@ -118,6 +119,7 @@ export class PaymentCategoriesComponent
     this._paymentCategoryService
       .getAll(
         this.selectedPaymentCategoryFilter,
+        this.isPassive,
         this.sortingColumn,
         request.skipCount,
         request.maxResultCount
