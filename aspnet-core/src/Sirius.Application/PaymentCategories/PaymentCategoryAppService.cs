@@ -128,7 +128,7 @@ namespace Sirius.PaymentCategories
                 from subFpa in fpa.DefaultIfEmpty()
                 join tpa in _paymentAccountRepository.GetAll() on pc.DefaultToPaymentAccountId equals tpa.Id into tpa
                 from subTpa in tpa.DefaultIfEmpty()
-                where pc.IsActive
+                where pc.IsActive == !input.IsPassive
                 select new PaymentCategoryDto
                 {
                     Id = pc.Id,

@@ -34,39 +34,46 @@
             ></abp-validation-summary>
           </div>
         </div>
-        <!-- <div class="form-group row required" *ngIf="paymentCategory.housingDueType">
-          <label class="col-md-3 col-form-label" for="paymentCategoryName">
-            {{ "AdditionalHousingDueType" | localize }}
-          </label>
-          <div class="col-md-9">
-            <div class="p-field-radiobutton mb-1">
-              <p-radioButton
-                name="housingDueType"
-                [value]="HousingDueTypeEnum.AdditionalHousingDueForResident"
-                [(ngModel)]="paymentCategory.housingDueType"
-                inputId="housingDueForResident"
-                required
-                disabled
-              ></p-radioButton>
-              <label class="mb-0 ml-3" for="housingDueTypeForResident">{{
-                "AdditionalHousingDueForResident" | localize
-              }}</label>
-            </div>
-            <div class="p-field-radiobutton">
-              <p-radioButton
-                name="housingDueType"
-                [value]="HousingDueTypeEnum.AdditionalHousingDueForOwner"
-                [(ngModel)]="paymentCategory.housingDueType"
-                inputId="housingDueTypeForOwner"
-                required
-                disabled
-              ></p-radioButton>
-              <label class="mb-0 ml-3" for="housingDueTypeForOwner">{{
-                "AdditionalHousingDueForOwner" | localize
-              }}</label>
-            </div>
+          <div class="form-group row mb-0">
+              <label class="col-md-3 col-form-label">
+                  {{ "IsValidForAllPeriods" | localize }}
+              </label>
+              <div class="col-md-9">
+                  <div class="custom-control custom-checkbox">
+                      <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="isValidForAllPeriods"
+                              id="isValidForAllPeriods"
+                              [(ngModel)]="paymentCategory.isValidForAllPeriods"
+                      />
+                      <label
+                              class="custom-control-label mt-2"
+                              for="isValidForAllPeriods"
+                      ></label>
+                  </div>
+              </div>
           </div>
-        </div>         -->
+          <div class="form-group row mb-0">
+              <label class="col-md-3 col-form-label">
+                  {{ "IsActive" | localize }}
+              </label>
+              <div class="col-md-9">
+                  <div class="custom-control custom-checkbox">
+                      <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="isActive"
+                              id="isActive"
+                              [(ngModel)]="paymentCategory.isActive"
+                      />
+                      <label
+                              class="custom-control-label mt-2"
+                              for="isActive"
+                      ></label>
+                  </div>
+              </div>
+          </div>
         <div
           class="form-group row required"
           *ngIf="
