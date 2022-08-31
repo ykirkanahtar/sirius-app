@@ -27,14 +27,15 @@ namespace Sirius.Reports
         private readonly IRepository<HousingPaymentPlan, Guid> _housingPaymentPlanRepository;
         private readonly IRepository<Block, Guid> _blockRepository;
         private readonly IRepository<AccountBook, Guid> _accountBookRepository;
-        private readonly IRepository<Period, Guid> _periodRepository;
         private readonly IRepository<Tenant> _tenantRepository;
+        private readonly IPeriodManager _periodManager;
 
         public ReportAppService(IRepository<PaymentAccount, Guid> paymentAccountRepository,
             IRepository<Housing, Guid> housingRepository, IRepository<PaymentCategory, Guid> paymentCategoryRepository,
             IRepository<HousingPaymentPlan, Guid> housingPaymentPlanRepository,
             IRepository<Block, Guid> blockRepository, IRepository<AccountBook, Guid> accountBookRepository,
-            IRepository<Period, Guid> periodRepository, IRepository<Tenant> tenantRepository)
+            IRepository<Tenant> tenantRepository,
+            IPeriodManager periodManager)
         {
             _paymentAccountRepository = paymentAccountRepository;
             _housingRepository = housingRepository;
@@ -42,23 +43,25 @@ namespace Sirius.Reports
             _housingPaymentPlanRepository = housingPaymentPlanRepository;
             _blockRepository = blockRepository;
             _accountBookRepository = accountBookRepository;
-            _periodRepository = periodRepository;
             _tenantRepository = tenantRepository;
+            _periodManager = periodManager;
         }
 
         public async Task<DashboardDto> GetDashboardData()
         {
             var dashboardDto = new DashboardDto();
 
-            dashboardDto.PaymentAccounts = await _paymentAccountRepository.GetAll().Select(p =>
-                new PaymentAccountDashboardDto
-                {
-                    PaymentAccountName = p.AccountName,
-                    Balance = p.Balance
-                }).OrderByDescending(p => p.Balance).ToListAsync();
+            dashboardDto.PaymentAccounts = await _paymentAccountRepository.GetAll()
+                .Where(p => p.IsActive)
+                .Select(p =>
+                    new PaymentAccountDashboardDto
+                    {
+                        PaymentAccountName = p.AccountName,
+                        Balance = p.Balance
+                    }).OrderByDescending(p => p.Balance).ToListAsync();
 
             var currentPeriod =
-                await _periodRepository.GetAll().OrderByDescending(p => p.StartDate).FirstOrDefaultAsync();
+                await _periodManager.GetActivePeriod();
 
             if (currentPeriod != null)
             {
@@ -83,8 +86,7 @@ namespace Sirius.Reports
                 };
 
                 var housingDueQuery = from ab in _accountBookRepository.GetAll()
-                    join p in _periodRepository.GetAll() on ab.PeriodId equals p.Id
-                    where p.IsActive &&
+                    where ab.PeriodId == currentPeriod.Id &&
                           (ab.AccountBookType == AccountBookType.HousingDue || ab.AccountBookType ==
                               AccountBookType.OtherPaymentWithNettingForHousingDue)
                     select ab;
@@ -166,19 +168,16 @@ namespace Sirius.Reports
 
         public async Task<FinancialStatementDto> GetFinancialStatement()
         {
-            var activePeriod = await _periodRepository.GetAll()
-                .Where(p => p.IsActive)
-                .SingleAsync();
+            var activePeriod = await _periodManager.GetActivePeriod();
 
             var accountBooksQuery = from ab in _accountBookRepository.GetAll()
-                join p in _periodRepository.GetAll() on ab.PeriodId equals p.Id
                 join fpa in _paymentAccountRepository.GetAll() on ab.FromPaymentAccountId equals fpa.Id into nullableFpa
                 from fpa in nullableFpa.DefaultIfEmpty()
                 join tpa in _paymentAccountRepository.GetAll() on ab.ToPaymentAccountId equals tpa.Id into nullableTpa
                 from tpa in nullableTpa.DefaultIfEmpty()
                 join pc in _paymentCategoryRepository.GetAll() on ab.PaymentCategoryId equals pc.Id into nullablePc
                 from pc in nullablePc.DefaultIfEmpty()
-                where p.IsActive && ab.IsDeleted == false
+                where ab.PeriodId == activePeriod.Id && ab.IsDeleted == false
                 select new
                 {
                     AccountBook = ab,
@@ -189,10 +188,10 @@ namespace Sirius.Reports
 
             var incomes = await accountBooksQuery
                 .Where(p => p.AccountBook.AccountBookType == AccountBookType.HousingDue ||
-                             p.AccountBook.AccountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue ||
-                             (p.AccountBook.AccountBookType == AccountBookType.Other &&
-                              p.PaymentCategory.PaymentCategoryType == PaymentCategoryType.Income))
-                    .ToListAsync();
+                            p.AccountBook.AccountBookType == AccountBookType.OtherPaymentWithNettingForHousingDue ||
+                            (p.AccountBook.AccountBookType == AccountBookType.Other &&
+                             p.PaymentCategory.PaymentCategoryType == PaymentCategoryType.Income))
+                .ToListAsync();
 
             var housingDueTotal = incomes.Where(p => p.AccountBook.AccountBookType == AccountBookType.HousingDue ||
                                                      p.AccountBook.AccountBookType ==
