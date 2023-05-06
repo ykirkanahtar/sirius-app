@@ -396,6 +396,6 @@
     <text name="UploadFileWarning">Kaydet butonuna basana kadar yaptığınız işlemler kaydedilmeyecektir.</text>
     <text name="UploadNewFile">Yeni dosya yükle</text>
     <text name="UsersActivation">Kullanıcı aktivasyonu</text>
-    <text name="WorkerWarmingFee">Görevli ısınma ödemesii</text>
+    <text name="WorkerWarmingFee">Görevli ısınma ödemesi</text>
   </texts>
 </localizationDictionary>
