@@ -6,6 +6,7 @@ using Sirius.Authorization.Roles;
 using Sirius.Authorization.Users;
 using Sirius.MultiTenancy;
 using Microsoft.Extensions.Logging;
+using Abp.Domain.Uow;
 
 namespace Sirius.Identity
 {
@@ -15,8 +16,9 @@ namespace Sirius.Identity
             IOptions<SecurityStampValidatorOptions> options,
             SignInManager signInManager,
             ISystemClock systemClock,
-            ILoggerFactory loggerFactory) 
-            : base(options, signInManager, systemClock, loggerFactory)
+            ILoggerFactory loggerFactory,
+            IUnitOfWorkManager unitOfWorkManager)
+            : base(options, signInManager, systemClock, loggerFactory, unitOfWorkManager)
         {
         }
     }

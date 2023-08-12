@@ -1,7 +1,7 @@
-﻿using Abp.Dependency;
-using Abp.Localization;
+﻿using Abp.Localization;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
+using Abp.Runtime.Security;
 using Abp.Timing;
 using Abp.Zero;
 using Abp.Zero.Configuration;
@@ -10,7 +10,6 @@ using Sirius.Authorization.Users;
 using Sirius.Configuration;
 using Sirius.Localization;
 using Sirius.MultiTenancy;
-using Sirius.PaymentAccounts;
 using Sirius.Timing;
 
 namespace Sirius
@@ -38,6 +37,9 @@ namespace Sirius
             Configuration.Settings.Providers.Add<AppSettingProvider>();
             
             Configuration.Localization.Languages.Add(new LanguageInfo("fa", "فارسی", "famfamfam-flags ir"));
+            
+            Configuration.Settings.SettingEncryptionConfiguration.DefaultPassPhrase = SiriusConsts.DefaultPassPhrase;
+            SimpleStringCipher.DefaultPassPhrase = SiriusConsts.DefaultPassPhrase;
         }
 
         public override void Initialize()

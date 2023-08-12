@@ -47,7 +47,7 @@ export class HousingPaymentPlanGroupsComponent
   housingCategoriesFilter: SelectItem[] = [];
   selectedHousingCategoriesFilter: string[] = [];
 
-  housingsFilters: SelectItem[] = [];
+  housingsFilters: LookUpDto[] = [];
   selectedHousingsFilters: string[] = [];
 
   peopleFilters: SelectItem[] = [];

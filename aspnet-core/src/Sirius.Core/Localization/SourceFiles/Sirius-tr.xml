@@ -30,6 +30,7 @@
     <text name="SavedSuccessfully" value="Başarıyla kaydedildi" />
     <text name="CreateNewTenant" value="Yeni müşteri oluştur" />
     <text name="AdminEmailAddress" value="Yönetici e-posta adresi" />
+    <text name="AdminPassword" value="Yönetici şifresi" />
     <text name="Save" value="Kaydet" />
     <text name="Cancel" value="İptal" />
     <text name="TenantName_Regex_Description" value="Müşteri adı en az 2 karakter olmalı, bir harfle başlamalı ve harf, rakam, tire ya da alt çizgi ile devam etmelidir." />

@@ -250,3 +250,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+src/Sirius.Web.Mvc/secrets.json
+src/Sirius.Web.Host/secrets.json
+src/Sirius.Migrator/secrets.json

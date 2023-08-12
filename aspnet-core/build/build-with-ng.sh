@@ -1,14 +1,14 @@
+#!/bin/bash
 echo " Welcome to docker build"
 echo ""
 echo ""
 
-$ABP_HOST="abp/host"
-$ABP_HOST_DOCKERFILE_PATH="src/Sirius.Web.Host/Dockerfile"
-$ABP_NG="abp/ng"
+ABP_HOST="abp/host"
+ABP_NG="abp/ng"
 
 cd ..
 echo " Building docker image $ABP_HOST..."
-docker build -t $ABP_HOST -f $ABP_HOST_DOCKERFILE_PATH . 
+docker build -t $ABP_HOST .
 echo " Done. -- Building docker image $ABP_HOST..."
 echo ""
 echo ""

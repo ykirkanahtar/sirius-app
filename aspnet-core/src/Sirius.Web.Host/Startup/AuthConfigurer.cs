@@ -71,7 +71,7 @@ namespace Sirius.Web.Host.Startup
             }
 
             // Set auth token from cookie
-            context.Token = SimpleStringCipher.Instance.Decrypt(qsAuthToken, AppConsts.DefaultPassPhrase);
+            context.Token = SimpleStringCipher.Instance.Decrypt(qsAuthToken);
             return Task.CompletedTask;
         }
     }
